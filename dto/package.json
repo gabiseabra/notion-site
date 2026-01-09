@@ -1,0 +1,24 @@
+{
+  "name": "@notion-site/dto",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    "./*": {
+      "types": "./src/*",
+      "default": "./dist/*"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@orpc/contract": "^1.13.2",
+    "typescript": "^5.2.2"
+  }
+}

@@ -1,0 +1,10 @@
+/* Global SCSS styles for the frontend application. You can add variables,
+ * mixins and resets here. Stylesheets imported from SCSS modules will be
+ * automatically scoped to their components. */
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f7f7f7;
+  color: #333;
+}

@@ -1,0 +1,5 @@
+.idea
+api/.env
+node_modules
+dist
+tsconfig.tsbuildinfo

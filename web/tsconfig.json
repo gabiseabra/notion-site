@@ -1,0 +1,22 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "target": "ES2019",
+    "module": "NodeNext",
+    "rootDir": "src",
+    "moduleResolution": "NodeNext",
+    "types": [
+      "vite/client"
+    ],
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
