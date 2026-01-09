@@ -2,15 +2,16 @@
   "name": "@gabiseabra/notion-site",
   "private": true,
   "version": "0.1.0",
-      "description": "Notion‑backed blog with API contracts, api server and web application.",    "workspaces": [
-        "api",
-        "web",
-        "dto"
-    ],
-    "scripts": {
-        "build": "npm run build -w dto && npm run build -w api && npm run build -w web",
-        "start": "npm run start -w api",
-        "dev": "concurrently \"npm run dev -w api\" \"npm run dev -w web\"",
+  "description": "Notion‑backed blog with API contracts, api server and web application.",
+  "workspaces": [
+    "api",
+    "web",
+    "dto"
+  ],
+  "scripts": {
+    "build": "npm run build -w dto && npm run build -w api && npm run build -w web",
+    "start": "npm run start -w api",
+    "dev": "concurrently \"npm run dev -w api\" \"npm run dev -w web\"",
     "lint": "eslint . --ext .ts,.tsx"
   },
   "engines": {

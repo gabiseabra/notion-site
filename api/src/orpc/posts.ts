@@ -1,6 +1,6 @@
 import { implement } from "@orpc/server";
 import { api } from "@notion-site/dto/orpc/index.js";
-import { getPosts } from "@api/services/notion.js";
+import { getPosts } from "@api/services/notion/posts.js";
 
 const c = implement(api.posts);
 
