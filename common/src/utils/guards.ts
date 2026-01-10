@@ -2,6 +2,12 @@ export function isNonNullable<T>(value: T): value is NonNullable<T> {
   return value !== null && value !== undefined;
 }
 
+export function isTruthy<T>(
+  value: T,
+): value is Exclude<T, null | undefined | false | "" | 0> {
+  return !!value;
+}
+
 export function hasNonNullableProperty<T, K extends keyof T>(key: K) {
   return (obj: T): obj is T & { [key in K]: NonNullable<T[K]> } =>
     isNonNullable(obj[key]);

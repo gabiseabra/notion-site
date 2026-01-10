@@ -6,8 +6,6 @@ export const GetBlogPostsInput = z.object({
   query: z.string(),
   after: z.string().optional(),
   tags: z.string().array().optional(),
-  minDate: z.date().optional(),
-  maxDate: z.date().optional(),
 });
 export type GetBlogPostsInput = z.infer<typeof GetBlogPostsInput>;
 
@@ -28,7 +26,7 @@ export const blogPosts = oc.prefix("/blog-posts").router({
 
   getBlogPost: oc
     .route({})
-    .input(z.object({ name: z.string() }))
+    .input(z.object({ id: z.string() }))
     .errors({
       NOT_FOUND: {
         message: "Blog post not found",

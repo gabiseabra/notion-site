@@ -1,35 +1,7 @@
-import { Link } from "react-router";
-import { useOrpc } from "../providers/OrpcProvider.js";
-import { useQuery } from "@tanstack/react-query";
-import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
+import { LoaderFunctionArgs, redirect } from "react-router";
 
 export const path = "/";
-export const index = true;
 
-export function Component() {
-  const orpc = useOrpc();
-  const blogPostsQuery = useQuery(
-    orpc.blogPosts.getBlogPosts.queryOptions({
-      input: { query: "" },
-    }),
-  );
-  const posts = blogPostsQuery.data?.posts ?? [];
-
-  return (
-    <section>
-      <h2>All Blog Posts</h2>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.url}>
-            <Link to={`/posts/${post.url}`}>
-              {post.properties.Title.title
-                .filter(hasPropertyValue("type", "text"))
-                .map((title) => title.text.content)
-                .join(" ")}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
+export function loader({}: LoaderFunctionArgs) {
+  throw redirect("/blog");
 }
