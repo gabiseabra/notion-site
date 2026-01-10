@@ -6,10 +6,10 @@
   "workspaces": [
     "api",
     "web",
-    "dto"
+    "common"
   ],
   "scripts": {
-    "build": "npm run build -w dto && npm run build -w api && npm run build -w web",
+    "build": "npm run build -w common && npm run build -w api && npm run build -w web",
     "start": "npm run start -w api",
     "dev": "concurrently \"npm run dev -w api\" \"npm run dev -w web\"",
     "lint": "eslint . --ext .ts,.tsx"
@@ -27,6 +27,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "nodemon": "^3.1.4",
-    "prettier": "^3.7.4"
+    "prettier": "^3.7.4",
+    "typescript": "^5.2.2"
   }
 }

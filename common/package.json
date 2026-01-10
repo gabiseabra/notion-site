@@ -1,5 +1,5 @@
 {
-  "name": "@notion-site/dto",
+  "name": "@notion-site/common",
   "version": "0.1.0",
   "private": true,
   "main": "dist/index.js",
@@ -12,14 +12,12 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "npm run build -- --watch"
+    "build": "tsc -b"
   },
   "dependencies": {
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@orpc/contract": "^1.13.2",
-    "typescript": "^5.2.2"
+    "@orpc/contract": "^1.13.2"
   }
 }

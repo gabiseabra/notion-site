@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { useOrpc } from "../providers/OrpcProvider.js";
 import { useQuery } from "@tanstack/react-query";
-import { hasPropertyValue } from "@notion-site/dto/utils/guards.js";
+import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 
 export const path = "/";
 export const index = true;

@@ -1,5 +1,5 @@
 import { implement } from "@orpc/server";
-import { api } from "@notion-site/dto/orpc/index.js";
+import { api } from "@notion-site/common/dto/orpc/index.js";
 import { getBlogPosts } from "../services/notion/blog-posts.js";
 
 const c = implement(api.blogPosts);

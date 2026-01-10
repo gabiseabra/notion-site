@@ -9,12 +9,12 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json tsconfig.base.json ./
-COPY dto ./dto
+COPY common ./common
 COPY api ./api
 
 RUN npm install
 
-RUN npm run build -w dto -w api
+RUN npm run build -w common -w api
 
 ### Runtime image
 FROM node:18-alpine AS runtime

@@ -1,7 +1,7 @@
 import { Client as NotionClient } from "@notionhq/client";
 import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints.js";
-import { GetBlogPostsInput } from "@notion-site/dto/orpc/blog-posts.js";
-import { BlogPost } from "@notion-site/dto/notion/blog-post.js";
+import { GetBlogPostsInput } from "@notion-site/common/dto/orpc/blog-posts.js";
+import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 
 const siteUrl = process.env.SITE_URL ?? "http://localhost:5173";
 const notionToken = process.env.NOTION_TOKEN;

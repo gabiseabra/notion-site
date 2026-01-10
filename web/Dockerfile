@@ -7,12 +7,12 @@ WORKDIR /app
 # Copy root manifests and workspace packages into the build stage. Copying
 # tsconfig.base.json ensures that TypeScript extends correctly.
 COPY package.json package-lock.json tsconfig.base.json ./
-COPY dto ./dto
+COPY common ./common
 COPY web ./web
 
 RUN npm install
 
-RUN npm run build -w dto -w web
+RUN npm run build -w common -w web
 
 ### Runtime image
 FROM node:18-alpine AS runtime

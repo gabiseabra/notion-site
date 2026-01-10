@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@notion-site/dto": "*",
+    "@notion-site/common": "*",
     "@orpc/client": "^1.13.2",
     "@orpc/tanstack-query": "^1.13.2",
     "@tanstack/query-core": "5.80.2",
@@ -23,7 +23,6 @@
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.4",
     "sass": "^1.69.0",
-    "typescript": "^5.2.2",
     "vite": "^4.4.9"
   }
 }
