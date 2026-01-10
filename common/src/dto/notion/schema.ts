@@ -242,7 +242,7 @@ export const numbered_list_item = z.object({
 
 export const quote = z.object({
   type: z.literal("quote"),
-  numbered_list_item: z.object({
+  quote: z.object({
     rich_text: rich_text_item,
     color: api_color,
   }),

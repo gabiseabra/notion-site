@@ -10,7 +10,7 @@ export function RichText({
   color,
   indent,
 }: {
-  as?: "span" | "h1" | "h2" | "h3" | "h4";
+  as?: "span" | "h1" | "h2" | "h3" | "h4" | "blockquote";
   data: n.rich_text_item;
   color?: n.api_color;
   indent?: number;
