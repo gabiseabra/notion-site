@@ -8,6 +8,7 @@ import {
 } from "@notionhq/client/build/src/api-endpoints.js";
 import { GetBlogPostsInput } from "@notion-site/common/dto/orpc/blog-posts.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
+import * as n from "@notion-site/common/dto/notion/schema.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 
 const siteUrl = process.env.SITE_URL ?? "http://localhost:5173";
@@ -76,7 +77,7 @@ export async function getBlogPost(id: string) {
 }
 
 export async function getBlocks(id: string) {
-  const blocks: BlockObjectResponse[] = [];
+  const blocks: n.block[] = [];
   let cursor = undefined;
 
   do {
@@ -86,13 +87,13 @@ export async function getBlocks(id: string) {
       start_cursor: cursor,
     });
 
-    for (const block of response.results.filter(isBlockObjectResponse)) {
-      // add this block
+    for (const block of response.results
+      .filter(isBlockObjectResponse)
+      .map(parseBlock)) {
       blocks.push(block);
-      // if block has nested children, fetch them too
+
       if (block.has_children) {
-        const nested = await getBlocks(block.id);
-        blocks.push(...nested);
+        blocks.push(...(await getBlocks(block.id)));
       }
     }
 
@@ -100,6 +101,12 @@ export async function getBlocks(id: string) {
   } while (cursor);
 
   return blocks;
+}
+
+function isPageObjectResponse(
+  page: GetPageResponse | GetDatabaseResponse,
+): page is PageObjectResponse {
+  return true;
 }
 
 function parseBlogPost(page: PageObjectResponse): BlogPost {
@@ -115,14 +122,18 @@ function parseBlogPost(page: PageObjectResponse): BlogPost {
   };
 }
 
-function isPageObjectResponse(
-  page: GetPageResponse | GetDatabaseResponse,
-): page is PageObjectResponse {
+function isBlockObjectResponse(
+  block: GetBlockResponse,
+): block is BlockObjectResponse {
   return true;
 }
 
-function isBlockObjectResponse(
-  page: GetBlockResponse,
-): page is BlockObjectResponse {
-  return true;
+function parseBlock(block: BlockObjectResponse): n.block {
+  const result = n.block.safeParse(block);
+
+  if (!result.success) {
+    throw new Error(`Failed to parse block`);
+  }
+
+  return result.data;
 }

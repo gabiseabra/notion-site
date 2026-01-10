@@ -19,12 +19,10 @@ export const blogPosts = c.router({
       getBlocks(input.id),
     ]);
 
-    console.log("!!!", JSON.stringify(blocks, null, 2));
-
     if (!post) {
       throw errors.NOT_FOUND();
     }
 
-    return post;
+    return { ...post, blocks };
   }),
 });
