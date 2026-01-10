@@ -7,10 +7,7 @@
     "declarationMap": true,
     "composite": true,
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "@notion-site/dto/*": [
-      "../dto/*"
-    ]
+    "moduleResolution": "NodeNext"
   },
   "include": [
     "src/**/*"

@@ -1,6 +1,6 @@
 import { oc } from "@orpc/contract";
-import { posts } from "./posts.js";
+import { blogPosts } from "./blog-posts.js";
 
 export const api = oc.router({
-  posts,
+  blogPosts,
 });

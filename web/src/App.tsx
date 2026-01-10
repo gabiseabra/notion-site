@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function App() {
   const orpc = useOrpc();
   const postsQuery = useQuery(
-    orpc.posts.getPosts.queryOptions({
+    orpc.blogPosts.getBlogPosts.queryOptions({
       input: { query: "" },
     }),
   );
