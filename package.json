@@ -30,5 +30,8 @@
     "nodemon": "^3.1.4",
     "prettier": "^3.7.4",
     "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "ts-pattern": "^5.9.0"
   }
 }

@@ -2,7 +2,7 @@ import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useOrpc } from "../../providers/OrpcProvider.js";
 import { RichText } from "../../components/notion/RichText.js";
-import { Blocks } from "../../components/notion/Block.js";
+import { Blocks } from "../../components/notion/Blocks.js";
 
 export const path = "/blog/:url";
 

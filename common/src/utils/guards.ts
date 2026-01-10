@@ -26,6 +26,5 @@ export function hasPropertyValue<
   const K extends keyof T,
   const V extends T[K],
 >(key: K, value: V) {
-  console.log("...");
   return (obj: T): obj is T & { [key in K]: V } => obj[key] === value;
 }

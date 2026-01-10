@@ -74,20 +74,23 @@ export const number = z.object({
   number: z.number().nullable(),
 });
 
+export const annotations = z.object({
+  bold: z.boolean(),
+  italic: z.boolean(),
+  strikethrough: z.boolean(),
+  underline: z.boolean(),
+  code: z.boolean(),
+  color: api_color,
+});
+export type annotations = z.infer<typeof annotations>;
+
 export const text = z.object({
   type: z.literal("text"),
   text: z.object({
     content: z.string(),
     link: z.object({ url: z.string() }).nullable(),
   }),
-  annotations: z.object({
-    bold: z.boolean(),
-    italic: z.boolean(),
-    strikethrough: z.boolean(),
-    underline: z.boolean(),
-    code: z.boolean(),
-    color: z.union([color, background_color]),
-  }),
+  annotations,
 });
 
 export const rich_text_item = z.union([text, mention, equation]).array();
