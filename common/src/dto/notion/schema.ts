@@ -28,7 +28,8 @@ const background_color = z.enum([
   "red_background",
 ]);
 
-const api_color = z.union([color, background_color]);
+export const api_color = z.union([color, background_color]);
+export type api_color = z.infer<typeof api_color>;
 
 // icons
 
@@ -66,8 +67,6 @@ export const icon = z.union([external, emoji, custom_emoji, file]);
 export const mention = z.object({ type: z.literal("mention") });
 export const equation = z.object({ type: z.literal("equation") });
 
-export const unsupported = z.union([mention, equation]);
-
 // property types
 
 export const number = z.object({
@@ -91,7 +90,8 @@ export const text = z.object({
   }),
 });
 
-const rich_text_item = z.union([text, mention, equation]).array();
+export const rich_text_item = z.union([text, mention, equation]).array();
+export type rich_text_item = z.infer<typeof rich_text_item>;
 
 export const rich_text = z.object({
   type: z.literal("rich_text"),
@@ -260,9 +260,8 @@ export const block = z.union([
   numbered_list_item.extend(base_block_shape),
   quote.extend(base_block_shape),
   z.object(base_block_shape).transform((block) => ({
-    type: "unsupported_block",
+    type: "unsupported_block" as const,
     ...block,
   })),
 ]);
-
 export type block = z.infer<typeof block>;
