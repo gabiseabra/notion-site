@@ -5,12 +5,6 @@
   "main": "dist/server.js",
   "types": "dist/server.d.ts",
   "type": "module",
-  "exports": {
-    "./router": {
-      "types": "./src/router.ts",
-      "default": "./dist/router.js"
-    }
-  },
   "scripts": {
     "build": "tsc -b",
     "clean": "tsc -b --clean",
