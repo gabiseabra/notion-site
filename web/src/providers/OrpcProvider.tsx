@@ -27,7 +27,7 @@ export function useOrpc() {
 }
 
 export function OrpcProvider({ children }: { children: ReactNode }) {
-  const url = `http://localhost:3030/api`;
+  const url = `${window.location.origin}/api`;
 
   const link = useMemo(
     () =>

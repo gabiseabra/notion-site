@@ -15,7 +15,7 @@
     "build": "tsc -b",
     "clean": "tsc -b --clean",
     "start": "node dist/server.js",
-    "dev": "nodemon --watch 'src/**' --watch '../common/src/**' --ext ts,tsx,js,json --exec 'npm run build && npm run start'"
+    "dev": "nodemon --watch 'src/**' --watch '../common/src/**' --ext ts,tsx,js,json --exec 'npm run build && dotenvx run -f ../.env -- npm run start'"
   },
   "dependencies": {
     "@notion-site/common": "*",

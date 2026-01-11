@@ -1,0 +1,16 @@
+:3030 {
+
+  handle /api/* {
+    reverse_proxy api:3000
+  }
+
+  handle /feed {
+    reverse_proxy api:3000
+  }
+
+  handle {
+    root * /app/dist
+    try_files {path} /index.html
+    file_server
+  }
+}

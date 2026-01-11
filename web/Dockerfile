@@ -1,30 +1,32 @@
-##
-# Dockerfile for the web service
-
 FROM node:18-alpine AS builder
+
 WORKDIR /app
 
-# Copy root manifests and workspace packages into the build stage. Copying
-# tsconfig.base.json ensures that TypeScript extends correctly.
-COPY package.json package-lock.json tsconfig.base.json ./
-COPY common ./common
-COPY web ./web
+# copy only what is needed to install deps
+COPY package.json package-lock.json ./
+COPY web/package.json web/
+COPY common/package.json common/
 
-RUN npm install
+RUN npm ci
 
-RUN npm run build -w common -w web
+# copy sources
+COPY web web
+COPY common common
+COPY tsconfig.json tsconfig.base.json ./
 
-### Runtime image
-FROM node:18-alpine AS runtime
+# build web
+RUN npm run build -w web
+
+# ---- runtime ----
+FROM caddy:2-alpine
+
 WORKDIR /app
 
-ENV NODE_ENV=production
-
+# Copy the built static files and the Caddy configuration
 COPY --from=builder /app/web/dist ./dist
+COPY --from=builder /app/web/Caddyfile ./Caddyfile
 
+EXPOSE 3030
 
-EXPOSE 4173
-
-# Start the static server on port 4173. The `-s` flag serves static files from
-# the `dist` directory, and `-l` specifies the listening port.
-CMD ["serve", "-s", "dist", "-l", "4173"]
+# Start Caddy using the configuration file
+CMD ["caddy", "run", "--config", "Caddyfile", "--adapter", "caddyfile"]

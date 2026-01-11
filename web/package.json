@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "dotenvx run -f ../.env -- vite",
+    "build": "dotenvx run -f ../.env -- vite build",
+    "preview": "dotenvx run -f ../.env -- vite preview"
   },
   "dependencies": {
     "@notion-site/common": "*",
