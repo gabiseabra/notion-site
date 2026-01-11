@@ -5,9 +5,6 @@ services:
     build:
       context: .
       dockerfile: api/Dockerfile
-    env_file:
-      - path: .env
-        required: false
     environment:
       - NOTION_TOKEN
       - NOTION_DATABASE_ID

@@ -1,6 +1,6 @@
 steps:
   # running docker-compose
-  - name: 'docker/compose:2.30.0'
+  - name: 'docker/compose:1.26.2'
     args: [ 'up', '-d' ]
     env:
       - 'NODE_ENV=production'
