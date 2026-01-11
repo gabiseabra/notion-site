@@ -1,9 +1,8 @@
 import * as n from "@notion-site/common/dto/notion/schema.js";
-import {
-  hasPropertyValue,
-  isTruthy,
-} from "@notion-site/common/utils/guards.js";
+import { isTruthy } from "@notion-site/common/utils/guards.js";
 import css from "./RichText.module.scss";
+import { match } from "ts-pattern";
+import { Banner } from "../feedback/Banner.js";
 
 export function RichText({
   as: Component = "span",
@@ -17,13 +16,15 @@ export function RichText({
 }) {
   return (
     <Component className={[className].filter(isTruthy).join(" ")}>
-      {data.filter(hasPropertyValue("type", "text")).map((item) => {
-        return (
-          <Annotations annotations={item.annotations}>
-            {item.text.content}
-          </Annotations>
-        );
-      })}
+      {data.map((item) =>
+        match(item)
+          .with({ type: "text" }, (item) => (
+            <Annotations annotations={item.annotations}>
+              {item.text.content}
+            </Annotations>
+          ))
+          .otherwise(() => <Banner type="warning">Unsupported block</Banner>),
+      )}
     </Component>
   );
 }

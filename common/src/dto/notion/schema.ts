@@ -62,6 +62,7 @@ export const file = z.object({
 });
 
 export const icon = z.union([external, emoji, custom_emoji, file]);
+export type icon = z.infer<typeof icon>;
 
 // unsupported nodes
 

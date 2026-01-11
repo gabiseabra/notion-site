@@ -1,30 +1,24 @@
-@use "../../styles/theme" as theme;
-
-$warning-color: map-get(theme.$colors, orange);
-$error-color: map-get(theme.$colors, red);
-
 .Banner {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  column-gap: theme.$space;
+  column-gap: var(--space);
 
-  padding: theme.$space (theme.$space * 2);
-  margin: theme.$space * 2;
+  padding: var(--space) calc(var(--space) * 2);
+  margin: calc(var(--space) * 2);
 
   &:global(.warning) {
-    color: map-get($warning-color, color);
-    background: map-get($warning-color, background-color);
-    border: 1px solid map-get($warning-color, color);
-    box-shadow: map-get($warning-color, color) (theme.$space / 2) (theme.$space / 2) 0px;
+    color: var(--color-orange);
+    background: var(--bg-orange);
+    border: 1px solid var(--color-orange);
+    box-shadow: var(--color-orange) calc(var(--space) / 2) calc(var(--space) / 2) 0px;
   }
-
-
+  
   &:global(.error) {
-    color: map-get($error-color, color);
-    background: map-get($error-color, background-color);
-    border: 1px solid map-get($error-color, color);;
-    box-shadow: map-get($error-color, color) (theme.$space / 2) (theme.$space / 2) 0px;
+    color: var(--color-red);
+    background: var(--bg-red);
+    border: 1px solid var(--color-red);
+    box-shadow: var(--color-red) calc(var(--space) / 2) calc(var(--space) / 2) 0px;
   }
 }
 

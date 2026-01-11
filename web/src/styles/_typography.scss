@@ -1,36 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Italiana:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,100..900;1,100..900&display=swap');
-
 @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
+:root {
+  --font: 'Roboto', 'Arial', sans-serif;
+  --heading-font: 'Crimson Pro', 'Times New Roman', Times, serif;
+  --monospace-font: 'Courier New', Courier, monospace;
 
-$font: 'Roboto', 'Arial', sans-serif !default;
-$heading-font: 'Crimson Pro', 'Times New Roman', Times, serif !default;
-$monospace-font: 'Courier New', Courier, monospace !default;
-$font-size: 16px !default;
-$line-height: 1.345rem !default;
-$letter-spacing: 0px !default;
-$paragraph-margin: .75em !default;
-$indentation: 1em !default;
-$text-color: rgb(39, 26, 87) !default;
-$code-color: #9e0978;
-$code-background-color: #ececec;
+  --font-size: 16px;
+  --line-height: 1.345rem;
+  --letter-spacing: 0px;
+
+  --paragraph-margin: 0.75em;
+  --indentation: 1em;
+
+  --text-color: rgb(39, 26, 87);
+  --link-color: #c30996;
+
+  --code-color: #9e0978;
+  --code-bg-color: #ececec;
+}
 
 body {
   margin: 0;
-  font-family: $font;
-  font-size: $font-size;
-  line-height: $line-height;
-  letter-spacing: $letter-spacing;
+  font-family: var(--font);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  letter-spacing: var(--letter-spacing);
   background-color: #fff;
-  color: $text-color;
+  color: var(--text-color);
 }
 
 @mixin paragraph($indent: 0) {
-  margin: $paragraph-margin 0;
-  padding: 0 ($indentation * $indent);
+  margin: var(--paragraph-margin) 0;
+  padding: 0 calc(var(--indentation) * $indent);
 }
 
 p {
@@ -38,8 +39,8 @@ p {
 }
 
 @mixin list {
-  margin: $paragraph-margin 0;
-  padding: 0 $indentation;
+  margin: var(--paragraph-margin) 0;
+  padding: 0 var(--indentation);
 }
 
 ul, ol {
@@ -47,8 +48,8 @@ ul, ol {
 }
 
 @mixin divider {
-  margin: $paragraph-margin 0;
-  padding: 0 $indentation;
+  margin: var(--paragraph-margin) 0;
+  padding: 0 var(--indentation);
 }
 
 hr {
@@ -56,8 +57,8 @@ hr {
 }
 
 @mixin code {
-  color: $code-color;
-  background: $code-background-color;
+  color: var(--code-color);
+  background: var(--code-bg-color);
 }
 
 code {
@@ -73,28 +74,30 @@ blockquote {
 }
 
 h1 {
-  font-family: $heading-font;
+  font-family: var(--heading-font);
   font-weight: normal;
   font-size: 2.65em;
 }
 
 h2 {
-  font-family: $heading-font;
+  font-family: var(--heading-font);
   font-weight: normal;
   font-size: 2em;
 }
 
 h3 {
-  font-family: $heading-font;
+  font-family: var(--heading-font);
   font-weight: normal;
   font-size: 1.5em;
 }
 
 h4 {
-  font-family: $heading-font;
+  font-family: var(--heading-font);
   font-size: 1.25em;
 }
 
-code {
-  @include code
+a {
+  text-decoration: none;
+  color: var(--link-color);
 }
+

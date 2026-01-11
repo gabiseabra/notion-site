@@ -1,16 +1,15 @@
 @use "../../styles/theme" as theme;
 
 .Badge {
-  padding: (theme.$space / 2) (theme.$space * 2);
-  border-radius: theme.$radius;
+  padding: calc(var(--space) / 2) calc(var(--space) * 2);
+  border-radius: var(--radius);
   font-size: 0.85em;
 
-  @each $name, $values in theme.$colors {
+  @each $name, $_ in theme.$colors-codes {
     &:global(.#{"color-" + $name}) {
-      color: map-get($values, color);
-      background-color: map-get($values, background);
+      color: var(#{"--color-" + $name});
+      background-color: var(#{"--bg-" + $name});
     }
   }
-
 }
 

@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import { DateLabel } from "../ui/DateLabel.js";
 import { Col, Row } from "../ui/FlexBox.js";
 import css from "./BlogPostList.module.scss";
+import { Icon } from "../notion/Icon.js";
 
 export function BlogPostList({ items }: { items: BlogPost[] }) {
   return (
@@ -12,9 +13,13 @@ export function BlogPostList({ items }: { items: BlogPost[] }) {
       {items.map((post) => (
         <li key={post.url}>
           <Row alignX="space-between">
-            <Link to={`/blog/${post.url}`} className={css.Link}>
-              <RichText data={post.properties.Title.title} />
-            </Link>
+            <Row alignY="baseline">
+              {post.icon && <Icon size="m" data={post.icon} />}
+
+              <Link to={`/blog/${post.url}`} className={css.Link}>
+                <RichText data={post.properties.Title.title} />
+              </Link>
+            </Row>
 
             <Col>
               <DateLabel

@@ -1,12 +1,10 @@
-@use "../../styles/theme" as theme;
-
 .BlogPost {
   header {
     display: grid;
     grid-template:
     "header header"
     "date   tags" / 1fr auto;
-    gap: theme.$space;
+    gap: var(--space);
 
     & > *:nth-child(1) {
       grid-area: header;
@@ -19,7 +17,7 @@
     & > *:nth-child(3) {
       grid-area: tags;
       display: flex;
-      gap: theme.$space;
+      gap: var(--space);
     }
   }
 }

@@ -1,51 +1,38 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+$colors-codes: default, gray, brown, orange, yellow, green, blue, purple, pink, red;
 
-$space: 4px !default;
-$radius: 6px !default;
-$primary-color: #ef6be4;
+:root {
+  --space: 4px;
+  --radius: 8px;
+  --primary-color: #ef6be4;
 
-// notion colors
+  /* notion colors */
+  --color-default: #424242;
+  --bg-default: transparent;
 
-$colors: (
-        default: (
-                color: #424242,
-                background: transparent,
-        ),
-        gray: (
-                color: #707070,
-                background: #bababa,
-        ),
-        brown: (
-                color: #501501,
-                background: #e6bca0,
-        ),
-        orange: (
-                color: #a54202,
-                background: #ffdab5,
-        ),
-        yellow: (
-                color: #97651c,
-                background: #ffe9ae,
-        ),
-        green: (
-                color: #608513,
-                background: #beed98,
-        ),
-        blue: (
-                color: #1c47b6,
-                background: #9acdff,
-        ),
-        purple: (
-                color: #37069a,
-                background: #b9b7ff,
-        ),
-        pink: (
-                color: #6c0053,
-                background: #ffc1dd,
-        ),
-        red: (
-                color: #930101,
-                background: #ffcccc,
-        ),
-);
+  --color-gray: #707070;
+  --bg-gray: #e8e8e8;
+
+  --color-brown: #501501;
+  --bg-brown: #e6bca0;
+
+  --color-orange: #a54202;
+  --bg-orange: #ffdab5;
+
+  --color-yellow: #97651c;
+  --bg-yellow: #ffe9ae;
+
+  --color-green: #608513;
+  --bg-green: #beed98;
+
+  --color-blue: #1c47b6;
+  --bg-blue: #9acdff;
+
+  --color-purple: #37069a;
+  --bg-purple: #b9b7ff;
+
+  --color-pink: #6c0053;
+  --bg-pink: #ffc1dd;
+
+  --color-red: #930101;
+  --bg-red: #ffcccc;
+}

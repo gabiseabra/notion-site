@@ -5,14 +5,22 @@ import { Badge } from "../ui/Badge.js";
 import { DateLabel } from "../ui/DateLabel.js";
 import { Row } from "../ui/FlexBox.js";
 import css from "./BlogPost.module.scss";
+import { Link } from "react-router";
+import { Icon } from "../notion/Icon.js";
 
 export function BlogPost({ post }: { post: GetBlogPostOutput }) {
   return (
     <article className={css.BlogPost}>
       <header>
-        <h1>
-          <RichText data={post.properties.Title.title} />
-        </h1>
+        <Link to={`/blog/${post.url}`}>
+          <h1>
+            <Row>
+              {post.icon && <Icon data={post.icon} size="l" />}
+
+              <RichText data={post.properties.Title.title} />
+            </Row>
+          </h1>
+        </Link>
 
         <DateLabel
           verb="Published"

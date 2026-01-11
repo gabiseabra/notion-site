@@ -1,6 +1,8 @@
 import { ComponentProps, CSSProperties } from "react";
 import css from "./FlexBox.module.scss";
 
+type Gap = 0 | 0.5 | 1 | 2 | 3;
+
 export function Row({
   className = "",
   style = {},
@@ -10,11 +12,12 @@ export function Row({
 }: ComponentProps<"div"> & {
   alignX?: CSSProperties["justifyContent"];
   alignY?: CSSProperties["alignItems"];
+  gap?: Gap;
 }) {
   return (
     <div
       className={`${className} ${css.Row}`}
-      style={{ alignContent: alignY, justifyContent: alignX, ...style }}
+      style={{ alignItems: alignY, justifyContent: alignX, ...style }}
       {...props}
     />
   );
