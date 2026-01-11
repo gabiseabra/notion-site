@@ -49,7 +49,6 @@ ul, ol {
 
 @mixin divider {
   margin: var(--paragraph-margin) 0;
-  padding: 0 var(--indentation);
 }
 
 hr {
@@ -66,7 +65,9 @@ code {
 }
 
 @mixin blockquote {
-  // @todo
+  @include paragraph(1);
+  white-space: pre-wrap;
+  border-left: var(--space) solid var(--text-color);
 }
 
 blockquote {
