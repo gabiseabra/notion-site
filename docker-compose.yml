@@ -6,7 +6,11 @@ services:
       context: .
       dockerfile: api/Dockerfile
     env_file:
-      - .env
+      - path: .env
+        required: false
+    environment:
+      - NOTION_TOKEN
+      - NOTION_DATABASE_ID
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -15,8 +19,6 @@ services:
     build:
       context: .
       dockerfile: web/Dockerfile
-    env_file:
-      - .env
     ports:
       - "3030:3030"
     depends_on:
