@@ -25,12 +25,10 @@ export function Component() {
       <h2>All Blog Posts</h2>
 
       {blogPostsQuery.isError ? (
-        <Col alignX="stretch" alignY="center" style={{ flex: 1 }}>
-          <QueryErrorBanner
-            query={blogPostsQuery}
-            fallback="Failed to load bog posts"
-          />
-        </Col>
+        <QueryErrorBanner
+          query={blogPostsQuery}
+          fallback="Failed to load bog posts"
+        />
       ) : blogPostsQuery.isPending ? (
         <Col alignX="center" alignY="center" style={{ flex: 1 }}>
           <Spinner size="l" />

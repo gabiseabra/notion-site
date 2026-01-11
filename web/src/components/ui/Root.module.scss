@@ -20,6 +20,10 @@
   & > footer {
     text-align: center;
     margin: var(--paragraph-margin) 0;
+
+    a {
+      color: var(--secondary-color-1);
+    }
   }
 }
 
