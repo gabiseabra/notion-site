@@ -2,3 +2,8 @@ steps:
   # running docker-compose
   - name: 'docker/compose:1.26.2'
     args: [ 'up', '-d' ]
+    env:
+      - 'NODE_ENV=production'
+      - 'NOTION_TOKEN=${_NOTION_TOKEN}'
+      - 'NOTION_DATABASE_ID=${_NOTION_DATABASE_ID}'
+      - 'SITE_URL=blog.gabiseabra.dev'
