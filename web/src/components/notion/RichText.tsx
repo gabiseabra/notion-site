@@ -16,10 +16,10 @@ export function RichText({
 }) {
   return (
     <Component className={[className].filter(isTruthy).join(" ")}>
-      {data.map((item) =>
+      {data.map((item, ix) =>
         match(item)
           .with({ type: "text" }, (item) => (
-            <Annotations annotations={item.annotations}>
+            <Annotations key={`${ix}`} annotations={item.annotations}>
               {item.text.content}
             </Annotations>
           ))

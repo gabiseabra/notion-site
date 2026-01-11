@@ -31,7 +31,9 @@ export function BlogPost({ post }: { post: GetBlogPostOutput }) {
 
         <Row>
           {post.properties.Tags.multi_select.map((option) => (
-            <Badge color={option.color}>{option.name}</Badge>
+            <Badge key={option.name} color={option.color}>
+              {option.name}
+            </Badge>
           ))}
         </Row>
       </header>
