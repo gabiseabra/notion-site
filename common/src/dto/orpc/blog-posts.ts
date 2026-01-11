@@ -19,6 +19,10 @@ export const GetBlogPostsOutput = z.object({
 });
 export type GetBlogPostsOutput = z.infer<typeof GetBlogPostsOutput>;
 
+
+export const GetBlogPostOutput = BlogPost.extend({blocks: n.block.array() })
+export type GetBlogPostOutput = z.infer<typeof GetBlogPostOutput>;
+
 export const blogPosts = oc.prefix("/blog-posts").router({
   getBlogPosts: oc
     .route({})
@@ -35,8 +39,6 @@ export const blogPosts = oc.prefix("/blog-posts").router({
       },
     })
     .output(
-      BlogPost.extend({
-        blocks: n.block.array(),
-      }),
+      GetBlogPostOutput
     ),
 });

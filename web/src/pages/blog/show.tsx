@@ -1,9 +1,7 @@
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useOrpc } from "../../providers/OrpcProvider.js";
-import { RichText } from "../../components/notion/RichText.js";
-import { Blocks } from "../../components/notion/Blocks.js";
-import { Banner } from "../../components/feedback/Banner.js";
+import { BlogPost } from "../../components/blog/BlogPost.js";
 
 export const path = "/blog/:url";
 
@@ -23,13 +21,5 @@ export function Component() {
 
   const blogPost = blogPostQuery.data;
 
-  return (
-    <article>
-      <h1>
-        <RichText data={blogPost.properties.Title.title} />
-      </h1>
-
-      <Blocks data={blogPost.blocks} />
-    </article>
-  );
+  return <BlogPost blogPost={blogPost} />;
 }

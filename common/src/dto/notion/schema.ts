@@ -2,7 +2,7 @@ import { z } from "zod";
 
 // enums
 
-const color = z.enum([
+export const color = z.enum([
   "default",
   "gray",
   "brown",
@@ -14,6 +14,7 @@ const color = z.enum([
   "pink",
   "red",
 ]);
+export type color = z.infer<typeof color>;
 
 const background_color = z.enum([
   "default_background",
