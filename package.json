@@ -11,7 +11,7 @@
   "scripts": {
     "build": "npm run build -w common && npm run build -w api && npm run build -w web",
     "clean": "npm run clean -w common && npm run clean -w api",
-    "start": "npm run start -w api",
+    "start": "STATIC_DIR=\"$(pwd)/web/dist\" npm run start -w api",
     "dev": "concurrently \"npm run dev -w api\" \"npm run dev -w web\"",
     "lint": "eslint . --ext .ts,.tsx"
   },

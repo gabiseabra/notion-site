@@ -2,8 +2,8 @@ import { resolve } from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
+const VITE_PORT = parseInt(process.env.VITE_PORT || "3030", 10);
 const PORT = parseInt(process.env.PORT || "3000", 10);
-const BE_PORT = parseInt(process.env.BE_PORT || "3030", 10);
 
 export default defineConfig({
   plugins: [react()],
@@ -21,11 +21,11 @@ export default defineConfig({
     },
   },
   server: {
-    port: PORT,
+    port: VITE_PORT,
     proxy: {
-      "/feed": `http://localhost:${BE_PORT}`,
+      "/feed": `http://localhost:${PORT}`,
       "/api": {
-        target: `http://localhost:${BE_PORT}`,
+        target: `http://localhost:${PORT}`,
         changeOrigin: true,
       },
     },

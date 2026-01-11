@@ -1,3 +1,4 @@
+import path from "path";
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
@@ -5,7 +6,8 @@ import { RPCHandler } from "@orpc/server/node";
 import { onError } from "@orpc/server";
 import { router } from "./orpc/index.js";
 
-const port = process.env.BE_PORT || 3000;
+const port = process.env.PORT || 3000;
+const staticDir = process.env.STATIC_DIR;
 const app = express();
 
 app.use(cors({ origin: `http://localhost:${port}` }));
@@ -29,6 +31,14 @@ app.use("/api", async (req, res, next) => {
 
   next();
 });
+
+if (staticDir) {
+  app.use(express.static(staticDir));
+
+  app.use((req, res) => {
+    res.sendFile(path.join(staticDir, "index.html"));
+  });
+}
 
 // Start the server at port
 const server = app.listen(port, () => {
