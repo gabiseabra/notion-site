@@ -1,8 +1,7 @@
 # notion-site
 
 A Notion-backed blog platform with a modern tech stack.
-This project serves a personal blog directly from a Notion database,
-deployed at [blog.gabiseabra.dev](https://blog.gabiseabra.dev) on Render.
+This project serves a personal blog directly from a Notion database.
 
 ## Overview
 
@@ -40,15 +39,15 @@ traditional CMS backends.
 This is a monorepo using npm workspaces and typescript compose builds with following packages:
 
 - **common** - Shared types, schemas, and DTOs
-    - Location: `./common`
+    - Location: [common](./common)
     - Exports: API contracts, Notion schema definitions
 
 - **api** - Backend server (Express + ORPC)
-    - Location: `./api`
+    - Location: [api](./api)
     - Features: Notion API integration, RSS feed generation
 
 - **web** - Frontend app (React + Vite)
-    - Location: `./web`
+    - Location: [web](./web)
     - Features: Blog post listing and viewing
 
 ## Notion Database Schema
@@ -78,7 +77,8 @@ npm run install
 
 ### Step 2 Configure Environment Variables
 
-Copy `./.env.example` file to `./.env`, and change the `NOTION_TOKEN` and `NOTION_DATABASE_ID` with values obtained from
+Copy [.env.example](.env.example) file to `.env`, and change the `NOTION_TOKEN` and `NOTION_DATABASE_ID` with values
+obtained from
 the steps below.
 
 ```bash
@@ -122,7 +122,7 @@ docker-compose --env-file .env up
 
 This project is deployed on Render at [blog.gabiseabra.dev](blog.gabiseabra.dev).
 The deployment runs `npm run build; npm run start` in a node container,
-which starts the server serving static files from the `./web` and API routes from the `./api` build.
+which starts the server serving static files from the [web](./web) and API routes from the [api](./api) build.
 
 ## TODO / Roadmap
 
