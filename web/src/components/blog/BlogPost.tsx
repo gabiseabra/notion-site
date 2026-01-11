@@ -2,30 +2,31 @@ import { RichText } from "../notion/RichText.js";
 import { Blocks } from "../notion/Blocks.js";
 import { GetBlogPostOutput } from "@notion-site/common/dto/orpc/blog-posts.js";
 import { Badge } from "../ui/Badge.js";
+import { DateLabel } from "../ui/DateLabel.js";
+import { Row } from "../ui/FlexBox.js";
 import css from "./BlogPost.module.scss";
 
-export function BlogPost({ blogPost }: { blogPost: GetBlogPostOutput }) {
+export function BlogPost({ post }: { post: GetBlogPostOutput }) {
   return (
     <article className={css.BlogPost}>
       <header>
         <h1>
-          <RichText data={blogPost.properties.Title.title} />
+          <RichText data={post.properties.Title.title} />
         </h1>
 
-        <div>
-          Published
-          <span>@</span>
-          {blogPost.properties["Publish Date"].date.start.toLocaleDateString()}
-        </div>
+        <DateLabel
+          verb="Published"
+          start={post.properties["Publish Date"].date.start}
+        />
 
-        <div>
-          {blogPost.properties.Tags.multi_select.map((option) => (
+        <Row>
+          {post.properties.Tags.multi_select.map((option) => (
             <Badge color={option.color}>{option.name}</Badge>
           ))}
-        </div>
+        </Row>
       </header>
 
-      <Blocks data={blogPost.blocks} />
+      <Blocks data={post.blocks} />
     </article>
   );
 }

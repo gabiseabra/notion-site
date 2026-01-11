@@ -1,0 +1,13 @@
+@use "../../styles/theme" as theme;
+
+.Row {
+  display: flex;
+  flex-direction: row;
+  gap: theme.$space
+}
+
+.Col {
+  display: flex;
+  flex-direction: column;
+  gap: theme.$space
+}

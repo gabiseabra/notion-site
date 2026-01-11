@@ -1,7 +1,7 @@
 @use "../../styles/theme" as theme;
 
 .Badge {
-  padding: theme.$space (theme.$space * 2);
+  padding: (theme.$space / 2) (theme.$space * 2);
   border-radius: theme.$radius;
   font-size: 0.85em;
 

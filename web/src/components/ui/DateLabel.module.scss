@@ -1,0 +1,12 @@
+@use "../../styles/theme" as theme;
+
+.DateLabel {
+  display: inline-flex;
+  color: grey;
+  font-style: italic;
+  gap: theme.$space;
+
+  span {
+    color: theme.$primary-color-0;
+  }
+}

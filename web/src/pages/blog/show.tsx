@@ -21,5 +21,5 @@ export function Component() {
 
   const blogPost = blogPostQuery.data;
 
-  return <BlogPost blogPost={blogPost} />;
+  return <BlogPost post={blogPost} />;
 }
