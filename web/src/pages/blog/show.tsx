@@ -33,7 +33,7 @@ export function Component() {
   if (blogPostQuery.isPending)
     return (
       <Col alignX="center" alignY="center" style={{ flex: 1 }}>
-        <Spinner size="l" />
+        <Spinner size="m" />
       </Col>
     );
 

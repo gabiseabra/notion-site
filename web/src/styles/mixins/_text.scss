@@ -8,35 +8,3 @@
           0 ($width * -1) 0 $color
   );
 }
-
-@mixin paragraph($indent: 0) {
-  margin: var(--paragraph-margin) 0;
-  padding: 0 calc(var(--indentation) * $indent);
-}
-
-@mixin list {
-  margin: var(--paragraph-margin) 0;
-  padding: 0 var(--indentation);
-}
-
-@mixin blockquote {
-  @include paragraph(1);
-  white-space: pre-wrap;
-  border-left: var(--space) solid var(--text-color);
-}
-
-@mixin code {
-  padding: 0 var(--space);
-  color: var(--secondary-color-1);
-  background: var(--surface-color);
-  font-family: var(--monospace-font);
-}
-
-@mixin divider {
-  margin: var(--paragraph-margin) 0;
-}
-
-@mixin link {
-  text-decoration: none;
-  color: var(--link-color);
-}

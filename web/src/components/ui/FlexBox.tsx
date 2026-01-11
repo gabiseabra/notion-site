@@ -1,6 +1,13 @@
 import { ComponentProps, CSSProperties } from "react";
 import css from "./FlexBox.module.scss";
 
+export type RowProps = ComponentProps<"div"> & {
+  as?: "div" | "section";
+  alignX?: CSSProperties["justifyContent"];
+  alignY?: CSSProperties["alignItems"];
+  gap?: number;
+};
+
 export function Row({
   as: Component = "div",
   className = "",
@@ -9,12 +16,7 @@ export function Row({
   alignY,
   gap,
   ...props
-}: ComponentProps<"div"> & {
-  as?: "div" | "section";
-  alignX?: CSSProperties["justifyContent"];
-  alignY?: CSSProperties["alignItems"];
-  gap?: number;
-}) {
+}: RowProps) {
   return (
     <Component
       className={`${className} ${css.Row}`}
@@ -30,6 +32,13 @@ export function Row({
   );
 }
 
+export type ColProps = ComponentProps<"div"> & {
+  as?: "div" | "section";
+  alignX?: CSSProperties["alignItems"];
+  alignY?: CSSProperties["justifyContent"];
+  gap?: number;
+};
+
 export function Col({
   as: Component = "div",
   className = "",
@@ -38,12 +47,7 @@ export function Col({
   alignY,
   gap,
   ...props
-}: ComponentProps<"div"> & {
-  as?: "div" | "section";
-  alignX?: CSSProperties["alignItems"];
-  alignY?: CSSProperties["justifyContent"];
-  gap?: number;
-}) {
+}: ColProps) {
   return (
     <Component
       className={`${className} ${css.Col}`}

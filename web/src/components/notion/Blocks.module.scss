@@ -1,5 +1,6 @@
-@use "../../styles/mixins/text" as text;
+@use "../../styles/typography" as typography;
 
 .Indentation {
-  @include text.paragraph(1)
+  @extend %paragraph;
+  @include typography.indent(1);
 }

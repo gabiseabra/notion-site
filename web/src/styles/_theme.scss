@@ -1,0 +1,77 @@
+/***********************************************************************************************************************
+ * [_theme.scss] Color and spacing configurations
+ **********************************************************************************************************************/
+
+$colors-codes: default, gray, brown, orange, yellow, green, blue, purple, pink, red;
+
+:root {
+  --space: 4px;
+  --radius: 8px;
+
+  --color-primary: rgb(92, 69, 237);
+  --bg-primary: rgb(255, 171, 241);
+  --color-secondary: rgb(243, 88, 199);
+  --bg-secondary: rgb(218, 210, 255);
+  --bg-from: rgb(251, 250, 255);
+  --bg-to: #e9e4ff;
+
+  --color-text: var(--color-default);
+  --color-heading: #2a16bd;
+  --color-muted: #c3bdd8;
+  --color-disabled: #a09bb5;
+  --color-link: var(--color-secondary);
+
+  /* notion colors */
+  --color-default: #2c1f5c;
+  --bg-default: var(--bg-from);
+
+  --color-gray: #707070;
+  --bg-gray: #e8e8e8;
+
+  --color-brown: #8e2600;
+  --bg-brown: #f3d0c2;
+
+  --color-orange: #c36e00;
+  --bg-orange: #ffddb0;
+
+  --color-yellow: #97651c;
+  --bg-yellow: #ffe9ae;
+
+  --color-green: #3d7a03;
+  --bg-green: #c5f1a8;
+
+  --color-blue: #2d60e4;
+  --bg-blue: #c8e6ff;
+
+  --color-purple: #6d2fe4;
+  --bg-purple: #d9d8ff;
+
+  --color-pink: #cc16ae;
+  --bg-pink: #ffd4e6;
+
+  --color-red: #930101;
+  --bg-red: #ffcccc;
+}
+
+/** Gradient background */
+
+
+/**
+ * this bit ensures that the gradient doesn't stop after 100vh
+ */
+html {
+  display: table;
+  min-height: 100%;
+  background: var(--bg-default);
+}
+
+body {
+  margin: 0;
+  background-image: linear-gradient(
+                  to bottom,
+                  var(--bg-from),
+                  var(--bg-to)
+  );
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}

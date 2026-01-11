@@ -1,45 +1,53 @@
-$spinner-color-0: var(--primary-color-0);
-$spinner-color-1: var(--primary-color-1);
 
 .Spinner {
-  --size: 16px;
-  --gap: 32px;
-
-  width: var(--size);
-  height: var(--size);
-  border-radius: 50%;
-  background-color: $spinner-color-0;
-  box-shadow: var(--gap) 0 $spinner-color-0, calc(var(--gap) * -1) 0 $spinner-color-0;
-  position: relative;
-  animation: flash 0.5s ease-out infinite alternate;
+  --spinner-animation-duration: 1.4s;
+  --spinner-animation-delay: 0.21s;
 
   &:global(.size-s) {
-    --size: 8px;
-    --gap: 16px;
+    --spinner-size: 8px;
+    --spinner-gap: 4px;
+    --spinner-inverse-bounce-rate: 0.55;
   }
 
   &:global(.size-m) {
-    --size: 12px;
-    --gap: 24px;
+    --spinner-size: 16px;
+    --spinner-gap: 10px;
+    --spinner-inverse-bounce-rate: 0.65;
   }
 
-  &:global(.size-l) {
-    --size: 16px;
-    --gap: 32px;
+  display: inline-flex;
+  gap: var(--spinner-gap);
+  text-align: center;
+
+  & > * {
+    width: var(--spinner-size);
+    height: var(--spinner-size);
+
+    border-radius: 100%;
+    display: inline-block;
+    -webkit-animation: sk-bouncedelay var(--spinner-animation-duration) infinite ease-in-out both;
+    animation: sk-bouncedelay var(--spinner-animation-duration) infinite ease-in-out both;
+  }
+
+  & > *:nth-child(1) {
+    -webkit-animation-delay: calc(var(--spinner-animation-delay) * -2);
+    animation-delay: calc(var(--spinner-animation-delay) * -2);
+  }
+
+  & > *:nth-child(2) {
+    -webkit-animation-delay: calc(var(--spinner-animation-delay) * -1);
+    animation-delay: calc(var(--spinner-animation-delay) * -1);
   }
 }
 
-@keyframes flash {
-  0% {
-    background-color: $spinner-color-1;
-    box-shadow: var(--gap) 0 $spinner-color-1, calc(var(--gap) * -1) 0 $spinner-color-0;
+
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% {
+    transform: scale(var(--spinner-inverse-bounce-rate));
+    background-color: var(--bg-secondary);
   }
-  50% {
-    background-color: #FFF;
-    box-shadow: var(--gap) 0 $spinner-color-1, calc(var(--gap) * -1) 0 $spinner-color-1;
-  }
-  100% {
-    background-color: $spinner-color-1;
-    box-shadow: var(--gap) 0 $spinner-color-0, calc(var(--gap) * -1) 0 $spinner-color-1;
+  40% {
+    transform: scale(1.0);
+    background-color: var(--color-secondary);
   }
 }

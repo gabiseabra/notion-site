@@ -1,11 +1,18 @@
 @use "../../styles/mixins/text" as text;
 
+$max-width: 800px;
+$min-padding-inline: 40px;
+
 .Root {
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-width: 800px;
+  max-width: $max-width;
   margin: auto;
+
+  @media (max-width: ($max-width + $min-padding-inline)) {
+    margin: 0 $min-padding-inline;
+  }
 
   & > header {
     margin: var(--paragraph-margin) 0;
@@ -22,32 +29,42 @@
     margin: var(--paragraph-margin) 0;
 
     a {
-      color: var(--secondary-color-1);
+      color: var(--color-primary);
     }
   }
 }
 
 .Link {
-  color: var(--h1-color-0);
+  color: var(--color-primary);
 }
 
 .Subdomain {
-  font-family: var(--cursive-font);
+  font-family: var(--font-cursive);
   font-size: 2em;
 }
 
 .Domain {
-  color: var(--h1-color-0);
-  text-shadow: text.shadow-outline(var(--h1-color-1), 0.5px),
-  1px 2px var(--h1-color-2);
-  font-family: var(--monospace-font);
+  color: var(--color-primary);
+  text-shadow: text.shadow-outline(white, 0.5px),
+  1px 2px var(--color-secondary);
+  font-family: var(--font-monospace);
   font-weight: bold;
   font-size: 1.25em;
 }
 
 .Dot {
-  color: var(--h1-color-2);
-  font-size: 1.5em;
+  --dot-size: 3px;
+  --dot-radius: 1px;
+
+  color: transparent;
+  font-size: .1em;
+  background: var(--color-secondary);
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: var(--dot-radius);
+  display: inline-block;
+  vertical-align: text-bottom;
+  margin-bottom: 2px;
 }
 
 $github-badge-size: 64px;
@@ -67,7 +84,7 @@ $github-icon-size: 21px;
 
     svg {
       z-index: 1;
-      fill: var(--secondary-color-0);
+      fill: var(--bg-secondary);
       margin: calc(var(--space) * 2);
       width: $github-icon-size;
       height: $github-icon-size;
@@ -80,7 +97,7 @@ $github-icon-size: 21px;
       height: 0;
       border-style: solid;
       border-width: 0 $github-badge-size $github-badge-size 0;
-      border-color: transparent var(--secondary-color-1) transparent transparent;
+      border-color: transparent var(--color-primary) transparent transparent;
       right: 0;
       top: 0;
       position: absolute;

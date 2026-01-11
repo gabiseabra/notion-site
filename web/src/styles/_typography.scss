@@ -1,0 +1,148 @@
+/***********************************************************************************************************************
+ * [_typography.scss] Fonts & text element configurations
+ **********************************************************************************************************************/
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Lovers+Quarrel&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Outfit:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Quicksand:wght@300..700&family=Raleway:ital,wght@0,100..900;1,100..900&family=Saira:ital,wght@0,100..900;1,100..900&family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Arsenal+SC:ital,wght@0,400;0,700;1,400;1,700&family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
+
+:root {
+  /** global text size & spacing variables */
+
+  --font-size: 16px;
+  --line-height: 1.345rem;
+  --letter-spacing: 0px;
+  --paragraph-margin: 0.75em;
+  --indentation: 1em;
+
+  --font-body: 'Lato', 'Arial', sans-serif;
+  --font: 'Outfit', 'Arial', sans-serif;
+  --font-heading: "Tinos", 'Times New Roman', Times, serif;
+  --font-heading: "EB Garamond", 'Times New Roman', Times, serif;
+  --font-heading: "Cormorant Garamond", 'Times New Roman', Times, serif;
+  --font-monospace: "Source Code Pro", Courier, monospace;
+  --font-cursive: "Lovers Quarrel", "Brush Script MT", "Apple Chancery", "Lucida Handwriting", cursive;
+
+  /** more heading options */
+
+  /** h1 properties */
+  --weight-h1: 700;
+  /** h4 properties */
+  --weight-h4: 700;
+  --font-h4: var(--font-body);
+  /** h2, h3 properties */
+  --weight-heading: 800;
+
+  /** divider options */
+
+  --size-divider: 2px;
+  --radius-divider: 1px;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  letter-spacing: var(--letter-spacing);
+  color: var(--color-text);
+}
+
+@mixin indent($indent: 0) {
+  padding: 0 calc(var(--indentation) * $indent);
+}
+
+p, %paragraph {
+  margin: var(--paragraph-margin) 0;
+}
+
+ul, ol, %list {
+  margin: var(--paragraph-margin) 0;
+  padding: 0 var(--indentation);
+}
+
+hr, %divider {
+  box-shadow: none;
+  text-shadow: none;
+  border: none;
+  height: var(--size-divider);
+  border-radius: var(--radius-divider);
+  background: var(--color-muted);
+  width: calc(100% - var(--space) * 8);
+  margin: var(--paragraph-margin) auto;
+}
+
+code, %code {
+  padding: 0 var(--space);
+  color: var(--color-primary);
+  background: var(--bg-from);
+  font-family: var(--font-monospace);
+}
+
+blockquote, %blockquote {
+  @include indent(1);
+
+  position: relative;
+  margin: var(--paragraph-margin) 0;
+  white-space: pre-wrap;
+
+  &::after {
+    position: absolute;
+    display: block;
+    content: ' ';
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: calc(var(--size-divider) * 2);
+    border-radius: calc(var(--radius-divider) * 2);
+    background: var(--color-text);
+  }
+}
+
+a, %link {
+  text-decoration: none;
+  color: var(--color-link);
+}
+
+h1 {
+  font-family: var(--font-h1, var(--font-heading));
+  font-weight: var(--weight-h1, var(--weight-heading));
+  font-size: 2.25em;
+  line-height: 1em;
+}
+
+h2 {
+  font-family: var(--font-h2, var(--font-heading));
+  font-weight: var(--weight-h2, var(--weight-heading));
+  color: var(--color-heading);
+  font-size: 2em;
+  line-height: 1em;
+}
+
+h3 {
+  font-family: var(--font-h3, var(--font-heading));
+  font-weight: var(--weight-h3, var(--weight-heading));
+  color: var(--color-heading);
+  font-size: 1.5em;
+  line-height: 1em;
+}
+
+h4 {
+  font-family: var(--font-h4, var(--font-heading));
+  font-weight: var(--weight-h4, var(--weight-heading));
+  color: var(--color-heading);
+  font-size: 1.25em;
+  line-height: 1em;
+}
+

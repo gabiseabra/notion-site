@@ -4,10 +4,10 @@
   &:global(.variant-plain) {
     background: transparent;
     border: none;
-    color: var(--link-color);
+    color: var(--color-link);
 
     &:disabled {
-      color: var(--disabled-color)
+      color: var(--color-disabled)
     }
   }
 }

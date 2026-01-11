@@ -31,7 +31,7 @@ export function Component() {
         />
       ) : blogPostsQuery.isPending ? (
         <Col alignX="center" alignY="center" style={{ flex: 1 }}>
-          <Spinner size="l" />
+          <Spinner size="m" />
         </Col>
       ) : (
         <>
