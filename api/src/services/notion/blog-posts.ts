@@ -11,13 +11,16 @@ import { GetBlogPostsInput } from "@notion-site/common/dto/orpc/blog-posts.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import * as n from "@notion-site/common/dto/notion/schema.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
+import memoize from "memoizee";
+
+const ttl = process.env.NODE_ENV === "development" ? 10 : 60_000 * 5;
 
 const notionToken = process.env.NOTION_TOKEN;
 const databaseId = process.env.NOTION_DATABASE_ID ?? "xyz";
 
 const notion = new NotionClient({ auth: notionToken });
 
-export async function getBlogPosts(filters: GetBlogPostsInput) {
+async function _getBlogPosts(filters: GetBlogPostsInput) {
   const response = await notion.databases.query({
     database_id: databaseId,
     start_cursor: filters.after,
@@ -65,7 +68,12 @@ export async function getBlogPosts(filters: GetBlogPostsInput) {
   };
 }
 
-export async function getBlogPost(id: string) {
+export const getBlogPosts = memoize(_getBlogPosts, {
+  async: true,
+  maxAge: ttl,
+});
+
+async function _getBlogPost(id: string) {
   const response = await notion.pages
     .retrieve({
       page_id: id,
@@ -83,7 +91,9 @@ export async function getBlogPost(id: string) {
   return parseBlogPost(response);
 }
 
-export async function getBlocks(id: string) {
+export const getBlogPost = memoize(_getBlogPost, { async: true, maxAge: ttl });
+
+async function _getBlocks(id: string) {
   const blocks: n.block[] = [];
   let cursor = undefined;
 
@@ -116,6 +126,8 @@ export async function getBlocks(id: string) {
 
   return blocks;
 }
+
+export const getBlocks = memoize(_getBlocks, { async: true, maxAge: ttl });
 
 function isPageObjectResponse(
   page: GetPageResponse | GetDatabaseResponse,
