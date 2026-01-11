@@ -1,0 +1,45 @@
+$spinner-color-0: var(--primary-color-0);
+$spinner-color-1: var(--primary-color-1);
+
+.Spinner {
+  --size: 16px;
+  --gap: 32px;
+
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background-color: $spinner-color-0;
+  box-shadow: var(--gap) 0 $spinner-color-0, calc(var(--gap) * -1) 0 $spinner-color-0;
+  position: relative;
+  animation: flash 0.5s ease-out infinite alternate;
+
+  &:global(.size-s) {
+    --size: 8px;
+    --gap: 16px;
+  }
+
+  &:global(.size-m) {
+    --size: 12px;
+    --gap: 24px;
+  }
+
+  &:global(.size-l) {
+    --size: 16px;
+    --gap: 32px;
+  }
+}
+
+@keyframes flash {
+  0% {
+    background-color: $spinner-color-1;
+    box-shadow: var(--gap) 0 $spinner-color-1, calc(var(--gap) * -1) 0 $spinner-color-0;
+  }
+  50% {
+    background-color: #FFF;
+    box-shadow: var(--gap) 0 $spinner-color-1, calc(var(--gap) * -1) 0 $spinner-color-1;
+  }
+  100% {
+    background-color: $spinner-color-1;
+    box-shadow: var(--gap) 0 $spinner-color-0, calc(var(--gap) * -1) 0 $spinner-color-1;
+  }
+}
