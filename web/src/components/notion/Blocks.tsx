@@ -2,6 +2,7 @@ import * as n from "@notion-site/common/dto/notion/schema.js";
 import { RichText } from "./RichText.js";
 import { match } from "ts-pattern";
 import { Fragment } from "react";
+import css from "./Blocks.module.scss";
 
 export function Blocks({ data }: { data: n.block[] }) {
   return (
@@ -10,19 +11,17 @@ export function Blocks({ data }: { data: n.block[] }) {
         match(block)
           .with({ type: "paragraph" }, ({ block }) => (
             <Fragment key={block.id}>
-              <p className="Paragraph" key={block.id}>
-                <Block data={block} />
-              </p>
+              <Block data={block} />
 
               {block.children.length ? (
-                <div className="Indentation">
+                <div className={css.Indentation}>
                   <Blocks data={block.children} />
                 </div>
               ) : null}
             </Fragment>
           ))
           .with({ type: "bulleted_list" }, ({ children }) => (
-            <ul className="BulletedList" key={block.id}>
+            <ul className={css.BulletedList} key={block.id}>
               {children.map((block) => (
                 <li key={block.id}>
                   <Block data={block} />
@@ -35,7 +34,7 @@ export function Blocks({ data }: { data: n.block[] }) {
             </ul>
           ))
           .with({ type: "numbered_list" }, ({ children }) => (
-            <ol className="NumberedList" key={block.id}>
+            <ol className={css.NumberedList} key={block.id}>
               {children.map((block) => (
                 <li key={block.id}>
                   <Block data={block} />
@@ -59,18 +58,24 @@ function Block({ data }: { data: n.block }) {
       {match(data)
         .with({ type: "paragraph" }, (data) => (
           <RichText
+            as="p"
+            className={css.Paragraph}
             data={data.paragraph.rich_text}
             color={data.paragraph.color}
           />
         ))
         .with({ type: "bulleted_list_item" }, (data) => (
           <RichText
+            as="p"
+            className={css.Paragraph}
             data={data.bulleted_list_item.rich_text}
             color={data.bulleted_list_item.color}
           />
         ))
         .with({ type: "numbered_list_item" }, (data) => (
           <RichText
+            as="p"
+            className={css.Paragraph}
             data={data.numbered_list_item.rich_text}
             color={data.numbered_list_item.color}
           />
@@ -78,6 +83,7 @@ function Block({ data }: { data: n.block }) {
         .with({ type: "heading_1" }, (data) => (
           <RichText
             as="h2"
+            className={css.Heading}
             data={data.heading_1.rich_text}
             color={data.heading_1.color}
           />
@@ -85,6 +91,7 @@ function Block({ data }: { data: n.block }) {
         .with({ type: "heading_2" }, (data) => (
           <RichText
             as="h3"
+            className={css.Heading}
             data={data.heading_2.rich_text}
             color={data.heading_2.color}
           />
@@ -92,6 +99,7 @@ function Block({ data }: { data: n.block }) {
         .with({ type: "heading_3" }, (data) => (
           <RichText
             as="h4"
+            className={css.Heading}
             data={data.heading_3.rich_text}
             color={data.heading_3.color}
           />
@@ -99,10 +107,12 @@ function Block({ data }: { data: n.block }) {
         .with({ type: "quote" }, (data) => (
           <RichText
             as="blockquote"
+            className={css.Blockquote}
             data={data.quote.rich_text}
             color={data.quote.color}
           />
         ))
+        .with({ type: "divider" }, () => <hr className={css.Divider} />)
         .with({ type: "unsupported_block" }, () => <div>unsupported block</div>)
         .exhaustive()}
     </>

@@ -248,6 +248,10 @@ export const quote = z.object({
   }),
 });
 
+export const divider = z.object({
+  type: z.literal("divider"),
+});
+
 const base_block_shape = {
   id: z.string(),
   parent: z.union([page_id, block_id]),
@@ -261,6 +265,7 @@ export const block = z.union([
   heading_3.extend(base_block_shape),
   bulleted_list_item.extend(base_block_shape),
   numbered_list_item.extend(base_block_shape),
+  divider.extend(base_block_shape),
   quote.extend(base_block_shape),
   z.object(base_block_shape).transform((block) => ({
     type: "unsupported_block" as const,

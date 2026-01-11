@@ -3,28 +3,20 @@ import {
   hasPropertyValue,
   isTruthy,
 } from "@notion-site/common/utils/guards.js";
+import css from "./RichText.module.scss";
 
 export function RichText({
   as: Component = "span",
+  className,
   data,
-  color,
-  indent,
 }: {
-  as?: "span" | "h1" | "h2" | "h3" | "h4" | "blockquote";
+  as?: "span" | "p" | "h1" | "h2" | "h3" | "h4" | "blockquote";
+  className?: string;
   data: n.rich_text_item;
-  color?: n.api_color;
-  indent?: number;
+  color?: n.api_color; // ??
 }) {
   return (
-    <Component
-      className={[
-        "RichText",
-        color && `color-${color}`,
-        indent && `indent-${indent}`,
-      ]
-        .filter(isTruthy)
-        .join(" ")}
-    >
+    <Component className={[className].filter(isTruthy).join(" ")}>
       {data.filter(hasPropertyValue("type", "text")).map((item) => {
         return (
           <Annotations annotations={item.annotations}>
@@ -46,13 +38,13 @@ function Annotations({
   return (
     <span
       className={[
-        "Annotations",
-        annotations.bold && "bold",
-        annotations.italic && "italic",
-        annotations.underline && "underline",
-        annotations.strikethrough && "strikethrough",
-        annotations.code && "code",
-        annotations.color && `color-${annotations.color}`,
+        annotations.bold && css.Bold,
+        annotations.italic && css.Italic,
+        annotations.underline && css.Underline,
+        annotations.strikethrough && css.Strikethrough,
+        annotations.code && css.Code,
+        // @todo support colors
+        // annotations.color && `color-${annotations.color}`,
       ]
         .filter(isTruthy)
         .join(" ")}

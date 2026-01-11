@@ -1,0 +1,27 @@
+@use "../../styles/theme" as theme;
+
+.Italic {
+  font-style: italic;
+}
+
+.Bold {
+  font-weight: bold;
+}
+
+.Underline {
+  text-decoration: underline;
+}
+
+.Strikethrough {
+  text-decoration: line-through;
+}
+
+.Underline.Strikethrough {
+  text-decoration: underline line-through;
+}
+
+.Code {
+  background: lightgray;
+  font-family: theme.$mono-font;
+}
+

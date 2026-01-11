@@ -1,0 +1,26 @@
+@use "../../styles/theme" as theme;
+
+.Paragraph {
+  margin: .7em 0;
+}
+
+.BulletedList, .NumberedList {
+  margin: .7em 0;
+  padding: 0 1em;
+}
+
+.Indentation {
+  padding: 0 1em;
+}
+
+.Blockquote {
+  // @todo
+}
+
+.Heading {
+  font-font: theme.$heading-font;
+}
+
+.Divider {
+  margin: 1em;
+}

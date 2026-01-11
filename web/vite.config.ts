@@ -4,6 +4,13 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        includePaths: [resolve(__dirname, "src")],
+      },
+    },
+  },
   resolve: {
     preserveSymlinks: true,
     alias: {
