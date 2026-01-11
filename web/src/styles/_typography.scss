@@ -29,6 +29,11 @@ body {
   color: var(--text-color);
 }
 
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
 @mixin paragraph($indent: 0) {
   margin: var(--paragraph-margin) 0;
   padding: 0 calc(var(--indentation) * $indent);

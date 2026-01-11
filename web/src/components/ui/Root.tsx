@@ -10,8 +10,11 @@ export function Root({ children }: { children: ReactNode }) {
       </header>
 
       <main>{children}</main>
+
       <footer>
-        <p>&copy; 2025</p>
+        <p>
+          <a href="https://gabiseabra.dev">gabiseabra.dev</a> &copy; 2025
+        </p>
       </footer>
     </div>
   );

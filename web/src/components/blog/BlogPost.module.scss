@@ -5,6 +5,11 @@
     "header header"
     "date   tags" / 1fr auto;
     gap: var(--space);
+    margin-bottom: 1.5em;
+
+    h1 {
+      margin-bottom: .25em;
+    }
 
     & > *:nth-child(1) {
       grid-area: header;

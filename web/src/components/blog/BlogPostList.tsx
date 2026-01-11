@@ -29,7 +29,7 @@ export function BlogPostList({ items }: { items: BlogPost[] }) {
                 />
               )}
 
-              <Row>
+              <Row alignX="end">
                 {post.properties.Tags.multi_select.map((option) => (
                   <Badge key={option.name} color={option.color}>
                     {option.name}
