@@ -1,16 +1,16 @@
 @use "../../styles/theme" as theme;
 
 .Paragraph {
-  margin: .7em 0;
+  margin: theme.$paragraph-spacing 0;
 }
 
 .BulletedList, .NumberedList {
-  margin: .7em 0;
-  padding: 0 1em;
+  margin: theme.$paragraph-spacing 0;
+  padding: 0 theme.$indentation;
 }
 
 .Indentation {
-  padding: 0 1em;
+  padding: 0 theme.$indentation;
 }
 
 .Blockquote {
@@ -22,5 +22,5 @@
 }
 
 .Divider {
-  margin: 1em;
+  margin: theme.$space;
 }
