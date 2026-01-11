@@ -7,6 +7,7 @@
   gap: theme.$space;
 
   span {
-    color: theme.$primary-color-0;
+    color: theme.$primary-color;
+    font-weight: bold;
   }
 }

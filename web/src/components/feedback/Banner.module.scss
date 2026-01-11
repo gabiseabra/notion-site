@@ -1,10 +1,7 @@
 @use "../../styles/theme" as theme;
 
-$warning-color: #a86206;
-$warning-background-color: #fff2e2;
-
-$error-color: #a86206;
-$error-background-color: #fff2e2;
+$warning-color: map-get(theme.$colors, orange);
+$error-color: map-get(theme.$colors, red);
 
 .Banner {
   display: grid;
@@ -16,18 +13,18 @@ $error-background-color: #fff2e2;
   margin: theme.$space * 2;
 
   &:global(.warning) {
-    color: $warning-color;
-    background: $warning-background-color;
-    border: 1px solid $warning-color;
-    box-shadow: $warning-color (theme.$space / 2) (theme.$space / 2) 0px;
+    color: map-get($warning-color, color);
+    background: map-get($warning-color, background-color);
+    border: 1px solid map-get($warning-color, color);
+    box-shadow: map-get($warning-color, color) (theme.$space / 2) (theme.$space / 2) 0px;
   }
 
 
   &:global(.error) {
-    color: $warning-color;
-    background: $warning-background-color;
-    border: 1px solid $warning-color;
-    box-shadow: $warning-color (theme.$space / 2) (theme.$space / 2) 0px;
+    color: map-get($error-color, color);
+    background: map-get($error-color, background-color);
+    border: 1px solid map-get($error-color, color);;
+    box-shadow: map-get($error-color, color) (theme.$space / 2) (theme.$space / 2) 0px;
   }
 }
 

@@ -1,13 +1,2 @@
 @forward "theme";
-
-@use "theme" as theme;
-
-body {
-  margin: 0;
-  font-family: theme.$font;
-  font-size: theme.$font-size;
-  line-height: theme.$line-height;
-  letter-spacing: theme.$letter-spacing;
-  background-color: #f7f7f7;
-  color: #333;
-}
+@forward "typography";

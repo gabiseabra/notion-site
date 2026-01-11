@@ -3,23 +3,7 @@
 
 $space: 4px !default;
 $radius: 6px !default;
-$text-color: rgb(39, 26, 87) !default;
-$surface-color: rgb(228, 228, 228) !default;
-$primary-color-0: rgb(194, 192, 202) !default;
-$primary-color-1: rgb(39, 26, 87) !default;
-$secondary-color-0: rgb(223 222 230) !default;
-$secondary-color-1: rgb(39, 26, 87) !default;
-
-// fonts
-
-$font: 'Roboto', 'Arial', sans-serif !default;
-$heading-font: 'Cormorant', 'Times New Roman', Times, serif !default;
-$mono-font: 'Courier New', Courier, monospace !default;
-$font-size: 16px !default;
-$line-height: 1.345rem !default;
-$letter-spacing: 0px !default;
-$paragraph-spacing: .75em !default;
-$indentation: 1em !default;
+$primary-color: #ef6be4;
 
 // notion colors
 
@@ -65,4 +49,3 @@ $colors: (
                 background: #ffcccc,
         ),
 );
-

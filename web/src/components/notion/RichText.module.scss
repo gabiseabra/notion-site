@@ -1,4 +1,4 @@
-@use "../../styles/theme" as theme;
+@use "../../styles/typography" as typography;
 
 .Italic {
   font-style: italic;
@@ -21,7 +21,6 @@
 }
 
 .Code {
-  background: lightgray;
-  font-family: theme.$mono-font;
+  @include typography.code
 }
 

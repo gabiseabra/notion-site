@@ -22,7 +22,7 @@ export function Blocks({ data }: { data: n.block[] }) {
             </Fragment>
           ))
           .with({ type: "bulleted_list" }, ({ children }) => (
-            <ul className={css.BulletedList} key={block.id}>
+            <ul key={block.id}>
               {children.map((block) => (
                 <li key={block.id}>
                   <Block data={block} />
@@ -35,7 +35,7 @@ export function Blocks({ data }: { data: n.block[] }) {
             </ul>
           ))
           .with({ type: "numbered_list" }, ({ children }) => (
-            <ol className={css.NumberedList} key={block.id}>
+            <ol key={block.id}>
               {children.map((block) => (
                 <li key={block.id}>
                   <Block data={block} />
@@ -60,7 +60,6 @@ function Block({ data }: { data: n.block }) {
         .with({ type: "paragraph" }, (data) => (
           <RichText
             as="p"
-            className={css.Paragraph}
             data={data.paragraph.rich_text}
             color={data.paragraph.color}
           />
@@ -68,7 +67,6 @@ function Block({ data }: { data: n.block }) {
         .with({ type: "bulleted_list_item" }, (data) => (
           <RichText
             as="p"
-            className={css.Paragraph}
             data={data.bulleted_list_item.rich_text}
             color={data.bulleted_list_item.color}
           />
@@ -76,7 +74,6 @@ function Block({ data }: { data: n.block }) {
         .with({ type: "numbered_list_item" }, (data) => (
           <RichText
             as="p"
-            className={css.Paragraph}
             data={data.numbered_list_item.rich_text}
             color={data.numbered_list_item.color}
           />
@@ -84,7 +81,6 @@ function Block({ data }: { data: n.block }) {
         .with({ type: "heading_1" }, (data) => (
           <RichText
             as="h2"
-            className={css.Heading}
             data={data.heading_1.rich_text}
             color={data.heading_1.color}
           />
@@ -92,7 +88,6 @@ function Block({ data }: { data: n.block }) {
         .with({ type: "heading_2" }, (data) => (
           <RichText
             as="h3"
-            className={css.Heading}
             data={data.heading_2.rich_text}
             color={data.heading_2.color}
           />
@@ -100,7 +95,6 @@ function Block({ data }: { data: n.block }) {
         .with({ type: "heading_3" }, (data) => (
           <RichText
             as="h4"
-            className={css.Heading}
             data={data.heading_3.rich_text}
             color={data.heading_3.color}
           />
@@ -108,12 +102,11 @@ function Block({ data }: { data: n.block }) {
         .with({ type: "quote" }, (data) => (
           <RichText
             as="blockquote"
-            className={css.Blockquote}
             data={data.quote.rich_text}
             color={data.quote.color}
           />
         ))
-        .with({ type: "divider" }, () => <hr className={css.Divider} />)
+        .with({ type: "divider" }, () => <hr />)
         .with({ type: "unsupported_block" }, () => (
           <Banner type="warning">Unsupported block</Banner>
         ))

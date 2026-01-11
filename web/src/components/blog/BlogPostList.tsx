@@ -12,7 +12,7 @@ export function BlogPostList({ items }: { items: BlogPost[] }) {
       {items.map((post) => (
         <li key={post.url}>
           <Row alignX="space-between">
-            <Link to={`/blog/${post.url}`}>
+            <Link to={`/blog/${post.url}`} className={css.Link}>
               <RichText data={post.properties.Title.title} />
             </Link>
 
