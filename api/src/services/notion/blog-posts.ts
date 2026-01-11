@@ -113,7 +113,9 @@ function parseBlogPost(page: PageObjectResponse): BlogPost {
   const result = BlogPost.safeParse(page);
 
   if (!result.success) {
-    throw new Error(`Failed to parse blog post ${page.url}`);
+    throw new Error(
+      `Failed to parse blog post ${page.url} : ${JSON.stringify(result.error, null, 2)}`,
+    );
   }
 
   return {

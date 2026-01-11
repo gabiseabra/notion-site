@@ -22,10 +22,12 @@ export function BlogPost({ post }: { post: GetBlogPostOutput }) {
           </h1>
         </Link>
 
-        <DateLabel
-          verb="Published"
-          start={post.properties["Publish Date"].date.start}
-        />
+        {post.properties["Publish Date"].date && (
+          <DateLabel
+            verb="Published"
+            start={post.properties["Publish Date"].date.start}
+          />
+        )}
 
         <Row>
           {post.properties.Tags.multi_select.map((option) => (

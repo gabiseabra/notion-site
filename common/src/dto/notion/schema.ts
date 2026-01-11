@@ -166,10 +166,12 @@ export function multi_select<T extends [string, ...string[]]>(options: T) {
 
 export const date = z.object({
   type: z.literal("date"),
-  date: z.object({
-    start: z.coerce.date(),
-    end: z.coerce.date().nullable(),
-  }),
+  date: z
+    .object({
+      start: z.coerce.date(),
+      end: z.coerce.date().nullable(),
+    })
+    .nullable(),
 });
 
 export const checkbox = z.object({
