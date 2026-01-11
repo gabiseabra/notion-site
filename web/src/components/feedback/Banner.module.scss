@@ -1,0 +1,33 @@
+@use "../../styles/theme" as theme;
+
+$warning-color: #a86206;
+$warning-background-color: #fff2e2;
+
+$error-color: #a86206;
+$error-background-color: #fff2e2;
+
+.Banner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: theme.$space;
+
+  padding: theme.$space (theme.$space * 2);
+  margin: theme.$space * 2;
+
+  &:global(.warning) {
+    color: $warning-color;
+    background: $warning-background-color;
+    border: 1px solid $warning-color;
+    box-shadow: $warning-color (theme.$space / 2) (theme.$space / 2) 0px;
+  }
+
+
+  &:global(.error) {
+    color: $warning-color;
+    background: $warning-background-color;
+    border: 1px solid $warning-color;
+    box-shadow: $warning-color (theme.$space / 2) (theme.$space / 2) 0px;
+  }
+}
+

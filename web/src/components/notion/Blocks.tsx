@@ -3,6 +3,7 @@ import { RichText } from "./RichText.js";
 import { match } from "ts-pattern";
 import { Fragment } from "react";
 import css from "./Blocks.module.scss";
+import { Banner } from "../feedback/Banner.js";
 
 export function Blocks({ data }: { data: n.block[] }) {
   return (
@@ -113,7 +114,9 @@ function Block({ data }: { data: n.block }) {
           />
         ))
         .with({ type: "divider" }, () => <hr className={css.Divider} />)
-        .with({ type: "unsupported_block" }, () => <div>unsupported block</div>)
+        .with({ type: "unsupported_block" }, () => (
+          <Banner type="warning">Unsupported block</Banner>
+        ))
         .exhaustive()}
     </>
   );
