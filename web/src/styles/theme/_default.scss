@@ -11,7 +11,7 @@ $colors-codes: default, gray, brown, orange, yellow, green, blue, purple, pink, 
   --surface-color: rgb(241, 241, 241);
 
   --text-color: var(--color-default);
-  --disabled-color: #aaaaaa;
+  --disabled-color: #a09bb5;
   --link-color: var(--primary-color-1);
 
   --h1-color-0: var(--secondary-color-1);
@@ -51,4 +51,28 @@ $colors-codes: default, gray, brown, orange, yellow, green, blue, purple, pink, 
 
   --color-red: #930101;
   --bg-red: #ffcccc;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+$bg-color-from: rgb(251, 250, 255);
+$bg-color-to: #e9e4ff;
+
+html {
+  display: table;
+  background: $bg-color-from;
+}
+
+body {
+  margin: 0;
+  background-image: linear-gradient(
+                  to bottom,
+                  $bg-color-from,
+                  $bg-color-to
+  );
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
