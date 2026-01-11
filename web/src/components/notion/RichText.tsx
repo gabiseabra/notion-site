@@ -16,14 +16,18 @@ export function RichText({
 }) {
   return (
     <Component className={[className].filter(isTruthy).join(" ")}>
-      {data.map((item, ix) =>
-        match(item)
-          .with({ type: "text" }, (item) => (
-            <Annotations key={`${ix}`} annotations={item.annotations}>
-              {item.text.content}
-            </Annotations>
-          ))
-          .otherwise(() => <Banner type="warning">Unsupported block</Banner>),
+      {data.length ? (
+        data.map((item, ix) =>
+          match(item)
+            .with({ type: "text" }, (item) => (
+              <Annotations key={`${ix}`} annotations={item.annotations}>
+                {item.text.content}
+              </Annotations>
+            ))
+            .otherwise(() => <Banner type="warning">Unsupported block</Banner>),
+        )
+      ) : (
+        <>&nbsp;</>
       )}
     </Component>
   );
