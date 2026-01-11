@@ -3,7 +3,22 @@ $colors-codes: default, gray, brown, orange, yellow, green, blue, purple, pink, 
 :root {
   --space: 4px;
   --radius: 8px;
-  --primary-color: #ef6be4;
+
+  --primary-color-0: rgb(255, 171, 241);
+  --primary-color-1: rgb(243, 88, 199);
+  --secondary-color-0: rgb(218, 210, 255);
+  --secondary-color-1: rgb(125, 106, 246);
+  --surface-color: rgb(241, 241, 241);
+
+  --text-color: var(--color-default);
+  --link-color: var(--primary-color-1);
+
+  --h1-color-0: var(--secondary-color-1);
+  --h1-color-1: white;
+  --h1-color-2: var(--primary-color-1);
+  --h2-color: var(--color-default);
+  --h3-color: var(--color-default);
+  --h4-color: var(--color-default);
 
   /* notion colors */
   --color-default: #424242;

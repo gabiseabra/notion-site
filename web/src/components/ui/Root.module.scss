@@ -1,3 +1,5 @@
+@use "../../styles/mixins/text" as text;
+
 .Root {
   display: flex;
   flex-direction: column;
@@ -15,5 +17,29 @@
 
   & > footer {
     text-align: center;
+    margin: var(--paragraph-margin) 0;
   }
+}
+
+.Link {
+  color: var(--h1-color-0);
+}
+
+.Subdomain {
+  font-family: var(--cursive-font);
+  font-size: 2em;
+}
+
+.Domain {
+  color: var(--h1-color-0);
+  text-shadow: text.shadow-outline(var(--h1-color-1), 0.5px),
+  1px 2px var(--h1-color-2);
+  font-family: var(--monospace-font);
+  font-weight: bold;
+  font-size: 1.25em;
+}
+
+.Dot {
+  color: var(--h1-color-2);
+  font-size: 1.5em;
 }

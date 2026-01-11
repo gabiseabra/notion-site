@@ -1,4 +1,4 @@
-@use "../../styles/typography" as typography;
+@use "../../styles/mixins/text" as text;
 
 .Italic {
   font-style: italic;
@@ -21,6 +21,6 @@
 }
 
 .Code {
-  @include typography.code
+  @include text.code
 }
 

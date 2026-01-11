@@ -14,7 +14,7 @@ export function BlogPost({ post }: { post: GetBlogPostOutput }) {
       <header>
         <Link to={`/blog/${post.url}`}>
           <h1>
-            <Row gap={2}>
+            <Row gap={2} alignY="baseline">
               {post.icon && <Icon data={post.icon} size="l" />}
 
               <RichText data={post.properties.Title.title} />

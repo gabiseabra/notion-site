@@ -9,13 +9,15 @@
 
   &:global(.warning) {
     color: var(--color-orange);
+    border-radius: var(--radius);
     background: var(--bg-orange);
     border: 1px solid var(--color-orange);
     box-shadow: var(--color-orange) calc(var(--space) / 2) calc(var(--space) / 2) 0px;
   }
-  
+
   &:global(.error) {
     color: var(--color-red);
+    border-radius: var(--radius);
     background: var(--bg-red);
     border: 1px solid var(--color-red);
     box-shadow: var(--color-red) calc(var(--space) / 2) calc(var(--space) / 2) 0px;

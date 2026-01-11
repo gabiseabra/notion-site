@@ -1,9 +1,21 @@
+/*************************
+ * base/typography
+ *************************/
+
+@use "../mixins/text" as text;
+
 @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Lovers+Quarrel&text=blog&display=swap');
+
+
 :root {
-  --font: 'Roboto', 'Arial', sans-serif;
+  --font: 'Source Sans', 'Arial', sans-serif;
   --heading-font: 'Crimson Pro', 'Times New Roman', Times, serif;
-  --monospace-font: 'Courier New', Courier, monospace;
+  --monospace-font: 'Source Code Pro', Courier, monospace;
+  --cursive-font: "Lovers Quarrel", "Brush Script MT", "Apple Chancery", "Lucida Handwriting", cursive;
 
   --font-size: 16px;
   --line-height: 1.345rem;
@@ -11,12 +23,6 @@
 
   --paragraph-margin: 0.75em;
   --indentation: 1em;
-
-  --text-color: rgb(39, 26, 87);
-  --link-color: #c30996;
-
-  --code-color: #9e0978;
-  --code-bg-color: #ececec;
 }
 
 body {
@@ -34,76 +40,54 @@ html, body, #root {
   width: 100%;
 }
 
-@mixin paragraph($indent: 0) {
-  margin: var(--paragraph-margin) 0;
-  padding: 0 calc(var(--indentation) * $indent);
-}
-
 p {
-  @include paragraph
-}
-
-@mixin list {
-  margin: var(--paragraph-margin) 0;
-  padding: 0 var(--indentation);
+  @include text.paragraph
 }
 
 ul, ol {
-  @include list
-}
-
-@mixin divider {
-  margin: var(--paragraph-margin) 0;
+  @include text.list
 }
 
 hr {
-  @include divider
-}
-
-@mixin code {
-  color: var(--code-color);
-  background: var(--code-bg-color);
+  @include text.divider
 }
 
 code {
-  @include code
-}
-
-@mixin blockquote {
-  @include paragraph(1);
-  white-space: pre-wrap;
-  border-left: var(--space) solid var(--text-color);
+  @include text.code
 }
 
 blockquote {
-  @include blockquote
+  @include text.blockquote
+}
+
+a {
+  @include text.link
 }
 
 h1 {
   font-family: var(--heading-font);
+  color: var(--h1-color);
   font-weight: normal;
-  font-size: 2.65em;
+  font-size: 2.25em;
 }
 
 h2 {
   font-family: var(--heading-font);
+  color: var(--h2-color);
   font-weight: normal;
   font-size: 2em;
 }
 
 h3 {
   font-family: var(--heading-font);
+  color: var(--h3-color);
   font-weight: normal;
   font-size: 1.5em;
 }
 
 h4 {
   font-family: var(--heading-font);
+  color: var(--h4-color);
   font-size: 1.25em;
-}
-
-a {
-  text-decoration: none;
-  color: var(--link-color);
 }
 
