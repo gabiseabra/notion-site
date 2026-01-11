@@ -7,3 +7,5 @@ steps:
       - 'NOTION_TOKEN=${_NOTION_TOKEN}'
       - 'NOTION_DATABASE_ID=${_NOTION_DATABASE_ID}'
       - 'SITE_URL=blog.gabiseabra.dev'
+options:
+  logging: CLOUD_LOGGING_ONLY
