@@ -1,0 +1,14 @@
+.Button {
+  font-size: .85em;
+
+  &:global(.variant-plain) {
+    background: transparent;
+    border: none;
+    color: var(--link-color);
+
+    &:disabled {
+      color: var(--disabled-color)
+    }
+  }
+}
+

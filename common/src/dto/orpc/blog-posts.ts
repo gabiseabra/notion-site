@@ -5,6 +5,7 @@ import z from "zod";
 
 export const GetBlogPostsInput = z.object({
   query: z.string(),
+  limit: z.number().max(100).optional(),
   after: z.string().optional(),
   tags: z.string().array().optional(),
 });
@@ -19,8 +20,7 @@ export const GetBlogPostsOutput = z.object({
 });
 export type GetBlogPostsOutput = z.infer<typeof GetBlogPostsOutput>;
 
-
-export const GetBlogPostOutput = BlogPost.extend({blocks: n.block.array() })
+export const GetBlogPostOutput = BlogPost.extend({ blocks: n.block.array() });
 export type GetBlogPostOutput = z.infer<typeof GetBlogPostOutput>;
 
 export const blogPosts = oc.prefix("/blog-posts").router({
@@ -38,7 +38,5 @@ export const blogPosts = oc.prefix("/blog-posts").router({
         status: 404,
       },
     })
-    .output(
-      GetBlogPostOutput
-    ),
+    .output(GetBlogPostOutput),
 });

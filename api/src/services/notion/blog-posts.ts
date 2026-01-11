@@ -1,9 +1,10 @@
-import { Client as NotionClient } from "@notionhq/client";
+import { APIResponseError, Client as NotionClient } from "@notionhq/client";
 import {
   BlockObjectResponse,
   GetBlockResponse,
   GetDatabaseResponse,
   GetPageResponse,
+  type ListBlockChildrenResponse,
   PageObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints.js";
 import { GetBlogPostsInput } from "@notion-site/common/dto/orpc/blog-posts.js";
@@ -11,7 +12,6 @@ import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import * as n from "@notion-site/common/dto/notion/schema.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 
-const siteUrl = process.env.SITE_URL ?? "http://localhost:5173";
 const notionToken = process.env.NOTION_TOKEN;
 const databaseId = process.env.NOTION_DATABASE_ID ?? "xyz";
 
@@ -21,6 +21,7 @@ export async function getBlogPosts(filters: GetBlogPostsInput) {
   const response = await notion.databases.query({
     database_id: databaseId,
     start_cursor: filters.after,
+    page_size: filters.limit,
     filter: {
       and: [
         // Default filters
@@ -65,13 +66,19 @@ export async function getBlogPosts(filters: GetBlogPostsInput) {
 }
 
 export async function getBlogPost(id: string) {
-  const response = await notion.pages.retrieve({
-    page_id: id,
-  });
+  const response = await notion.pages
+    .retrieve({
+      page_id: id,
+    })
+    .catch((error) => {
+      if (error instanceof APIResponseError && error.status === 404) {
+        return null;
+      } else {
+        throw error;
+      }
+    });
 
-  if (!isPageObjectResponse(response)) {
-    throw new Error("lmao");
-  }
+  if (!response || !isPageObjectResponse(response)) return null;
 
   return parseBlogPost(response);
 }
@@ -81,11 +88,18 @@ export async function getBlocks(id: string) {
   let cursor = undefined;
 
   do {
-    const response = await notion.blocks.children.list({
-      block_id: id,
-      page_size: 100,
-      start_cursor: cursor,
-    });
+    const response: ListBlockChildrenResponse | null =
+      await notion.blocks.children
+        .list({
+          block_id: id,
+          page_size: 100,
+          start_cursor: cursor,
+        })
+        .catch(() => {
+          return null;
+        });
+
+    if (!response) return [];
 
     for (const block of response.results
       .filter(isBlockObjectResponse)

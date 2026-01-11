@@ -1,5 +1,6 @@
 import { UseQueryResult } from "@tanstack/react-query";
 import { Banner } from "./Banner.js";
+import { ORPCError } from "@orpc/client";
 
 export function QueryErrorBanner({
   query,
@@ -9,6 +10,15 @@ export function QueryErrorBanner({
   fallback: string;
 }) {
   if (!query.isError) return null;
-  console.log(query.error);
-  return <Banner type="error">{fallback}</Banner>;
+
+  return (
+    <Banner type="error">{extractErrorMessage(query.error) ?? fallback}</Banner>
+  );
+}
+
+function extractErrorMessage(error: unknown) {
+  if (error instanceof ORPCError) {
+    return error.message;
+  }
+  return null;
 }
