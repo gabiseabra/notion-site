@@ -1,9 +1,6 @@
 # notion-site
 
 A Notion-backed blog platform with a modern tech stack.
-This project serves a personal blog directly from a Notion database.
-
-## Overview
 
 This is a full-stack web application that transforms your Notion workspace into a published blog.
 Content is managed entirely through a Notion database, providing a seamless publishing experience without the need for
@@ -120,7 +117,7 @@ docker-compose --env-file .env up
 
 ## Deploying
 
-This project is deployed on Render at [blog.gabiseabra.dev](blog.gabiseabra.dev).
+This project is deployed on Render at [blog.gabiseabra.dev](https://blog.gabiseabra.dev).
 The deployment runs `npm run build; npm run start` in a node container,
 which starts the server serving static files from the [web](./web) and API routes from the [api](./api) build.
 
