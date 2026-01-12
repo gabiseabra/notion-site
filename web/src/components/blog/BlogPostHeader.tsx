@@ -5,11 +5,17 @@ import { Link } from "react-router";
 import { Col, Row } from "../ui/FlexBox.js";
 import { Icon } from "../notion/Icon.js";
 import { Span, Text } from "../ui/Text.js";
+import { match } from "ts-pattern";
+
+const defaultHiddenProperties: (keyof BlogPost["properties"])[] = import.meta
+  .env.DEV
+  ? []
+  : ["Status"];
 
 export function BlogPostHeader({
   size,
   post,
-  hiddenProperties,
+  hiddenProperties = defaultHiddenProperties,
 }: {
   size: "m" | "l";
   post: BlogPost;
@@ -31,20 +37,34 @@ export function BlogPostHeader({
         </Link>
       )}
 
-      <Row alignX="space-between" style={{ marginTop: gap }}>
+      <Row style={{ marginTop: gap }}>
         {!hiddenProperties?.includes("Publish Date") &&
           post.properties["Publish Date"].date && (
             <PublishedDate date={post.properties["Publish Date"].date.start} />
           )}
 
+        {!hiddenProperties?.includes("Status") &&
+          post.properties["Status"].status && (
+            <Badge
+              color={post.properties["Status"].status.color}
+              status={match(post.properties["Status"].status.name)
+                .with("Published", () => "complete" as const)
+                .with("In Review", () => "in-progress" as const)
+                .with("Draft", () => "empty" as const)
+                .exhaustive()}
+            >
+              {post.properties["Status"].status.name}
+            </Badge>
+          )}
+
         {!hiddenProperties?.includes("Tags") && (
-          <Row>
+          <>
             {post.properties.Tags.multi_select.map((option) => (
               <Badge key={option.name} color={option.color}>
                 {option.name}
               </Badge>
             ))}
-          </Row>
+          </>
         )}
       </Row>
     </Col>
