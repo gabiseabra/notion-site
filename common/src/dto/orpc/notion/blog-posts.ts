@@ -1,6 +1,6 @@
 import { oc } from "@orpc/contract";
-import { BlogPost } from "../notion/blog-post.js";
-import * as n from "../notion/schema.js";
+import { BlogPost } from "../../notion/blog-post.js";
+import * as n from "../../notion/schema.js";
 import z from "zod";
 
 export const GetBlogPostsInput = z.object({
@@ -29,7 +29,7 @@ export const blogPosts = oc.prefix("/blog-posts").router({
     .input(GetBlogPostsInput)
     .output(GetBlogPostsOutput),
 
-  getBlogPost: oc
+  getBlogPostById: oc
     .route({})
     .input(z.object({ id: z.string() }))
     .errors({

@@ -4,16 +4,16 @@ import {
   getBlocks,
   getBlogPost,
   getBlogPosts,
-} from "../services/notion/blog-posts.js";
+} from "../../services/notion/blog-posts.js";
 
-const c = implement(api.blogPosts);
+const c = implement(api.notion.blogPosts);
 
 export const blogPosts = c.router({
   getBlogPosts: c.getBlogPosts.handler(async ({ input }) => {
     return getBlogPosts(input);
   }),
 
-  getBlogPost: c.getBlogPost.handler(async ({ input, errors }) => {
+  getBlogPostById: c.getBlogPostById.handler(async ({ input, errors }) => {
     const [post, blocks] = await Promise.all([
       getBlogPost(input.id),
       getBlocks(input.id),

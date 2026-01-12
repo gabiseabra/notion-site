@@ -1,18 +1,13 @@
-import { z } from "zod";
+import { NotionDatabase } from "./database.js";
 import * as n from "./schema.js";
+import { z } from "zod";
 
 export const BlogPostStatus = z.enum(["Published", "Draft", "In Review"]);
 export type BlogPostStatus = z.infer<typeof BlogPostStatus>;
 
-export const BlogPost = z.object({
-  id: z.string(),
-  url: z.string(),
-  icon: n.icon.nullable(),
-  properties: z.object({
-    "Publish Date": n.date,
-    Title: n.title,
-    Tags: n._multi_select,
-    Status: n.status(BlogPostStatus.options),
-  }),
+export const BlogPost = NotionDatabase({
+  "Publish Date": n.date,
+  Tags: n._multi_select,
+  Status: n.status(BlogPostStatus.options),
 });
 export type BlogPost = z.infer<typeof BlogPost>;

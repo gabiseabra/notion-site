@@ -7,8 +7,8 @@ import {
   type ListBlockChildrenResponse,
   PageObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints.js";
-import { GetBlogPostsInput } from "@notion-site/common/dto/orpc/blog-posts.js";
-import { Page } from "@notion-site/common/dto/notion/page.js";
+import { GetBlogPostsInput } from "@notion-site/common/dto/orpc/notion/blog-posts.js";
+import { NotionPage } from "@notion-site/common/dto/notion/page.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import * as n from "@notion-site/common/dto/notion/schema.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
@@ -158,8 +158,8 @@ function isPageObjectResponse(
   return true;
 }
 
-function parsePage(page: PageObjectResponse): Page {
-  const result = Page.safeParse(page);
+function parsePage(page: PageObjectResponse): NotionPage {
+  const result = NotionPage.safeParse(page);
 
   if (!result.success) {
     throw new Error(

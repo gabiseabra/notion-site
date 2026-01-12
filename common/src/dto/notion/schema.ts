@@ -1,3 +1,10 @@
+/**
+ * @module @notion-site/common/dto/notion/schema.js
+ * The goal is to provide a stable DTO layer between the API and web packages.
+ * This module defines the shared Zod schemas and TypeScript types used to validate and type Notion API data across the
+ * project. It is a deliberately partial model: it mirrors the Notion API where needed, but it does not aim for full
+ * coverage, and several shapes are simplified or unsupported.
+ */
 import { z } from "zod";
 
 // enums

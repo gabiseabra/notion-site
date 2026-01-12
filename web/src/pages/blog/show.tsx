@@ -15,7 +15,7 @@ export function Component() {
 
   const orpc = useOrpc();
   const blogPostQuery = useQuery(
-    orpc.blogPosts.getBlogPost.queryOptions({
+    orpc.notion.blogPosts.getBlogPostById.queryOptions({
       input: { id },
     }),
   );

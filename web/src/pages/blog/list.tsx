@@ -12,7 +12,7 @@ export const index = true;
 export function Component() {
   const orpc = useOrpc();
   const blogPostsQuery = useInfiniteQuery(
-    orpc.blogPosts.getBlogPosts.infiniteOptions({
+    orpc.notion.blogPosts.getBlogPosts.infiniteOptions({
       input: (after) => ({ query: "", limit: 25, after }),
       initialPageParam: undefined as string | undefined,
       getNextPageParam: ({ pageInfo }) => pageInfo.nextCursor ?? undefined,
