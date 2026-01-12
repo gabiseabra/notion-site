@@ -3,10 +3,9 @@ import { NotionPage } from "../../notion/page.js";
 import * as zN from "../../notion/schema.js";
 import z from "zod";
 
-export const GetNotionPageOutput = NotionPage.extend({
+const GetNotionPageOutput = NotionPage.extend({
   blocks: zN.block.array(),
 });
-export type GetNotionPageOutput = z.infer<typeof GetNotionPageOutput>;
 
 export const pages = oc.prefix("/pages").router({
   getPageById: oc
