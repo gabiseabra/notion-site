@@ -42,13 +42,16 @@ type NotionDatabaseFilter<DB extends NotionDatabase> = {
   > & { property: k };
 }[keyof DB["properties"] & string];
 
-type Expr<T> = { and: T[] } | { or: T[] } | T;
-
+/**
+ * Notion SDK database.query filters expression for a concrete database schema.
+ */
 type NotionDatabaseFilterExpr<DB extends NotionDatabase> = Expr<
   | NotionDatabaseFilter<DB>
   | NotionTimestampFilter
   | Expr<NotionDatabaseFilter<DB>>
 >;
+
+type Expr<T> = { and: T[] } | { or: T[] } | T;
 
 /**
  * Sort descriptor restricted to property names declared in the database schema or timestamps.
@@ -63,6 +66,9 @@ type NotionDatabaseSorting<DB extends NotionDatabase> =
       direction: "ascending" | "descending";
     };
 
+/**
+ * Queries a Notion database with filter types inferred from the provided zod schema, and parses results.
+ */
 export async function queryNotionDatabase<DB extends NotionDatabase>(
   databaseId: string,
   schema: z.ZodSchema<DB>,
@@ -108,6 +114,9 @@ export async function queryNotionDatabase<DB extends NotionDatabase>(
   };
 }
 
+/**
+ * Recursively fetches all blocks for a page (depth-first) and parses them.
+ */
 export async function getNotionPage<DB extends NotionDatabase>(
   id: string,
   schema: z.ZodSchema<DB>,
@@ -135,6 +144,9 @@ export async function getNotionPage<DB extends NotionDatabase>(
   return parseResult.data;
 }
 
+/**
+ * Recursively fetches all blocks for a page (depth-first) and parses them.
+ */
 export async function getNotionBlocks(id: string) {
   const blocks: n.block[] = [];
   const errors: { id: string; error: z.ZodError }[] = [];

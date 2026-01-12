@@ -5,7 +5,7 @@ import {
   getNotionBlocks,
   getNotionPage,
   queryNotionDatabase,
-} from "../../services/notion/database.js";
+} from "../../services/notion/api.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 
 const c = implement(api.notion.blogPosts);

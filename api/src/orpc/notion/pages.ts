@@ -1,10 +1,7 @@
 import { implement } from "@orpc/server";
 import { api } from "@notion-site/common/dto/orpc/index.js";
 import { NotionPage } from "@notion-site/common/dto/notion/page.js";
-import {
-  getNotionBlocks,
-  getNotionPage,
-} from "../../services/notion/database.js";
+import { getNotionBlocks, getNotionPage } from "../../services/notion/api.js";
 
 const c = implement(api.notion.pages);
 
