@@ -6,6 +6,7 @@ import { Col, Row } from "../ui/FlexBox.js";
 import { Icon } from "../notion/Icon.js";
 import { Span, Text } from "../ui/Text.js";
 import { match } from "ts-pattern";
+import * as css from "../../styles/variables.js";
 
 const defaultHiddenProperties: (keyof BlogPost["properties"])[] = import.meta
   .env.DEV
@@ -17,13 +18,13 @@ export function BlogPostHeader({
   post,
   hiddenProperties = defaultHiddenProperties,
 }: {
-  size: "m" | "l";
+  size: "s" | "m" | "l";
   post: BlogPost;
   hiddenProperties?: (keyof BlogPost["properties"])[];
 }) {
   const TextElement = size === "l" ? "h1" : "span";
-  const textSize = size === "m" ? "h3" : undefined;
-  const gap = size === "l" ? 2 : 1;
+  const textSize = ({ s: "h4", m: "h3", l: undefined } as const)[size];
+  const gap = ({ s: 0.5, m: 1, l: 2 } as const)[size];
 
   return (
     <Col as="header" gap={gap}>
@@ -37,7 +38,9 @@ export function BlogPostHeader({
         </Link>
       )}
 
-      <Row style={{ marginTop: gap }}>
+      <Row
+        style={{ marginBottom: `calc(${css.space} * ${size === "l" ? 4 : 2})` }}
+      >
         {!hiddenProperties?.includes("Publish Date") &&
           post.properties["Publish Date"].date && (
             <PublishedDate date={post.properties["Publish Date"].date.start} />

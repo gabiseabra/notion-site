@@ -7,7 +7,7 @@ export function BlogPostList({ items }: { items: BlogPost[] }) {
     <ul className={styles.BlogPostList}>
       {items.map((post) => (
         <li key={post.url}>
-          <BlogPostHeader size="m" post={post} />
+          <BlogPostHeader size="s" post={post} />
         </li>
       ))}
     </ul>
