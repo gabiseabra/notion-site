@@ -64,6 +64,9 @@ export const file = z.object({
 export const icon = z.union([external, emoji, custom_emoji, file]);
 export type icon = z.infer<typeof icon>;
 
+export const cover = z.union([external, file]);
+export type cover = z.infer<typeof cover>;
+
 // unsupported nodes
 
 export const mention = z.object({ type: z.literal("mention") });

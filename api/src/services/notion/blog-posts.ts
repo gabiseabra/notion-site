@@ -8,6 +8,7 @@ import {
   PageObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints.js";
 import { GetBlogPostsInput } from "@notion-site/common/dto/orpc/blog-posts.js";
+import { Page } from "@notion-site/common/dto/notion/page.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import * as n from "@notion-site/common/dto/notion/schema.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
@@ -95,6 +96,26 @@ async function _getBlogPost(id: string) {
 
 export const getBlogPost = memoize(_getBlogPost, { async: true, maxAge: ttl });
 
+async function _getPage(id: string) {
+  const response = await notion.pages
+    .retrieve({
+      page_id: id,
+    })
+    .catch((error) => {
+      if (error instanceof APIResponseError && error.status === 404) {
+        return null;
+      } else {
+        throw error;
+      }
+    });
+
+  if (!response || !isPageObjectResponse(response)) return null;
+
+  return parsePage(response);
+}
+
+export const getPage = memoize(_getPage, { async: true, maxAge: ttl });
+
 async function _getBlocks(id: string) {
   const blocks: n.block[] = [];
   let cursor = undefined;
@@ -135,6 +156,21 @@ function isPageObjectResponse(
   page: GetPageResponse | GetDatabaseResponse,
 ): page is PageObjectResponse {
   return true;
+}
+
+function parsePage(page: PageObjectResponse): Page {
+  const result = Page.safeParse(page);
+
+  if (!result.success) {
+    throw new Error(
+      `Failed to parse page ${page.url} : ${JSON.stringify(result.error, null, 2)}`,
+    );
+  }
+
+  return {
+    ...result.data,
+    url: new URL(result.data.url).pathname.replace(/^\//, ""),
+  };
 }
 
 function parseBlogPost(page: PageObjectResponse): BlogPost {
