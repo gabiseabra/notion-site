@@ -4,7 +4,7 @@ import {
   ContractRouterClient,
   inferRPCMethodFromContractRouter,
 } from "@orpc/contract";
-import { api } from "@notion-site/common/dto/orpc/index.js";
+import { api } from "@notion-site/common/orpc/index.js";
 import {
   BatchLinkPlugin,
   SimpleCsrfProtectionLinkPlugin,

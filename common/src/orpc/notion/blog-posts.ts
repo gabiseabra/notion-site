@@ -1,6 +1,6 @@
 import { oc } from "@orpc/contract";
-import { BlogPost } from "../../notion/blog-post.js";
-import * as zN from "../../notion/schema.js";
+import { BlogPost } from "../../dto/notion/blog-post.js";
+import * as zN from "../../dto/notion/schema.js";
 import z from "zod";
 
 const GetBlogPostsInput = z.object({

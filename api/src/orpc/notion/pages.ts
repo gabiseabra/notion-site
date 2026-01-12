@@ -1,5 +1,5 @@
 import { implement } from "@orpc/server";
-import { api } from "@notion-site/common/dto/orpc/index.js";
+import { api } from "@notion-site/common/orpc/index.js";
 import { NotionPage } from "@notion-site/common/dto/notion/page.js";
 import { getNotionBlocks, getNotionPage } from "../../services/notion/api.js";
 

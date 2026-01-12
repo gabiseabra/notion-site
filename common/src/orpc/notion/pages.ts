@@ -1,6 +1,6 @@
 import { oc } from "@orpc/contract";
-import { NotionPage } from "../../notion/page.js";
-import * as zN from "../../notion/schema.js";
+import { NotionPage } from "../../dto/notion/page.js";
+import * as zN from "../../dto/notion/schema.js";
 import z from "zod";
 
 const GetNotionPageOutput = NotionPage.extend({
