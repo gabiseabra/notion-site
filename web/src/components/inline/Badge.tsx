@@ -1,10 +1,10 @@
-import * as n from "@notion-site/common/dto/notion/schema.js";
+import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { ReactNode } from "react";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import styles from "./Badge.module.scss";
 
 type BadgeProps = {
-  color: n.color;
+  color: zN.color;
   status?: "empty" | "in-progress" | "complete";
   children: ReactNode;
 };

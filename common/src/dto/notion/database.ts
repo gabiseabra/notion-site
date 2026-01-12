@@ -1,5 +1,5 @@
 import { z } from "zod";
-import * as n from "./schema.js";
+import * as zN from "./schema.js";
 
 /**
  * Creates a Zod schema for a Notion database entry.
@@ -12,10 +12,10 @@ export const NotionDatabase = <T extends z.ZodRawShape>(shape: T) =>
   z.object({
     id: z.string(),
     url: z.string().transform((url) => URL.parse(url)?.pathname ?? url),
-    icon: n.icon.nullable(),
-    cover: n.cover.nullable(),
+    icon: zN.icon.nullable(),
+    cover: zN.cover.nullable(),
     properties: z.object({
-      Title: n.title,
+      Title: zN.title,
       ...shape,
     }),
   });
@@ -23,21 +23,21 @@ export const NotionDatabase = <T extends z.ZodRawShape>(shape: T) =>
  * Matches all valid Notion database property schemas.
  */
 export const NotionProperty = z.union([
-  n.text,
-  n.number,
-  n.date,
-  n.title,
-  n.rich_text,
-  n._status,
-  n._select,
-  n._multi_select,
+  zN.text,
+  zN.number,
+  zN.date,
+  zN.title,
+  zN.rich_text,
+  zN._status,
+  zN._select,
+  zN._multi_select,
 ]);
 export type NotionProperty = z.infer<typeof NotionProperty>;
 export type NotionPropertiesRecord = { [k: string]: NotionProperty };
 export type NotionDatabase<
   T extends NotionPropertiesRecord = NotionPropertiesRecord,
 > = {
-  properties: { Title: n.title } & T;
+  properties: { Title: zN.title } & T;
 } & Omit<
   z.infer<ReturnType<typeof NotionDatabase<z.ZodRawShape>>>,
   "properties"

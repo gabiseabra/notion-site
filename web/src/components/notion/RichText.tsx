@@ -1,4 +1,4 @@
-import * as n from "@notion-site/common/dto/notion/schema.js";
+import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { match } from "ts-pattern";
 import { Banner } from "../block/Banner.js";
 import { BlockAnnotations, Span, Text, TextElement } from "../inline/Text.js";
@@ -9,7 +9,7 @@ export function RichText({
   ...props
 }: {
   as: TextElement;
-  data: n.rich_text_item;
+  data: zN.rich_text_item;
 } & Partial<BlockAnnotations>) {
   return (
     <Text as={as} {...props}>

@@ -2,7 +2,7 @@ import { RichText } from "../RichText.js";
 import { Badge } from "../../inline/Badge.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import { Link } from "react-router";
-import { Col, Row } from "../../block/FlexBox.js";
+import { Col, ColProps, Row } from "../../block/FlexBox.js";
 import { Icon } from "../Icon.js";
 import { Span, Text } from "../../inline/Text.js";
 import { match } from "ts-pattern";
@@ -13,13 +13,15 @@ const defaultHiddenProperties: (keyof BlogPost["properties"])[] = import.meta
   ? []
   : ["Status"];
 
-export function BlogPostHeader({
+export function BlogPostMetadata({
+  as: Component,
   size,
-  post,
+  blogPost,
   hiddenProperties = defaultHiddenProperties,
 }: {
+  as: ColProps["as"];
   size: "s" | "m" | "l";
-  post: BlogPost;
+  blogPost: BlogPost;
   hiddenProperties?: (keyof BlogPost["properties"])[];
 }) {
   const TextElement = size === "l" ? "h1" : "span";
@@ -27,40 +29,42 @@ export function BlogPostHeader({
   const gap = ({ s: 0.5, m: 1, l: 2 } as const)[size];
 
   return (
-    <Col as="header" gap={gap}>
+    <Col as={Component} gap={gap}>
       {!hiddenProperties?.includes("Title") && (
-        <Link to={`/blog/${post.url}`}>
+        <Link to={`/blog/${blogPost.url}`}>
           <Text as={TextElement} size={textSize} style={{ marginBottom: 0 }}>
-            {post.icon && <Icon data={post.icon} size={size} />}
+            {blogPost.icon && <Icon data={blogPost.icon} size={size} />}
             &nbsp;
-            <RichText as="span" data={post.properties.Title.title} />
+            <RichText as="span" data={blogPost.properties.Title.title} />
           </Text>
         </Link>
       )}
 
       <Row wrap style={{ marginBottom: css.space(size === "l" ? 4 : 2) }}>
         {!hiddenProperties?.includes("Publish Date") &&
-          post.properties["Publish Date"].date && (
-            <PublishedDate date={post.properties["Publish Date"].date.start} />
+          blogPost.properties["Publish Date"].date && (
+            <PublishedDate
+              date={blogPost.properties["Publish Date"].date.start}
+            />
           )}
 
         {!hiddenProperties?.includes("Status") &&
-          post.properties["Status"].status && (
+          blogPost.properties["Status"].status && (
             <Badge
-              color={post.properties["Status"].status.color}
-              status={match(post.properties["Status"].status.name)
+              color={blogPost.properties["Status"].status.color}
+              status={match(blogPost.properties["Status"].status.name)
                 .with("Published", () => "complete" as const)
                 .with("In Review", () => "in-progress" as const)
                 .with("Draft", () => "empty" as const)
                 .exhaustive()}
             >
-              {post.properties["Status"].status.name}
+              {blogPost.properties["Status"].status.name}
             </Badge>
           )}
 
         {!hiddenProperties?.includes("Tags") && (
           <>
-            {post.properties.Tags.multi_select.map((option) => (
+            {blogPost.properties.Tags.multi_select.map((option) => (
               <Badge key={option.name} color={option.color}>
                 {option.name}
               </Badge>

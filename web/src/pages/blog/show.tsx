@@ -1,10 +1,11 @@
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useOrpc } from "../../providers/OrpcProvider.js";
-import { BlogPost } from "../../components/notion/blog-posts/BlogPost.js";
 import { QueryErrorBanner } from "../../components/block/QueryErrorBanner.js";
 import { Spinner } from "../../components/inline/Spinner.js";
 import { Col } from "../../components/block/FlexBox.js";
+import { BlogPostMetadata } from "../../components/notion/blog-posts/BlogPostMetadata.js";
+import { NestedBlocks } from "../../components/notion/NestedBlocks.js";
 
 export const path = "/blog/:url";
 
@@ -39,5 +40,11 @@ export function Component() {
 
   const blogPost = blogPostQuery.data;
 
-  return <BlogPost post={blogPost} />;
+  return (
+    <article>
+      <BlogPostMetadata as="header" size="l" blogPost={blogPost} />
+
+      <NestedBlocks data={blogPost.blocks} />
+    </article>
+  );
 }

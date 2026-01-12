@@ -1,6 +1,6 @@
 import { oc } from "@orpc/contract";
 import { BlogPost } from "../../notion/blog-post.js";
-import * as n from "../../notion/schema.js";
+import * as zN from "../../notion/schema.js";
 import z from "zod";
 
 export const GetBlogPostsInput = z.object({
@@ -20,7 +20,7 @@ export const GetBlogPostsOutput = z.object({
 });
 export type GetBlogPostsOutput = z.infer<typeof GetBlogPostsOutput>;
 
-export const GetBlogPostOutput = BlogPost.extend({ blocks: n.block.array() });
+export const GetBlogPostOutput = BlogPost.extend({ blocks: zN.block.array() });
 export type GetBlogPostOutput = z.infer<typeof GetBlogPostOutput>;
 
 export const blogPosts = oc.prefix("/blog-posts").router({

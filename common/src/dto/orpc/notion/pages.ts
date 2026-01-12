@@ -1,10 +1,10 @@
 import { oc } from "@orpc/contract";
 import { NotionPage } from "../../notion/page.js";
-import * as n from "../../notion/schema.js";
+import * as zN from "../../notion/schema.js";
 import z from "zod";
 
 export const GetNotionPageOutput = NotionPage.extend({
-  blocks: n.block.array(),
+  blocks: zN.block.array(),
 });
 export type GetNotionPageOutput = z.infer<typeof GetNotionPageOutput>;
 

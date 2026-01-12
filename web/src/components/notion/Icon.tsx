@@ -1,4 +1,4 @@
-import * as n from "@notion-site/common/dto/notion/schema.js";
+import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { match } from "ts-pattern";
 import { ComponentProps } from "react";
 
@@ -7,7 +7,7 @@ export function Icon({
   size,
   style = {},
   ...props
-}: ComponentProps<"div"> & { data: n.icon; size: "s" | "m" | "l" }) {
+}: ComponentProps<"div"> & { data: zN.icon; size: "s" | "m" | "l" }) {
   const width = { s: "18px", m: "24px", l: "32px" }[size];
 
   return (

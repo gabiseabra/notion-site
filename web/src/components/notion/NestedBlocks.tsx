@@ -1,4 +1,4 @@
-import * as n from "@notion-site/common/dto/notion/schema.js";
+import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { RichText } from "./RichText.js";
 import { match } from "ts-pattern";
 import { Fragment } from "react";
@@ -8,7 +8,7 @@ import { BlockAnnotations } from "../inline/Text.js";
 export function NestedBlocks({
   data,
   indent = 0,
-}: { data: n.block[] } & Partial<BlockAnnotations>) {
+}: { data: zN.block[] } & Partial<BlockAnnotations>) {
   return (
     <>
       {getRootBlocks(data).map((block) =>
@@ -57,7 +57,7 @@ export function NestedBlocks({
 function Block({
   data,
   ...props
-}: { data: n.block } & Partial<BlockAnnotations>) {
+}: { data: zN.block } & Partial<BlockAnnotations>) {
   return (
     <>
       {match(data)
@@ -116,11 +116,11 @@ export type RootBlock =
       children: Extract<NestedBlock, { type: "numbered_list_item" }>[];
     };
 
-export type NestedBlock = n.block & {
-  children: n.block[];
+export type NestedBlock = zN.block & {
+  children: zN.block[];
 };
 
-function getRootBlocks(blocks: n.block[]) {
+function getRootBlocks(blocks: zN.block[]) {
   const isNested = blocks.every((block) => block.parent.type === "block_id");
 
   return blocks
@@ -136,8 +136,8 @@ function getRootBlocks(blocks: n.block[]) {
 }
 
 const mapNestedBlock =
-  (blocks: n.block[]) =>
-  (block: n.block): NestedBlock => ({
+  (blocks: zN.block[]) =>
+  (block: zN.block): NestedBlock => ({
     ...block,
     // includes all of the deeply nested blocks of children
     children: blocks

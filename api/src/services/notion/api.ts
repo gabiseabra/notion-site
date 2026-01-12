@@ -10,7 +10,7 @@ import {
 } from "@notionhq/client/build/src/api-endpoints.js";
 import { DistributiveOmit } from "@notion-site/common/utils/types.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
-import * as n from "@notion-site/common/dto/notion/schema.js";
+import * as zN from "@notion-site/common/dto/notion/schema.js";
 
 const notionToken = process.env.NOTION_TOKEN;
 const notion = new NotionClient({ auth: notionToken });
@@ -148,7 +148,7 @@ export async function getNotionPage<DB extends NotionDatabase>(
  * Recursively fetches all blocks for a page (depth-first) and parses them.
  */
 export async function getNotionBlocks(id: string) {
-  const blocks: n.block[] = [];
+  const blocks: zN.block[] = [];
   const errors: { id: string; error: z.ZodError }[] = [];
 
   let cursor = undefined;
@@ -168,7 +168,7 @@ export async function getNotionBlocks(id: string) {
     if (!response) return { blocks, errors };
 
     for (const block of response.results) {
-      const parseResult = n.block.safeParse(block);
+      const parseResult = zN.block.safeParse(block);
 
       if (!parseResult.success) {
         errors.push({ id: block.id, error: parseResult.error });
