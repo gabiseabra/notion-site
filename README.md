@@ -126,5 +126,5 @@ which starts the server serving static files from the [web](./web) and API route
 - [ ] Support unsupported blocks (e.g. code blocks)
 - [ ] Add `/tags/:tag` front-end route to list posts by tag
 - [ ] Add search bar and tags filter
+- [ ] Add component and API to render notion pages by id
 - [ ] Improve error handling
-
