@@ -1,10 +1,10 @@
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useOrpc } from "../../providers/OrpcProvider.js";
-import { BlogPost } from "../../components/blog/BlogPost.js";
-import { QueryErrorBanner } from "../../components/feedback/QueryErrorBanner.js";
-import { Spinner } from "../../components/feedback/Spinner.js";
-import { Col } from "../../components/ui/FlexBox.js";
+import { BlogPost } from "../../components/notion/blog-posts/BlogPost.js";
+import { QueryErrorBanner } from "../../components/block/QueryErrorBanner.js";
+import { Spinner } from "../../components/inline/Spinner.js";
+import { Col } from "../../components/block/FlexBox.js";
 
 export const path = "/blog/:url";
 

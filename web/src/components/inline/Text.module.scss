@@ -1,66 +1,70 @@
-@use "../../styles/mixins/text" as text;
-@use "../../styles/theme" as theme;
-@use "../../styles/typography" as typography;
+@use "../../css/mixins/text" as text;
+@use "../../css/theme" as theme;
+@use "../../css/typography" as typography;
 
-.Italic {
+.italic {
   font-style: italic;
 }
 
-.Bold {
+.bold {
   font-weight: bold;
 }
 
-.Underline {
+.underline {
   text-decoration: underline;
 }
 
-.Strikethrough {
+.strikethrough {
   text-decoration: line-through;
 }
 
-.Underline.Strikethrough {
+.underline.strikethrough {
   text-decoration: underline line-through;
 }
 
-.Code {
+.code {
   @extend %code;
 }
 
 // Theme palette classes
 @each $name, $_ in theme.$colors-codes {
-  .#{"Color-" + $name} {
-    color: var(#{"--color-" + $name});
+  .#{"color-" + $name} {
+    @if ($name == "default") {
+      color: currentColor;
+    } @else {
+      color: var(#{"--color-" + $name});
+    }
   }
 
-  .#{"Color-" + $name + "_background"} {
+  .#{"color-" + $name + "_background"} {
     color: var(#{"--color-" + $name});
     background-color: var(#{"--bg-" + $name});
   }
 }
 
-// Semantic colour aliases (if you still want these explicitly)
+// Semantic colour aliases
 @each $key in (primary, secondary, muted, disabled, link) {
-  .#{"Color-" + $key} {
+  .#{"color-" + $key} {
     color: var(#{"--color-" + $key});
   }
 }
 
 // Sizes
 @each $name, $size in (caption: "var(--font-size-caption)", body: "var(--font-size)") {
-  .#{"Size-" + $name} {
+  .#{"size-" + $name} {
     font-size: #{$size};
   }
 }
 
 @for $level from 1 through 4 {
-  .#{"Size-h" + $level} {
+  .#{"size-h" + $level} {
     @include text.heading-size($level);
   }
 }
 
 // Indents
 @for $i from 1 through 4 {
-  .#{"Indent-" + $i} {
+  .#{"indent-" + $i} {
     @include typography.indent($i);
   }
 }

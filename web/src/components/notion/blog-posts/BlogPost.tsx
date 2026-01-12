@@ -1,4 +1,4 @@
-import { NestedBlocks } from "../notion/NestedBlocks.js";
+import { NestedBlocks } from "../NestedBlocks.js";
 import { GetBlogPostOutput } from "@notion-site/common/dto/orpc/blog-posts.js";
 import { BlogPostHeader } from "./BlogPostHeader.js";
 

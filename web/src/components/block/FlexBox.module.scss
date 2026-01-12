@@ -1,10 +1,10 @@
-.Row {
+.row {
   display: flex;
   flex-direction: row;
   gap: var(--space);
 }
 
-.Col {
+.col {
   display: flex;
   flex-direction: column;
   gap: var(--space);

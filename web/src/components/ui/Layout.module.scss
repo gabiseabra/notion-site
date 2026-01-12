@@ -1,9 +1,9 @@
-@use "../../styles/mixins/text" as text;
+@use "../../css/mixins/text" as text;
 
 $max-width: 800px;
 $min-padding-inline: 18px;
 
-.Layout {
+.layout {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -34,74 +34,4 @@ $min-padding-inline: 18px;
   }
 }
 
-.Link {
-  color: var(--color-primary);
-}
-
-.Subdomain {
-  font-family: var(--font-cursive);
-  font-size: 2em;
-}
-
-.Domain {
-  color: var(--color-primary);
-  text-shadow: text.shadow-outline(white, 0.5px),
-  1px 2px var(--color-secondary);
-  font-family: var(--font-monospace);
-  font-weight: bold;
-  font-size: 1.25em;
-}
-
-.Dot {
-  --dot-size: 3px;
-  --dot-radius: 1px;
-
-  color: transparent;
-  background: var(--color-secondary);
-  width: var(--dot-size);
-  height: var(--dot-size);
-  border-radius: var(--dot-radius);
-  display: inline-block;
-  vertical-align: text-bottom;
-  margin-bottom: 2px;
-}
-
-$github-badge-size: 64px;
-$github-icon-size: 21px;
-$github-icon-margin: 8px;
-
-.Github {
-  cursor: pointer;
-  position: fixed;
-  top: 0;
-  right: 0;
-
-  & > div {
-    overflow: hidden;
-    display: flex;
-    justify-content: end;
-    align-items: end;
-
-    svg {
-      z-index: 1;
-      fill: var(--bg-secondary);
-      margin: $github-icon-margin;
-      width: $github-icon-size;
-      height: $github-icon-size;
-    }
-
-    &:after {
-      z-index: 0;
-      content: '';
-      width: 0;
-      height: 0;
-      border-style: solid;
-      border-width: 0 $github-badge-size $github-badge-size 0;
-      border-color: transparent var(--color-primary) transparent transparent;
-      right: 0;
-      top: 0;
-      position: absolute;
-    }
-  }
-}
 

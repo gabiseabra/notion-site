@@ -1,19 +1,21 @@
-.Spinner {
+.spinner {
   --spinner-animation-duration: 1.4s;
-  --spinner-animation-delay: 0.21s;
+  --spinner-animation-delay: 0.18s;
+}
 
-  &:global(.size-s) {
-    --spinner-size: 8px;
-    --spinner-gap: 4px;
-    --spinner-inverse-bounce-rate: 0.55;
-  }
+.size-s {
+  --spinner-size: 8px;
+  --spinner-gap: 4px;
+  --spinner-inverse-bounce-rate: 0.55;
+}
 
-  &:global(.size-m) {
-    --spinner-size: 16px;
-    --spinner-gap: 10px;
-    --spinner-inverse-bounce-rate: 0.65;
-  }
+.size-m {
+  --spinner-size: 16px;
+  --spinner-gap: 10px;
+  --spinner-inverse-bounce-rate: 0.65;
+}
 
+.spinner {
   display: inline-flex;
   gap: var(--spinner-gap);
   text-align: center;
@@ -38,7 +40,6 @@
     animation-delay: calc(var(--spinner-animation-delay) * -1);
   }
 }
-
 
 @keyframes sk-bouncedelay {
   0%, 80%, 100% {

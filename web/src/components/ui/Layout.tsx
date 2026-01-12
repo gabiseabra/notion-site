@@ -1,30 +1,18 @@
 import { ReactNode } from "react";
+import { SiteLogo } from "./SiteLogo.js";
+import { GithubRibbon } from "./GithubRibbon.js";
 import { Link } from "react-router";
-import { FaGithub } from "react-icons/fa";
 import styles from "./Layout.module.scss";
 
 export function Layout({ children }: { children: ReactNode }) {
   return (
-    <div className={styles.Layout}>
+    <div className={styles.layout}>
       <header>
-        <Link to="/" className={styles.Link}>
-          <span className={styles.Subdomain}>blog</span>
-          <span className={styles.Dot}>.</span>
-          <span className={styles.Domain}>gabiseabra</span>
-          <span className={styles.Dot}>.</span>
-          <span className={styles.Domain}>dev</span>
+        <Link to="/">
+          <SiteLogo />
         </Link>
 
-        <a
-          target="_blank"
-          href="https://github.com/gabiseabra/notion-site"
-          title="See the source code on Github"
-          className={styles.Github}
-        >
-          <div>
-            <FaGithub />
-          </div>
-        </a>
+        <GithubRibbon />
       </header>
 
       <main>{children}</main>

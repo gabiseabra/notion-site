@@ -1,0 +1,33 @@
+@use "../../css/mixins/text" as text;
+
+.site-logo {
+  color: var(--color-primary);
+}
+
+.subdomain {
+  font-family: var(--font-cursive);
+  font-size: 2em;
+}
+
+.domain {
+  color: var(--color-primary);
+  text-shadow: text.shadow-outline(white, 0.5px),
+  1px 2px var(--color-secondary);
+  font-family: var(--font-monospace);
+  font-weight: bold;
+  font-size: 1.25em;
+}
+
+.dot {
+  --dot-size: 3px;
+  --dot-radius: 1px;
+
+  color: transparent;
+  background: var(--color-secondary);
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: var(--dot-radius);
+  display: inline-block;
+  vertical-align: text-bottom;
+  margin-bottom: 2px;
+}

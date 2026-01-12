@@ -1,9 +1,9 @@
 import { useOrpc } from "../../providers/OrpcProvider.js";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { BlogPostList } from "../../components/blog/BlogPostList.js";
-import { QueryErrorBanner } from "../../components/feedback/QueryErrorBanner.js";
-import { Spinner } from "../../components/feedback/Spinner.js";
-import { Col } from "../../components/ui/FlexBox.js";
+import { BlogPostList } from "../../components/notion/blog-posts/BlogPostList.js";
+import { QueryErrorBanner } from "../../components/block/QueryErrorBanner.js";
+import { Spinner } from "../../components/inline/Spinner.js";
+import { Col } from "../../components/block/FlexBox.js";
 import { Button } from "../../components/form/Button.js";
 
 // export const path = "/blog";

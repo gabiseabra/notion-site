@@ -13,9 +13,9 @@ export function Badge({ color, status, children }: BadgeProps) {
   return (
     <span
       className={[
-        styles.Badge,
-        styles[`Color-${color}`],
-        status && styles[`Status-${status}`],
+        styles.badge,
+        styles[`color-${color}`],
+        status && styles[`status-${status}`],
       ]
         .filter(isTruthy)
         .join(" ")}

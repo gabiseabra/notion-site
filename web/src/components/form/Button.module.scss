@@ -1,14 +1,13 @@
-.Button {
+.button {
   font-size: .85em;
-
-  &:global(.variant-plain) {
-    background: transparent;
-    border: none;
-    color: var(--color-link);
-
-    &:disabled {
-      color: var(--color-disabled)
-    }
-  }
 }
 
+.variant-plain {
+  background: transparent;
+  border: none;
+  color: var(--color-link);
+
+  &:disabled {
+    color: var(--color-disabled)
+  }
+}

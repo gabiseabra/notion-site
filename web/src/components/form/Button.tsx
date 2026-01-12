@@ -10,7 +10,9 @@ export function Button({
 }) {
   return (
     <button
-      className={[className, styles.Button, `variant-${variant}`].join(" ")}
+      className={[className, styles.button, styles[`variant-${variant}`]].join(
+        " ",
+      )}
       {...props}
     />
   );

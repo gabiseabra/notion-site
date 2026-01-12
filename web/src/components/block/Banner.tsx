@@ -10,7 +10,7 @@ type BannerProps = {
 
 export function Banner({ type, children }: BannerProps) {
   return (
-    <div className={[styles.Banner, type].join(" ")}>
+    <div className={[styles.banner, styles[`type-${type}`]].join(" ")}>
       {match(type)
         .with("warning", () => <PiWarningBold />)
         .with("error", () => <PiWarningCircleBold />)

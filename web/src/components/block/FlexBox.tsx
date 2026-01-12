@@ -1,31 +1,33 @@
 import { ComponentProps, CSSProperties } from "react";
 import styles from "./FlexBox.module.scss";
-import * as css from "../../styles/variables.js";
+import * as css from "../../css/index.js";
 
 export type RowProps = ComponentProps<"div"> & {
   as?: "div" | "section";
+  gap?: number;
+  wrap?: boolean;
   alignX?: CSSProperties["justifyContent"];
   alignY?: CSSProperties["alignItems"];
-  gap?: number;
 };
 
 export function Row({
   as: Component = "div",
-  className = "",
   style = {},
+  gap,
+  wrap,
   alignX,
   alignY,
-  gap,
+  className = "",
   ...props
 }: RowProps) {
   return (
     <Component
-      className={`${className} ${styles.Row}`}
+      className={`${className} ${styles.row}`}
       style={{
         alignItems: alignY,
         justifyContent: alignX,
-        gap:
-          typeof gap === "number" ? `calc(${css.space} * ${gap})` : undefined,
+        gap: typeof gap === "number" ? css.space(gap) : undefined,
+        flexWrap: wrap ? "wrap" : undefined,
         ...style,
       }}
       {...props}
@@ -51,12 +53,11 @@ export function Col({
 }: ColProps) {
   return (
     <Component
-      className={`${className} ${styles.Col}`}
+      className={`${className} ${styles.col}`}
       style={{
         alignItems: alignX,
         justifyContent: alignY,
-        gap:
-          typeof gap === "number" ? `calc(${css.space} * ${gap})` : undefined,
+        gap: typeof gap === "number" ? css.space(gap) : undefined,
         ...style,
       }}
       {...props}

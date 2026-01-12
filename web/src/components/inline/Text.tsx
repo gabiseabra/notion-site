@@ -3,8 +3,6 @@ import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { CSSProperties, ReactNode } from "react";
 import styles from "./Text.module.scss";
 
-type Arrayable<T> = T | T[];
-
 export type TextColor =
   | n.annotations["color"]
   | "primary"
@@ -17,12 +15,12 @@ export type TextSize = "caption" | "body" | "h1" | "h2" | "h3" | "h4";
 
 export type InlineAnnotations = {
   size: TextSize;
-  color: Arrayable<TextColor>;
+  color: TextColor;
 } & Omit<n.annotations, "color">;
 
 export type BlockAnnotations = {
   size: TextSize;
-  color: Arrayable<TextColor>;
+  color: TextColor;
   indent: number;
 };
 
@@ -52,9 +50,9 @@ export function Text({
   return (
     <Tag
       className={[
-        indent && styles[`Indent-${{ 1: 1, 2: 2, 3: 3, 4: 4 }[indent] ?? 0}`],
-        size && styles[`Size-${size}`],
-        getColorClass(color),
+        indent && styles[`indent-${{ 1: 1, 2: 2, 3: 3, 4: 4 }[indent] ?? 0}`],
+        size && styles[`size-${size}`],
+        color && styles[`color-${color}`],
         className,
       ]
         .filter(isTruthy)
@@ -81,13 +79,13 @@ export function Span({
   return (
     <span
       className={[
-        bold && styles.Bold,
-        italic && styles.Italic,
-        underline && styles.Underline,
-        strikethrough && styles.Strikethrough,
-        code && styles.Code,
-        size && styles[`Size-${size}`],
-        ...getColorClass(color),
+        bold && styles.bold,
+        italic && styles.italic,
+        underline && styles.underline,
+        strikethrough && styles.strikethrough,
+        code && styles.code,
+        size && styles[`size-${size}`],
+        color && styles[`color-${color}`],
       ]
         .filter(isTruthy)
         .join(" ")}
@@ -95,11 +93,4 @@ export function Span({
       {children}
     </span>
   );
-}
-
-function getColorClass(color?: Arrayable<TextColor>) {
-  return ([] as TextColor[])
-    .concat(color ?? [])
-    .filter((color) => color !== "default")
-    .map((color) => styles[`Color-${color}`]);
 }

@@ -1,21 +1,21 @@
-@use "../../styles/theme" as theme;
+@use "../../css/theme" as theme;
 
-.Badge {
+.badge {
   padding: 0 var(--space);
   border-radius: var(--radius);
   font-size: var(--font-size-caption);
 }
 
 @each $name, $_ in theme.$colors-codes {
-  .#{"Color-" + $name} {
+  .#{"color-" + $name} {
     color: var(#{"--color-" + $name});
     background-color: var(#{"--bg-" + $name});
   }
 }
 
-.Status-empty,
-.Status-in-progress,
-.Status-complete {
+.status-empty,
+.status-in-progress,
+.status-complete {
   position: relative;
   padding-left: calc(var(--space) * 2 + 6px);
 
@@ -34,14 +34,14 @@
   }
 }
 
-.Status-empty {
+.status-empty {
   &::before {
     border: 1px solid currentColor;
     background: transparent;
   }
 }
 
-.Status-in-progress {
+.status-in-progress {
   &::before {
     border: 1px solid currentColor;
     background: linear-gradient(
@@ -52,7 +52,7 @@
   }
 }
 
-.Status-complete {
+.status-complete {
   &::before {
     background: currentColor;
   }

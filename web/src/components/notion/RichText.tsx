@@ -1,7 +1,7 @@
 import * as n from "@notion-site/common/dto/notion/schema.js";
 import { match } from "ts-pattern";
-import { Banner } from "../feedback/Banner.js";
-import { BlockAnnotations, Span, Text, TextElement } from "../ui/Text.js";
+import { Banner } from "../block/Banner.js";
+import { BlockAnnotations, Span, Text, TextElement } from "../inline/Text.js";
 
 export function RichText({
   as,

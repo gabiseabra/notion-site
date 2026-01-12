@@ -1,12 +1,12 @@
-import { RichText } from "../notion/RichText.js";
-import { Badge } from "../ui/Badge.js";
+import { RichText } from "../RichText.js";
+import { Badge } from "../../inline/Badge.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import { Link } from "react-router";
-import { Col, Row } from "../ui/FlexBox.js";
-import { Icon } from "../notion/Icon.js";
-import { Span, Text } from "../ui/Text.js";
+import { Col, Row } from "../../block/FlexBox.js";
+import { Icon } from "../Icon.js";
+import { Span, Text } from "../../inline/Text.js";
 import { match } from "ts-pattern";
-import * as css from "../../styles/variables.js";
+import * as css from "../../../css/index.js";
 
 const defaultHiddenProperties: (keyof BlogPost["properties"])[] = import.meta
   .env.DEV
@@ -38,9 +38,7 @@ export function BlogPostHeader({
         </Link>
       )}
 
-      <Row
-        style={{ marginBottom: `calc(${css.space} * ${size === "l" ? 4 : 2})` }}
-      >
+      <Row wrap style={{ marginBottom: css.space(size === "l" ? 4 : 2) }}>
         {!hiddenProperties?.includes("Publish Date") &&
           post.properties["Publish Date"].date && (
             <PublishedDate date={post.properties["Publish Date"].date.start} />

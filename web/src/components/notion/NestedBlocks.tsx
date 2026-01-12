@@ -2,8 +2,8 @@ import * as n from "@notion-site/common/dto/notion/schema.js";
 import { RichText } from "./RichText.js";
 import { match } from "ts-pattern";
 import { Fragment } from "react";
-import { Banner } from "../feedback/Banner.js";
-import { BlockAnnotations } from "../ui/Text.js";
+import { Banner } from "../block/Banner.js";
+import { BlockAnnotations } from "../inline/Text.js";
 
 export function NestedBlocks({
   data,
