@@ -115,6 +115,14 @@ Use `docker-compose` to run with Docker:
 docker-compose --env-file .env up
 ```
 
+### Dev mode
+
+There are enhanced visibility tools in dev mode you help with editing:
+
+- [x] List hidden posts
+- [ ] Go to edit mode
+- [ ] Make a comment as an authenticated user
+
 ## Deploying
 
 This project is deployed on Render at [blog.gabiseabra.dev](https://blog.gabiseabra.dev).
@@ -123,8 +131,10 @@ which starts the server serving static files from the [web](./web) and API route
 
 ## TODO / Roadmap
 
-- [ ] Support unsupported blocks (e.g. code blocks)
+- [ ] Support unsupported blocks (e.g. code, callout)
 - [ ] Add `/tags/:tag` front-end route to list posts by tag
 - [ ] Add search bar and tags filter
 - [ ] Add component and API to render notion pages by id
+- [ ] Add RSS feed
+- [ ] Add related posts
 - [ ] Improve error handling
