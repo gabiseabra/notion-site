@@ -1,60 +1,31 @@
 import * as n from "@notion-site/common/dto/notion/schema.js";
-import { isTruthy } from "@notion-site/common/utils/guards.js";
-import css from "./RichText.module.scss";
 import { match } from "ts-pattern";
 import { Banner } from "../feedback/Banner.js";
+import { BlockAnnotations, Span, Text, TextElement } from "../ui/Text.js";
 
 export function RichText({
-  as: Component = "span",
-  className,
+  as,
   data,
+  ...props
 }: {
-  as?: "span" | "p" | "h1" | "h2" | "h3" | "h4" | "blockquote";
-  className?: string;
+  as: TextElement;
   data: n.rich_text_item;
-  color?: n.api_color; // ??
-}) {
+} & Partial<BlockAnnotations>) {
   return (
-    <Component className={[className].filter(isTruthy).join(" ")}>
+    <Text as={as} {...props}>
       {data.length ? (
         data.map((item, ix) =>
           match(item)
             .with({ type: "text" }, (item) => (
-              <Annotations key={`${ix}`} annotations={item.annotations}>
+              <Span key={`${ix}`} {...item.annotations}>
                 {item.text.content}
-              </Annotations>
+              </Span>
             ))
             .otherwise(() => <Banner type="warning">Unsupported block</Banner>),
         )
       ) : (
-        <>&nbsp;</>
+        <span>&nbsp;</span>
       )}
-    </Component>
-  );
-}
-
-function Annotations({
-  children,
-  annotations,
-}: {
-  children: string;
-  annotations: n.annotations;
-}) {
-  return (
-    <span
-      className={[
-        annotations.bold && css.Bold,
-        annotations.italic && css.Italic,
-        annotations.underline && css.Underline,
-        annotations.strikethrough && css.Strikethrough,
-        annotations.code && css.Code,
-        // @todo support colors
-        // annotations.color && `color-${annotations.color}`,
-      ]
-        .filter(isTruthy)
-        .join(" ")}
-    >
-      {children}
-    </span>
+    </Text>
   );
 }

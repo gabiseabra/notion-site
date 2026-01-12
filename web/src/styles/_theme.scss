@@ -5,23 +5,31 @@
 $colors-codes: default, gray, brown, orange, yellow, green, blue, purple, pink, red;
 
 :root {
-  --space: 4px;
+  --space: 6px;
   --radius: 8px;
+
+  /* site palette */
 
   --color-primary: rgb(92, 69, 237);
   --bg-primary: rgb(255, 171, 241);
   --color-secondary: rgb(243, 88, 199);
   --bg-secondary: rgb(218, 210, 255);
+
+  /* background color */
+
   --bg-from: rgb(251, 250, 255);
   --bg-to: #e9e4ff;
+
+  /* text colors */
 
   --color-text: var(--color-default);
   --color-heading: #2a16bd;
   --color-muted: #c3bdd8;
-  --color-disabled: #a09bb5;
+  --color-disabled: #8f86b3;
   --color-link: var(--color-secondary);
 
   /* notion colors */
+
   --color-default: #2c1f5c;
   --bg-default: var(--bg-from);
 

@@ -1,6 +1,0 @@
-@use "../../styles/typography" as typography;
-
-.Indentation {
-  @extend %paragraph;
-  @include typography.indent(1);
-}

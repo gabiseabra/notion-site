@@ -1,5 +1,6 @@
 import { ComponentProps, CSSProperties } from "react";
-import css from "./FlexBox.module.scss";
+import styles from "./FlexBox.module.scss";
+import * as css from "../../styles/variables.js";
 
 export type RowProps = ComponentProps<"div"> & {
   as?: "div" | "section";
@@ -19,12 +20,11 @@ export function Row({
 }: RowProps) {
   return (
     <Component
-      className={`${className} ${css.Row}`}
+      className={`${className} ${styles.Row}`}
       style={{
         alignItems: alignY,
         justifyContent: alignX,
-        gap:
-          typeof gap === "number" ? `calc(var(--space) * ${gap})` : undefined,
+        gap: typeof gap === "number" ? `calc(${css.size} * ${gap})` : undefined,
         ...style,
       }}
       {...props}
@@ -33,7 +33,7 @@ export function Row({
 }
 
 export type ColProps = ComponentProps<"div"> & {
-  as?: "div" | "section";
+  as?: "div" | "section" | "header";
   alignX?: CSSProperties["alignItems"];
   alignY?: CSSProperties["justifyContent"];
   gap?: number;
@@ -50,7 +50,7 @@ export function Col({
 }: ColProps) {
   return (
     <Component
-      className={`${className} ${css.Col}`}
+      className={`${className} ${styles.Col}`}
       style={{
         alignItems: alignX,
         justifyContent: alignY,

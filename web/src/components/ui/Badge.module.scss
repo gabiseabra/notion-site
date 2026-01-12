@@ -1,7 +1,7 @@
 @use "../../styles/theme" as theme;
 
 .Badge {
-  padding: calc(var(--space) / 2) calc(var(--space) * 2);
+  padding: 2px calc(var(--space) * 2);
   border-radius: var(--radius);
   font-size: 0.85em;
 

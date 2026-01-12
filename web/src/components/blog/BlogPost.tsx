@@ -1,44 +1,13 @@
-import { RichText } from "../notion/RichText.js";
-import { Blocks } from "../notion/Blocks.js";
+import { NestedBlocks } from "../notion/NestedBlocks.js";
 import { GetBlogPostOutput } from "@notion-site/common/dto/orpc/blog-posts.js";
-import { Badge } from "../ui/Badge.js";
-import { DateLabel } from "../ui/DateLabel.js";
-import { Row } from "../ui/FlexBox.js";
-import css from "./BlogPost.module.scss";
-import { Link } from "react-router";
-import { Icon } from "../notion/Icon.js";
+import { BlogPostHeader } from "./BlogPostHeader.js";
 
 export function BlogPost({ post }: { post: GetBlogPostOutput }) {
   return (
-    <article className={css.BlogPost}>
-      <header>
-        <Link to={`/blog/${post.url}`}>
-          <h1>
-            <Row gap={2} alignY="baseline">
-              {post.icon && <Icon data={post.icon} size="l" />}
+    <article>
+      <BlogPostHeader size="l" post={post} />
 
-              <RichText data={post.properties.Title.title} />
-            </Row>
-          </h1>
-        </Link>
-
-        {post.properties["Publish Date"].date && (
-          <DateLabel
-            verb="Published"
-            start={post.properties["Publish Date"].date.start}
-          />
-        )}
-
-        <Row>
-          {post.properties.Tags.multi_select.map((option) => (
-            <Badge key={option.name} color={option.color}>
-              {option.name}
-            </Badge>
-          ))}
-        </Row>
-      </header>
-
-      <Blocks data={post.blocks} />
+      <NestedBlocks data={post.blocks} />
     </article>
   );
 }

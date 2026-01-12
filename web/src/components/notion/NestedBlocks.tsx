@@ -2,22 +2,23 @@ import * as n from "@notion-site/common/dto/notion/schema.js";
 import { RichText } from "./RichText.js";
 import { match } from "ts-pattern";
 import { Fragment } from "react";
-import css from "./Blocks.module.scss";
 import { Banner } from "../feedback/Banner.js";
+import { BlockAnnotations } from "../ui/Text.js";
 
-export function Blocks({ data }: { data: n.block[] }) {
+export function NestedBlocks({
+  data,
+  indent = 0,
+}: { data: n.block[] } & Partial<BlockAnnotations>) {
   return (
     <>
       {getRootBlocks(data).map((block) =>
         match(block)
           .with({ type: "paragraph" }, ({ block }) => (
             <Fragment key={block.id}>
-              <Block data={block} />
+              <Block data={block} indent={indent} />
 
               {block.children.length ? (
-                <div className={css.Indentation}>
-                  <Blocks data={block.children} />
-                </div>
+                <NestedBlocks data={block.children} indent={indent + 1} />
               ) : null}
             </Fragment>
           ))
@@ -28,7 +29,7 @@ export function Blocks({ data }: { data: n.block[] }) {
                   <Block data={block} />
 
                   {block.children.length ? (
-                    <Blocks data={block.children} />
+                    <NestedBlocks data={block.children} />
                   ) : null}
                 </li>
               ))}
@@ -41,7 +42,7 @@ export function Blocks({ data }: { data: n.block[] }) {
                   <Block data={block} />
 
                   {block.children.length ? (
-                    <Blocks data={block.children} />
+                    <NestedBlocks data={block.children} />
                   ) : null}
                 </li>
               ))}
@@ -53,58 +54,41 @@ export function Blocks({ data }: { data: n.block[] }) {
   );
 }
 
-function Block({ data }: { data: n.block }) {
+function Block({
+  data,
+  ...props
+}: { data: n.block } & Partial<BlockAnnotations>) {
   return (
     <>
       {match(data)
         .with({ type: "paragraph" }, (data) => (
-          <RichText
-            as="p"
-            data={data.paragraph.rich_text}
-            color={data.paragraph.color}
-          />
+          <RichText as="p" data={data.paragraph.rich_text} {...props} />
         ))
         .with({ type: "bulleted_list_item" }, (data) => (
           <RichText
             as="p"
             data={data.bulleted_list_item.rich_text}
-            color={data.bulleted_list_item.color}
+            {...props}
           />
         ))
         .with({ type: "numbered_list_item" }, (data) => (
           <RichText
             as="p"
             data={data.numbered_list_item.rich_text}
-            color={data.numbered_list_item.color}
+            {...props}
           />
         ))
         .with({ type: "heading_1" }, (data) => (
-          <RichText
-            as="h2"
-            data={data.heading_1.rich_text}
-            color={data.heading_1.color}
-          />
+          <RichText as="h2" data={data.heading_1.rich_text} {...props} />
         ))
         .with({ type: "heading_2" }, (data) => (
-          <RichText
-            as="h3"
-            data={data.heading_2.rich_text}
-            color={data.heading_2.color}
-          />
+          <RichText as="h3" data={data.heading_2.rich_text} {...props} />
         ))
         .with({ type: "heading_3" }, (data) => (
-          <RichText
-            as="h4"
-            data={data.heading_3.rich_text}
-            color={data.heading_3.color}
-          />
+          <RichText as="h4" data={data.heading_3.rich_text} {...props} />
         ))
         .with({ type: "quote" }, (data) => (
-          <RichText
-            as="blockquote"
-            data={data.quote.rich_text}
-            color={data.quote.color}
-          />
+          <RichText as="blockquote" data={data.quote.rich_text} {...props} />
         ))
         .with({ type: "divider" }, () => <hr />)
         .with({ type: "unsupported_block" }, () => (

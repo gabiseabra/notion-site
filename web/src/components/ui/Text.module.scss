@@ -1,0 +1,66 @@
+@use "../../styles/mixins/text" as text;
+@use "../../styles/theme" as theme;
+@use "../../styles/typography" as typography;
+
+.Italic {
+  font-style: italic;
+}
+
+.Bold {
+  font-weight: bold;
+}
+
+.Underline {
+  text-decoration: underline;
+}
+
+.Strikethrough {
+  text-decoration: line-through;
+}
+
+.Underline.Strikethrough {
+  text-decoration: underline line-through;
+}
+
+.Code {
+  @extend %code;
+}
+
+// Theme palette classes
+@each $name, $_ in theme.$colors-codes {
+  .#{"Color-" + $name} {
+    color: var(#{"--color-" + $name});
+  }
+
+  .#{"Color-" + $name + "_background"} {
+    color: var(#{"--color-" + $name});
+    background-color: var(#{"--bg-" + $name});
+  }
+}
+
+// Semantic colour aliases (if you still want these explicitly)
+@each $key in (primary, secondary, muted, disabled, link) {
+  .#{"Color-" + $key} {
+    color: var(#{"--color-" + $key});
+  }
+}
+
+// Sizes
+@each $name, $size in (caption: "var(--font-size-caption)", body: "var(--font-size)") {
+  .#{"Size-" + $name} {
+    font-size: #{$size};
+  }
+}
+
+@for $level from 1 through 4 {
+  .#{"Size-h" + $level} {
+    @include text.heading-size($level);
+  }
+}
+
+// Indents
+@for $i from 1 through 4 {
+  .#{"Indent-" + $i} {
+    @include typography.indent($i);
+  }
+}

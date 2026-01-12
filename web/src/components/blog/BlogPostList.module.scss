@@ -3,9 +3,5 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  gap: var(--space);
-}
-
-.Link {
-  font-size: 1.15em;
+  gap: calc(var(--space) * 2);
 }

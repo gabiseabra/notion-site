@@ -1,25 +1,25 @@
 import { ReactNode } from "react";
 import { Link } from "react-router";
 import { FaGithub } from "react-icons/fa";
-import css from "./Root.module.scss";
+import styles from "./Layout.module.scss";
 
-export function Root({ children }: { children: ReactNode }) {
+export function Layout({ children }: { children: ReactNode }) {
   return (
-    <div className={css.Root}>
+    <div className={styles.Layout}>
       <header>
-        <Link to="/" className={css.Link}>
-          <span className={css.Subdomain}>blog</span>
-          <span className={css.Dot}>.</span>
-          <span className={css.Domain}>gabiseabra</span>
-          <span className={css.Dot}>.</span>
-          <span className={css.Domain}>dev</span>
+        <Link to="/" className={styles.Link}>
+          <span className={styles.Subdomain}>blog</span>
+          <span className={styles.Dot}>.</span>
+          <span className={styles.Domain}>gabiseabra</span>
+          <span className={styles.Dot}>.</span>
+          <span className={styles.Domain}>dev</span>
         </Link>
 
         <a
           target="_blank"
           href="https://github.com/gabiseabra/notion-site"
           title="See the source code on Github"
-          className={css.Github}
+          className={styles.Github}
         >
           <div>
             <FaGithub />

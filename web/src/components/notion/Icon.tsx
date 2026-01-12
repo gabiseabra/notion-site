@@ -12,7 +12,12 @@ export function Icon({
 
   return (
     <div
-      style={{ width, aspectRatio: 1, display: "inline-block", ...style }}
+      style={{
+        width,
+        aspectRatio: 1,
+        display: "inline-block",
+        ...style,
+      }}
       {...props}
     >
       {match(data)

@@ -1,5 +1,5 @@
 import { ComponentProps } from "react";
-import css from "./Button.module.scss";
+import styles from "./Button.module.scss";
 
 export function Button({
   className = "",
@@ -10,7 +10,7 @@ export function Button({
 }) {
   return (
     <button
-      className={[className, css.Button, `variant-${variant}`].join(" ")}
+      className={[className, styles.Button, `variant-${variant}`].join(" ")}
       {...props}
     />
   );

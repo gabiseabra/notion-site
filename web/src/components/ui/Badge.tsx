@@ -1,6 +1,6 @@
 import * as n from "@notion-site/common/dto/notion/schema.js";
 import { ReactNode } from "react";
-import css from "./Badge.module.scss";
+import styles from "./Badge.module.scss";
 
 type BadgeProps = {
   color: n.color;
@@ -9,6 +9,8 @@ type BadgeProps = {
 
 export function Badge({ color, children }: BadgeProps) {
   return (
-    <span className={[css.Badge, `color-${color}`].join(" ")}>{children}</span>
+    <span className={[styles.Badge, `color-${color}`].join(" ")}>
+      {children}
+    </span>
   );
 }

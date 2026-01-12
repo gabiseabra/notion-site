@@ -2,6 +2,8 @@
  * [_typography.scss] Fonts & text element configurations
  **********************************************************************************************************************/
 
+@use "mixins/text" as text;
+
 @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
@@ -22,27 +24,33 @@
   /** global text size & spacing variables */
 
   --font-size: 16px;
+  --font-size-caption: 14px;
   --line-height: 1.345rem;
   --letter-spacing: 0px;
   --paragraph-margin: 0.75em;
   --indentation: 1em;
 
-  --font-body: 'Lato', 'Arial', sans-serif;
-  --font: 'Outfit', 'Arial', sans-serif;
+  --font-body: 'Outfit', 'Arial', sans-serif;
   --font-heading: "Tinos", 'Times New Roman', Times, serif;
   --font-heading: "EB Garamond", 'Times New Roman', Times, serif;
-  --font-heading: "Cormorant Garamond", 'Times New Roman', Times, serif;
+  // A thiner serif header althernative
+  // --font-heading: "Cormorant Garamond", 'Times New Roman', Times, serif;
   --font-monospace: "Source Code Pro", Courier, monospace;
   --font-cursive: "Lovers Quarrel", "Brush Script MT", "Apple Chancery", "Lucida Handwriting", cursive;
 
   /** more heading options */
 
-  /** h1 properties */
-  --weight-h1: 700;
-  /** h4 properties */
+  /** max heading font-size */
+  --size-h1: 2.25em;
+  /** min heading font-size */
+  --size-h4: 1.25em;
+  /** h4 font-weight */
   --weight-h4: 700;
+  /** h1 font-weight */
+  --weight-h1: 700;
+  /** h4 font-family */
   --font-h4: var(--font-body);
-  /** h2, h3 properties */
+  /** h2, h3 font-weight */
   --weight-heading: 800;
 
   /** divider options */
@@ -116,33 +124,33 @@ a, %link {
 }
 
 h1 {
+  @include text.heading-size(1);
   font-family: var(--font-h1, var(--font-heading));
   font-weight: var(--weight-h1, var(--weight-heading));
-  font-size: 2.25em;
   line-height: 1em;
 }
 
 h2 {
+  @include text.heading-size(2);
   font-family: var(--font-h2, var(--font-heading));
   font-weight: var(--weight-h2, var(--weight-heading));
   color: var(--color-heading);
-  font-size: 2em;
   line-height: 1em;
 }
 
 h3 {
+  @include text.heading-size(3);
   font-family: var(--font-h3, var(--font-heading));
   font-weight: var(--weight-h3, var(--weight-heading));
   color: var(--color-heading);
-  font-size: 1.5em;
   line-height: 1em;
 }
 
 h4 {
+  @include text.heading-size(4);
   font-family: var(--font-h4, var(--font-heading));
   font-weight: var(--weight-h4, var(--weight-heading));
   color: var(--color-heading);
-  font-size: 1.25em;
   line-height: 1em;
 }
 
