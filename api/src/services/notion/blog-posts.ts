@@ -28,11 +28,13 @@ async function _getBlogPosts(filters: GetBlogPostsInput) {
     filter: {
       and: [
         // Default filters
-        {
-          type: "status" as const,
-          property: "Status",
-          status: { equals: "Published" },
-        },
+        process.env.NODE_ENV === "development"
+          ? undefined
+          : {
+              type: "status" as const,
+              property: "Status",
+              status: { equals: "Published" },
+            },
         // Apply filters from request
         filters.query && {
           type: "title" as const,

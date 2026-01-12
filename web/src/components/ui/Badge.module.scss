@@ -1,15 +1,59 @@
 @use "../../styles/theme" as theme;
 
 .Badge {
-  padding: 2px calc(var(--space) * 2);
+  padding: 0 var(--space);
   border-radius: var(--radius);
-  font-size: 0.85em;
+  font-size: var(--font-size-caption);
+}
 
-  @each $name, $_ in theme.$colors-codes {
-    &:global(.#{"color-" + $name}) {
-      color: var(#{"--color-" + $name});
-      background-color: var(#{"--bg-" + $name});
-    }
+@each $name, $_ in theme.$colors-codes {
+  .#{"Color-" + $name} {
+    color: var(#{"--color-" + $name});
+    background-color: var(#{"--bg-" + $name});
   }
 }
 
+.Status-empty,
+.Status-in-progress,
+.Status-complete {
+  position: relative;
+  padding-left: calc(var(--space) * 2 + 6px);
+
+  &::before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: var(--space);
+    top: 50%;
+    margin-top: -3px;
+    margin-right: var(--space);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    vertical-align: middle;
+  }
+}
+
+.Status-empty {
+  &::before {
+    border: 1px solid currentColor;
+    background: transparent;
+  }
+}
+
+.Status-in-progress {
+  &::before {
+    border: 1px solid currentColor;
+    background: linear-gradient(
+                    to right,
+                    currentColor 50%,
+                    transparent 50%
+    );
+  }
+}
+
+.Status-complete {
+  &::before {
+    background: currentColor;
+  }
+}

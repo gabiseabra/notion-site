@@ -1,2 +1,2 @@
-export const size = "var(--size)";
+export const space = "var(--space)";
 export const radius = "var(--size)";

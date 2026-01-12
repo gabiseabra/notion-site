@@ -24,7 +24,8 @@ export function Row({
       style={{
         alignItems: alignY,
         justifyContent: alignX,
-        gap: typeof gap === "number" ? `calc(${css.size} * ${gap})` : undefined,
+        gap:
+          typeof gap === "number" ? `calc(${css.space} * ${gap})` : undefined,
         ...style,
       }}
       {...props}
@@ -55,7 +56,7 @@ export function Col({
         alignItems: alignX,
         justifyContent: alignY,
         gap:
-          typeof gap === "number" ? `calc(var(--space) * ${gap})` : undefined,
+          typeof gap === "number" ? `calc(${css.space} * ${gap})` : undefined,
         ...style,
       }}
       {...props}
