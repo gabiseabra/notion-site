@@ -16,13 +16,6 @@ const notionToken = process.env.NOTION_TOKEN;
 const notion = new NotionClient({ auth: notionToken });
 
 /**
- * Minimal boolean-expression wrapper used to build Notion `filter` objects.
- * Notion supports nesting filters with `{ and: [...] }` / `{ or: [...] }`.
- * This type allows either a single filter node (`T`) or a nested conjunction/disjunction.
- */
-type Expr<T> = { and: T[] } | { or: T[] } | T;
-
-/**
  * Filter variants that target Notion page timestamps.
  */
 type NotionTimestampFilter = Extract<
@@ -40,17 +33,22 @@ type NotionPropertyFilter<Prop extends NotionProperty> = Extract<
 >;
 
 /**
- * Filter union for a concrete database schema.
- * Produces a union of all valid property filters for the database’s declared properties.
+ * PropertyFilter union of a concrete database schema.
  */
-type NotionDatabaseFilter<DB extends NotionDatabase> =
-  | {
-      [k in keyof DB["properties"] & string]: DistributiveOmit<
-        NotionPropertyFilter<DB["properties"][k]>,
-        "property"
-      > & { property: k };
-    }[keyof DB["properties"] & string]
-  | NotionTimestampFilter;
+type NotionDatabaseFilter<DB extends NotionDatabase> = {
+  [k in keyof DB["properties"] & string]: DistributiveOmit<
+    NotionPropertyFilter<DB["properties"][k]>,
+    "property"
+  > & { property: k };
+}[keyof DB["properties"] & string];
+
+type Expr<T> = { and: T[] } | { or: T[] } | T;
+
+type NotionDatabaseFilterExpr<DB extends NotionDatabase> = Expr<
+  | NotionDatabaseFilter<DB>
+  | NotionTimestampFilter
+  | Expr<NotionDatabaseFilter<DB>>
+>;
 
 /**
  * Sort descriptor restricted to property names declared in the database schema or timestamps.
@@ -76,7 +74,7 @@ export async function queryNotionDatabase<DB extends NotionDatabase>(
   }: {
     limit: number;
     after?: string;
-    filter?: Expr<NotionDatabaseFilter<DB>>;
+    filter?: NotionDatabaseFilterExpr<DB>;
     sorts?: NotionDatabaseSorting<DB>[];
   },
 ) {
