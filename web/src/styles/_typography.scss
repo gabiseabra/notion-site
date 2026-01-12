@@ -1,27 +1,19 @@
 /***********************************************************************************************************************
  * [_typography.scss] Fonts & text element configurations
  **********************************************************************************************************************/
-
 @use "mixins/text" as text;
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
-
+/** Outfit */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+/** EB Garamond */
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
+/** Source Sans Pro */
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+/** Lovers Quarrel */
 @import url('https://fonts.googleapis.com/css2?family=Lovers+Quarrel&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Outfit:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Quicksand:wght@300..700&family=Raleway:ital,wght@0,100..900;1,100..900&family=Saira:ital,wght@0,100..900;1,100..900&family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Arsenal+SC:ital,wght@0,400;0,700;1,400;1,700&family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
-
 :root {
-  /** global text size & spacing variables */
+  /* global text size & spacing variables */
 
   --font-size: 16px;
   --font-size-caption: 14px;
@@ -31,14 +23,13 @@
   --indentation: 1em;
 
   --font-body: 'Outfit', 'Arial', sans-serif;
-  --font-heading: "Tinos", 'Times New Roman', Times, serif;
   --font-heading: "EB Garamond", 'Times New Roman', Times, serif;
   // A thiner serif header althernative
   // --font-heading: "Cormorant Garamond", 'Times New Roman', Times, serif;
   --font-monospace: "Source Code Pro", Courier, monospace;
   --font-cursive: "Lovers Quarrel", "Brush Script MT", "Apple Chancery", "Lucida Handwriting", cursive;
 
-  /** more heading options */
+  /* more heading options */
 
   /** max heading font-size */
   --size-h1: 2.25em;
@@ -53,7 +44,7 @@
   /** h2, h3 font-weight */
   --weight-heading: 800;
 
-  /** divider options */
+  /* divider options */
 
   --size-divider: 2px;
   --radius-divider: 1px;
