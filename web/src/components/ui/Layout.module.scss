@@ -1,7 +1,7 @@
 @use "../../styles/mixins/text" as text;
 
 $max-width: 800px;
-$min-padding-inline: 40px;
+$min-padding-inline: 24px;
 
 .Layout {
   display: flex;
