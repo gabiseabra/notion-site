@@ -5,7 +5,7 @@ import z from "zod";
 
 export const GetBlogPostsInput = z.object({
   query: z.string(),
-  limit: z.number().max(100).optional(),
+  limit: z.number().max(100),
   after: z.string().optional(),
   tags: z.string().array().optional(),
 });

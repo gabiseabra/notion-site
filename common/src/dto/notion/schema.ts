@@ -35,6 +35,7 @@ const background_color = z.enum([
   "pink_background",
   "red_background",
 ]);
+export type background_color = z.infer<typeof background_color>;
 
 export const api_color = z.union([color, background_color]);
 export type api_color = z.infer<typeof api_color>;
@@ -47,11 +48,13 @@ export const external = z.object({
     url: z.string(),
   }),
 });
+export type external = z.infer<typeof external>;
 
 export const emoji = z.object({
   type: z.literal("emoji"),
   emoji: z.string(),
 });
+export type emoji = z.infer<typeof emoji>;
 
 export const custom_emoji = z.object({
   type: z.literal("custom_emoji"),
@@ -60,6 +63,7 @@ export const custom_emoji = z.object({
     url: z.string(),
   }),
 });
+export type custom_emoji = z.infer<typeof custom_emoji>;
 
 export const file = z.object({
   type: z.literal("file"),
@@ -67,6 +71,7 @@ export const file = z.object({
     url: z.string(),
   }),
 });
+export type file = z.infer<typeof file>;
 
 export const icon = z.union([external, emoji, custom_emoji, file]);
 export type icon = z.infer<typeof icon>;
@@ -85,6 +90,7 @@ export const number = z.object({
   type: z.literal("number"),
   number: z.number().nullable(),
 });
+export type _number = z.infer<typeof number>;
 
 export const annotations = z.object({
   bold: z.boolean(),
@@ -104,6 +110,7 @@ export const text = z.object({
   }),
   annotations,
 });
+export type text = z.infer<typeof text>;
 
 export const rich_text_item = z.union([text, mention, equation]).array();
 export type rich_text_item = z.infer<typeof rich_text_item>;
@@ -112,11 +119,13 @@ export const rich_text = z.object({
   type: z.literal("rich_text"),
   rich_text: rich_text_item,
 });
+export type rich_text = z.infer<typeof rich_text>;
 
 export const title = z.object({
   type: z.literal("title"),
   title: rich_text_item,
 });
+export type title = z.infer<typeof title>;
 
 export function status<T extends [string, ...string[]]>(options: T) {
   return z.object({
@@ -129,6 +138,24 @@ export function status<T extends [string, ...string[]]>(options: T) {
       .nullable(),
   });
 }
+
+export const _status = z.object({
+  type: z.literal("status"),
+  status: z
+    .object({
+      name: z.string(),
+      color: color,
+    })
+    .nullable(),
+});
+
+export type status<T extends string> = {
+  type: "status";
+  status: {
+    name: T;
+    color: color;
+  };
+};
 
 export const _select = z.object({
   type: z.literal("select"),
@@ -152,6 +179,14 @@ export function select<T extends [string, ...string[]]>(options: T) {
   });
 }
 
+export type select<T extends string> = {
+  type: "select";
+  select: {
+    name: T;
+    color: color;
+  } | null;
+};
+
 export const _multi_select = z.object({
   type: z.literal("multi_select"),
   multi_select: z
@@ -173,6 +208,14 @@ export function multi_select<T extends [string, ...string[]]>(options: T) {
       .array(),
   });
 }
+
+export type multi_select<T extends string> = {
+  type: "multi_select";
+  multi_select: {
+    name: T;
+    color: color;
+  }[];
+};
 
 export const date = z.object({
   type: z.literal("date"),

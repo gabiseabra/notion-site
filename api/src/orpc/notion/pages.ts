@@ -1,14 +1,18 @@
 import { implement } from "@orpc/server";
 import { api } from "@notion-site/common/dto/orpc/index.js";
-import { getBlocks, getPage } from "../../services/notion/blog-posts.js";
+import { NotionPage } from "@notion-site/common/dto/notion/page.js";
+import {
+  getNotionBlocks,
+  getNotionPage,
+} from "../../services/notion/database.js";
 
 const c = implement(api.notion.pages);
 
 export const pages = c.router({
   getPageById: c.getPageById.handler(async ({ input, errors }) => {
-    const [page, blocks] = await Promise.all([
-      getPage(input.id),
-      getBlocks(input.id),
+    const [page, { blocks }] = await Promise.all([
+      getNotionPage(input.id, NotionPage),
+      getNotionBlocks(input.id),
     ]);
 
     if (!page) {
