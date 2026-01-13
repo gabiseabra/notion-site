@@ -16,6 +16,6 @@ export const pages = oc.prefix("/pages").router({
         status: 404,
       },
     })
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.string().nonempty() }))
     .output(GetNotionPageOutput),
 });

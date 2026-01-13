@@ -28,7 +28,7 @@ export const blogPosts = oc.prefix("/blog-posts").router({
 
   getBlogPostById: oc
     .route({})
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.string().nonempty() }))
     .errors({
       NOT_FOUND: {
         message: "Blog post not found",
