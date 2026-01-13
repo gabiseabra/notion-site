@@ -1,3 +1,5 @@
+import { ORPCError } from "@orpc/contract";
+
 /**
  * Extracts a human-facing message from an unknown error value.
  *
@@ -13,6 +15,12 @@ export function extractErrorMessage(
   }
 
   return fallback;
+}
+
+export function extractErrorCode(error: unknown) {
+  if (error instanceof ORPCError) {
+    return error.code;
+  }
 }
 
 /**

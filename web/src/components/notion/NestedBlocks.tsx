@@ -4,6 +4,7 @@ import { match } from "ts-pattern";
 import { Fragment } from "react";
 import { Banner } from "../block/Banner.js";
 import { BlockAnnotations } from "../inline/Text.js";
+import { LinkToPage } from "./LinkToPage.js";
 
 export function NestedBlocks({
   data,
@@ -91,6 +92,16 @@ function Block({
           <RichText as="blockquote" data={data.quote.rich_text} {...props} />
         ))
         .with({ type: "divider" }, () => <hr />)
+        .with({ type: "link_to_page" }, (data) => (
+          <p>
+            <LinkToPage id={data.link_to_page.page_id} />
+          </p>
+        ))
+        .with({ type: "child_page" }, (data) => (
+          <p>
+            <LinkToPage id={data.id} />
+          </p>
+        ))
         .with({ type: "unsupported_block" }, () => (
           <Banner type="warning">Unsupported block</Banner>
         ))

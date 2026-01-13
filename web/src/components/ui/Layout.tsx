@@ -8,7 +8,7 @@ export function Layout({ children }: { children: ReactNode }) {
   return (
     <div className={styles.layout}>
       <header>
-        <Link to="/">
+        <Link to="/" style={{ textDecoration: "none" }}>
           <SiteLogo />
         </Link>
 

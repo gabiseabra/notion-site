@@ -1,7 +1,4 @@
-import {
-  NotionDatabase,
-  NotionProperty,
-} from "@notion-site/common/dto/notion/database.js";
+import { NotionDatabase } from "@notion-site/common/dto/notion/database.js";
 import { APIResponseError, Client as NotionClient } from "@notionhq/client";
 import z from "zod";
 import {
@@ -28,7 +25,7 @@ type NotionTimestampFilter = Extract<
  * Property filter variants compatible with a specific Notion property type.
  * Inferred from the Notion SDK’s `QueryDatabaseParameters["filter"]` union.
  */
-type NotionPropertyFilter<Prop extends NotionProperty> = Extract<
+type NotionPropertyFilter<Prop extends zN.property> = Extract<
   QueryDatabaseParameters["filter"],
   { type?: Prop["type"] }
 >;
@@ -136,11 +133,15 @@ export async function getNotionPage<DB extends NotionDatabase>(
 
   if (!response) return null;
 
-  console.log(JSON.stringify(response, null, 2));
   const parseResult = schema.safeParse(response);
 
   if (!parseResult.success) {
-    throw new Error(`Failed page ${id}: ${showError(parseResult.error)}`);
+    throw new Error(
+      `Failed to parse page ${id}: ${showError({
+        error: parseResult.error,
+        response,
+      })}`,
+    );
   }
 
   return parseResult.data;
@@ -179,7 +180,7 @@ export async function getNotionBlocks(id: string) {
 
         blocks.push(block);
 
-        if (block.has_children) {
+        if (block.has_children && block.type !== "child_page") {
           const children = await getNotionBlocks(block.id);
 
           blocks.push(...children.blocks);

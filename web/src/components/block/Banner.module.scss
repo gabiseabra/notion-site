@@ -1,4 +1,7 @@
 .banner {
+  --banner-color: var(--color-default);
+  --banner-bg: var(--bg-default);
+
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
@@ -6,20 +9,28 @@
 
   padding: var(--space) calc(var(--space) * 2);
   margin: calc(var(--space) * 2);
+
+
+  background: var(--banner-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--banner-color);
+  box-shadow: var(--banner-color) calc(var(--space) / 2) calc(var(--space) / 2) 0px;
+}
+
+.icon {
+  display: inline-flex;
 }
 
 .type-warning {
-  color: var(--color-orange);
-  border-radius: var(--radius);
-  background: var(--bg-orange);
-  border: 1px solid var(--color-orange);
-  box-shadow: var(--color-orange) calc(var(--space) / 2) calc(var(--space) / 2) 0px;
+  --banner-color: var(--color-orange);
+  --banner-bg: var(--color-orange);
+
+  color: var(--banner-color);
 }
 
 .type-error {
-  color: var(--color-red);
-  border-radius: var(--radius);
-  background: var(--bg-red);
-  border: 1px solid var(--color-red);
-  box-shadow: var(--color-red) calc(var(--space) / 2) calc(var(--space) / 2) 0px;
+  --banner-color: var(--color-red);
+  --banner-bg: var(--bg-red);
+
+  color: var(--banner-color);
 }

@@ -84,7 +84,7 @@ hr, %divider {
 
 code, %code {
   padding: 0 var(--space);
-  color: var(--color-primary);
+  color: var(--color-primary) !important;
   background: var(--bg-from);
   font-family: var(--font-monospace);
 }
@@ -110,8 +110,12 @@ blockquote, %blockquote {
 }
 
 a, %link {
-  text-decoration: none;
   color: var(--color-link);
+  text-decoration: underline;
+
+  &:has(h1), &:has(h2), &:has(h3), &:has(h4) {
+    text-decoration: none;
+  }
 }
 
 h1 {
@@ -144,4 +148,3 @@ h4 {
   color: var(--color-heading);
   line-height: 1em;
 }
-

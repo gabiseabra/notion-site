@@ -2,14 +2,13 @@ import { oc } from "@orpc/contract";
 import { NotionPage } from "../../dto/notion/page.js";
 import * as zN from "../../dto/notion/schema.js";
 import z from "zod";
-
-const GetNotionPageOutput = NotionPage.extend({
-  blocks: zN.block.array(),
-});
+import { _NotionDatabase } from "../../dto/notion/database.js";
 
 export const pages = oc.prefix("/pages").router({
-  getPageById: oc
-    .route({})
+  getPage: oc
+    .route({
+      description: "Get the metadata of a notion page",
+    })
     .errors({
       NOT_FOUND: {
         message: "Page not found",
@@ -17,5 +16,26 @@ export const pages = oc.prefix("/pages").router({
       },
     })
     .input(z.object({ id: z.string().nonempty() }))
-    .output(GetNotionPageOutput),
+    .output(NotionPage),
+
+  getMetadata: oc
+    .route({
+      description:
+        "Get the metadata of a notion resource including all properties",
+    })
+    .errors({
+      NOT_FOUND: {
+        message: "Resource not found",
+        status: 404,
+      },
+    })
+    .input(z.object({ id: z.string().nonempty() }))
+    .output(_NotionDatabase),
+
+  getBlocks: oc
+    .route({
+      description: "Get the content of a Notion resource",
+    })
+    .input(z.object({ id: z.string().nonempty() }))
+    .output(z.object({ blocks: zN.block.array() })),
 });

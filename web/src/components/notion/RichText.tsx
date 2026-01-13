@@ -2,6 +2,8 @@ import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { match } from "ts-pattern";
 import { Banner } from "../block/Banner.js";
 import { BlockAnnotations, Span, Text, TextElement } from "../inline/Text.js";
+import { MaybeLink } from "../inline/MaybeLink.js";
+import { rewriteUrl } from "../../routes/url.js";
 
 export function RichText({
   as,
@@ -17,9 +19,12 @@ export function RichText({
         data.map((item, ix) =>
           match(item)
             .with({ type: "text" }, (item) => (
-              <Span key={`${ix}`} {...item.annotations}>
-                {item.text.content}
-              </Span>
+              <MaybeLink
+                key={`${ix}`}
+                to={item.text.link ? rewriteUrl(item.text.link.url) : undefined}
+              >
+                <Span {...item.annotations}>{item.text.content}</Span>
+              </MaybeLink>
             ))
             .otherwise(() => <Banner type="warning">Unsupported block</Banner>),
         )

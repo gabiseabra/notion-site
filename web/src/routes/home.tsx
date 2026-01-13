@@ -7,6 +7,8 @@ import { suspend } from "suspend-react";
 import { NestedBlocks } from "../components/notion/NestedBlocks.js";
 import { RichText } from "../components/notion/RichText.js";
 import { DistributiveOmit } from "@notion-site/common/utils/types.js";
+import { MaybeLink } from "../components/inline/MaybeLink.js";
+import { getResourceUrl } from "./url.js";
 
 /** RouteObject exports */
 
@@ -75,18 +77,29 @@ type NotionPagePageProps = {
 
 function NotionPagePage({
   id,
-  header = (page) => <RichText as="h1" data={page.properties.title.title} />,
+  header = (page) => (
+    <MaybeLink to={getResourceUrl(page)}>
+      <RichText as="h1" data={page.properties.title.title} />
+    </MaybeLink>
+  ),
   footer,
 }: NotionPagePageProps) {
   const orpc = useOrpc();
 
-  const page = suspend(() => orpc.notion.pages.getPageById({ id }), [id, orpc]);
+  const [page, { blocks }] = suspend(
+    () =>
+      Promise.all([
+        orpc.notion.pages.getPage({ id }),
+        orpc.notion.pages.getBlocks({ id }),
+      ]),
+    [id, orpc],
+  );
 
   return (
     <article>
       {header(page)}
 
-      <NestedBlocks data={page.blocks} />
+      <NestedBlocks data={blocks} />
 
       {footer?.(page)}
     </article>

@@ -12,12 +12,13 @@ export const NotionDatabase = <T extends z.ZodRawShape>(shape: T) =>
   z.object({
     id: z.string(),
     url: z.string().transform((url) => URL.parse(url)?.pathname ?? url),
+    parent: z.union([zN.database_id, zN.page_id, zN.workspace]),
     icon: zN.icon.nullable(),
     cover: zN.cover.nullable(),
     properties: z.object(shape),
   });
 export type NotionDatabase<
-  T extends NotionPropertiesRecord = NotionPropertiesRecord,
+  T extends Record<string, zN.property> = Record<string, zN.property>,
 > = {
   properties: T;
 } & Omit<
@@ -26,17 +27,13 @@ export type NotionDatabase<
 >;
 
 /**
- * Matches all valid Notion database property schemas.
+ * A generic notion database.
  */
-export const NotionProperty = z.union([
-  zN.text,
-  zN.number,
-  zN.date,
-  zN.title,
-  zN.rich_text,
-  zN._status,
-  zN._select,
-  zN._multi_select,
-]);
-export type NotionProperty = z.infer<typeof NotionProperty>;
-export type NotionPropertiesRecord = { [k: string]: NotionProperty };
+export const _NotionDatabase = z.object({
+  id: z.string(),
+  url: z.string().transform((url) => URL.parse(url)?.pathname ?? url),
+  parent: z.union([zN.database_id, zN.page_id, zN.workspace]),
+  icon: zN.icon.nullable(),
+  cover: zN.cover.nullable(),
+  properties: z.record(zN.property),
+});

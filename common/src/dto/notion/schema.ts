@@ -84,6 +84,31 @@ export type cover = z.infer<typeof cover>;
 export const mention = z.object({ type: z.literal("mention") });
 export const equation = z.object({ type: z.literal("equation") });
 
+// reference types
+
+export const database_id = z.object({
+  type: z.literal("database_id"),
+  database_id: z.string(),
+});
+export type database_id = z.infer<typeof database_id>;
+
+export const page_id = z.object({
+  type: z.literal("page_id"),
+  page_id: z.string(),
+});
+export type page_id = z.infer<typeof page_id>;
+
+export const block_id = z.object({
+  type: z.literal("block_id"),
+  block_id: z.string(),
+});
+export type block_id = z.infer<typeof block_id>;
+
+export const workspace = z.object({
+  type: z.literal("workspace"),
+});
+export type workspace = z.infer<typeof workspace>;
+
 // property types
 
 export const number = z.object({
@@ -226,23 +251,38 @@ export const date = z.object({
     })
     .nullable(),
 });
+export type date = z.infer<typeof date>;
 
 export const checkbox = z.object({
   type: z.literal("checkbox"),
   checkbox: z.boolean(),
 });
+export type checkbox = z.infer<typeof checkbox>;
 
-// reference types
-
-export const page_id = z.object({
-  type: z.literal("page_id"),
-  page_id: z.string(),
+export const people = z.object({
+  type: z.literal("people"),
 });
+export type people = z.infer<typeof people>;
 
-export const block_id = z.object({
-  type: z.literal("block_id"),
-  block_id: z.string(),
+export const relation = z.object({
+  type: z.literal("relation"),
+  relation: z.object({ id: z.string() }).array(),
 });
+export type relation = z.infer<typeof relation>;
+
+export const property = z.union([
+  text,
+  number,
+  date,
+  title,
+  rich_text,
+  _status,
+  _select,
+  _multi_select,
+  people,
+  relation,
+]);
+export type property = z.infer<typeof property>;
 
 // block types
 
@@ -253,6 +293,7 @@ export const paragraph = z.object({
     color: api_color,
   }),
 });
+export type paragraph = z.infer<typeof paragraph>;
 
 export const heading_1 = z.object({
   type: z.literal("heading_1"),
@@ -262,6 +303,7 @@ export const heading_1 = z.object({
     is_toggleable: z.boolean(),
   }),
 });
+export type heading_1 = z.infer<typeof heading_1>;
 
 export const heading_2 = z.object({
   type: z.literal("heading_2"),
@@ -271,6 +313,7 @@ export const heading_2 = z.object({
     is_toggleable: z.boolean(),
   }),
 });
+export type heading_2 = z.infer<typeof heading_2>;
 
 export const heading_3 = z.object({
   type: z.literal("heading_3"),
@@ -280,6 +323,7 @@ export const heading_3 = z.object({
     is_toggleable: z.boolean(),
   }),
 });
+export type heading_3 = z.infer<typeof heading_3>;
 
 export const bulleted_list_item = z.object({
   type: z.literal("bulleted_list_item"),
@@ -288,6 +332,7 @@ export const bulleted_list_item = z.object({
     color: api_color,
   }),
 });
+export type bulleted_list_item = z.infer<typeof bulleted_list_item>;
 
 export const numbered_list_item = z.object({
   type: z.literal("numbered_list_item"),
@@ -296,6 +341,7 @@ export const numbered_list_item = z.object({
     color: api_color,
   }),
 });
+export type numbered_list_item = z.infer<typeof numbered_list_item>;
 
 export const quote = z.object({
   type: z.literal("quote"),
@@ -304,10 +350,24 @@ export const quote = z.object({
     color: api_color,
   }),
 });
+export type quote = z.infer<typeof quote>;
 
 export const divider = z.object({
   type: z.literal("divider"),
 });
+export type divider = z.infer<typeof divider>;
+
+export const link_to_page = z.object({
+  type: z.literal("link_to_page"),
+  link_to_page: page_id,
+});
+export type link_to_page = z.infer<typeof link_to_page>;
+
+export const child_page = z.object({
+  type: z.literal("child_page"),
+  child_page: z.object({ title: z.string() }),
+});
+export type child_page = z.infer<typeof child_page>;
 
 const base_block_shape = {
   id: z.string(),
@@ -324,6 +384,8 @@ export const block = z.union([
   numbered_list_item.extend(base_block_shape),
   divider.extend(base_block_shape),
   quote.extend(base_block_shape),
+  link_to_page.extend(base_block_shape),
+  child_page.extend(base_block_shape),
   z.object(base_block_shape).transform((block) => ({
     type: "unsupported_block" as const,
     ...block,
