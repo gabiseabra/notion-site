@@ -5,6 +5,9 @@ import { BlockAnnotations, Span, Text, TextElement } from "../inline/Text.js";
 import { MaybeLink } from "../inline/MaybeLink.js";
 import { rewriteUrl } from "../../utils/url.js";
 
+/**
+ * Renders a single line of Notion rich-text.
+ */
 export function RichText({
   as,
   data,

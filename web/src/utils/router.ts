@@ -1,12 +1,16 @@
 import { RouteObject } from "react-router";
 import * as route from "../routes/index.js";
 
+/**
+ * Finds the URL path for a route with the given `id` by walking a react-router routes tree.
+ * Route id comparison is normalised by removing hyphens.
+ */
 export function getPathByRouteId(
   id: string,
   routes: RouteObject[] = [route],
   base: string = "/",
 ): string | undefined {
-  for (const route of routes ?? [window.route]) {
+  for (const route of routes) {
     const nextBase = route.index ? base : join(base, route.path);
 
     if (route.id?.replace(/-/g, "") === id.replace(/-/g, "")) {

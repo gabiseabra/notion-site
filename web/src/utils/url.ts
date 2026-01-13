@@ -1,7 +1,3 @@
-/**
- * @module utils/url.ts
- * Route-aware URL utilities.
- */
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { match } from "ts-pattern";
 import { getPathByRouteId } from "./router.js";

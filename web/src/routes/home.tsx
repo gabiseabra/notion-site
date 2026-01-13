@@ -16,7 +16,7 @@ export const children: RouteObject[] = [
     Component: NotionPageLoader,
   }),
   notionPage({
-    path: "/lmao-123",
+    path: "/lmao",
     id: "2e7f40080aac8008a49df3ec2a14b74e",
     Component: NotionPageLoader,
   }),

@@ -7,12 +7,15 @@ import { RichText } from "./RichText.js";
 import { Icon } from "./Icon.js";
 import { LinkProps } from "react-router";
 import { Spinner } from "../inline/Spinner.js";
-import * as css from "../../css/index.js";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { Span } from "../inline/Text.js";
 import { Row } from "../block/FlexBox.js";
 import { BannerIcon } from "../block/Banner.js";
 
+/**
+ * Renders a link to a Notion page by id.
+ * The page's icon and title are fetched from the server.
+ */
 export function LinkToPage({
   id,
   ...props
@@ -46,11 +49,14 @@ function LinkToPageLoader({
 
   return (
     <MaybeLink to={getResourceUrl(resource)} {...props}>
-      <span style={{ display: "inline-flex", gap: css.space(1) }}>
-        {resource.icon && <Icon data={resource.icon} size="s" />}
+      {resource.icon && (
+        <>
+          <Icon data={resource.icon} size="s" />
+          &nbsp;
+        </>
+      )}
 
-        {title && <RichText as="span" data={title.title} />}
-      </span>
+      {title && <RichText as="span" data={title.title} />}
     </MaybeLink>
   );
 }

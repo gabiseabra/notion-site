@@ -1,12 +1,8 @@
-import { RichText } from "../RichText.js";
 import { Badge } from "../../inline/Badge.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
-import { Link } from "react-router";
-import { Col, ColProps, Row } from "../../block/FlexBox.js";
-import { Icon } from "../Icon.js";
+import { ColProps, Row } from "../../block/FlexBox.js";
 import { Span, Text } from "../../inline/Text.js";
 import { match } from "ts-pattern";
-import * as css from "../../../css/index.js";
 import { ResourceMetadata } from "../resources/ResourceMetadata.js";
 
 const defaultHiddenProperties: (keyof BlogPost["properties"])[] = import.meta
@@ -28,6 +24,7 @@ export function BlogPostMetadata({
     <ResourceMetadata
       {...props}
       resource={blogPost}
+      hiddenTitle={hiddenProperties?.includes("Title")}
       after={
         <Row wrap>
           {!hiddenProperties?.includes("Publish Date") &&

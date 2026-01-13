@@ -1,3 +1,10 @@
+/**
+ * @module components/notion/NestedBlocks.ts
+ * Notion returns blocks as a flat list with parent references. This module derives a
+ * hierarchy by resolving each block’s descendants from the same response set, then
+ * produces a top-level render stream where consecutive list items are grouped into
+ * list containers (bulleted/numbered).
+ */
 import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { RichText } from "./RichText.js";
 import { match } from "ts-pattern";
@@ -6,6 +13,9 @@ import { Banner } from "../block/Banner.js";
 import { BlockAnnotations } from "../inline/Text.js";
 import { LinkToPage } from "./LinkToPage.js";
 
+/**
+ * Accepts a flat block array and renders it recursively.
+ */
 export function NestedBlocks({
   data,
   indent = 0,
@@ -55,6 +65,9 @@ export function NestedBlocks({
   );
 }
 
+/**
+ * Renders a single block node according to its type.
+ */
 function Block({
   data,
   ...props
@@ -110,6 +123,14 @@ function Block({
   );
 }
 
+/** Utilities */
+
+/**
+ * Normalised top-level render nodes.
+ *
+ * Paragraph-like blocks render as standalone nodes, while adjacent list item blocks
+ * are grouped into a single list container.
+ */
 export type RootBlock =
   | {
       id: string;
@@ -127,10 +148,16 @@ export type RootBlock =
       children: Extract<NestedBlock, { type: "numbered_list_item" }>[];
     };
 
+/**
+ * A Notion block augmented with the descendant blocks present in the same response set.
+ */
 export type NestedBlock = zN.block & {
   children: zN.block[];
 };
 
+/**
+ * Builds the top-level render stream from a flat Notion block array.
+ */
 function getRootBlocks(blocks: zN.block[]) {
   const isNested = blocks.every((block) => block.parent.type === "block_id");
 
