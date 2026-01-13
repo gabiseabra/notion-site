@@ -7,6 +7,7 @@ import { Icon } from "../Icon.js";
 import { Span, Text } from "../../inline/Text.js";
 import { match } from "ts-pattern";
 import * as css from "../../../css/index.js";
+import { ResourceMetadata } from "../resources/ResourceMetadata.js";
 
 const defaultHiddenProperties: (keyof BlogPost["properties"])[] = import.meta
   .env.DEV
@@ -14,65 +15,54 @@ const defaultHiddenProperties: (keyof BlogPost["properties"])[] = import.meta
   : ["Status"];
 
 export function BlogPostMetadata({
-  as: Component,
-  size,
   blogPost,
   hiddenProperties = defaultHiddenProperties,
+  ...props
 }: {
   as: ColProps["as"];
   size: "s" | "m" | "l";
   blogPost: BlogPost;
   hiddenProperties?: (keyof BlogPost["properties"])[];
 }) {
-  const TextElement = size === "l" ? "h1" : "span";
-  const textSize = ({ s: "h4", m: "h3", l: undefined } as const)[size];
-  const gap = ({ s: 0.5, m: 1, l: 2 } as const)[size];
-
   return (
-    <Col as={Component} gap={gap}>
-      {!hiddenProperties?.includes("Title") && (
-        <Link to={`/blog/${blogPost.url}`}>
-          <Text as={TextElement} size={textSize} style={{ marginBottom: 0 }}>
-            {blogPost.icon && <Icon data={blogPost.icon} size={size} />}
-            &nbsp;
-            <RichText as="span" data={blogPost.properties.Title.title} />
-          </Text>
-        </Link>
-      )}
+    <ResourceMetadata
+      {...props}
+      resource={blogPost}
+      after={
+        <Row wrap>
+          {!hiddenProperties?.includes("Publish Date") &&
+            blogPost.properties["Publish Date"].date && (
+              <PublishedDate
+                date={blogPost.properties["Publish Date"].date.start}
+              />
+            )}
 
-      <Row wrap mb={size === "l" ? 4 : 2}>
-        {!hiddenProperties?.includes("Publish Date") &&
-          blogPost.properties["Publish Date"].date && (
-            <PublishedDate
-              date={blogPost.properties["Publish Date"].date.start}
-            />
-          )}
-
-        {!hiddenProperties?.includes("Status") &&
-          blogPost.properties["Status"].status && (
-            <Badge
-              color={blogPost.properties["Status"].status.color}
-              status={match(blogPost.properties["Status"].status.name)
-                .with("Published", () => "complete" as const)
-                .with("In Review", () => "in-progress" as const)
-                .with("Draft", () => "empty" as const)
-                .exhaustive()}
-            >
-              {blogPost.properties["Status"].status.name}
-            </Badge>
-          )}
-
-        {!hiddenProperties?.includes("Tags") && (
-          <>
-            {blogPost.properties.Tags.multi_select.map((option) => (
-              <Badge key={option.name} color={option.color}>
-                {option.name}
+          {!hiddenProperties?.includes("Status") &&
+            blogPost.properties["Status"].status && (
+              <Badge
+                color={blogPost.properties["Status"].status.color}
+                status={match(blogPost.properties["Status"].status.name)
+                  .with("Published", () => "complete" as const)
+                  .with("In Review", () => "in-progress" as const)
+                  .with("Draft", () => "empty" as const)
+                  .exhaustive()}
+              >
+                {blogPost.properties["Status"].status.name}
               </Badge>
-            ))}
-          </>
-        )}
-      </Row>
-    </Col>
+            )}
+
+          {!hiddenProperties?.includes("Tags") && (
+            <>
+              {blogPost.properties.Tags.multi_select.map((option) => (
+                <Badge key={option.name} color={option.color}>
+                  {option.name}
+                </Badge>
+              ))}
+            </>
+          )}
+        </Row>
+      }
+    />
   );
 }
 

@@ -8,7 +8,7 @@ import * as zN from "./schema.js";
  * database.
  * Use this to define schemas that parse and validate responses returned by the Notion SDK.
  */
-export const NotionDatabase = <T extends z.ZodRawShape>(shape: T) =>
+export const NotionResource = <T extends z.ZodRawShape>(shape: T) =>
   z.object({
     id: z.string(),
     url: z.string().transform((url) => URL.parse(url)?.pathname ?? url),
@@ -17,19 +17,19 @@ export const NotionDatabase = <T extends z.ZodRawShape>(shape: T) =>
     cover: zN.cover.nullable(),
     properties: z.object(shape),
   });
-export type NotionDatabase<
+export type NotionResource<
   T extends Record<string, zN.property> = Record<string, zN.property>,
 > = {
   properties: T;
 } & Omit<
-  z.infer<ReturnType<typeof NotionDatabase<z.ZodRawShape>>>,
+  z.infer<ReturnType<typeof NotionResource<z.ZodRawShape>>>,
   "properties"
 >;
 
 /**
- * A generic notion database.
+ * A generic notion database resource or page.
  */
-export const _NotionDatabase = z.object({
+export const _NotionResource = z.object({
   id: z.string(),
   url: z.string().transform((url) => URL.parse(url)?.pathname ?? url),
   parent: z.union([zN.database_id, zN.page_id, zN.workspace]),

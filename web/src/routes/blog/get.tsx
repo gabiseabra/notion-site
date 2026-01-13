@@ -1,9 +1,7 @@
 import { useParams } from "react-router";
-import { useOrpc } from "../../providers/OrpcProvider.js";
 import { BlogPostMetadata } from "../../components/notion/blog-posts/BlogPostMetadata.js";
-import { NestedBlocks } from "../../components/notion/NestedBlocks.js";
 import { SuspenseBoundary } from "../../components/ui/SuspenseBoundary.js";
-import { suspend } from "suspend-react";
+import { ResourceLoader } from "../../components/notion/resources/ResourceLoader.js";
 
 export const path = "/blog/:url";
 
@@ -14,24 +12,13 @@ export function Component() {
 
   return (
     <SuspenseBoundary>
-      <BlogPostPage id={id} />
+      <ResourceLoader
+        id={id}
+        fetch={(id, orpc) => orpc.notion.blogPosts.getBlogPostById({ id })}
+        header={(blogPost) => (
+          <BlogPostMetadata as="header" size="l" blogPost={blogPost} />
+        )}
+      />
     </SuspenseBoundary>
-  );
-}
-
-function BlogPostPage({ id }: { id: string }) {
-  const orpc = useOrpc();
-
-  const blogPost = suspend(
-    () => orpc.notion.blogPosts.getBlogPostById({ id }),
-    [id, orpc],
-  );
-
-  return (
-    <article>
-      <BlogPostMetadata as="header" size="l" blogPost={blogPost} />
-
-      <NestedBlocks data={blogPost.blocks} />
-    </article>
   );
 }

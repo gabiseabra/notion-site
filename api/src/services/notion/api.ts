@@ -1,4 +1,4 @@
-import { NotionDatabase } from "@notion-site/common/dto/notion/database.js";
+import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { APIResponseError, Client as NotionClient } from "@notionhq/client";
 import z from "zod";
 import {
@@ -33,7 +33,7 @@ type NotionPropertyFilter<Prop extends zN.property> = Extract<
 /**
  * PropertyFilter union of a concrete database schema.
  */
-type NotionDatabaseFilter<DB extends NotionDatabase> = {
+type NotionResourceFilter<DB extends NotionResource> = {
   [k in keyof DB["properties"] & string]: DistributiveOmit<
     NotionPropertyFilter<DB["properties"][k]>,
     "property"
@@ -43,10 +43,10 @@ type NotionDatabaseFilter<DB extends NotionDatabase> = {
 /**
  * Notion SDK database.query filters expression for a concrete database schema.
  */
-type NotionDatabaseFilterExpr<DB extends NotionDatabase> = Expr<
-  | NotionDatabaseFilter<DB>
+type NotionResourceFilterExpr<DB extends NotionResource> = Expr<
+  | NotionResourceFilter<DB>
   | NotionTimestampFilter
-  | Expr<NotionDatabaseFilter<DB>>
+  | Expr<NotionResourceFilter<DB>>
 >;
 
 type Expr<T> = { and: T[] } | { or: T[] } | T;
@@ -54,7 +54,7 @@ type Expr<T> = { and: T[] } | { or: T[] } | T;
 /**
  * Sort descriptor restricted to property names declared in the database schema or timestamps.
  */
-type NotionDatabaseSorting<DB extends NotionDatabase> =
+type NotionResourceSorting<DB extends NotionResource> =
   | {
       property: Extract<keyof DB["properties"], string>;
       direction: "ascending" | "descending";
@@ -67,7 +67,7 @@ type NotionDatabaseSorting<DB extends NotionDatabase> =
 /**
  * Queries a Notion database with filter types inferred from the provided zod schema, and parses results.
  */
-export async function queryNotionDatabase<DB extends NotionDatabase>(
+export async function queryNotionDatabase<DB extends NotionResource>(
   databaseId: string,
   schema: z.ZodSchema<DB>,
   {
@@ -78,8 +78,8 @@ export async function queryNotionDatabase<DB extends NotionDatabase>(
   }: {
     limit: number;
     after?: string;
-    filter?: NotionDatabaseFilterExpr<DB>;
-    sorts?: NotionDatabaseSorting<DB>[];
+    filter?: NotionResourceFilterExpr<DB>;
+    sorts?: NotionResourceSorting<DB>[];
   },
 ) {
   const response = await notion.databases.query({
@@ -115,7 +115,7 @@ export async function queryNotionDatabase<DB extends NotionDatabase>(
 /**
  * Get an arbitrary notion page by id and parse it with the given schema.
  */
-export async function getNotionPage<DB extends NotionDatabase>(
+export async function getNotionPage<DB extends NotionResource>(
   id: string,
   schema: z.ZodSchema<DB>,
 ) {

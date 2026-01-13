@@ -1,11 +1,11 @@
-import { NotionDatabase } from "./database.js";
+import { NotionResource } from "./resource.js";
 import * as zN from "./schema.js";
 import { z } from "zod";
 
 export const BlogPostStatus = z.enum(["Published", "Draft", "In Review"]);
 export type BlogPostStatus = z.infer<typeof BlogPostStatus>;
 
-export const BlogPost = NotionDatabase({
+export const BlogPost = NotionResource({
   Title: zN.title,
   "Publish Date": zN.date,
   Tags: zN._multi_select,

@@ -1,8 +1,8 @@
-import { NotionDatabase } from "./database.js";
+import { NotionResource } from "./resource.js";
 import z from "zod";
 import * as zN from "./schema.js";
 
-export const NotionPage = NotionDatabase({
+export const NotionPage = NotionResource({
   title: zN.title,
 })
   // Exclude database resources

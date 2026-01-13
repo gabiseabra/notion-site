@@ -2,7 +2,7 @@ import { oc } from "@orpc/contract";
 import { NotionPage } from "../../dto/notion/page.js";
 import * as zN from "../../dto/notion/schema.js";
 import z from "zod";
-import { _NotionDatabase } from "../../dto/notion/database.js";
+import { _NotionResource } from "../../dto/notion/resource.js";
 
 export const pages = oc.prefix("/pages").router({
   getPage: oc
@@ -30,7 +30,7 @@ export const pages = oc.prefix("/pages").router({
       },
     })
     .input(z.object({ id: z.string().nonempty() }))
-    .output(_NotionDatabase),
+    .output(_NotionResource),
 
   getBlocks: oc
     .route({

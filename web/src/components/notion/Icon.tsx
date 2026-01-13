@@ -11,7 +11,7 @@ export function Icon({
   const width = { s: "18px", m: "24px", l: "32px" }[size];
 
   return (
-    <div
+    <span
       style={{
         width,
         aspectRatio: 1,
@@ -30,6 +30,6 @@ export function Icon({
         .with({ type: "external" }, (icon) => <img src={icon.external.url} />)
         .with({ type: "file" }, (icon) => <img src={icon.file.url} />)
         .exhaustive()}
-    </div>
+    </span>
   );
 }

@@ -2,7 +2,7 @@ import { SuspenseBoundary } from "../ui/SuspenseBoundary.js";
 import { suspend } from "suspend-react";
 import { useOrpc } from "../../providers/OrpcProvider.js";
 import { MaybeLink } from "../inline/MaybeLink.js";
-import { getResourceUrl } from "../../routes/url.js";
+import { getResourceUrl } from "../../utils/url.js";
 import { RichText } from "./RichText.js";
 import { Icon } from "./Icon.js";
 import { LinkProps } from "react-router";

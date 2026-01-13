@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import { Banner } from "../block/Banner.js";
 import { BlockAnnotations, Span, Text, TextElement } from "../inline/Text.js";
 import { MaybeLink } from "../inline/MaybeLink.js";
-import { rewriteUrl } from "../../routes/url.js";
+import { rewriteUrl } from "../../utils/url.js";
 
 export function RichText({
   as,
