@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
+import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { Col } from "../block/FlexBox.js";
 import { Spinner } from "../inline/Spinner.js";
 import { Banner } from "../block/Banner.js";
-import { extractErrorMessage } from "../../utils/error.js";
 
 type ErrorFallback = ReactNode | ((error: unknown) => ReactNode);
 

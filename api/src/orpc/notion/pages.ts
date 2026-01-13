@@ -7,6 +7,8 @@ const c = implement(api.notion.pages);
 
 export const pages = c.router({
   getPageById: c.getPageById.handler(async ({ input, errors }) => {
+    console.log("!!!", input.id);
+
     const [page, { blocks }] = await Promise.all([
       getNotionPage(input.id, NotionPage),
       getNotionBlocks(input.id),

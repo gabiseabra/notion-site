@@ -14,15 +14,12 @@ export const NotionDatabase = <T extends z.ZodRawShape>(shape: T) =>
     url: z.string().transform((url) => URL.parse(url)?.pathname ?? url),
     icon: zN.icon.nullable(),
     cover: zN.cover.nullable(),
-    properties: z.object({
-      Title: zN.title,
-      ...shape,
-    }),
+    properties: z.object(shape),
   });
 export type NotionDatabase<
   T extends NotionPropertiesRecord = NotionPropertiesRecord,
 > = {
-  properties: { Title: zN.title } & T;
+  properties: T;
 } & Omit<
   z.infer<ReturnType<typeof NotionDatabase<z.ZodRawShape>>>,
   "properties"

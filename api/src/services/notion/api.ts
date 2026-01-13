@@ -11,6 +11,7 @@ import {
 import { DistributiveOmit } from "@notion-site/common/utils/types.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import * as zN from "@notion-site/common/dto/notion/schema.js";
+import { showError } from "@notion-site/common/utils/error.js";
 
 const notionToken = process.env.NOTION_TOKEN;
 const notion = new NotionClient({ auth: notionToken });
@@ -135,10 +136,11 @@ export async function getNotionPage<DB extends NotionDatabase>(
 
   if (!response) return null;
 
+  console.log(JSON.stringify(response, null, 2));
   const parseResult = schema.safeParse(response);
 
   if (!parseResult.success) {
-    throw new Error(`Failed to parse database entry ${id}`);
+    throw new Error(`Failed page ${id}: ${showError(parseResult.error)}`);
   }
 
   return parseResult.data;
