@@ -20,6 +20,12 @@ export const blogPosts = c.router({
       {
         limit: input.limit,
         after: input.after,
+        sorts: [
+          {
+            property: "Publish Date",
+            direction: "descending",
+          },
+        ],
         filter: {
           and: [
             // Show unpublished posts in dev mode
