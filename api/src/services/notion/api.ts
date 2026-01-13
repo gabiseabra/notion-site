@@ -115,7 +115,7 @@ export async function queryNotionDatabase<DB extends NotionDatabase>(
 }
 
 /**
- * Recursively fetches all blocks for a page (depth-first) and parses them.
+ * Get an arbitrary notion page by id and parse it with the given schema.
  */
 export async function getNotionPage<DB extends NotionDatabase>(
   id: string,

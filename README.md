@@ -12,12 +12,12 @@ traditional CMS backends.
 
 ### Frontend
 
-- **react** 18
+- **react** 19
 - **react-router** 7
+- **suspend-react**
+- **@orpc/client**
 - **vite** 4
 - **sass**
-- **@transtack/react-query** 5
-- **@orpc/client**
 
 ### Backend
 

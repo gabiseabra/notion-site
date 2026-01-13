@@ -2,24 +2,16 @@ import "./css/global.scss";
 
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { OrpcProvider } from "./providers/OrpcProvider.js";
-import { RouterProvider } from "react-router";
-import { createRouter } from "./pages/router.js";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import * as route from "./routes/index.js";
 
-const queryClient = new QueryClient();
-
-function AppWithRouter() {
-  const router = createRouter();
-  return <RouterProvider router={router} />;
-}
+const router = createBrowserRouter([route]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <OrpcProvider>
-      <QueryClientProvider client={queryClient}>
-        <AppWithRouter />
-      </QueryClientProvider>
+      <RouterProvider router={router} />
     </OrpcProvider>
   </React.StrictMode>,
 );

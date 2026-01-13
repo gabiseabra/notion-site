@@ -19,6 +19,15 @@ export const NotionDatabase = <T extends z.ZodRawShape>(shape: T) =>
       ...shape,
     }),
   });
+export type NotionDatabase<
+  T extends NotionPropertiesRecord = NotionPropertiesRecord,
+> = {
+  properties: { Title: zN.title } & T;
+} & Omit<
+  z.infer<ReturnType<typeof NotionDatabase<z.ZodRawShape>>>,
+  "properties"
+>;
+
 /**
  * Matches all valid Notion database property schemas.
  */
@@ -34,11 +43,3 @@ export const NotionProperty = z.union([
 ]);
 export type NotionProperty = z.infer<typeof NotionProperty>;
 export type NotionPropertiesRecord = { [k: string]: NotionProperty };
-export type NotionDatabase<
-  T extends NotionPropertiesRecord = NotionPropertiesRecord,
-> = {
-  properties: { Title: zN.title } & T;
-} & Omit<
-  z.infer<ReturnType<typeof NotionDatabase<z.ZodRawShape>>>,
-  "properties"
->;

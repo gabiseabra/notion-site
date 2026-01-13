@@ -40,7 +40,7 @@ export function BlogPostMetadata({
         </Link>
       )}
 
-      <Row wrap style={{ marginBottom: css.space(size === "l" ? 4 : 2) }}>
+      <Row wrap mb={size === "l" ? 4 : 2}>
         {!hiddenProperties?.includes("Publish Date") &&
           blogPost.properties["Publish Date"].date && (
             <PublishedDate

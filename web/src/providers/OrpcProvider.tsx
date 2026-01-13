@@ -5,16 +5,11 @@ import {
   inferRPCMethodFromContractRouter,
 } from "@orpc/contract";
 import { api } from "@notion-site/common/orpc/index.js";
-import {
-  BatchLinkPlugin,
-  SimpleCsrfProtectionLinkPlugin,
-} from "@orpc/client/plugins";
+import { SimpleCsrfProtectionLinkPlugin } from "@orpc/client/plugins";
 import { createContext, ReactNode, useContext, useMemo } from "react";
-import { createTanstackQueryUtils, RouterUtils } from "@orpc/tanstack-query";
 
-const OrpcContext = createContext<RouterUtils<
-  ContractRouterClient<typeof api>
-> | null>(null);
+export type OrpcContext = ContractRouterClient<typeof api>;
+const OrpcContext = createContext<OrpcContext | null>(null);
 
 export function useOrpc() {
   const client = useContext(OrpcContext);
@@ -34,12 +29,7 @@ export function OrpcProvider({ children }: { children: ReactNode }) {
       new RPCLink({
         url,
         method: inferRPCMethodFromContractRouter(api),
-        plugins: [
-          new BatchLinkPlugin({
-            groups: [{ condition: () => true, context: {} }],
-          }),
-          new SimpleCsrfProtectionLinkPlugin(),
-        ],
+        plugins: [new SimpleCsrfProtectionLinkPlugin()],
         interceptors: [
           onError((error) => {
             console.error(error);
@@ -53,7 +43,6 @@ export function OrpcProvider({ children }: { children: ReactNode }) {
     () => createORPCClient(link),
     [link],
   );
-  const orpc = createTanstackQueryUtils(client);
 
-  return <OrpcContext.Provider value={orpc}>{children}</OrpcContext.Provider>;
+  return <OrpcContext.Provider value={client}>{children}</OrpcContext.Provider>;
 }
