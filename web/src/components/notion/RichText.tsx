@@ -29,7 +29,11 @@ export function RichText({
                 <Span {...item.annotations}>{item.text.content}</Span>
               </MaybeLink>
             ))
-            .otherwise(() => <Banner type="warning">Unsupported block</Banner>),
+            .otherwise(() => (
+              <Banner type="warning" size="m">
+                Unsupported block
+              </Banner>
+            )),
         )
       ) : (
         <span>&nbsp;</span>

@@ -116,7 +116,9 @@ function Block({
           </p>
         ))
         .with({ type: "unsupported_block" }, () => (
-          <Banner type="warning">Unsupported block</Banner>
+          <Banner type="warning" size="m">
+            Unsupported block
+          </Banner>
         ))
         .exhaustive()}
     </>
