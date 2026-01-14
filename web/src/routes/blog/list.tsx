@@ -14,7 +14,7 @@ export const element = (
   <Col as="section" style={{ flex: 1 }}>
     <h2>All Blog Posts</h2>
 
-    <SuspenseBoundary>
+    <SuspenseBoundary size="l" resourceName="blog posts">
       <BlogPostsPage />
     </SuspenseBoundary>
   </Col>

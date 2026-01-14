@@ -11,7 +11,7 @@ export function Component() {
   const id = url.split("-").pop() ?? "";
 
   return (
-    <SuspenseBoundary>
+    <SuspenseBoundary size="l" resourceName="the blog post">
       <ResourceLoader
         id={id}
         fetch={(id, orpc) => orpc.notion.blogPosts.getBlogPostById({ id })}

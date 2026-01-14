@@ -39,7 +39,7 @@ children.push({
     const { id } = useLoaderData<{ id: string }>();
 
     return (
-      <SuspenseBoundary>
+      <SuspenseBoundary size="l" resourceName="the page">
         <NotionPageLoader id={id} />
       </SuspenseBoundary>
     );
@@ -59,7 +59,7 @@ function notionPage({
   return {
     id,
     element: (
-      <SuspenseBoundary>
+      <SuspenseBoundary size="l" resourceName="the page">
         <Component id={id} />
       </SuspenseBoundary>
     ),

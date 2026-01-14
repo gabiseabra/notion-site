@@ -3,13 +3,22 @@ import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { Col } from "../block/FlexBox.js";
 import { Spinner } from "../inline/Spinner.js";
 import { Banner } from "../block/Banner.js";
+import { Span } from "../inline/Text.js";
 
 type ErrorFallback = ReactNode | ((error: unknown) => ReactNode);
 
 export type SuspenseBoundaryProps = {
   children: ReactNode;
-  loading?: ReactNode;
-  error?: ErrorFallback;
+  /**
+   * Size of the spinner / error banner.
+   * @note use `s` for inline elements, `m` for block elements, and `l` for top-level page elements
+   */
+  size: "s" | "m" | "l";
+  /**
+   * Name of the resource being loaded.
+   * @note used for enhancing the feedback elements in large size.
+   */
+  resourceName: string;
   onError?: (error: unknown) => void;
 };
 
@@ -20,21 +29,55 @@ export type SuspenseBoundaryProps = {
  */
 export function SuspenseBoundary({
   children,
-  loading = (
-    <Col alignX="center" alignY="center" style={{ flex: 1, height: "100%" }}>
-      <Spinner size="m" />
-    </Col>
-  ),
-  error = (error) => (
-    <Col alignX="center">
-      <Banner type="error">{extractErrorMessage(error)}</Banner>
-    </Col>
-  ),
+  size,
+  resourceName,
   onError,
 }: SuspenseBoundaryProps) {
+  const alignY = size === "s" ? "baseline" : "center";
+  const alignX = size === "l" ? "center" : undefined;
+  const flex = size === "l" ? 1 : undefined;
+
   return (
-    <Boundary fallback={error} onError={onError}>
-      <React.Suspense fallback={loading}>{children}</React.Suspense>
+    <Boundary
+      fallback={(error) => (
+        <Col alignX={alignX} alignY={alignY} style={{ flex }}>
+          <Banner
+            type="error"
+            size={size}
+            title={
+              size === "l"
+                ? `There was an error loading ${resourceName}`
+                : undefined
+            }
+          >
+            {extractErrorMessage(error)}
+          </Banner>
+        </Col>
+      )}
+      onError={onError}
+    >
+      <React.Suspense
+        fallback={
+          <Col
+            alignX={alignX}
+            alignY={alignY}
+            style={{ flex, display: "inline-flex" }}
+          >
+            <Col alignX="center" gap={4}>
+              <Spinner size={size} />
+
+              {size === "l" && (
+                <Span
+                  color="muted"
+                  size="caption"
+                >{`Loading ${resourceName}`}</Span>
+              )}
+            </Col>
+          </Col>
+        }
+      >
+        {children}
+      </React.Suspense>
     </Boundary>
   );
 }

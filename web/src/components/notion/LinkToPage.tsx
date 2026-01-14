@@ -10,7 +10,7 @@ import { Spinner } from "../inline/Spinner.js";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { Span } from "../inline/Text.js";
 import { Row } from "../block/FlexBox.js";
-import { BannerIcon } from "../block/Banner.js";
+import { Banner, BannerIcon } from "../block/Banner.js";
 
 /**
  * Renders a link to a Notion page by id.
@@ -21,16 +21,7 @@ export function LinkToPage({
   ...props
 }: { id: string } & Omit<LinkProps, "to">) {
   return (
-    <SuspenseBoundary
-      loading={<Spinner size="s" />}
-      error={(error) => (
-        <Row alignY="center">
-          <BannerIcon type="error" />
-
-          <Span color="red">{extractErrorMessage(error)}</Span>
-        </Row>
-      )}
-    >
+    <SuspenseBoundary size="s" resourceName="the page">
       <LinkToPageLoader id={id} {...props} />
     </SuspenseBoundary>
   );

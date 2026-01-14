@@ -10,6 +10,12 @@
 }
 
 .size-m {
+  --spinner-size: 11px;
+  --spinner-gap: 5px;
+  --spinner-inverse-bounce-rate: 0.65;
+}
+
+.size-l {
   --spinner-size: 16px;
   --spinner-gap: 10px;
   --spinner-inverse-bounce-rate: 0.65;
