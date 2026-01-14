@@ -1,4 +1,5 @@
 import { RouteObject } from "react-router";
+import { uuidEquals } from "@notion-site/common/utils/uuid.js";
 import * as route from "../routes/index.js";
 
 /**
@@ -13,7 +14,7 @@ export function getPathByRouteId(
   for (const route of routes) {
     const nextBase = route.index ? base : join(base, route.path);
 
-    if (route.id?.replace(/-/g, "") === id.replace(/-/g, "")) {
+    if (route.id && uuidEquals(route.id, id)) {
       return nextBase;
     }
 

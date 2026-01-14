@@ -1,6 +1,7 @@
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { match } from "ts-pattern";
 import { getPathByRouteId } from "./router.js";
+import { uuidEquals } from "@notion-site/common/utils/uuid.js";
 
 const SITE_URL: string = import.meta.env.VITE_SITE_URL;
 const BLOG_POSTS_DATABASE_ID: string = import.meta.env
@@ -19,10 +20,7 @@ export function getResourceUrl({ id, url, parent }: NotionResource) {
     getPathByRouteId(id) ??
     match(parent)
       .with({ type: "database_id" }, ({ database_id }) => {
-        if (
-          database_id.replace(/-/g, "") ===
-          BLOG_POSTS_DATABASE_ID.replace(/-/g, "")
-        ) {
+        if (uuidEquals(database_id, BLOG_POSTS_DATABASE_ID)) {
           return `/blog${url}`;
         }
       })
