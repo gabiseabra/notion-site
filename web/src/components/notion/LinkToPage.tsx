@@ -6,11 +6,6 @@ import { getResourceUrl } from "../../utils/url.js";
 import { RichText } from "./RichText.js";
 import { Icon } from "./Icon.js";
 import { LinkProps } from "react-router";
-import { Spinner } from "../inline/Spinner.js";
-import { extractErrorMessage } from "@notion-site/common/utils/error.js";
-import { Span } from "../inline/Text.js";
-import { Row } from "../block/FlexBox.js";
-import { Banner, BannerIcon } from "../block/Banner.js";
 
 /**
  * Renders a link to a Notion page by id.

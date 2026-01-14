@@ -1,15 +1,24 @@
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import { BlogPostMetadata } from "./BlogPostMetadata.js";
-import styles from "./BlogPostList.module.scss";
+import { ResourceList } from "../resources/ResourceList.js";
+import { useNavigate } from "react-router";
 
 export function BlogPostList({ items }: { items: BlogPost[] }) {
+  const navigate = useNavigate();
+
   return (
-    <ul className={styles["blog-post-list"]}>
-      {items.map((blogPost) => (
-        <li key={blogPost.url}>
-          <BlogPostMetadata as="section" size="s" blogPost={blogPost} />
-        </li>
-      ))}
-    </ul>
+    <ResourceList
+      items={items}
+      getItemKey={(blogPost) => blogPost.id}
+      onClick={(blogPost) => navigate(`/blog${blogPost.url}`)}
+      render={(blogPost) => (
+        <BlogPostMetadata
+          key={blogPost.id}
+          as="section"
+          size="s"
+          blogPost={blogPost}
+        />
+      )}
+    />
   );
 }

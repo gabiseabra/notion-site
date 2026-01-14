@@ -1,7 +1,27 @@
+import { CSSProperties, ReactNode } from "react";
 import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
-import { CSSProperties, ReactNode } from "react";
+import { omit } from "@notion-site/common/utils/object.js";
+import * as css from "../../css/index.js";
 import styles from "./Text.module.scss";
+
+export type TextProps = {
+  as: TextElement;
+  children?: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+} & Partial<BlockAnnotations> &
+  css.MarginProps &
+  css.PaddingProps;
+
+export type TextElement =
+  | "span"
+  | "p"
+  | "blockquote"
+  | "h1"
+  | "h2"
+  | "h3"
+  | "h4";
 
 export type TextColor =
   | zN.annotations["color"]
@@ -24,15 +44,6 @@ export type BlockAnnotations = {
   indent: number;
 };
 
-export type TextElement =
-  | "span"
-  | "p"
-  | "blockquote"
-  | "h1"
-  | "h2"
-  | "h3"
-  | "h4";
-
 export function Text({
   as: Tag,
   indent,
@@ -40,13 +51,9 @@ export function Text({
   size,
   children,
   className,
+  style = {},
   ...props
-}: {
-  as: TextElement;
-  children?: ReactNode;
-  className?: string;
-  style?: CSSProperties;
-} & Partial<BlockAnnotations>) {
+}: TextProps) {
   return (
     <Tag
       className={[
@@ -57,7 +64,13 @@ export function Text({
       ]
         .filter(isTruthy)
         .join(" ")}
-      {...props}
+      style={{
+        display: Tag === "span" ? "inline-flex" : undefined,
+        ...css.getPaddingStyles(props),
+        ...css.getMarginStyles(props),
+        ...style,
+      }}
+      {...omit(props, [...css.marginProps, ...css.paddingProps])}
     >
       {children}
     </Tag>

@@ -1,9 +1,11 @@
 import React, { ReactNode } from "react";
+import { match } from "ts-pattern";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { Col } from "../block/FlexBox.js";
 import { Spinner } from "../inline/Spinner.js";
 import { Banner } from "../block/Banner.js";
-import { Span } from "../inline/Text.js";
+import { Span, Text } from "../inline/Text.js";
+import * as css from "../../css/index.js";
 
 type ErrorFallback = ReactNode | ((error: unknown) => ReactNode);
 
@@ -37,10 +39,22 @@ export function SuspenseBoundary({
   const alignX = size === "l" ? "center" : undefined;
   const flex = size === "l" ? 1 : undefined;
 
+  const renderFallback = (children: ReactNode) => {
+    return match(size)
+      .with("s", () => <Text as="span">{children}</Text>)
+      .with("m", () => <Col style={{ display: "inline-flex" }}>{children}</Col>)
+      .with("l", () => (
+        <Col alignX="center" alignY="center" style={{ flex: 1 }}>
+          {children}
+        </Col>
+      ))
+      .exhaustive();
+  };
+
   return (
     <Boundary
-      fallback={(error) => (
-        <Col alignX={alignX} alignY={alignY} style={{ flex }}>
+      fallback={(error) =>
+        renderFallback(
           <Banner
             type="error"
             size={size}
@@ -51,30 +65,31 @@ export function SuspenseBoundary({
             }
           >
             {extractErrorMessage(error)}
-          </Banner>
-        </Col>
-      )}
+          </Banner>,
+        )
+      }
       onError={onError}
     >
       <React.Suspense
-        fallback={
-          <Col
-            alignX={alignX}
-            alignY={alignY}
-            style={{ flex, display: "inline-flex" }}
+        fallback={renderFallback(
+          <span
+            style={{
+              alignItems: "center",
+              display: "inline-flex",
+              flexDirection: "column",
+              gap: css.space(4),
+            }}
           >
-            <Col alignX="center" gap={4}>
-              <Spinner size={size} />
+            <Spinner size={size} />
 
-              {size === "l" && (
-                <Span
-                  color="muted"
-                  size="caption"
-                >{`Loading ${resourceName}`}</Span>
-              )}
-            </Col>
-          </Col>
-        }
+            {size === "l" && (
+              <Span
+                color="muted"
+                size="caption"
+              >{`Loading ${resourceName}`}</Span>
+            )}
+          </span>,
+        )}
       >
         {children}
       </React.Suspense>
