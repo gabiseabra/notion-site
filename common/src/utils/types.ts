@@ -10,6 +10,6 @@ export type GenericObject = { [k: string]: unknown };
  * distribution by using a distributive conditional type, applying `Omit` to each union
  * member and then re-unioning the results.
  */
-export type DistributiveOmit<T, K extends PropertyKey> = T extends any
+export type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
   ? Omit<T, K>
   : never;

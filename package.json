@@ -13,7 +13,8 @@
     "clean": "npm run clean -w common && npm run clean -w api",
     "start": "STATIC_DIR=\"$(pwd)/web/dist\" npm run start -w api",
     "dev": "concurrently \"npm run dev -w api\" \"npm run dev -w web\"",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "eslint \"{api,web,common}/src/**/*.{ts,tsx}\"",
+    "tsc": "tsc -b"
   },
   "engines": {
     "node": ">=18",
@@ -24,11 +25,9 @@
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
     "concurrently": "^9.2.1",
-    "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
-    "nodemon": "^3.1.4",
     "prettier": "^3.7.4",
     "typescript": "^5.2.2"
   },
