@@ -138,3 +138,7 @@ which starts the server serving static files from the [web](./web) and API route
 - [ ] Add RSS feed
 - [ ] Add related posts
 - [ ] Improve error handling
+- [ ] Rewrite routes from JSON configuration
+- [ ] Don't show posts published in the future
+- [ ] Let u hide links to sub-pages in the bottom of a page
+- [ ] Don't configure /blog routes if database id is not configured
