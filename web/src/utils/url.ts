@@ -4,8 +4,8 @@ import { getPathByRouteId } from "./router.js";
 import { uuidEquals } from "@notion-site/common/utils/uuid.js";
 
 const SITE_URL: string = import.meta.env.VITE_SITE_URL;
-const BLOG_POSTS_DATABASE_ID: string = import.meta.env
-  .VITE_BLOG_POSTS_DATABASE_ID;
+const BLOG_POSTS_DATABASE_ID: string =
+  import.meta.env.VITE_BLOG_POSTS_DATABASE_ID ?? "";
 
 export function rewriteUrl(url: string) {
   if (url.startsWith(SITE_URL)) {
