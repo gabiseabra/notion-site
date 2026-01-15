@@ -2,12 +2,16 @@ import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { match } from "ts-pattern";
 import { ComponentProps } from "react";
 
+/**
+ * Renders a Notion icon.
+ * @direction inline
+ */
 export function Icon({
-  data,
+  icon,
   size,
   style = {},
   ...props
-}: ComponentProps<"div"> & { data: zN.icon; size: "s" | "m" | "l" }) {
+}: ComponentProps<"div"> & { icon: zN.icon; size: "s" | "m" | "l" }) {
   const width = { s: "18px", m: "24px", l: "32px" }[size];
 
   return (
@@ -20,7 +24,7 @@ export function Icon({
       }}
       {...props}
     >
-      {match(data)
+      {match(icon)
         .with({ type: "emoji" }, (icon) => (
           <span style={{ fontSize: width }}>{icon.emoji}</span>
         ))

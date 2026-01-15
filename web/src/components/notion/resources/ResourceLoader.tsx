@@ -8,13 +8,24 @@ import { ResourceMetadata } from "./ResourceMetadata.js";
 export type ResourceLoaderProps<T = NotionResource> = {
   id: string;
   fetch: (id: string, orpc: OrpcContext) => Promise<T>;
+  /**
+   * Renders the resource's <head /> attributes.
+   */
+  head?: (page: T) => ReactNode;
+  /**
+   * Renders the resource's Metadata component.
+   */
   header?: (page: T) => ReactNode;
+  /**
+   * Renders something on the bottom of the page.
+   */
   footer?: (page: T) => ReactNode;
 };
 
 export function ResourceLoader<T extends NotionResource>({
   id,
   fetch,
+  head,
   header = (resource) => (
     <ResourceMetadata as="header" size="l" resource={resource} />
   ),
@@ -29,9 +40,11 @@ export function ResourceLoader<T extends NotionResource>({
 
   return (
     <article>
+      {head?.(resource)}
+
       {header?.(resource)}
 
-      <NestedBlocks data={blocks} />
+      <NestedBlocks blocks={blocks} />
 
       {footer?.(resource)}
     </article>

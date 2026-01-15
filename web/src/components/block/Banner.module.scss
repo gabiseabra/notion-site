@@ -32,6 +32,11 @@
   }
 }
 
+.alert {
+  display: inline-flex;
+  gap: var(--space);
+}
+
 .icon {
   aspect-ratio: 1;
   display: inline-flex;
@@ -42,7 +47,6 @@
   }
 
   &.size-s {
-    width: 12px;
   }
 
   &.size-m {

@@ -6,19 +6,31 @@ import { getResourceUrl } from "../../utils/url.js";
 import { RichText } from "./RichText.js";
 import { Icon } from "./Icon.js";
 import { LinkProps } from "react-router";
+import styles from "./LinkToPage.module.scss";
+import { Spinner } from "../inline/Spinner.js";
+import { Alert } from "../block/Banner.js";
+import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 
 /**
  * Renders a link to a Notion page by id.
  * The page's icon and title are fetched from the server.
+ * @direction block
  */
 export function LinkToPage({
   id,
   ...props
 }: { id: string } & Omit<LinkProps, "to">) {
   return (
-    <SuspenseBoundary size="s" resourceName="the page">
-      <LinkToPageLoader id={id} {...props} />
-    </SuspenseBoundary>
+    <p className={styles["link-to-page"]}>
+      <SuspenseBoundary
+        loading={<Spinner size="s" />}
+        error={(error) => (
+          <Alert type="error">{extractErrorMessage(error)}</Alert>
+        )}
+      >
+        <LinkToPageLoader id={id} {...props} />
+      </SuspenseBoundary>
+    </p>
   );
 }
 
@@ -33,16 +45,18 @@ function LinkToPageLoader({
     (prop) => prop.type === "title",
   );
 
+  const url = getResourceUrl(resource);
+
   return (
-    <MaybeLink to={getResourceUrl(resource)} {...props}>
+    <MaybeLink to={url} {...props}>
       {resource.icon && (
         <>
-          <Icon data={resource.icon} size="s" />
+          <Icon icon={resource.icon} size="s" />
           &nbsp;
         </>
       )}
 
-      {title && <RichText as="span" data={title.title} />}
+      {title && <RichText data={title.title} />}
     </MaybeLink>
   );
 }

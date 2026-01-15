@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import styles from "./ResourceList.module.scss";
 
 export function ResourceList<T>({

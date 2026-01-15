@@ -1,0 +1,28 @@
+.link-to-page {
+  height: calc(var(--line-height) + var(--paragraph-margin));
+  margin: 0;
+  display: flex;
+  align-items: center;
+
+  & > a {
+    // ellipsis
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+
+    // box sizing
+    height: var(--line-height);
+    padding-block: calc(var(--paragraph-margin) / 2);
+    padding-inline: var(--space);
+    margin-inline: calc(var(--space) * -1);
+
+    // link ui
+    border-radius: var(--radius);
+
+    &:hover {
+      background: #ffffff60;
+    }
+  }
+}

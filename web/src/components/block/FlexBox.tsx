@@ -5,6 +5,7 @@ import * as css from "../../css/index.js";
 
 export type RowProps = {
   as?: "div" | "section";
+  flex?: number | string;
   gap?: number;
   wrap?: boolean;
   alignX?: CSSProperties["justifyContent"];
@@ -16,6 +17,7 @@ export type RowProps = {
 export function Row({
   as: Component = "div",
   style = {},
+  flex,
   gap,
   wrap,
   alignX,
@@ -27,6 +29,7 @@ export function Row({
     <Component
       className={`${className} ${styles.row}`}
       style={{
+        flex,
         alignItems: alignY,
         justifyContent: alignX,
         gap: typeof gap === "number" ? css.space(gap) : undefined,
@@ -42,6 +45,7 @@ export function Row({
 
 export type ColProps = {
   as?: "div" | "section" | "header";
+  flex?: number | string;
   alignX?: CSSProperties["alignItems"];
   alignY?: CSSProperties["justifyContent"];
   gap?: number;
@@ -51,6 +55,7 @@ export type ColProps = {
 
 export function Col({
   as: Component = "div",
+  flex,
   gap,
   alignX,
   alignY,
@@ -62,6 +67,7 @@ export function Col({
     <Component
       className={`${className} ${styles.col}`}
       style={{
+        flex,
         alignItems: alignX,
         justifyContent: alignY,
         gap: typeof gap === "number" ? css.space(gap) : undefined,

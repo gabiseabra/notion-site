@@ -1,7 +1,6 @@
 import { Outlet, redirect, RouteObject, useLoaderData } from "react-router";
-import { SuspenseBoundary } from "../components/ui/SuspenseBoundary.js";
+import { PageSuspenseBoundary } from "../components/ui/SuspenseBoundary.js";
 import { NotionPageLoader } from "../components/notion/pages/PageLoader.js";
-import { ComponentType } from "react";
 import { getPathByRouteId } from "../utils/router.js";
 
 export const path = "/";
@@ -13,12 +12,10 @@ export const children: RouteObject[] = [
   notionPage({
     index: true,
     id: "2e7f40080aac8039a95ec99ac51b8a2d",
-    Component: NotionPageLoader,
   }),
   notionPage({
     path: "/lmao",
     id: "2e7f40080aac8008a49df3ec2a14b74e",
-    Component: NotionPageLoader,
   }),
 ];
 
@@ -39,9 +36,9 @@ children.push({
     const { id } = useLoaderData<{ id: string }>();
 
     return (
-      <SuspenseBoundary size="l" resourceName="the page">
+      <PageSuspenseBoundary resourceName="the page">
         <NotionPageLoader id={id} />
-      </SuspenseBoundary>
+      </PageSuspenseBoundary>
     );
   },
 });
@@ -50,18 +47,16 @@ children.push({
 
 function notionPage({
   id,
-  Component,
   ...rest
 }: {
   id: string;
-  Component: ComponentType<{ id: string }>;
 } & RouteObject): RouteObject {
   return {
     id,
     element: (
-      <SuspenseBoundary size="l" resourceName="the page">
-        <Component id={id} />
-      </SuspenseBoundary>
+      <PageSuspenseBoundary resourceName="the page">
+        <NotionPageLoader id={id} />
+      </PageSuspenseBoundary>
     ),
     ...rest,
   };

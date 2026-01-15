@@ -1,7 +1,7 @@
 import { Badge } from "../../inline/Badge.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import { ColProps, Row } from "../../block/FlexBox.js";
-import { Span, Text } from "../../inline/Text.js";
+import { Span } from "../../inline/Text.js";
 import { match } from "ts-pattern";
 import { ResourceMetadata } from "../resources/ResourceMetadata.js";
 
@@ -65,16 +65,16 @@ export function BlogPostMetadata({
 
 function PublishedDate({ date }: { date: Date }) {
   return (
-    <Text as="span" size="caption">
-      <Span bold color="disabled">
+    <span>
+      <Span bold size="caption" color="disabled">
         Published
       </Span>
-      <Span bold color="primary">
+      <Span bold size="caption" color="primary">
         &nbsp; @ &nbsp;
       </Span>
-      <Span bold color="disabled">
+      <Span bold size="caption" color="disabled">
         {date.toLocaleDateString()}
       </Span>
-    </Text>
+    </span>
   );
 }

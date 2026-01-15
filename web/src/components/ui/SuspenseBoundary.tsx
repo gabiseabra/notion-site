@@ -1,107 +1,83 @@
 import React, { ReactNode } from "react";
-import { match } from "ts-pattern";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { Col } from "../block/FlexBox.js";
 import { Spinner } from "../inline/Spinner.js";
 import { Banner } from "../block/Banner.js";
-import { Span, Text } from "../inline/Text.js";
-import * as css from "../../css/index.js";
-
-type ErrorFallback = ReactNode | ((error: unknown) => ReactNode);
+import { Span } from "../inline/Text.js";
 
 export type SuspenseBoundaryProps = {
   children: ReactNode;
-  /**
-   * Size of the spinner / error banner.
-   * @note use `s` for inline elements, `m` for block elements, and `l` for top-level page elements
-   */
-  size: "s" | "m" | "l";
+  loading: ReactNode;
+  error: (error: unknown) => ReactNode;
+  onError?: (error: unknown) => void;
+};
+
+/**
+ * Combines an error boundary with React Suspense.
+ * Children may suspend by throwing a Promise and may fail by throwing an error.
+ */
+export function SuspenseBoundary({
+  children,
+  loading,
+  error,
+  onError,
+}: SuspenseBoundaryProps) {
+  return (
+    <Boundary fallback={error} onError={onError}>
+      <React.Suspense fallback={loading}>{children}</React.Suspense>
+    </Boundary>
+  );
+}
+
+export type PageSuspenseBoundaryProps = {
+  children: ReactNode;
   /**
    * Name of the resource being loaded.
-   * @note used for enhancing the feedback elements in large size.
    */
   resourceName: string;
   onError?: (error: unknown) => void;
 };
 
 /**
- * Combines an error boundary with React Suspense.
- *
- * Children may suspend by throwing a Promise and may fail by throwing an error.
+ * Suspense and error boundary for loading pages with normalized feedback indicators.
+ * @direction block
  */
-export function SuspenseBoundary({
-  children,
-  size,
+export function PageSuspenseBoundary({
   resourceName,
-  onError,
-}: SuspenseBoundaryProps) {
-  const alignY = size === "s" ? "baseline" : "center";
-  const alignX = size === "l" ? "center" : undefined;
-  const flex = size === "l" ? 1 : undefined;
-
-  const renderFallback = (children: ReactNode) => {
-    return match(size)
-      .with("s", () => <Text as="span">{children}</Text>)
-      .with("m", () => <Col style={{ display: "inline-flex" }}>{children}</Col>)
-      .with("l", () => (
-        <Col alignX="center" alignY="center" style={{ flex: 1 }}>
-          {children}
-        </Col>
-      ))
-      .exhaustive();
-  };
-
+  ...props
+}: PageSuspenseBoundaryProps) {
   return (
-    <Boundary
-      fallback={(error) =>
-        renderFallback(
+    <SuspenseBoundary
+      {...props}
+      loading={
+        <Col flex={1} alignX="center" alignY="center" gap={4}>
+          <Spinner size="l" />
+
+          <Span color="muted" size="caption">{`Loading ${resourceName}`}</Span>
+        </Col>
+      }
+      error={(error) => (
+        <Col flex={1} alignX="center" alignY="center" gap={4}>
           <Banner
             type="error"
-            size={size}
-            title={
-              size === "l"
-                ? `There was an error loading ${resourceName}`
-                : undefined
-            }
+            size="l"
+            title={`There was an error loading ${resourceName}`}
           >
             {extractErrorMessage(error)}
-          </Banner>,
-        )
-      }
-      onError={onError}
-    >
-      <React.Suspense
-        fallback={renderFallback(
-          <span
-            style={{
-              alignItems: "center",
-              display: "inline-flex",
-              flexDirection: "column",
-              gap: css.space(4),
-            }}
-          >
-            <Spinner size={size} />
-
-            {size === "l" && (
-              <Span
-                color="muted"
-                size="caption"
-              >{`Loading ${resourceName}`}</Span>
-            )}
-          </span>,
-        )}
-      >
-        {children}
-      </React.Suspense>
-    </Boundary>
+          </Banner>
+        </Col>
+      )}
+    />
   );
 }
+
+/** Utilities */
 
 type BoundaryState = { error: unknown | null };
 
 class Boundary extends React.Component<
   {
-    fallback: ErrorFallback;
+    fallback: (error: unknown) => ReactNode;
     onError?: (error: unknown) => void;
     children: ReactNode;
   },
@@ -122,9 +98,7 @@ class Boundary extends React.Component<
     const { fallback, children } = this.props;
 
     if (error) {
-      return typeof fallback === "function"
-        ? (fallback as (e: unknown) => ReactNode)(error)
-        : fallback;
+      return fallback(error);
     }
 
     return children;

@@ -10,3 +10,15 @@ export function omit<T extends object, const K extends readonly (keyof T)[]>(
 
   return out;
 }
+
+export function omitUndefined<T>(object: Partial<T>): Partial<T> {
+  const out: Partial<T> = {};
+
+  for (const key in object) {
+    if (typeof object[key] !== "undefined") {
+      out[key] = object[key];
+    }
+  }
+
+  return out;
+}

@@ -2,7 +2,7 @@ import { useOrpc } from "../../providers/OrpcProvider.js";
 import { BlogPostList } from "../../components/notion/blog-posts/BlogPostList.js";
 import { Col } from "../../components/block/FlexBox.js";
 import { Button } from "../../components/form/Button.js";
-import { SuspenseBoundary } from "../../components/ui/SuspenseBoundary.js";
+import { PageSuspenseBoundary } from "../../components/ui/SuspenseBoundary.js";
 import { useState } from "react";
 import { suspend } from "suspend-react";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
@@ -14,9 +14,9 @@ export const element = (
   <Col as="section" style={{ flex: 1 }}>
     <h2>All Blog Posts</h2>
 
-    <SuspenseBoundary size="l" resourceName="blog posts">
+    <PageSuspenseBoundary resourceName="blog posts">
       <BlogPostsPage />
-    </SuspenseBoundary>
+    </PageSuspenseBoundary>
   </Col>
 );
 

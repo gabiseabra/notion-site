@@ -1,23 +1,17 @@
 import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { match } from "ts-pattern";
 import { Banner } from "../block/Banner.js";
-import { BlockAnnotations, Span, Text, TextElement } from "../inline/Text.js";
+import { Span } from "../inline/Text.js";
 import { MaybeLink } from "../inline/MaybeLink.js";
 import { rewriteUrl } from "../../utils/url.js";
 
 /**
  * Renders a single line of Notion rich-text.
+ * @direction inline
  */
-export function RichText({
-  as,
-  data,
-  ...props
-}: {
-  as: TextElement;
-  data: zN.rich_text_item;
-} & Partial<BlockAnnotations>) {
+export function RichText({ data }: { data: zN.rich_text_item }) {
   return (
-    <Text as={as} {...props}>
+    <>
       {data.length ? (
         data.map((item, ix) =>
           match(item)
@@ -38,6 +32,6 @@ export function RichText({
       ) : (
         <span>&nbsp;</span>
       )}
-    </Text>
+    </>
   );
 }

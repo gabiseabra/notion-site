@@ -6,6 +6,8 @@ import * as _404 from "./404.js";
 
 export const element = (
   <Layout>
+    <title>{import.meta.env.VITE_SITE_TITLE}</title>
+
     <Outlet />
   </Layout>
 );

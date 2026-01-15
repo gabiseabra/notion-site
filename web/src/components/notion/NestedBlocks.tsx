@@ -1,5 +1,5 @@
 /**
- * @module components/notion/NestedBlocks.ts
+ * @module @notion-site/web/components/notion/NestedBlocks.ts
  * Notion returns blocks as a flat list with parent references. This module derives a
  * hierarchy by resolving each block’s descendants from the same response set, then
  * produces a top-level render stream where consecutive list items are grouped into
@@ -10,26 +10,28 @@ import { RichText } from "./RichText.js";
 import { match } from "ts-pattern";
 import { Fragment } from "react";
 import { Banner } from "../block/Banner.js";
-import { BlockAnnotations } from "../inline/Text.js";
+import { BlockAnnotations, Text } from "../inline/Text.js";
 import { LinkToPage } from "./LinkToPage.js";
 
 /**
  * Accepts a flat block array and renders it recursively.
+ * Each top-leven block
+ * @direction block
  */
 export function NestedBlocks({
-  data,
+  blocks,
   indent = 0,
-}: { data: zN.block[] } & Partial<BlockAnnotations>) {
+}: { blocks: zN.block[] } & Partial<BlockAnnotations>) {
   return (
     <>
-      {getRootBlocks(data).map((block) =>
+      {getRootBlocks(blocks).map((block) =>
         match(block)
           .with({ type: "paragraph" }, ({ block }) => (
             <Fragment key={block.id}>
               <Block data={block} indent={indent} />
 
               {block.children.length ? (
-                <NestedBlocks data={block.children} indent={indent + 1} />
+                <NestedBlocks blocks={block.children} indent={indent + 1} />
               ) : null}
             </Fragment>
           ))
@@ -40,7 +42,7 @@ export function NestedBlocks({
                   <Block data={block} />
 
                   {block.children.length ? (
-                    <NestedBlocks data={block.children} />
+                    <NestedBlocks blocks={block.children} />
                   ) : null}
                 </li>
               ))}
@@ -53,7 +55,7 @@ export function NestedBlocks({
                   <Block data={block} />
 
                   {block.children.length ? (
-                    <NestedBlocks data={block.children} />
+                    <NestedBlocks blocks={block.children} />
                   ) : null}
                 </li>
               ))}
@@ -68,53 +70,50 @@ export function NestedBlocks({
 /**
  * Renders a single block node according to its type.
  */
-function Block({
-  data,
-  ...props
-}: { data: zN.block } & Partial<BlockAnnotations>) {
+function Block({ data, indent }: { data: zN.block; indent?: number }) {
   return (
     <>
       {match(data)
         .with({ type: "paragraph" }, (data) => (
-          <RichText as="p" data={data.paragraph.rich_text} {...props} />
+          <Text as="p" indent={indent}>
+            <RichText data={data.paragraph.rich_text} />
+          </Text>
         ))
         .with({ type: "bulleted_list_item" }, (data) => (
-          <RichText
-            as="p"
-            data={data.bulleted_list_item.rich_text}
-            {...props}
-          />
+          <Text as="p" indent={indent}>
+            <RichText data={data.bulleted_list_item.rich_text} />
+          </Text>
         ))
         .with({ type: "numbered_list_item" }, (data) => (
-          <RichText
-            as="p"
-            data={data.numbered_list_item.rich_text}
-            {...props}
-          />
+          <Text as="p" indent={indent}>
+            <RichText data={data.numbered_list_item.rich_text} />
+          </Text>
         ))
         .with({ type: "heading_1" }, (data) => (
-          <RichText as="h2" data={data.heading_1.rich_text} {...props} />
+          <Text as="h2" indent={indent}>
+            <RichText data={data.heading_1.rich_text} />
+          </Text>
         ))
         .with({ type: "heading_2" }, (data) => (
-          <RichText as="h3" data={data.heading_2.rich_text} {...props} />
+          <Text as="h3" indent={indent}>
+            <RichText data={data.heading_2.rich_text} />
+          </Text>
         ))
         .with({ type: "heading_3" }, (data) => (
-          <RichText as="h4" data={data.heading_3.rich_text} {...props} />
+          <Text as="h4" indent={indent}>
+            <RichText data={data.heading_3.rich_text} />
+          </Text>
         ))
         .with({ type: "quote" }, (data) => (
-          <RichText as="blockquote" data={data.quote.rich_text} {...props} />
+          <Text as="blockquote" indent={indent}>
+            <RichText data={data.quote.rich_text} />
+          </Text>
         ))
         .with({ type: "divider" }, () => <hr />)
         .with({ type: "link_to_page" }, (data) => (
-          <p>
-            <LinkToPage id={data.link_to_page.page_id} />
-          </p>
+          <LinkToPage id={data.link_to_page.page_id} />
         ))
-        .with({ type: "child_page" }, (data) => (
-          <p>
-            <LinkToPage id={data.id} />
-          </p>
-        ))
+        .with({ type: "child_page" }, (data) => <LinkToPage id={data.id} />)
         .with({ type: "unsupported_block" }, () => (
           <Banner type="warning" size="m">
             Unsupported block

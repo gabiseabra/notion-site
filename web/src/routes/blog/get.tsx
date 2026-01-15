@@ -1,7 +1,6 @@
 import { useParams } from "react-router";
-import { BlogPostMetadata } from "../../components/notion/blog-posts/BlogPostMetadata.js";
-import { SuspenseBoundary } from "../../components/ui/SuspenseBoundary.js";
-import { ResourceLoader } from "../../components/notion/resources/ResourceLoader.js";
+import { PageSuspenseBoundary } from "../../components/ui/SuspenseBoundary.js";
+import { BlogPostLoader } from "../../components/notion/blog-posts/BlogPostLoader.js";
 
 export const path = "/blog/:url";
 
@@ -11,14 +10,8 @@ export function Component() {
   const id = url.split("-").pop() ?? "";
 
   return (
-    <SuspenseBoundary size="l" resourceName="the blog post">
-      <ResourceLoader
-        id={id}
-        fetch={(id, orpc) => orpc.notion.blogPosts.getBlogPostById({ id })}
-        header={(blogPost) => (
-          <BlogPostMetadata as="header" size="l" blogPost={blogPost} />
-        )}
-      />
-    </SuspenseBoundary>
+    <PageSuspenseBoundary resourceName="the blog post">
+      <BlogPostLoader id={id} />
+    </PageSuspenseBoundary>
   );
 }

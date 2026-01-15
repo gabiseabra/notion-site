@@ -15,7 +15,7 @@ export type TextProps = {
   css.PaddingProps;
 
 export type TextElement =
-  | "span"
+  | "div"
   | "p"
   | "blockquote"
   | "h1"
@@ -44,6 +44,10 @@ export type BlockAnnotations = {
   indent: number;
 };
 
+/**
+ * A block element meant for wrapping around text.
+ * @direction block
+ */
 export function Text({
   as: Tag,
   indent,
@@ -65,7 +69,6 @@ export function Text({
         .filter(isTruthy)
         .join(" ")}
       style={{
-        display: Tag === "span" ? "inline-flex" : undefined,
         ...css.getPaddingStyles(props),
         ...css.getMarginStyles(props),
         ...style,
@@ -77,6 +80,10 @@ export function Text({
   );
 }
 
+/**
+ * An inline element for text with annotations.
+ * @direction inline
+ */
 export function Span({
   children,
   bold,

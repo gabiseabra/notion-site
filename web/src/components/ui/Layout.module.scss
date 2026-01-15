@@ -1,17 +1,17 @@
+@use "../../css/theme" as theme;
 @use "../../css/mixins/text" as text;
 
-$max-width: 800px;
-$min-padding-inline: 18px;
 
 .layout {
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-width: $max-width;
+  max-width: min(#{theme.$max-width}, 100vw);
   margin: auto;
 
-  @media (max-width: ($max-width + $min-padding-inline)) {
-    margin: 0 $min-padding-inline;
+  @media (max-width: #{theme.$max-width + theme.$min-padding-inline * 2}) {
+    margin: 0 theme.$min-padding-inline;
+    max-width: calc(100vw - #{theme.$min-padding-inline * 2});
   }
 
   & > header {

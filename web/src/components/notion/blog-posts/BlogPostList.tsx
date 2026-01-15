@@ -1,7 +1,8 @@
+import { useNavigate } from "react-router";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import { BlogPostMetadata } from "./BlogPostMetadata.js";
 import { ResourceList } from "../resources/ResourceList.js";
-import { useNavigate } from "react-router";
+import { Col } from "../../block/FlexBox.js";
 
 export function BlogPostList({ items }: { items: BlogPost[] }) {
   const navigate = useNavigate();
@@ -12,12 +13,14 @@ export function BlogPostList({ items }: { items: BlogPost[] }) {
       getItemKey={(blogPost) => blogPost.id}
       onClick={(blogPost) => navigate(`/blog${blogPost.url}`)}
       render={(blogPost) => (
-        <BlogPostMetadata
-          key={blogPost.id}
-          as="section"
-          size="s"
-          blogPost={blogPost}
-        />
+        <Col p={2}>
+          <BlogPostMetadata
+            key={blogPost.id}
+            as="section"
+            size="s"
+            blogPost={blogPost}
+          />
+        </Col>
       )}
     />
   );

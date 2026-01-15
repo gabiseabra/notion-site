@@ -4,13 +4,19 @@ import { PiWarningBold, PiWarningCircleBold } from "react-icons/pi";
 import { Col } from "./FlexBox.js";
 import styles from "./Banner.module.scss";
 
+export type FeedbackType = "warning" | "error";
+
 type BannerProps = {
-  type: "warning" | "error";
-  size: "s" | "m" | "l";
+  type: FeedbackType;
+  size: "m" | "l";
   title?: string;
   children: ReactNode;
 };
 
+/**
+ * Renders an error message or warning.
+ * @direction block
+ */
 export function Banner({ type, size, title, children }: BannerProps) {
   return (
     <div
@@ -31,7 +37,31 @@ export function Banner({ type, size, title, children }: BannerProps) {
   );
 }
 
-export function BannerIcon({ type, size }: Pick<BannerProps, "type" | "size">) {
+type AlertProps = {
+  type: FeedbackType;
+  children: ReactNode;
+};
+
+/**
+ * Renders a small error message or warning.
+ * @direction inline
+ */
+export function Alert({ type, children }: AlertProps) {
+  return (
+    <span className={[styles.alert, styles[`type-${type}`]].join(" ")}>
+      <BannerIcon type={type} size="s" />
+
+      {children}
+    </span>
+  );
+}
+
+type BannerIcon = {
+  type: FeedbackType;
+  size: "s" | "m" | "l";
+};
+
+function BannerIcon({ type, size }: BannerIcon) {
   return (
     <span
       className={[
