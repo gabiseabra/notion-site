@@ -50,10 +50,10 @@ export function BlogPostMetadata({
 
           {!hiddenProperties?.includes("Tags") && (
             <>
-              {blogPost.properties.Tags.multi_select.map((option) => (
-                <Badge key={option.name} color={option.color}>
-                  {option.name}
-                </Badge>
+              {blogPost.properties.Tags.multi_select.map((tag) => (
+                <a key={tag.name} href={`/blog/tag/${tag.name}`}>
+                  <Badge color={tag.color}>{tag.name}</Badge>
+                </a>
               ))}
             </>
           )}

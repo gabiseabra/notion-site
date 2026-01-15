@@ -3,12 +3,13 @@ import { BlogPost } from "../../dto/notion/blog-post.js";
 import * as zn from "../../dto/notion/schema.js";
 import z from "zod";
 
-const QueryBlogPostsInput = z.object({
+export const QueryBlogPostsInput = z.object({
   query: z.string(),
   limit: z.number().max(100),
   after: z.string().optional(),
   tags: z.string().array().optional(),
 });
+export type QueryBlogPostsInput = z.infer<typeof QueryBlogPostsInput>;
 
 const QueryBlogPostsOutput = z.object({
   posts: BlogPost.array(),

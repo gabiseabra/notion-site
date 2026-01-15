@@ -1,9 +1,13 @@
 @use "../../css/theme" as theme;
 
 .badge {
+  display: inline-block;
   padding: 0 var(--space);
   border-radius: var(--radius);
+  line-height: var(--line-height);
   font-size: var(--font-size-caption);
+  font-family: var(--font-body);
+  font-weight: normal;
 }
 
 @each $name, $_ in theme.$colors-codes {
@@ -11,6 +15,14 @@
     color: var(#{"--color-" + $name});
     background-color: var(#{"--bg-" + $name});
   }
+}
+
+.size-m {
+  transform: scale(1.1);
+}
+
+.size-l {
+  transform: scale(1.25);
 }
 
 .status-empty,
