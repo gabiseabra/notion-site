@@ -1,5 +1,11 @@
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
-import { APIResponseError, Client as NotionClient } from "@notionhq/client";
+import {
+  APIResponseError,
+  Client as NotionClient,
+  isFullBlock,
+  isFullDatabase,
+  isFullPage,
+} from "@notionhq/client";
 import z from "zod";
 import {
   type ListBlockChildrenResponse,
@@ -9,6 +15,7 @@ import { DistributiveOmit } from "@notion-site/common/utils/types.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { showError } from "@notion-site/common/utils/error.js";
+import { match } from "ts-pattern";
 
 const notionToken = process.env.NOTION_TOKEN;
 const notion = new NotionClient({ auth: notionToken });
@@ -90,7 +97,7 @@ export async function queryNotionDatabase<DB extends NotionResource>(
     sorts,
   });
 
-  const results = response.results.map((node) => ({
+  const results = response.results.filter(isFullPage).map((node) => ({
     id: node.id,
     ...schema.safeParse(node),
   }));
@@ -99,17 +106,63 @@ export async function queryNotionDatabase<DB extends NotionResource>(
     results: results
       .filter(hasPropertyValue("success", true))
       .map((result) => result.data),
-    errors: results
-      .filter(hasPropertyValue("success", false))
-      .map((result) => ({
+    errors: [
+      ...results.filter(hasPropertyValue("success", false)).map((result) => ({
         id: result.id,
         error: result.error,
       })),
+      ...response.results
+        .filter((node) => !isFullPage(node))
+        .map((node) => ({
+          id: node.id,
+          error: new Error("Expected a full page response."),
+        })),
+    ],
     pageInfo: {
       hasNextPage: response.has_more,
       nextCursor: response.next_cursor,
     },
   };
+}
+
+/**
+ * Returns all configured options for a database property of type "select", "multi_select", or "status".
+ */
+export async function getDatabaseSelectOptions(
+  databaseId: string,
+  property: string,
+): Promise<
+  {
+    name: string;
+    color: zN.color;
+    description: string | null;
+  }[]
+> {
+  const db = await notion.databases.retrieve({ database_id: databaseId });
+
+  if (!isFullDatabase(db)) {
+    throw new Error("Expected a full database object response.");
+  }
+
+  if (!db.properties[property]) {
+    throw new Error(`Database does not have property ${property}`);
+  }
+
+  return match(db.properties[property])
+    .with({ type: "select" }, (prop) => {
+      return prop.select.options;
+    })
+    .with({ type: "multi_select" }, (prop) => {
+      return prop.multi_select.options;
+    })
+    .with({ type: "status" }, (prop) => {
+      return prop.status.options;
+    })
+    .otherwise(() => {
+      throw new Error(
+        `Database property ${property} should be select, multi_select, or status`,
+      );
+    });
 }
 
 /**
@@ -133,6 +186,10 @@ export async function getNotionPage<DB extends NotionResource>(
 
   if (!response) return null;
 
+  if (!isFullPage(response)) {
+    throw new Error("Expected a full page response.");
+  }
+
   const parseResult = schema.safeParse(response);
 
   if (!parseResult.success) {
@@ -152,7 +209,7 @@ export async function getNotionPage<DB extends NotionResource>(
  */
 export async function getNotionBlocks(id: string) {
   const blocks: zN.block[] = [];
-  const errors: { id: string; error: z.ZodError }[] = [];
+  const errors: { id: string; error: Error }[] = [];
 
   let cursor = undefined;
 
@@ -171,6 +228,15 @@ export async function getNotionBlocks(id: string) {
     if (!response) return { blocks, errors };
 
     for (const block of response.results) {
+      if (!isFullBlock(block)) {
+        errors.push({
+          id: block.id,
+          error: new Error("Expected a full block response."),
+        });
+
+        continue;
+      }
+
       const parseResult = zN.block.safeParse(block);
 
       if (!parseResult.success) {

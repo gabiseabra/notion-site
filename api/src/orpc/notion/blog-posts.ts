@@ -2,6 +2,7 @@ import { implement } from "@orpc/server";
 import { api } from "@notion-site/common/orpc/index.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import {
+  getDatabaseSelectOptions,
   getNotionBlocks,
   getNotionPage,
   queryNotionDatabase,
@@ -13,7 +14,7 @@ const c = implement(api.notion.blogPosts);
 const databaseId = process.env.NOTION_DATABASE_ID ?? "";
 
 export const blogPosts = c.router({
-  getBlogPosts: c.getBlogPosts.handler(async ({ input }) => {
+  queryBlogPosts: c.queryBlogPosts.handler(async ({ input }) => {
     const { results, pageInfo } = await queryNotionDatabase(
       databaseId,
       BlogPost,
@@ -63,7 +64,7 @@ export const blogPosts = c.router({
     };
   }),
 
-  getBlogPostById: c.getBlogPostById.handler(async ({ input, errors }) => {
+  getBlogPost: c.getBlogPost.handler(async ({ input, errors }) => {
     const [post, { blocks }] = await Promise.all([
       getNotionPage(input.id, BlogPost),
       getNotionBlocks(input.id),
@@ -74,5 +75,12 @@ export const blogPosts = c.router({
     }
 
     return { ...post, blocks };
+  }),
+
+  getAllTags: c.getAllTags.handler(async () => {
+    return getDatabaseSelectOptions(
+      databaseId,
+      "Tags" satisfies keyof BlogPost["properties"],
+    );
   }),
 });

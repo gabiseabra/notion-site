@@ -1,16 +1,16 @@
 import { oc } from "@orpc/contract";
 import { BlogPost } from "../../dto/notion/blog-post.js";
-import * as zN from "../../dto/notion/schema.js";
+import * as zn from "../../dto/notion/schema.js";
 import z from "zod";
 
-const GetBlogPostsInput = z.object({
+const QueryBlogPostsInput = z.object({
   query: z.string(),
   limit: z.number().max(100),
   after: z.string().optional(),
   tags: z.string().array().optional(),
 });
 
-const GetBlogPostsOutput = z.object({
+const QueryBlogPostsOutput = z.object({
   posts: BlogPost.array(),
   pageInfo: z.object({
     hasNextPage: z.boolean(),
@@ -18,15 +18,23 @@ const GetBlogPostsOutput = z.object({
   }),
 });
 
-const GetBlogPostOutput = BlogPost.extend({ blocks: zN.block.array() });
+const GetBlogPostOutput = BlogPost.extend({ blocks: zn.block.array() });
+
+const GetAllTagsOutput = z
+  .object({
+    name: z.string(),
+    color: zn.color,
+    description: z.string().nullable(),
+  })
+  .array();
 
 export const blogPosts = oc.prefix("/blog-posts").router({
-  getBlogPosts: oc
+  queryBlogPosts: oc
     .route({})
-    .input(GetBlogPostsInput)
-    .output(GetBlogPostsOutput),
+    .input(QueryBlogPostsInput)
+    .output(QueryBlogPostsOutput),
 
-  getBlogPostById: oc
+  getBlogPost: oc
     .route({})
     .input(z.object({ id: z.string().nonempty() }))
     .errors({
@@ -36,4 +44,6 @@ export const blogPosts = oc.prefix("/blog-posts").router({
       },
     })
     .output(GetBlogPostOutput),
+
+  getAllTags: oc.route({}).output(GetAllTagsOutput),
 });

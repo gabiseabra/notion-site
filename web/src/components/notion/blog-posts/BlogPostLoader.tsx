@@ -36,7 +36,7 @@ export function BlogPostLoader({
   return (
     <ResourceLoader
       id={id}
-      fetch={(id, orpc) => orpc.notion.blogPosts.getBlogPostById({ id })}
+      fetch={(id, orpc) => orpc.notion.blogPosts.getBlogPost({ id })}
       head={head}
       header={header}
       footer={footer}

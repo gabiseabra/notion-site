@@ -29,7 +29,7 @@ function BlogPostsPage() {
   const orpc = useOrpc();
   const { posts, pageInfo } = suspend(
     () =>
-      orpc.notion.blogPosts.getBlogPosts({
+      orpc.notion.blogPosts.queryBlogPosts({
         query: "",
         limit: 100,
         after: after ?? undefined,
