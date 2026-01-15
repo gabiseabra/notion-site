@@ -10,6 +10,11 @@ export type NotionPageLoaderProps = {
   footer?: (blogPost: NotionPage) => ReactNode;
 };
 
+/**
+ * Fetches and renders a Notion page.
+ * @async
+ * @direction block
+ */
 export function NotionPageLoader({
   id,
   head = (page) => (

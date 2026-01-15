@@ -11,6 +11,11 @@ export type BlogPostLoaderProps = {
   footer?: (blogPost: BlogPost) => ReactNode;
 };
 
+/**
+ * Fetches and renders an entry from the blog-posts database.
+ * @async
+ * @direction block
+ */
 export function BlogPostLoader({
   id,
   head = (blogPost) => (

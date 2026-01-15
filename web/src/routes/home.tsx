@@ -12,6 +12,7 @@ export const children: RouteObject[] = [
   notionPage({
     index: true,
     id: "2e7f40080aac8039a95ec99ac51b8a2d",
+    title: import.meta.env.VITE_SITE_TITLE,
   }),
   notionPage({
     path: "/lmao",
@@ -47,15 +48,20 @@ children.push({
 
 function notionPage({
   id,
+  title,
   ...rest
 }: {
   id: string;
+  title?: string;
 } & RouteObject): RouteObject {
   return {
     id,
     element: (
       <PageSuspenseBoundary resourceName="the page">
-        <NotionPageLoader id={id} />
+        <NotionPageLoader
+          id={id}
+          head={!title ? undefined : () => <title>{title}</title>}
+        />
       </PageSuspenseBoundary>
     ),
     ...rest,

@@ -14,6 +14,8 @@ export const element = (
   <Col as="section" style={{ flex: 1 }}>
     <h2>All Blog Posts</h2>
 
+    <title>{["Blog", import.meta.env.VITE_SITE_TITLE].join(" • ")}</title>
+
     <PageSuspenseBoundary resourceName="blog posts">
       <BlogPostsPage />
     </PageSuspenseBoundary>

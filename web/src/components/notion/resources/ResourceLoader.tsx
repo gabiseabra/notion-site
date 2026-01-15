@@ -22,6 +22,11 @@ export type ResourceLoaderProps<T = NotionResource> = {
   footer?: (page: T) => ReactNode;
 };
 
+/**
+ * Fetches and renders a generic resource from Notion.
+ * @async
+ * @direction block
+ */
 export function ResourceLoader<T extends NotionResource>({
   id,
   fetch,
