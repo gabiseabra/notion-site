@@ -2,7 +2,7 @@ import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { match } from "ts-pattern";
 import { Banner } from "../feedback/Banner.js";
 import { Span } from "../typography/Text.js";
-import { MaybeLink } from "../typography/MaybeLink.js";
+import { MaybeLink } from "../navigation/MaybeLink.js";
 import { rewriteUrl } from "../../utils/url.js";
 
 /**

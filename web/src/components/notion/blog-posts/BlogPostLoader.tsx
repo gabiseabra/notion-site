@@ -7,6 +7,7 @@ import { titleToString } from "@notion-site/common/utils/notion/properties.js";
 export type BlogPostLoaderProps = {
   id: string;
   head?: (blogPost: BlogPost) => ReactNode;
+  metadata?: (blogPost: BlogPost) => ReactNode;
   header?: (blogPost: BlogPost) => ReactNode;
   footer?: (blogPost: BlogPost) => ReactNode;
 };
@@ -28,18 +29,18 @@ export function BlogPostLoader({
       </title>
     </>
   ),
-  header = (blogPost) => (
+  metadata = (blogPost) => (
     <BlogPostMetadata as="header" size="l" blogPost={blogPost} />
   ),
-  footer,
+  ...slots
 }: BlogPostLoaderProps) {
   return (
     <ResourceLoader
       id={id}
       fetch={(id, orpc) => orpc.notion.blogPosts.getBlogPost({ id })}
       head={head}
-      header={header}
-      footer={footer}
+      metadata={metadata}
+      {...slots}
     />
   );
 }

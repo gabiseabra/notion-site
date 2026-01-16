@@ -1,7 +1,7 @@
 import { SuspenseBoundary } from "../feedback/SuspenseBoundary.js";
 import { suspend } from "suspend-react";
 import { useOrpc } from "../../providers/OrpcProvider.js";
-import { MaybeLink } from "../typography/MaybeLink.js";
+import { MaybeLink } from "../navigation/MaybeLink.js";
 import { getResourceUrl } from "../../utils/url.js";
 import { RichText } from "./RichText.js";
 import { Icon } from "./Icon.js";

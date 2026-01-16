@@ -6,6 +6,6 @@ export function titleToString({ title }: zn.title) {
     title
       .filter(hasPropertyValue("type", "text"))
       .map((text) => text.text.content)
-      .join(" ") || null
+      .join(" ") || undefined
   );
 }

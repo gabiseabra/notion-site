@@ -3,6 +3,12 @@
   --spinner-animation-delay: 0.18s;
 }
 
+.size-xs {
+  --spinner-size: 3px;
+  --spinner-gap: 2px;
+  --spinner-inverse-bounce-rate: 0.3;
+}
+
 .size-s {
   --spinner-size: 6px;
   --spinner-gap: 3px;
@@ -25,6 +31,7 @@
   display: inline-flex;
   gap: var(--spinner-gap);
   text-align: center;
+  width: calc(var(--spinner-size) * 3 + var(--spinner-gap) * 2);
 
   & > * {
     width: var(--spinner-size);

@@ -1,0 +1,30 @@
+@use "../../css/theme" as theme;
+
+.breadcrumbs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  font-size: var(--font-size-caption);
+  color: var(--color-disabled);
+
+  & > * {
+    // ellipsis
+    flex: 0 1 auto; // size to content, but allow shrinking
+    min-width: 0; // critical: allow shrink below content
+    max-width: 250px; // cap per crumb
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    &::after {
+      display: inline-block;
+      content: '›';
+      margin-inline: var(--space);
+      font-weight: bold;
+    }
+
+    &:last-child::after {
+      display: none;
+    }
+  }
+}

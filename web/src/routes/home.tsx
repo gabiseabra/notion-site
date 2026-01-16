@@ -1,18 +1,21 @@
 import { Outlet, redirect, RouteObject, useLoaderData } from "react-router";
 import { PageSuspenseBoundary } from "../components/feedback/SuspenseBoundary.js";
 import { NotionPageLoader } from "../components/notion/pages/PageLoader.js";
-import { getPathByRouteId } from "../utils/router.js";
+import { ExtendedRouteObject, getPathByRouteId } from "../utils/router.js";
+import { DynamicBreadcrumbs } from "../components/notion/DynamicBreadcrumbs.js";
+import { Spinner } from "../components/feedback/Spinner.js";
 
 export const path = "/";
 
 export const element = <Outlet />;
 
 // @todo generate this from a json file
-export const children: RouteObject[] = [
+export const children = [
   notionPage({
     index: true,
     id: "2e7f40080aac8039a95ec99ac51b8a2d",
     title: import.meta.env.VITE_SITE_TITLE,
+    crumb: "Home",
   }),
   notionPage({
     path: "/lmao",
@@ -38,7 +41,10 @@ children.push({
 
     return (
       <PageSuspenseBoundary resourceName="the page">
-        <NotionPageLoader id={id} />
+        <NotionPageLoader
+          id={id}
+          header={() => <DynamicBreadcrumbs id={id} />}
+        />
       </PageSuspenseBoundary>
     );
   },
@@ -52,10 +58,10 @@ function notionPage({
   ...rest
 }: {
   id: string;
-  title?: string;
-} & RouteObject): RouteObject {
+} & ExtendedRouteObject): ExtendedRouteObject {
   return {
     id,
+    title,
     element: (
       <PageSuspenseBoundary resourceName="the page">
         <NotionPageLoader

@@ -15,6 +15,10 @@ export type ResourceLoaderProps<T = NotionResource> = {
   /**
    * Renders the resource's Metadata component.
    */
+  metadata?: (page: T) => ReactNode;
+  /**
+   * Renders something on top of the metadata component.
+   */
   header?: (page: T) => ReactNode;
   /**
    * Renders something on the bottom of the page.
@@ -31,9 +35,10 @@ export function ResourceLoader<T extends NotionResource>({
   id,
   fetch,
   head,
-  header = (resource) => (
+  metadata = (resource) => (
     <ResourceMetadata as="header" size="l" resource={resource} />
   ),
+  header,
   footer,
 }: ResourceLoaderProps<T>) {
   const orpc = useOrpc();
@@ -48,6 +53,8 @@ export function ResourceLoader<T extends NotionResource>({
       {head?.(resource)}
 
       {header?.(resource)}
+
+      {metadata?.(resource)}
 
       <NestedBlocks blocks={blocks} />
 

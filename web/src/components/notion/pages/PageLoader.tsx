@@ -6,6 +6,7 @@ import { titleToString } from "@notion-site/common/utils/notion/properties.js";
 export type NotionPageLoaderProps = {
   id: string;
   head?: (blogPost: NotionPage) => ReactNode;
+  metadata?: (blogPost: NotionPage) => ReactNode;
   header?: (blogPost: NotionPage) => ReactNode;
   footer?: (blogPost: NotionPage) => ReactNode;
 };
@@ -27,16 +28,14 @@ export function NotionPageLoader({
       </title>
     </>
   ),
-  header,
-  footer,
+  ...slots
 }: NotionPageLoaderProps) {
   return (
     <ResourceLoader
       id={id}
       fetch={(id, orpc) => orpc.notion.pages.getPage({ id })}
       head={head}
-      header={header}
-      footer={footer}
+      {...slots}
     />
   );
 }

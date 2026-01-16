@@ -2,17 +2,17 @@ import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { match } from "ts-pattern";
 import { ComponentProps } from "react";
 
+type IconProps = {
+  icon: zN.icon;
+  size: "xs" | "s" | "m" | "l";
+} & ComponentProps<"div">;
+
 /**
  * Renders a Notion icon.
  * @direction inline
  */
-export function Icon({
-  icon,
-  size,
-  style = {},
-  ...props
-}: ComponentProps<"div"> & { icon: zN.icon; size: "s" | "m" | "l" }) {
-  const width = { s: "18px", m: "24px", l: "32px" }[size];
+export function Icon({ icon, size, style = {}, ...props }: IconProps) {
+  const width = { xs: "14px", s: "18px", m: "24px", l: "32px" }[size];
 
   return (
     <span

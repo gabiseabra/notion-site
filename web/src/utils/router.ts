@@ -1,6 +1,14 @@
+import { ReactNode } from "react";
 import { RouteObject } from "react-router";
 import { uuidEquals } from "@notion-site/common/utils/uuid.js";
+import { DistributiveOmit } from "@notion-site/common/utils/types.js";
 import * as route from "../routes/index.js";
+
+export type ExtendedRouteObject = DistributiveOmit<RouteObject, "children"> & {
+  title?: string;
+  crumb?: ReactNode;
+  children?: ExtendedRouteObject[];
+};
 
 /**
  * Finds the URL path for a route with the given `id` by walking a react-router routes tree.
@@ -8,7 +16,7 @@ import * as route from "../routes/index.js";
  */
 export function getPathByRouteId(
   id: string,
-  routes: RouteObject[] = [route],
+  routes: ExtendedRouteObject[] = [route],
   base: string = "/",
 ): string | undefined {
   for (const route of routes) {
@@ -21,6 +29,22 @@ export function getPathByRouteId(
     if (route.children) {
       const path = getPathByRouteId(id, route.children, nextBase);
       if (path) return path;
+    }
+  }
+}
+
+export function getRouteById(
+  id: string,
+  routes: ExtendedRouteObject[] = [route],
+): ExtendedRouteObject | undefined {
+  for (const route of routes) {
+    if (route.id && uuidEquals(route.id, id)) {
+      return route;
+    }
+
+    if (route.children) {
+      const found = getRouteById(id, route.children);
+      if (found) return found;
     }
   }
 }

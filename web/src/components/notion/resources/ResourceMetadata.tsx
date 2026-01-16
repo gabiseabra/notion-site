@@ -4,7 +4,7 @@ import { Icon } from "../Icon.js";
 import { Text } from "../../typography/Text.js";
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { getResourceUrl } from "../../../utils/url.js";
-import { MaybeLink } from "../../typography/MaybeLink.js";
+import { MaybeLink } from "../../navigation/MaybeLink.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { ReactNode } from "react";
 
