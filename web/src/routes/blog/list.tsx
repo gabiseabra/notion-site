@@ -1,5 +1,5 @@
-import { Col } from "../../components/block/FlexBox.js";
-import { PageSuspenseBoundary } from "../../components/ui/SuspenseBoundary.js";
+import { Col } from "../../components/layout/FlexBox.js";
+import { PageSuspenseBoundary } from "../../components/feedback/SuspenseBoundary.js";
 import { BlogPostListLoader } from "../../components/notion/blog-posts/BlogPostListLoader.js";
 
 // export const path = "/blog";

@@ -1,8 +1,8 @@
 import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { match } from "ts-pattern";
-import { Banner } from "../block/Banner.js";
-import { Span } from "../inline/Text.js";
-import { MaybeLink } from "../inline/MaybeLink.js";
+import { Banner } from "../feedback/Banner.js";
+import { Span } from "../typography/Text.js";
+import { MaybeLink } from "../typography/MaybeLink.js";
 import { rewriteUrl } from "../../utils/url.js";
 
 /**

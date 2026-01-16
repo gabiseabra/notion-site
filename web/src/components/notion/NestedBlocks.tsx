@@ -9,8 +9,8 @@ import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { RichText } from "./RichText.js";
 import { match } from "ts-pattern";
 import { Fragment } from "react";
-import { Banner } from "../block/Banner.js";
-import { BlockAnnotations, Text } from "../inline/Text.js";
+import { Banner } from "../feedback/Banner.js";
+import { BlockAnnotations, Text } from "../typography/Text.js";
 import { LinkToPage } from "./LinkToPage.js";
 
 /**

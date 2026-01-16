@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import { BlogPostMetadata } from "./BlogPostMetadata.js";
 import { ResourceList } from "../resources/ResourceList.js";
-import { Col } from "../../block/FlexBox.js";
+import { Col } from "../../layout/FlexBox.js";
 
 export function BlogPostList({ items }: { items: BlogPost[] }) {
   const navigate = useNavigate();

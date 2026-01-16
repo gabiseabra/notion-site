@@ -1,12 +1,12 @@
-import { Col } from "../../components/block/FlexBox.js";
-import { PageSuspenseBoundary } from "../../components/ui/SuspenseBoundary.js";
+import { Col } from "../../components/layout/FlexBox.js";
+import { PageSuspenseBoundary } from "../../components/feedback/SuspenseBoundary.js";
 import { BlogPostListLoader } from "../../components/notion/blog-posts/BlogPostListLoader.js";
 import { useParams } from "react-router";
 import { suspend } from "suspend-react";
 import { useOrpc } from "../../providers/OrpcProvider.js";
-import { Badge } from "../../components/inline/Badge.js";
+import { Badge } from "../../components/typography/Badge.js";
 import { normalizeTag } from "@notion-site/common/utils/notion/blog-posts.js";
-import { Text } from "../../components/inline/Text.js";
+import { Text } from "../../components/typography/Text.js";
 
 export const path = "/blog/tag/:tag";
 

@@ -1,10 +1,10 @@
 import { RichText } from "../RichText.js";
-import { Col, ColProps } from "../../block/FlexBox.js";
+import { Col, ColProps } from "../../layout/FlexBox.js";
 import { Icon } from "../Icon.js";
-import { Text } from "../../inline/Text.js";
+import { Text } from "../../typography/Text.js";
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { getResourceUrl } from "../../../utils/url.js";
-import { MaybeLink } from "../../inline/MaybeLink.js";
+import { MaybeLink } from "../../typography/MaybeLink.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { ReactNode } from "react";
 

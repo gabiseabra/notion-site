@@ -1,14 +1,14 @@
-import { SuspenseBoundary } from "../ui/SuspenseBoundary.js";
+import { SuspenseBoundary } from "../feedback/SuspenseBoundary.js";
 import { suspend } from "suspend-react";
 import { useOrpc } from "../../providers/OrpcProvider.js";
-import { MaybeLink } from "../inline/MaybeLink.js";
+import { MaybeLink } from "../typography/MaybeLink.js";
 import { getResourceUrl } from "../../utils/url.js";
 import { RichText } from "./RichText.js";
 import { Icon } from "./Icon.js";
 import { LinkProps } from "react-router";
 import styles from "./LinkToPage.module.scss";
-import { Spinner } from "../inline/Spinner.js";
-import { Alert } from "../block/Banner.js";
+import { Spinner } from "../feedback/Spinner.js";
+import { Alert } from "../feedback/Banner.js";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 
 /**

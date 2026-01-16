@@ -1,7 +1,7 @@
-import { Badge } from "../../inline/Badge.js";
+import { Badge } from "../../typography/Badge.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
-import { ColProps, Row } from "../../block/FlexBox.js";
-import { Span } from "../../inline/Text.js";
+import { ColProps, Row } from "../../layout/FlexBox.js";
+import { Span } from "../../typography/Text.js";
 import { match } from "ts-pattern";
 import { ResourceMetadata } from "../resources/ResourceMetadata.js";
 

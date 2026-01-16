@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { match } from "ts-pattern";
 import { PiWarningBold, PiWarningCircleBold } from "react-icons/pi";
-import { Col } from "./FlexBox.js";
+import { Col } from "../layout/FlexBox.js";
 import styles from "./Banner.module.scss";
 
 export type FeedbackType = "warning" | "error";

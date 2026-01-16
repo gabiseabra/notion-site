@@ -1,5 +1,5 @@
 import { Outlet, redirect, RouteObject, useLoaderData } from "react-router";
-import { PageSuspenseBoundary } from "../components/ui/SuspenseBoundary.js";
+import { PageSuspenseBoundary } from "../components/feedback/SuspenseBoundary.js";
 import { NotionPageLoader } from "../components/notion/pages/PageLoader.js";
 import { getPathByRouteId } from "../utils/router.js";
 

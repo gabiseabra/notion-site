@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
-import { Col } from "../block/FlexBox.js";
-import { Banner } from "../block/Banner.js";
-import { SimlishSpinner } from "../block/SimlishSpinner.js";
+import { Col } from "../layout/FlexBox.js";
+import { Banner } from "./Banner.js";
+import { SimlishSpinner } from "./SimlishSpinner.js";
 
 export type SuspenseBoundaryProps = {
   children: ReactNode;
