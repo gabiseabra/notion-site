@@ -1,16 +1,16 @@
-import { SuspenseBoundary } from "../feedback/SuspenseBoundary.js";
-import { useOrpc } from "../../providers/OrpcProvider.js";
+import { SuspenseBoundary } from "../../feedback/SuspenseBoundary.js";
+import { useOrpc } from "../../../providers/OrpcProvider.js";
 import { suspend } from "suspend-react";
-import { getResourceUrl } from "../../utils/url.js";
-import { MaybeLink } from "../navigation/MaybeLink.js";
-import { RichText } from "./RichText.js";
-import { Spinner } from "../feedback/Spinner.js";
-import { Alert } from "../feedback/Banner.js";
+import { getResourceUrl } from "../../../utils/url.js";
+import { MaybeLink } from "../../navigation/MaybeLink.js";
+import { RichText } from "../typography/RichText.js";
+import { Spinner } from "../../feedback/Spinner.js";
+import { Alert } from "../../feedback/Banner.js";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
-import { Breadcrumbs } from "../navigation/Breadcrumbs.js";
-import { Icon } from "./Icon.js";
+import { Breadcrumbs } from "../../navigation/Breadcrumbs.js";
+import { Icon } from "../typography/Icon.js";
 import { titleToString } from "@notion-site/common/utils/notion/properties.js";
-import { getRouteById } from "../../utils/router.js";
+import { getRouteById } from "../../../utils/router.js";
 
 export function DynamicBreadcrumbs({ id }: { id: string }) {
   return (

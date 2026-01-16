@@ -5,13 +5,13 @@
  * produces a top-level render stream where consecutive list items are grouped into
  * list containers (bulleted/numbered).
  */
-import * as zN from "@notion-site/common/dto/notion/schema.js";
-import { RichText } from "./RichText.js";
-import { match } from "ts-pattern";
 import { Fragment } from "react";
+import * as zN from "@notion-site/common/dto/notion/schema.js";
+import { match } from "ts-pattern";
 import { Banner } from "../feedback/Banner.js";
 import { BlockAnnotations, Text } from "../typography/Text.js";
-import { LinkToPage } from "./LinkToPage.js";
+import { RichText } from "./typography/RichText.js";
+import { LinkToPage } from "./navigation/LinkToPage.js";
 
 /**
  * Accepts a flat block array and renders it recursively.
