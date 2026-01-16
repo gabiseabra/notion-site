@@ -26,6 +26,10 @@ export const blogPosts = c.router({
             property: "Publish Date",
             direction: "descending",
           },
+          {
+            timestamp: "created_time",
+            direction: "descending",
+          },
         ],
         filter: {
           and: [

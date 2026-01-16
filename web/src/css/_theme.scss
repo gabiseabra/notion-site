@@ -26,7 +26,7 @@ $min-padding-inline: 20px;
 
   /* text colors */
 
-  --color-text: var(--color-default);
+  --color-text: #2c1f5c;
   --color-heading: #2a16bd;
   --color-muted: #c3bdd8;
   --color-disabled: #a198c6;
@@ -37,7 +37,7 @@ $min-padding-inline: 20px;
   --color-default: var(--color-default);
   --bg-default: var(--bg-from);
 
-  --color-gray: var(--color-disabled);
+  --color-gray: var(--color-muted);
   --bg-gray: var(--bg-to);
 
   --color-brown: #8e2600;
