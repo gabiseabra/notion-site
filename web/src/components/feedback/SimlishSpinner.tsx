@@ -14,10 +14,10 @@ export function SimlishSpinner({ resourceName }: { resourceName: string }) {
   const [tick, setTick] = useState(0);
 
   const actions = useMemo(
-    () => [
-      `Loading ${resourceName}`,
-      `Polishing ${resourceName}`,
-      ...shuffle([
+    () =>
+      shuffle([
+        `Loading ${resourceName}`,
+        `Polishing ${resourceName}`,
         `Squeezing ${resourceName} through a tiny pipe`,
         `Reassembling ${resourceName} from blocks`,
         `Consulting the ${resourceName} oracle`,
@@ -30,9 +30,8 @@ export function SimlishSpinner({ resourceName }: { resourceName: string }) {
         `Luring ${resourceName} out with shiny pixels`,
         `Dusting glitter off ${resourceName}`,
         `Waiting for ${resourceName} to find their socks`,
-        `Rehearsing ${resourceName}’ entrance speech`,
+        `Rehearsing ${resourceName}’${resourceName.endsWith("s") ? "" : "s"} entrance speech`,
       ]),
-    ],
     [],
   );
 
