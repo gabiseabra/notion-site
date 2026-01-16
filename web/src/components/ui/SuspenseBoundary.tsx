@@ -1,9 +1,8 @@
 import React, { ReactNode } from "react";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { Col } from "../block/FlexBox.js";
-import { Spinner } from "../inline/Spinner.js";
 import { Banner } from "../block/Banner.js";
-import { Span } from "../inline/Text.js";
+import { SimlishSpinner } from "../block/SimlishSpinner.js";
 
 export type SuspenseBoundaryProps = {
   children: ReactNode;
@@ -50,10 +49,8 @@ export function PageSuspenseBoundary({
     <SuspenseBoundary
       {...props}
       loading={
-        <Col flex={1} alignX="center" alignY="center" gap={4}>
-          <Spinner size="l" />
-
-          <Span color="muted" size="caption">{`Loading ${resourceName}`}</Span>
+        <Col flex={1} alignX="center" alignY="center">
+          <SimlishSpinner resourceName={resourceName} />
         </Col>
       }
       error={(error) => (
