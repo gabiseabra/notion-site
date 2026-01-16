@@ -5,7 +5,6 @@ import { useParams } from "react-router";
 import { suspend } from "suspend-react";
 import { useOrpc } from "../../providers/OrpcProvider.js";
 import { Badge } from "../../components/typography/Badge.js";
-import { normalizeTag } from "@notion-site/common/utils/notion/blog-posts.js";
 import { Text } from "../../components/typography/Text.js";
 
 export const path = "/blog/tag/:tag";
@@ -56,4 +55,8 @@ function TagPageLoader({ tag: tagName }: { tag: string }) {
 
 function compareTags(a: string, b: string) {
   return normalizeTag(a) === normalizeTag(b);
+}
+
+export function normalizeTag(tag: string) {
+  return tag.replace(/\s/g, " ").replace(/-/g, " ").toLowerCase();
 }

@@ -1,15 +1,13 @@
-import { SuspenseBoundary } from "../../feedback/SuspenseBoundary.js";
 import { suspend } from "suspend-react";
+import { Link, LinkProps } from "react-router";
+import { extractErrorMessage } from "@notion-site/common/utils/error.js";
+import { SuspenseBoundary } from "../../feedback/SuspenseBoundary.js";
 import { useOrpc } from "../../../providers/OrpcProvider.js";
-import { MaybeLink } from "../../navigation/MaybeLink.js";
-import { getResourceUrl } from "../../../utils/url.js";
 import { RichText } from "../typography/RichText.js";
 import { Icon } from "../typography/Icon.js";
-import { LinkProps } from "react-router";
 import styles from "./LinkToPage.module.scss";
 import { Spinner } from "../../feedback/Spinner.js";
 import { Alert } from "../../feedback/Banner.js";
-import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 
 /**
  * Renders a link to a Notion page by id.
@@ -45,10 +43,8 @@ function LinkToPageLoader({
     (prop) => prop.type === "title",
   );
 
-  const url = getResourceUrl(resource);
-
   return (
-    <MaybeLink to={url} {...props}>
+    <Link to={resource.url} {...props}>
       {resource.icon && (
         <>
           <Icon icon={resource.icon} size="s" />
@@ -57,6 +53,6 @@ function LinkToPageLoader({
       )}
 
       {title && <RichText data={title.title} />}
-    </MaybeLink>
+    </Link>
   );
 }

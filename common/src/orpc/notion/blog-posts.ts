@@ -19,8 +19,6 @@ const QueryBlogPostsOutput = z.object({
   }),
 });
 
-const GetBlogPostOutput = BlogPost.extend({ blocks: zn.block.array() });
-
 const GetAllTagsOutput = z
   .object({
     name: z.string(),
@@ -32,19 +30,37 @@ const GetAllTagsOutput = z
 export const blogPosts = oc.prefix("/blog-posts").router({
   queryBlogPosts: oc
     .route({})
+    .errors({
+      NO_DATABASE: {
+        message: "No blog posts database",
+        status: 501,
+      },
+    })
     .input(QueryBlogPostsInput)
     .output(QueryBlogPostsOutput),
 
   getBlogPost: oc
     .route({})
-    .input(z.object({ id: z.string().nonempty() }))
     .errors({
+      NO_DATABASE: {
+        message: "No blog posts database",
+        status: 501,
+      },
       NOT_FOUND: {
         message: "Blog post not found",
         status: 404,
       },
     })
-    .output(GetBlogPostOutput),
+    .input(z.object({ id: z.string().nonempty() }))
+    .output(BlogPost),
 
-  getAllTags: oc.route({}).output(GetAllTagsOutput),
+  getAllTags: oc
+    .route({})
+    .errors({
+      NO_DATABASE: {
+        message: "No blog posts database",
+        status: 501,
+      },
+    })
+    .output(GetAllTagsOutput),
 });

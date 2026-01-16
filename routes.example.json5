@@ -1,0 +1,15 @@
+[
+  {
+    // home page
+    "path": "/",
+    "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "crumb": "Home",
+    // Page top-level SEO title (appended to VITE_SITE_TITLE), use empty string to omit.
+    "title": "",
+  },
+  {
+    // fallback route
+    "path": "/page/*",
+    "id": "*",
+  }
+]

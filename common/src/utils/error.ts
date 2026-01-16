@@ -36,3 +36,7 @@ export function showError(error: unknown) {
     return details;
   }
 }
+
+export function never(message: string): never {
+  throw new Error(message);
+}

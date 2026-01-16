@@ -1,12 +1,11 @@
+import { ReactNode } from "react";
+import { Link } from "react-router";
+import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
+import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { RichText } from "../typography/RichText.js";
 import { Col, ColProps } from "../../layout/FlexBox.js";
 import { Icon } from "../typography/Icon.js";
 import { Text } from "../../typography/Text.js";
-import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
-import { getResourceUrl } from "../../../utils/url.js";
-import { MaybeLink } from "../../navigation/MaybeLink.js";
-import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
-import { ReactNode } from "react";
 
 export function ResourceMetadata<T extends NotionResource>({
   as: Component,
@@ -38,7 +37,7 @@ export function ResourceMetadata<T extends NotionResource>({
       {before}
 
       {!hiddenTitle && (
-        <MaybeLink to={getResourceUrl(resource)}>
+        <Link to={resource.url}>
           <Text as={TextElement} size={textSize} m={0}>
             {resource.icon && (
               <>
@@ -49,7 +48,7 @@ export function ResourceMetadata<T extends NotionResource>({
 
             {title && <RichText data={title.title} />}
           </Text>
-        </MaybeLink>
+        </Link>
       )}
 
       {after}

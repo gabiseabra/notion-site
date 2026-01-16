@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
+import { titleToString } from "@notion-site/common/utils/notion.js";
 import { BlogPostMetadata } from "./BlogPostMetadata.js";
 import { ResourceLoader } from "../resources/ResourceLoader.js";
-import { titleToString } from "@notion-site/common/utils/notion/properties.js";
 
 export type BlogPostLoaderProps = {
   id: string;

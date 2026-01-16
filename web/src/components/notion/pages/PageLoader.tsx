@@ -1,14 +1,15 @@
 import { ReactNode } from "react";
-import { NotionPage } from "@notion-site/common/dto/notion/page.js";
+import { titleToString } from "@notion-site/common/utils/notion.js";
+import { GetNotionPageOutput } from "@notion-site/common/orpc/notion/pages.js";
 import { ResourceLoader } from "../resources/ResourceLoader.js";
-import { titleToString } from "@notion-site/common/utils/notion/properties.js";
+import { isTruthy } from "@notion-site/common/utils/guards.js";
 
 export type NotionPageLoaderProps = {
   id: string;
-  head?: (blogPost: NotionPage) => ReactNode;
-  metadata?: (blogPost: NotionPage) => ReactNode;
-  header?: (blogPost: NotionPage) => ReactNode;
-  footer?: (blogPost: NotionPage) => ReactNode;
+  head?: (blogPost: GetNotionPageOutput) => ReactNode;
+  metadata?: (blogPost: GetNotionPageOutput) => ReactNode;
+  header?: (blogPost: GetNotionPageOutput) => ReactNode;
+  footer?: (blogPost: GetNotionPageOutput) => ReactNode;
 };
 
 /**
@@ -22,9 +23,13 @@ export function NotionPageLoader({
     <>
       <title>
         {[
-          titleToString(page.properties.title) ?? "Untitled Page",
+          page.route.title ??
+            titleToString(page.properties.title) ??
+            "Untitled Page",
           import.meta.env.VITE_SITE_TITLE,
-        ].join(" • ")}
+        ]
+          .filter(isTruthy)
+          .join(" • ")}
       </title>
     </>
   ),

@@ -1,5 +1,5 @@
-import * as zn from "../../dto/notion/schema.js";
-import { hasPropertyValue } from "../guards.js";
+import * as zn from "../dto/notion/schema.js";
+import { hasPropertyValue } from "./guards.js";
 
 export function titleToString({ title }: zn.title) {
   return (

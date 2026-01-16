@@ -3,20 +3,23 @@ import { api } from "@notion-site/common/orpc/index.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import {
   getDatabaseSelectOptions,
-  getNotionBlocks,
   getNotionPage,
   queryNotionDatabase,
 } from "../../services/notion/api.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
+import * as env from "../../utils/env.js";
+import { getResourceUrl } from "../../utils/router.js";
 
 const c = implement(api.notion.blogPosts);
 
-const databaseId = process.env.NOTION_DATABASE_ID ?? "";
-
 export const blogPosts = c.router({
-  queryBlogPosts: c.queryBlogPosts.handler(async ({ input }) => {
+  queryBlogPosts: c.queryBlogPosts.handler(async ({ input, errors }) => {
+    if (!env.BLOG_POSTS_DATABASE_ID) {
+      throw errors.NO_DATABASE();
+    }
+
     const { results, pageInfo } = await queryNotionDatabase(
-      databaseId,
+      env.BLOG_POSTS_DATABASE_ID,
       BlogPost,
       {
         limit: input.limit,
@@ -63,28 +66,40 @@ export const blogPosts = c.router({
     );
 
     return {
-      posts: results,
+      posts: results.map(mapBlogPost),
       pageInfo,
     };
   }),
 
   getBlogPost: c.getBlogPost.handler(async ({ input, errors }) => {
-    const [post, { blocks }] = await Promise.all([
-      getNotionPage(input.id, BlogPost),
-      getNotionBlocks(input.id),
-    ]);
+    if (!env.BLOG_POSTS_DATABASE_ID) {
+      throw errors.NO_DATABASE();
+    }
 
-    if (!post) {
+    const blogPost = await getNotionPage(input.id, BlogPost);
+
+    if (!blogPost) {
       throw errors.NOT_FOUND();
     }
 
-    return { ...post, blocks };
+    return mapBlogPost(blogPost);
   }),
 
-  getAllTags: c.getAllTags.handler(async () => {
+  getAllTags: c.getAllTags.handler(async ({ errors }) => {
+    if (!env.BLOG_POSTS_DATABASE_ID) {
+      throw errors.NO_DATABASE();
+    }
+
     return getDatabaseSelectOptions(
-      databaseId,
+      env.BLOG_POSTS_DATABASE_ID,
       "Tags" satisfies keyof BlogPost["properties"],
     );
   }),
 });
+
+function mapBlogPost(blogPost: BlogPost) {
+  return {
+    ...blogPost,
+    url: getResourceUrl(blogPost) ?? blogPost.url,
+  };
+}

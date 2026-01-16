@@ -11,7 +11,7 @@ export function BlogPostList({ items }: { items: BlogPost[] }) {
     <ResourceList
       items={items}
       getItemKey={(blogPost) => blogPost.id}
-      onClick={(blogPost) => navigate(`/blog${blogPost.url}`)}
+      onClick={(blogPost) => navigate(blogPost.url)}
       render={(blogPost) => (
         <Col p={2}>
           <BlogPostMetadata
