@@ -9,7 +9,7 @@ export function Component() {
   const { pathname } = useLocation();
 
   return (
-    <PageSuspenseBoundary resourceName="the page">
+    <PageSuspenseBoundary key={pathname} resourceName="the page">
       <NotionPageLoader
         id={pathname}
         header={(page) =>
