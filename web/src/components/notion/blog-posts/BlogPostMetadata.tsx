@@ -1,8 +1,9 @@
-import { Badge } from "../../typography/Badge.js";
+import { match } from "ts-pattern";
+import { Link } from "react-router";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
+import { Badge } from "../../typography/Badge.js";
 import { ColProps, Row } from "../../layout/FlexBox.js";
 import { Span } from "../../typography/Text.js";
-import { match } from "ts-pattern";
 import { ResourceMetadata } from "../resources/ResourceMetadata.js";
 
 export function BlogPostMetadata({
@@ -53,9 +54,9 @@ export function BlogPostMetadata({
           {!hiddenProperties?.includes("Tags") && (
             <>
               {blogPost.properties.Tags.multi_select.map((tag) => (
-                <a key={tag.name} href={`/blog/tag/${tag.name}`}>
+                <Link key={tag.name} to={`/blog/tag/${tag.name}`}>
                   <Badge color={tag.color}>{tag.name}</Badge>
-                </a>
+                </Link>
               ))}
             </>
           )}
