@@ -34,11 +34,11 @@ $min-padding-inline: 20px;
 
   /* notion colors */
 
-  --color-default: #2c1f5c;
+  --color-default: var(--color-default);
   --bg-default: var(--bg-from);
 
-  --color-gray: #707070;
-  --bg-gray: #e8e8e8;
+  --color-gray: var(--color-disabled);
+  --bg-gray: var(--bg-to);
 
   --color-brown: #8e2600;
   --bg-brown: #f3d0c2;

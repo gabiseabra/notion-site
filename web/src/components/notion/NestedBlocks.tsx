@@ -75,17 +75,17 @@ function Block({ data, indent }: { data: zN.block; indent?: number }) {
     <>
       {match(data)
         .with({ type: "paragraph" }, (data) => (
-          <Text as="p" indent={indent}>
+          <Text as="p" indent={indent} color={data.paragraph.color}>
             <RichText data={data.paragraph.rich_text} />
           </Text>
         ))
         .with({ type: "bulleted_list_item" }, (data) => (
-          <Text as="p" indent={indent}>
+          <Text as="p" indent={indent} color={data.bulleted_list_item.color}>
             <RichText data={data.bulleted_list_item.rich_text} />
           </Text>
         ))
         .with({ type: "numbered_list_item" }, (data) => (
-          <Text as="p" indent={indent}>
+          <Text as="p" indent={indent} color={data.numbered_list_item.color}>
             <RichText data={data.numbered_list_item.rich_text} />
           </Text>
         ))
