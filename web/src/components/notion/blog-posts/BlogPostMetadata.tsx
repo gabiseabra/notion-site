@@ -5,14 +5,9 @@ import { Span } from "../../inline/Text.js";
 import { match } from "ts-pattern";
 import { ResourceMetadata } from "../resources/ResourceMetadata.js";
 
-const defaultHiddenProperties: (keyof BlogPost["properties"])[] = import.meta
-  .env.DEV
-  ? []
-  : ["Status"];
-
 export function BlogPostMetadata({
   blogPost,
-  hiddenProperties = defaultHiddenProperties,
+  hiddenProperties,
   ...props
 }: {
   as: ColProps["as"];
@@ -20,6 +15,13 @@ export function BlogPostMetadata({
   blogPost: BlogPost;
   hiddenProperties?: (keyof BlogPost["properties"])[];
 }) {
+  // Hide published status badge in production since only published posts are listed anyways
+  hiddenProperties ??=
+    import.meta.env.DEV ||
+    blogPost.properties["Status"].status?.name === "Published"
+      ? []
+      : ["Status"];
+
   return (
     <ResourceMetadata
       {...props}
