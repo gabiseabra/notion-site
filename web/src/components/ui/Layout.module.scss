@@ -1,7 +1,6 @@
 @use "../../css/theme" as theme;
 @use "../../css/mixins/text" as text;
 
-
 .layout {
   display: flex;
   flex-direction: column;
@@ -27,6 +26,7 @@
   & > footer {
     text-align: center;
     margin: var(--paragraph-margin) 0;
+    color: var(--color-disabled);
 
     a {
       color: var(--color-primary);
