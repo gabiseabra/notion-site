@@ -132,10 +132,6 @@ which starts the server serving static files from the [web](./web) and API route
 ## TODO / Roadmap
 
 - [ ] Support unsupported blocks (e.g. code, callout)
-- [ ] Add `/tags/:tag` front-end route to list posts by tag
 - [ ] Add search bar and tags filter
 - [ ] Add RSS feed
-- [ ] Improve error handling
-- [ ] Rewrite routes from JSON configuration
 - [ ] Don't show posts published in the future
-- [ ] Don't configure /blog routes if database id is not configured
