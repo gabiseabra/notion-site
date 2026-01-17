@@ -69,13 +69,13 @@ export function BlogPostMetadata({
 function PublishedDate({ date }: { date: Date }) {
   return (
     <span>
-      <Span bold size="caption" color="disabled">
+      <Span bold size="caption" color="muted">
         Published
       </Span>
       <Span bold size="caption" color="primary">
         &nbsp; @ &nbsp;
       </Span>
-      <Span bold size="caption" color="disabled">
+      <Span bold size="caption" color="muted">
         {date.toLocaleDateString()}
       </Span>
     </span>
