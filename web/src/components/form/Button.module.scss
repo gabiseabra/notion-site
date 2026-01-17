@@ -1,13 +1,98 @@
+@use "../../css/theme" as theme;
+
+// Button base styles
 .button {
-  font-size: .85em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--space) * 1.25);
+
+  padding: calc(var(--space) * 1.25) calc(var(--space) * 2);
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+
+  font: inherit;
+  font-size: 0.9em;
+  line-height: 1;
+
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition: background-color 120ms ease,
+  border-color 120ms ease,
+  box-shadow 120ms ease,
+  transform 80ms ease,
+  opacity 120ms ease;
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+
+  svg {
+    width: 1em;
+    height: 1em;
+    opacity: 0.85;
+  }
+}
+
+.variant-solid {
+  color: var(--button-color);
+  background-color: color-mix(in srgb, var(--button-bg) 70%, white);
+  border-color: color-mix(in srgb, var(--button-color) 35%, transparent);
+  font-weight: 600;
+
+  box-shadow: 0 1px 2px #0000001a;
+
+  &:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--button-bg) 82%, white);
+    border-color: color-mix(in srgb, var(--button-color) 50%, transparent);
+    box-shadow: 0 2px 8px #0000001a;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px #00000012, 0 0 0 4px color-mix(in srgb, var(--button-color) 45%, white);
+  }
 }
 
 .variant-plain {
+  color: var(--button-color);
   background: transparent;
-  border: none;
-  color: var(--color-link);
+  border-color: transparent;
+  text-decoration: underline;
 
   &:disabled {
-    color: var(--color-disabled)
+    color: var(--color-disabled);
+    text-decoration: none;
   }
+}
+
+
+@each $name, $_ in theme.$colors-codes {
+  .#{"color-" + $name} {
+    --button-color: var(#{"--color-" + $name});
+    --button-bg: var(#{"--bg-" + $name});
+  }
+}
+
+
+.button:disabled {
+  --button-color: var(--color-disabled);
+  --button-bg: var(--bg-gray);
+
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }

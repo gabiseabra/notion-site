@@ -70,18 +70,17 @@ export function PageSuspenseBoundary({
             {extractErrorMessage(error)}
 
             {onRetry && (
-              <Col alignX="center">
-                <Button
-                  color="red"
-                  icon={<FaArrowsRotate />}
-                  onClick={() => {
-                    setRetryKey((k) => k + 1);
-                    onRetry();
-                  }}
-                >
-                  Retry
-                </Button>
-              </Col>
+              <Button
+                color="red"
+                variant="plain"
+                icon={<FaArrowsRotate />}
+                onClick={() => {
+                  setRetryKey((k) => k + 1);
+                  onRetry();
+                }}
+              >
+                Retry
+              </Button>
             )}
           </Banner>
         </Col>

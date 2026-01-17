@@ -6,7 +6,6 @@
   grid-template-columns: auto 1fr;
   align-items: center;
   column-gap: var(--space);
-  align-items: baseline;
 
   &.size-m, &.size-l {
     background: var(--banner-bg);
@@ -17,11 +16,13 @@
 
   &.size-m {
     padding: var(--space) calc(var(--space) * 2);
+    padding-left: calc(var(--space) * 1);
     margin: calc(var(--space) * 2);
   }
 
   &.size-l {
     padding: calc(var(--space) * 4) calc(var(--space) * 6);
+    padding-left: calc(var(--space) * 3);
     margin: calc(var(--space) * 2);
     box-shadow: var(--banner-color) calc(var(--space) / 2) calc(var(--space) / 1) 0px;
   }
@@ -40,6 +41,7 @@
 .icon {
   aspect-ratio: 1;
   display: inline-flex;
+  align-self: baseline;
 
   svg {
     width: 100%;
