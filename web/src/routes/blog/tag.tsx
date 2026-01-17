@@ -45,7 +45,7 @@ function TagPageLoader({ tag: tagName }: { tag: string }) {
       </Text>
 
       {!!tag.description && (
-        <Text as="p" size-="caption" color="muted" mt={-3} mb={3}>
+        <Text as="p" size="caption" color="muted" mt={-3} mb={3}>
           {tag.description}
         </Text>
       )}
