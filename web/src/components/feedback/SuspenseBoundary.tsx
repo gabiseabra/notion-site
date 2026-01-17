@@ -1,8 +1,10 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
+import { FaArrowsRotate } from "react-icons/fa6";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { Col } from "../layout/FlexBox.js";
 import { Banner } from "./Banner.js";
 import { SimlishSpinner } from "./SimlishSpinner.js";
+import { Button } from "../form/Button.js";
 
 export type SuspenseBoundaryProps = {
   children: ReactNode;
@@ -34,6 +36,7 @@ export type PageSuspenseBoundaryProps = {
    * Name of the resource being loaded.
    */
   resourceName: string;
+  onRetry?: () => void;
   onError?: (error: unknown) => void;
 };
 
@@ -43,10 +46,14 @@ export type PageSuspenseBoundaryProps = {
  */
 export function PageSuspenseBoundary({
   resourceName,
+  onRetry,
   ...props
 }: PageSuspenseBoundaryProps) {
+  const [retryKey, setRetryKey] = useState(0);
+
   return (
     <SuspenseBoundary
+      key={retryKey}
       {...props}
       loading={
         <Col flex={1} alignX="center" alignY="center">
@@ -61,6 +68,21 @@ export function PageSuspenseBoundary({
             title={`There was an error loading ${resourceName}`}
           >
             {extractErrorMessage(error)}
+
+            {onRetry && (
+              <Col alignX="center">
+                <Button
+                  color="red"
+                  icon={<FaArrowsRotate />}
+                  onClick={() => {
+                    setRetryKey((k) => k + 1);
+                    onRetry();
+                  }}
+                >
+                  Retry
+                </Button>
+              </Col>
+            )}
           </Banner>
         </Col>
       )}

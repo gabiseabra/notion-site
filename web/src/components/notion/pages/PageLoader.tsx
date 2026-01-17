@@ -38,9 +38,12 @@ export function NotionPageLoader({
   return (
     <ResourceLoader
       id={id}
+      resourceKey="page"
       fetch={(id, orpc) => orpc.notion.pages.getPage({ id })}
       head={head}
       {...slots}
     />
   );
 }
+
+NotionPageLoader.clear = ResourceLoader.clear("page");

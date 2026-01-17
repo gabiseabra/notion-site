@@ -10,7 +10,10 @@ export function Component() {
   const id = url.split("-").pop() ?? "";
 
   return (
-    <PageSuspenseBoundary resourceName="the blog post">
+    <PageSuspenseBoundary
+      resourceName="the blog post"
+      onRetry={() => BlogPostLoader.clear(id)}
+    >
       <BlogPostLoader id={id} />
     </PageSuspenseBoundary>
   );

@@ -37,6 +37,7 @@ export function BlogPostLoader({
   return (
     <ResourceLoader
       id={id}
+      resourceKey="blog-post"
       fetch={(id, orpc) => orpc.notion.blogPosts.getBlogPost({ id })}
       head={head}
       metadata={metadata}
@@ -44,3 +45,5 @@ export function BlogPostLoader({
     />
   );
 }
+
+BlogPostLoader.clear = ResourceLoader.clear("blog-post");
