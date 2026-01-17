@@ -3,7 +3,7 @@ import { api } from "@notion-site/common/orpc/index.js";
 import { NotionPage } from "@notion-site/common/dto/notion/page.js";
 import { getNotionBlocks, getNotionPage } from "../../services/notion/api.js";
 import { _NotionResource } from "@notion-site/common/dto/notion/resource.js";
-import { getResourceUrl, matchRoute } from "../../utils/router.js";
+import { getResourceUrl, matchRoute } from "../../utils/route.js";
 
 const c = implement(api.notion.pages);
 

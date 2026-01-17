@@ -1,6 +1,7 @@
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { PageSuspenseBoundary } from "../../components/feedback/SuspenseBoundary.js";
 import { BlogPostLoader } from "../../components/notion/blog-posts/BlogPostLoader.js";
+import { DynamicBreadcrumbs } from "../../components/notion/navigation/DynamicBreadcrumbs.js";
 
 export const path = "/blog/:url";
 
@@ -14,6 +15,15 @@ export function Component() {
       resourceName="the blog post"
       onRetry={() => BlogPostLoader.clear(id)}
     >
+      <DynamicBreadcrumbs
+        id={id}
+        parent={() => (
+          <span>
+            <Link to="/blog">Blog</Link>
+          </span>
+        )}
+      />
+
       <BlogPostLoader id={id} />
     </PageSuspenseBoundary>
   );

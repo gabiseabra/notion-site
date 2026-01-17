@@ -8,7 +8,7 @@ import {
 } from "../../services/notion/api.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import * as env from "../../utils/env.js";
-import { getResourceUrl } from "../../utils/router.js";
+import { getResourceUrl } from "../../utils/route.js";
 
 const c = implement(api.notion.blogPosts);
 

@@ -3,7 +3,7 @@ export function uuidEquals(a: string, b: string) {
 }
 
 export function normalizeUuid(uuid: string) {
-  return uuid.replace(/-/g, "");
+  return uuid.replace(/-/g, "").toLowerCase();
 }
 
 export function isUuid(uuid: string) {

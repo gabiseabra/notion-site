@@ -1,20 +1,14 @@
-import { match } from "ts-pattern";
 import { isUuid, uuidEquals } from "@notion-site/common/utils/uuid.js";
 import { Route } from "@notion-site/common/dto/route.js";
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import * as env from "./env.js";
 
-export function getRouteById(
-  id: string,
-  routes: Route[] = env.routes,
-): Route | undefined {
-  for (const route of routes) {
-    if (route.id && uuidEquals(route.id, id)) {
-      if (route.path.endsWith("/*")) {
-        return { ...route, id, path: route.path.replace("*", id) };
-      } else {
-        return route;
-      }
+export function getRouteById(id: string): Route | undefined {
+  for (const route of env.routes) {
+    if (isUuid(route.id) && uuidEquals(route.id, id)) {
+      return route;
+    } else if (route.path.endsWith("/*")) {
+      return { ...route, id, path: route.path.replace("*", id) };
     }
   }
 }
@@ -38,20 +32,14 @@ export function getRouteByPath(path: string): Route | undefined {
 }
 
 export function getResourceUrl({ id, url, parent }: NotionResource) {
-  return (
-    getRouteById(id)?.path ??
-    match(parent)
-      .with({ type: "database_id" }, ({ database_id }) => {
-        if (
-          env.BLOG_POSTS_DATABASE_ID &&
-          uuidEquals(database_id, env.BLOG_POSTS_DATABASE_ID)
-        ) {
-          return `/blog${url}`;
-        }
-      })
-      .with({ type: "page_id" }, () => `/page${url}`)
-      .otherwise(() => undefined)
-  );
+  if (parent.type !== "database_id") {
+    return getRouteById(id)?.path;
+  } else if (
+    env.BLOG_POSTS_DATABASE_ID &&
+    uuidEquals(parent.database_id, env.BLOG_POSTS_DATABASE_ID)
+  ) {
+    return `/blog${url}`;
+  }
 }
 
 export function matchRoute(pathOrId: string): Route | undefined {

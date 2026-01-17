@@ -9,16 +9,25 @@ import { Alert } from "../../feedback/Banner.js";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { Breadcrumbs } from "../../navigation/Breadcrumbs.js";
 import { Icon } from "../typography/Icon.js";
+import { ReactNode } from "react";
+import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 
-export function DynamicBreadcrumbs({ id }: { id: string }) {
+type DynamicBreadcrumbsProps = {
+  id: string;
+  parent?: (resource: NotionResource) => ReactNode;
+};
+
+export function DynamicBreadcrumbs(props: DynamicBreadcrumbsProps) {
   return (
     <Breadcrumbs>
-      <DynamicBreadcrumbsCrumb id={id} />
+      <DynamicBreadcrumbs.Crumb {...props} />
     </Breadcrumbs>
   );
 }
 
-function DynamicBreadcrumbsCrumb({ id }: { id: string }) {
+DynamicBreadcrumbs.Crumb = function DynamicBreadcrumbsCrumb(
+  props: DynamicBreadcrumbsProps,
+) {
   return (
     <SuspenseBoundary
       loading={
@@ -32,12 +41,18 @@ function DynamicBreadcrumbsCrumb({ id }: { id: string }) {
         </span>
       )}
     >
-      <DynamicBreadcrumbsCrumbLoader id={id} />
+      <DynamicBreadcrumbs.CrumbLoader {...props} />
     </SuspenseBoundary>
   );
-}
+};
 
-function DynamicBreadcrumbsCrumbLoader({ id }: { id: string }) {
+DynamicBreadcrumbs.CrumbLoader = function DynamicBreadcrumbsCrumbLoader({
+  id,
+  parent = (resource) =>
+    resource.parent.type === "page_id" && (
+      <DynamicBreadcrumbs.Crumb id={resource.parent.page_id} />
+    ),
+}: DynamicBreadcrumbsProps) {
   const orpc = useOrpc();
   const resource = suspend(
     () => orpc.notion.pages.getMetadata({ id: id }),
@@ -50,13 +65,11 @@ function DynamicBreadcrumbsCrumbLoader({ id }: { id: string }) {
 
   return (
     <>
-      {resource.parent.type === "page_id" && (
-        <DynamicBreadcrumbsCrumb id={resource.parent.page_id} />
-      )}
+      {parent(resource)}
 
       <span>
         <Link
-          to={resource.route.path}
+          to={resource.url}
           title={title ? titleToString(title) : undefined}
         >
           {resource.route.crumb ?? (
@@ -75,4 +88,4 @@ function DynamicBreadcrumbsCrumbLoader({ id }: { id: string }) {
       </span>
     </>
   );
-}
+};
