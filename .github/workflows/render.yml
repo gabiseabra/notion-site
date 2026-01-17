@@ -3,7 +3,7 @@ name: Deploy api to Render
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
