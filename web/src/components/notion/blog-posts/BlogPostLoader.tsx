@@ -3,6 +3,7 @@ import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import { titleToString } from "@notion-site/common/utils/notion.js";
 import { BlogPostMetadata } from "./BlogPostMetadata.js";
 import { ResourceLoader } from "../resources/ResourceLoader.js";
+import { Favicon } from "../typography/Favicon.js";
 
 export type BlogPostLoaderProps = {
   id: string;
@@ -27,6 +28,8 @@ export function BlogPostLoader({
           import.meta.env.VITE_SITE_TITLE,
         ].join(" • ")}
       </title>
+
+      {blogPost.icon && <Favicon icon={blogPost.icon} />}
     </>
   ),
   metadata = (blogPost) => (
