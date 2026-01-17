@@ -22,7 +22,7 @@ export function useOrpc() {
 }
 
 export function OrpcProvider({ children }: { children: ReactNode }) {
-  const url = `${window.location.origin}/api`;
+  const url = `${import.meta.env.VITE_API_URL ?? window.location.origin}/api`;
 
   const link = useMemo(
     () =>
