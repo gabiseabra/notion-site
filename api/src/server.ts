@@ -5,12 +5,11 @@ import morgan from "morgan";
 import { RPCHandler } from "@orpc/server/node";
 import { onError } from "@orpc/server";
 import { router } from "./orpc/index.js";
+import * as env from "./utils/env.js";
 
-const port = process.env.PORT || 3000;
-const staticDir = process.env.STATIC_DIR;
 const app = express();
 
-app.use(cors({ origin: `http://localhost:${port}` }));
+app.use(cors({ origin: env.CORS_ORIGIN }));
 app.use(morgan("dev"));
 
 const handler = new RPCHandler(router, {
@@ -32,17 +31,17 @@ app.use("/api", async (req, res, next) => {
   next();
 });
 
-if (staticDir) {
-  app.use(express.static(staticDir));
+if (env.STATIC_DIR) {
+  app.use(express.static(env.STATIC_DIR));
 
   app.use((req, res) => {
-    res.sendFile(path.join(staticDir, "index.html"));
+    res.sendFile(path.join(env.STATIC_DIR!, "index.html"));
   });
 }
 
 // Start the server at port
-const server = app.listen(port, () => {
-  console.log(`Running a API server on http://localhost:${port}`);
+const server = app.listen(env.PORT, () => {
+  console.log(`Running a API server on http://localhost:${env.PORT}`);
 });
 
 const shutdown = () => {
