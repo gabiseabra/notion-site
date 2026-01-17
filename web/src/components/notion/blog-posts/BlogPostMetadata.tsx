@@ -19,7 +19,7 @@ export function BlogPostMetadata({
   // Hide published status badge in production since only published posts are listed anyways
   hiddenProperties ??=
     import.meta.env.DEV ||
-    blogPost.properties["Status"].status?.name === "Published"
+    blogPost.properties["Status"].status?.name !== "Published"
       ? []
       : ["Status"];
 
