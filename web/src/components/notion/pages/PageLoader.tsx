@@ -4,6 +4,7 @@ import { GetNotionPageOutput } from "@notion-site/common/orpc/notion/pages.js";
 import { ResourceLoader } from "../resources/ResourceLoader.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { Favicon } from "../typography/Favicon.js";
+import { Head } from "../../../providers/HeadProvider.js";
 
 export type NotionPageLoaderProps = {
   id: string;
@@ -21,7 +22,7 @@ export type NotionPageLoaderProps = {
 export function NotionPageLoader({
   id,
   head = (page) => (
-    <>
+    <Head>
       <title>
         {[
           page.route.title ??
@@ -34,7 +35,7 @@ export function NotionPageLoader({
       </title>
 
       {page.icon && <Favicon icon={page.icon} />}
-    </>
+    </Head>
   ),
   ...slots
 }: NotionPageLoaderProps) {

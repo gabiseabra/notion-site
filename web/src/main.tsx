@@ -5,13 +5,16 @@ import ReactDOM from "react-dom/client";
 import { OrpcProvider } from "./providers/OrpcProvider.js";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import * as route from "./routes/index.js";
+import { HeadProvider } from "./providers/HeadProvider.js";
 
 const router = createBrowserRouter([route]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <OrpcProvider>
-      <RouterProvider router={router} />
+      <HeadProvider>
+        <RouterProvider router={router} />
+      </HeadProvider>
     </OrpcProvider>
   </React.StrictMode>,
 );

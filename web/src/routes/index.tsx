@@ -3,11 +3,14 @@ import { Layout } from "../components/ui/Layout.js";
 import * as blog from "./blog/index.js";
 import * as page from "./page.js";
 import { Favicon } from "../components/notion/typography/Favicon.js";
+import { Head } from "../providers/HeadProvider.js";
 
 export const element = (
   <Layout>
-    <title>{import.meta.env.VITE_SITE_TITLE}</title>
-    <Favicon icon={{ type: "emoji", emoji: "🍋" }} />
+    <Head>
+      <title>{import.meta.env.VITE_SITE_TITLE}</title>
+      <Favicon icon={{ type: "emoji", emoji: "❓" }} />
+    </Head>
 
     <Outlet />
   </Layout>

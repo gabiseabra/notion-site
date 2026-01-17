@@ -4,6 +4,7 @@ import { titleToString } from "@notion-site/common/utils/notion.js";
 import { BlogPostMetadata } from "./BlogPostMetadata.js";
 import { ResourceLoader } from "../resources/ResourceLoader.js";
 import { Favicon } from "../typography/Favicon.js";
+import { Head } from "../../../providers/HeadProvider.js";
 
 export type BlogPostLoaderProps = {
   id: string;
@@ -21,7 +22,7 @@ export type BlogPostLoaderProps = {
 export function BlogPostLoader({
   id,
   head = (blogPost) => (
-    <>
+    <Head>
       <title>
         {[
           titleToString(blogPost.properties.Title) ?? "Untitled Blog Post",
@@ -30,7 +31,7 @@ export function BlogPostLoader({
       </title>
 
       {blogPost.icon && <Favicon icon={blogPost.icon} />}
-    </>
+    </Head>
   ),
   metadata = (blogPost) => (
     <BlogPostMetadata as="header" size="l" blogPost={blogPost} />

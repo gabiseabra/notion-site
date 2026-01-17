@@ -15,16 +15,19 @@ export function Component() {
       resourceName="the blog post"
       onRetry={() => BlogPostLoader.clear(id)}
     >
-      <DynamicBreadcrumbs
+      <BlogPostLoader
         id={id}
-        parent={() => (
-          <span>
-            <Link to="/blog">Blog</Link>
-          </span>
+        header={() => (
+          <DynamicBreadcrumbs
+            id={id}
+            parent={() => (
+              <span>
+                <Link to="/blog">Blog</Link>
+              </span>
+            )}
+          />
         )}
       />
-
-      <BlogPostLoader id={id} />
     </PageSuspenseBoundary>
   );
 }

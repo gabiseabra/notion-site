@@ -7,6 +7,7 @@ import { useOrpc } from "../../providers/OrpcProvider.js";
 import { Badge } from "../../components/typography/Badge.js";
 import { Text } from "../../components/typography/Text.js";
 import { Favicon } from "../../components/notion/typography/Favicon.js";
+import { Head } from "../../providers/HeadProvider.js";
 
 export const path = "/blog/tag/:tag";
 
@@ -34,8 +35,10 @@ function TagPageLoader({ tag: tagName }: { tag: string }) {
 
   return (
     <>
-      <title>{[tag.name, import.meta.env.VITE_SITE_TITLE].join(" • ")}</title>
-      <Favicon icon={{ type: "emoji", emoji: "🏷️" }} />
+      <Head>
+        <title>{[tag.name, import.meta.env.VITE_SITE_TITLE].join(" • ")}</title>
+        <Favicon icon={{ type: "emoji", emoji: "🏷️" }} />
+      </Head>
 
       <Text as="h2" style={{ display: "inline-flex", alignItems: "center" }}>
         Blog Posts Tagged &nbsp;
