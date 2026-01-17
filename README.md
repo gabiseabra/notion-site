@@ -109,12 +109,6 @@ npm run build
 npm run start
 ```
 
-Use `docker-compose` to run with Docker:
-
-```bash
-docker-compose --env-file .env up
-```
-
 ### Dev mode
 
 There are enhanced visibility tools in dev mode you help with editing:
