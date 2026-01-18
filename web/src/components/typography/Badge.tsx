@@ -5,7 +5,7 @@ import styles from "./Badge.module.scss";
 
 type BadgeProps = {
   color: zN.color;
-  size?: "s" | "m" | "l";
+  size: "xs" | "s" | "m" | "l";
   status?: "empty" | "in-progress" | "complete";
   children: ReactNode;
 };

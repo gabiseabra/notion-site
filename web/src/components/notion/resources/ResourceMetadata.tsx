@@ -25,7 +25,7 @@ export function ResourceMetadata<T extends NotionResource>({
   const TextElement = size === "l" ? "h1" : "div";
   const textSize = ({ s: "h4", m: "h3", l: undefined } as const)[size];
   const gap = ({ s: 1, m: 1, l: 2 } as const)[size];
-  const mt = ({ s: 0, m: 1, l: 3 } as const)[size];
+  const mt = ({ s: 0, m: 1, l: 4 } as const)[size];
   const mb = ({ s: 0, m: 3, l: 6 } as const)[size];
 
   const title = Object.values(resource.properties).find(

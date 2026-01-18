@@ -40,6 +40,7 @@ export function BlogPostMetadata({
           {!hiddenProperties?.includes("Status") &&
             blogPost.properties["Status"].status && (
               <Badge
+                size="s"
                 color={blogPost.properties["Status"].status.color}
                 status={match(blogPost.properties["Status"].status.name)
                   .with("Published", () => "complete" as const)
@@ -55,7 +56,9 @@ export function BlogPostMetadata({
             <>
               {blogPost.properties.Tags.multi_select.map((tag) => (
                 <Link key={tag.name} to={`/blog/tag/${tag.name}`}>
-                  <Badge color={tag.color}>{tag.name}</Badge>
+                  <Badge size="s" color={tag.color}>
+                    {tag.name}
+                  </Badge>
                 </Link>
               ))}
             </>

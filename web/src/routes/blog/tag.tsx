@@ -1,13 +1,13 @@
-import { Col } from "../../components/layout/FlexBox.js";
+import { Link, useParams } from "react-router";
+import { suspend } from "suspend-react";
 import { PageSuspenseBoundary } from "../../components/feedback/SuspenseBoundary.js";
 import { BlogPostListLoader } from "../../components/notion/blog-posts/BlogPostListLoader.js";
-import { useParams } from "react-router";
-import { suspend } from "suspend-react";
 import { useOrpc } from "../../providers/OrpcProvider.js";
 import { Badge } from "../../components/typography/Badge.js";
 import { Text } from "../../components/typography/Text.js";
 import { Favicon } from "../../components/notion/typography/Favicon.js";
 import { Head } from "../../providers/HeadProvider.js";
+import { Breadcrumbs } from "../../components/navigation/Breadcrumbs.js";
 
 export const path = "/blog/tag/:tag";
 
@@ -15,11 +15,9 @@ export function Component() {
   const { tag = "" } = useParams<{ tag: string }>();
 
   return (
-    <Col as="section" style={{ flex: 1 }}>
-      <PageSuspenseBoundary resourceName="blog posts">
-        <TagPageLoader tag={tag} />
-      </PageSuspenseBoundary>
-    </Col>
+    <PageSuspenseBoundary resourceName="blog posts">
+      <TagPageLoader tag={tag} />
+    </PageSuspenseBoundary>
   );
 }
 
@@ -40,11 +38,22 @@ function TagPageLoader({ tag: tagName }: { tag: string }) {
         <Favicon icon={{ type: "emoji", emoji: "🏷️" }} />
       </Head>
 
+      <Breadcrumbs>
+        <span>
+          <Link to="/blog">Blog</Link>
+        </span>
+
+        <span>
+          <Link to={`/blog/tag/${tag}`}>
+            <Badge size="xs" color={tag.color}>
+              {tag.name}
+            </Badge>
+          </Link>
+        </span>
+      </Breadcrumbs>
+
       <Text as="h2" style={{ display: "inline-flex", alignItems: "center" }}>
-        Blog Posts Tagged &nbsp;
-        <Badge size="l" color={tag.color}>
-          {tag.name}
-        </Badge>
+        Blog Posts Tagged "{tag.name}"
       </Text>
 
       {!!tag.description && (
