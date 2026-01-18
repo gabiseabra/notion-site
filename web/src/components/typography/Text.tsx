@@ -1,4 +1,4 @@
-import { CSSProperties, ReactNode } from "react";
+import { ComponentProps, CSSProperties, ReactNode } from "react";
 import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { omit } from "@notion-site/common/utils/object.js";
@@ -93,11 +93,14 @@ export function Span({
   code,
   color,
   size,
+  style,
 }: {
   children: string;
+  style?: CSSProperties;
 } & Partial<InlineAnnotations>) {
   return (
     <span
+      style={style}
       className={[
         bold && styles.bold,
         italic && styles.italic,

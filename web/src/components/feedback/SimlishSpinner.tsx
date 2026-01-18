@@ -18,7 +18,7 @@ export function SimlishSpinner({ resourceName }: { resourceName: string }) {
       shuffle([
         `Loading ${resourceName}`,
         `Squeezing ${resourceName} through a tiny pipe`,
-        `Consulting the ${resourceName} oracle`,
+        `Consulting the ${possessive(resourceName)} oracle`,
         `Herding ${resourceName} into a line`,
         `Shuffling ${resourceName} into place`,
         `Staring intensely at ${resourceName} until they load`,
@@ -51,7 +51,7 @@ export function SimlishSpinner({ resourceName }: { resourceName: string }) {
     <Col gap={4} alignX="center">
       <Spinner size="l" />
 
-      <Span color="muted" size="caption">
+      <Span color="muted" size="caption" style={{ textAlign: "center" }}>
         {`${actions[tick % actions.length]}…`}
       </Span>
     </Col>
