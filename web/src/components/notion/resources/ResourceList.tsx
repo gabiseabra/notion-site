@@ -6,12 +6,18 @@ export function ResourceList<T>({
   render,
   getItemKey,
   onClick,
+  emptyState,
 }: {
   items: T[];
   render: (item: T) => ReactNode;
   getItemKey: (item: T) => string;
   onClick?: (item: T) => void;
+  emptyState?: ReactNode;
 }) {
+  if (!items.length) {
+    return <div className={styles["list-empty"]}>{emptyState}</div>;
+  }
+
   return (
     <ul
       className={[styles["resource-list"], onClick && styles["clickable"]].join(

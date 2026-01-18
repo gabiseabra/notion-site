@@ -2,6 +2,7 @@ import { useNavigate } from "react-router";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import { BlogPostMetadata } from "./BlogPostMetadata.js";
 import { ResourceList } from "../resources/ResourceList.js";
+import { EmptyState } from "../../feedback/EmptyState.js";
 import { Col } from "../../layout/FlexBox.js";
 
 export function BlogPostList({ items }: { items: BlogPost[] }) {
@@ -12,6 +13,7 @@ export function BlogPostList({ items }: { items: BlogPost[] }) {
       items={items}
       getItemKey={(blogPost) => blogPost.id}
       onClick={(blogPost) => navigate(blogPost.url)}
+      emptyState={<EmptyState title="No blog posts found" />}
       render={(blogPost) => (
         <Col p={2}>
           <BlogPostMetadata
