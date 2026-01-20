@@ -1,0 +1,81 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.popover {
+  position: fixed;
+  z-index: 1000;
+  border-radius: var(--radius);
+  box-shadow: #00000040 0 1px 3px;
+  border: 1px solid #00000020;
+}
+
+.content {
+  background: white;
+  border-radius: var(--radius);
+  z-index: 1;
+}
+
+.arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #fff;
+  border: 1px solid #00000020;
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+/* Arrow placement (simple + clean). */
+.popover[data-placement^='top'] .arrow {
+  bottom: -5px;
+  left: 50%;
+  margin-left: -5px;
+}
+
+.popover[data-placement^='bottom'] .arrow {
+  top: -5px;
+  left: 50%;
+  margin-left: -5px;
+}
+
+.popover[data-placement^='left'] .arrow {
+  right: -5px;
+  top: 50%;
+  margin-top: -5px;
+}
+
+.popover[data-placement^='right'] .arrow {
+  left: -5px;
+  top: 50%;
+  margin-top: -5px;
+}
+
+/* Start/end variants nudge the arrow off-center. */
+.popover[data-placement$='-start'][data-placement^='top'] .arrow,
+.popover[data-placement$='-start'][data-placement^='bottom'] .arrow {
+  left: 14px;
+  margin-left: 0;
+}
+
+.popover[data-placement$='-end'][data-placement^='top'] .arrow,
+.popover[data-placement$='-end'][data-placement^='bottom'] .arrow {
+  left: auto;
+  right: 14px;
+  margin-left: 0;
+}
+
+.popover[data-placement$='-start'][data-placement^='left'] .arrow,
+.popover[data-placement$='-start'][data-placement^='right'] .arrow {
+  top: 14px;
+  margin-top: 0;
+}
+
+.popover[data-placement$='-end'][data-placement^='left'] .arrow,
+.popover[data-placement$='-end'][data-placement^='right'] .arrow {
+  top: auto;
+  bottom: 14px;
+  margin-top: 0;
+}

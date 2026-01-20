@@ -2,12 +2,42 @@
  * @module css/index.js
  * Helper functions to handle css vars in js world
  */
-import { CSSProperties } from "react";
 import { omitUndefined } from "@notion-site/common/utils/object.js";
+import { CSSProperties } from "react";
 
 export const _space = "var(--space)";
 
 export const space = (n: number) => `calc(${_space} * ${n})`;
+
+export function computeSpace(element: Element, n: number = 1) {
+  const raw = getComputedStyle(element).getPropertyValue("--space").trim();
+  const value = parseFloat(raw);
+  const unit = raw.replace(String(value), "").trim() || "px";
+  return `${value * n}${unit}`;
+}
+
+export function toPx(
+  value: string,
+  element: Element = document.documentElement,
+): number {
+  if (value.endsWith("px")) return parseFloat(value);
+
+  const probe = document.createElement("div");
+  probe.style.position = "absolute";
+  probe.style.visibility = "hidden";
+  probe.style.pointerEvents = "none";
+  probe.style.width = value;
+
+  (element instanceof HTMLElement
+    ? element
+    : document.documentElement
+  ).appendChild(probe);
+
+  const px = probe.getBoundingClientRect().width;
+  probe.remove();
+
+  return px;
+}
 
 export const paddingProps = ["p", "pt", "pl", "pr", "pb", "px", "py"] as const;
 export type PaddingProps = { [k in (typeof paddingProps)[number]]?: number };

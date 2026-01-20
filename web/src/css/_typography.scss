@@ -147,4 +147,7 @@ h4 {
   font-weight: var(--weight-h4, var(--weight-heading));
   color: var(--color-heading);
   line-height: 1em;
+
+  margin-block-start: 1em;
+  margin-block-end: 1em;
 }

@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { isEventFromMatchingDescendant } from "../../../utils/event.js";
 import styles from "./ResourceList.module.scss";
 
 export function ResourceList<T>({
@@ -30,18 +31,9 @@ export function ResourceList<T>({
           onClick={
             onClick &&
             ((e) => {
-              let element = e.target;
-
-              if (
-                element instanceof Element &&
-                element.closest("a") &&
-                !element.closest("a")?.contains(e.currentTarget)
-              ) {
-                // If the user clicked on a child <a /> tag, don't trigger onClick
-                return;
+              if (!isEventFromMatchingDescendant(e, "a")) {
+                onClick(item);
               }
-
-              onClick(item);
             })
           }
         >
