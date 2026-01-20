@@ -51,24 +51,6 @@
   }
 }
 
-.color-primary {
-  color: var(--color-primary);
-
-  .badge {
-    color: var(--color-primary);
-    background: var(--bg-primary);
-  }
-}
-
-.color-secondary {
-  color: var(--color-secondary);
-
-  .badge {
-    color: var(--color-secondary);
-    background: var(--bg-secondary);
-  }
-}
-
 .size-xs {
   --icon-size: 14px;
   --badge-size: 8px;

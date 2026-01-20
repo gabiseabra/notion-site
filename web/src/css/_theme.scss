@@ -2,7 +2,7 @@
  * [_theme.scss] Color and spacing configurations
  **********************************************************************************************************************/
 
-$colors-codes: default, gray, brown, orange, yellow, green, blue, purple, pink, red;
+$colors-codes: default, gray, brown, orange, yellow, green, blue, purple, pink, red, primary, secondary;
 // Layout body max width
 $max-content-width: 800px;
 // Min space between the body and the edge of the page
@@ -16,9 +16,9 @@ $max-width: ($max-content-width - $min-content-padding * 2);
   /* site palette */
 
   --color-primary: rgb(92, 69, 237);
-  --bg-primary: rgb(255, 171, 241);
+  --bg-primary: rgb(226, 221, 255);
   --color-secondary: rgb(243, 88, 199);
-  --bg-secondary: rgb(218, 210, 255);
+  --bg-secondary: rgb(255, 219, 245);
 
   /* background color */
 
