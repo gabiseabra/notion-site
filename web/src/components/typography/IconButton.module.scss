@@ -1,0 +1,90 @@
+@use "../../css/theme" as theme;
+
+.icon {
+  position: relative;
+  
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  width: var(--icon-size);
+  height: var(--icon-size);
+  font-size: var(--icon-size);
+  padding: 0;
+
+  background: transparent;
+  border: none;
+
+  &:focus, &:active {
+    outline: none;
+  }
+
+  svg {
+    width: 100%;
+  }
+}
+
+
+.badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+
+  height: var(--badge-size);
+  min-width: var(--badge-size);
+  border-radius: calc(var(--badge-size) / 2);
+  font-size: calc(var(--badge-size) * 0.85);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+@each $name, $_ in theme.$colors-codes {
+  .#{"color-" + $name} {
+    color: var(#{"--color-" + $name});
+
+    .badge {
+      background: var(#{"--color-" + $name});
+      color: var(#{"--bg-" + $name});
+    }
+  }
+}
+
+.color-primary {
+  color: var(--color-primary);
+
+  .badge {
+    color: var(--color-primary);
+    background: var(--bg-primary);
+  }
+}
+
+.color-secondary {
+  color: var(--color-secondary);
+
+  .badge {
+    color: var(--color-secondary);
+    background: var(--bg-secondary);
+  }
+}
+
+.size-xs {
+  --icon-size: 14px;
+  --badge-size: 8px;
+}
+
+.size-s {
+  --icon-size: 18px;
+  --badge-size: 10px;
+}
+
+.size-m {
+  --icon-size: 24px;
+  --badge-size: 12px;
+}
+
+.size-l {
+  --icon-size: 32px;
+  --badge-size: 14px;
+}
