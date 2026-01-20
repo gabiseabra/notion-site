@@ -1,5 +1,5 @@
 import { oc } from "@orpc/contract";
-import { BlogPost } from "../../dto/notion/blog-post.js";
+import { BlogPost, BlogPostStatus } from "../../dto/notion/blog-post.js";
 import * as zn from "../../dto/notion/schema.js";
 import z from "zod";
 
@@ -8,6 +8,7 @@ export const QueryBlogPostsInput = z.object({
   limit: z.number().max(100),
   after: z.string().optional(),
   tags: z.string().array().optional(),
+  statuses: BlogPostStatus.array().optional(),
 });
 export type QueryBlogPostsInput = z.infer<typeof QueryBlogPostsInput>;
 

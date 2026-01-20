@@ -1,6 +1,9 @@
 import { implement } from "@orpc/server";
 import { api } from "@notion-site/common/orpc/index.js";
-import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
+import {
+  BlogPost,
+  BlogPostStatus,
+} from "@notion-site/common/dto/notion/blog-post.js";
 import {
   getDatabaseSelectOptions,
   getNotionPage,
@@ -36,13 +39,17 @@ export const blogPosts = c.router({
         ],
         filter: {
           and: [
-            // Show unpublished posts in dev mode
+            // Only show completed statuses in production
             process.env.NODE_ENV === "development"
               ? undefined
-              : ({
-                  property: "Status",
-                  status: { equals: "Published" },
-                } as const),
+              : {
+                  or: BlogPostStatus.options
+                    .filter(BlogPostStatus.isComplete)
+                    .map((status) => ({
+                      property: "Status" as const,
+                      status: { equals: status },
+                    })),
+                },
 
             // Apply filters from request
             // query
@@ -60,6 +67,17 @@ export const blogPosts = c.router({
                   multi_select: { contains: tag },
                 }) as const,
             ),
+
+            // statuses
+            {
+              or: (input.statuses ?? []).map(
+                (status) =>
+                  ({
+                    property: "Status",
+                    status: { equals: status },
+                  }) as const,
+              ),
+            },
           ].filter(isTruthy),
         },
       },
