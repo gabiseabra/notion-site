@@ -151,3 +151,9 @@ h4 {
   margin-block-start: 1em;
   margin-block-end: 1em;
 }
+
+::selection {
+  background: var(--bg-highlight);
+  color: var(--color-highlight);
+  text-shadow: none;
+}

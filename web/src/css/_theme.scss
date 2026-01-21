@@ -33,6 +33,9 @@ $max-width: ($max-content-width - $min-content-padding * 2);
   --color-disabled: #a198c6;
   --color-divider: #c3bdd8;
   --color-link: var(--color-secondary);
+  // selected text colors
+  --color-highlight: rgb(232, 6, 143);
+  --bg-highlight: rgb(255, 219, 245);
 
   /* notion colors */
 
@@ -82,9 +85,9 @@ html {
 body {
   margin: 0;
   background-image: linear-gradient(
-                  to bottom,
-                  var(--bg-from),
-                  var(--bg-to)
+      to bottom,
+      var(--bg-from),
+      var(--bg-to)
   );
   background-repeat: no-repeat;
   background-attachment: fixed;
