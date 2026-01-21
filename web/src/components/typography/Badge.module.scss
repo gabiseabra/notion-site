@@ -1,7 +1,9 @@
 @use "../../css/theme" as theme;
 
 .badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+
   padding: 0 var(--space);
   border-radius: var(--radius);
   line-height: var(--line-height);
@@ -61,9 +63,9 @@
   &::before {
     border: 1px solid currentColor;
     background: linear-gradient(
-                    to right,
-                    currentColor 50%,
-                    transparent 50%
+        to right,
+        currentColor 50%,
+        transparent 50%
     );
   }
 }
