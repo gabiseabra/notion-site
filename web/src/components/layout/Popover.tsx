@@ -41,6 +41,7 @@ export type PopoverProps = {
   className?: string;
 
   onClickOutside?: () => void;
+  onOffScreen?: () => void;
 };
 
 type Coords = {
@@ -63,6 +64,7 @@ export function Popover({
   className,
 
   onClickOutside,
+  onOffScreen,
 }: PopoverProps) {
   const triggerRef = useRef<HTMLSpanElement | null>(null);
   const tipRef = useRef<HTMLDivElement | null>(null);
@@ -97,21 +99,26 @@ export function Popover({
     return undefined;
   }, [coords]);
 
+  const onOffScreenRef = useRef(() => {});
+  onOffScreenRef.current = onOffScreen ?? (() => {});
+
   const updatePosition = useRafThrottledCallback(() => {
     const triggerEl = triggerRef.current;
     const tipEl = tipRef.current;
     if (!triggerEl || !tipEl) return;
 
-    setCoords(
-      getBestCoords(
-        toPx(computeSpace(triggerEl, offset)),
-        toPx(computeSpace(triggerEl, 2)),
-        toPx(computeSpace(triggerEl, 2)),
-        placements,
-        triggerEl.getBoundingClientRect(),
-        tipEl.getBoundingClientRect(),
-      ),
+    const coords = getBestCoords(
+      toPx(computeSpace(triggerEl, offset)),
+      toPx(computeSpace(triggerEl, 2)),
+      toPx(computeSpace(triggerEl, 2)),
+      placements,
+      triggerEl.getBoundingClientRect(),
+      tipEl.getBoundingClientRect(),
     );
+
+    if (!coords) onOffScreenRef.current();
+
+    setCoords(coords);
   }, [hash(placements), offset]);
 
   // Position when opening + whenever content/placements change
@@ -188,6 +195,15 @@ function getBestCoords(
 ) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
+
+  // If the trigger is fully off-screen, don't try to position the popover.
+  const isOffscreen =
+    trigger.bottom < 0 ||
+    trigger.top > vh ||
+    trigger.right < 0 ||
+    trigger.left > vw;
+
+  if (isOffscreen) return null;
 
   const cx = trigger.left + trigger.width / 2;
   const cy = trigger.top + trigger.height / 2;

@@ -48,6 +48,7 @@ export function Filters({
           <Popover
             open={isFilterOverlayOpen}
             onClickOutside={() => setIsFilterOverlayOpen(false)}
+            onOffScreen={() => setIsFilterOverlayOpen(false)}
             placements={["bottom", "right", "left", "top"]}
             offset={4}
             content={
