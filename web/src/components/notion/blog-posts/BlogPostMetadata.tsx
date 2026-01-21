@@ -1,6 +1,9 @@
 import { match } from "ts-pattern";
 import { Link } from "react-router";
-import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
+import {
+  BlogPost,
+  BlogPostStatus,
+} from "@notion-site/common/dto/notion/blog-post.js";
 import { Badge } from "../../typography/Badge.js";
 import { ColProps, Row } from "../../layout/FlexBox.js";
 import { Span } from "../../typography/Text.js";
@@ -43,9 +46,12 @@ export function BlogPostMetadata({
                 size="s"
                 color={blogPost.properties["Status"].status.color}
                 status={match(blogPost.properties["Status"].status.name)
-                  .with("Published", () => "complete" as const)
-                  .with("In Review", () => "in-progress" as const)
-                  .with("Draft", () => "empty" as const)
+                  .when(BlogPostStatus.isComplete, () => "complete" as const)
+                  .when(
+                    BlogPostStatus.isInProgress,
+                    () => "in-progress" as const,
+                  )
+                  .when(BlogPostStatus.isEmpty, () => "empty" as const)
                   .exhaustive()}
               >
                 {blogPost.properties["Status"].status.name}
