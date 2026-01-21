@@ -131,3 +131,4 @@ which starts the server serving static files from the [web](./web) and API route
 - [ ] Optimize bundle size
 - [ ] Link previews
 - [ ] use nuqs
+- [ ] mobile friendly popover
