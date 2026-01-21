@@ -62,7 +62,13 @@ function TagPageLoader({ tag: tagName }: { tag: string }) {
         </Text>
       )}
 
-      <BlogPostListLoader filters={{ tags: [tag.name] }} />
+      <BlogPostListLoader
+        filters={{
+          query: "",
+          limit: 25,
+          tags: [tag.name],
+        }}
+      />
     </>
   );
 }
