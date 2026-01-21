@@ -106,6 +106,7 @@ export function Popover({
       getBestCoords(
         toPx(computeSpace(triggerEl, offset)),
         toPx(computeSpace(triggerEl, 2)),
+        toPx(computeSpace(triggerEl, 2)),
         placements,
         triggerEl.getBoundingClientRect(),
         tipEl.getBoundingClientRect(),
@@ -180,6 +181,7 @@ const clamp = (v: number, min: number, max: number) =>
 function getBestCoords(
   offset: number,
   arrowGutter: number,
+  viewportPad: number,
   placements: PopoverPlacement[],
   trigger: DOMRect,
   tip: DOMRect,
@@ -189,6 +191,16 @@ function getBestCoords(
 
   const cx = trigger.left + trigger.width / 2;
   const cy = trigger.top + trigger.height / 2;
+
+  const clampLeftInViewport = (left: number) => {
+    const maxLeft = Math.max(viewportPad, vw - tip.width - viewportPad);
+    return clamp(left, viewportPad, maxLeft);
+  };
+
+  const clampTopInViewport = (top: number) => {
+    const maxTop = Math.max(viewportPad, vh - tip.height - viewportPad);
+    return clamp(top, viewportPad, maxTop);
+  };
 
   let best: (Coords & { arrowLeft?: number; arrowTop?: number }) | null = null;
   let bestScore = Number.POSITIVE_INFINITY;
@@ -210,8 +222,8 @@ function getBestCoords(
       if (align === "start") left = trigger.left;
       if (align === "end") left = trigger.right - tip.width;
 
-      // slide horizontally BEFORE scoring
-      left = clamp(left, 0, vw - tip.width);
+      // slide horizontally BEFORE scoring (respect padding)
+      left = clampLeftInViewport(left);
     } else {
       left =
         base === "left"
@@ -222,14 +234,15 @@ function getBestCoords(
       if (align === "start") top = trigger.top;
       if (align === "end") top = trigger.bottom - tip.height;
 
-      // slide vertically BEFORE scoring
-      top = clamp(top, 0, vh - tip.height);
+      // slide vertically BEFORE scoring (respect padding)
+      top = clampTopInViewport(top);
     }
 
-    const overLeft = Math.max(0, 0 - left);
-    const overTop = Math.max(0, 0 - top);
-    const overRight = Math.max(0, left + tip.width - vw);
-    const overBottom = Math.max(0, top + tip.height - vh);
+    // score overflow against padded viewport
+    const overLeft = Math.max(0, viewportPad - left);
+    const overTop = Math.max(0, viewportPad - top);
+    const overRight = Math.max(0, left + tip.width - (vw - viewportPad));
+    const overBottom = Math.max(0, top + tip.height - (vh - viewportPad));
 
     const score = overLeft + overTop + overRight + overBottom;
 
@@ -251,8 +264,9 @@ function getBestCoords(
 
   if (!best) return null;
 
-  const top = clamp(best.top, 0, vh - tip.height);
-  const left = clamp(best.left, 0, vw - tip.width);
+  // final safety clamp (also respects padding)
+  const top = clampTopInViewport(best.top);
+  const left = clampLeftInViewport(best.left);
 
   const base = best.placement.split("-")[0];
   const arrowLeft =
