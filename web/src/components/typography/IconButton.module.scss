@@ -2,7 +2,7 @@
 
 .icon {
   position: relative;
-  
+
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -27,8 +27,8 @@
 
 .badge {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: calc(var(--badge-size) * -.5);
+  right: calc(var(--badge-size) * -.5);
 
   height: var(--badge-size);
   min-width: var(--badge-size);
@@ -53,20 +53,20 @@
 
 .size-xs {
   --icon-size: 14px;
-  --badge-size: 8px;
+  --badge-size: 10px;
 }
 
 .size-s {
   --icon-size: 18px;
-  --badge-size: 10px;
+  --badge-size: 12px;
 }
 
 .size-m {
   --icon-size: 24px;
-  --badge-size: 12px;
+  --badge-size: 14px;
 }
 
 .size-l {
   --icon-size: 32px;
-  --badge-size: 14px;
+  --badge-size: 16px;
 }
