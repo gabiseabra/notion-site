@@ -1,4 +1,4 @@
-import { ComponentProps, CSSProperties, ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { omit } from "@notion-site/common/utils/object.js";

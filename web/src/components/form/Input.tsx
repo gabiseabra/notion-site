@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { isEventFromMatchingDescendant } from "../../utils/event.js";
 import styles from "./Input.module.scss";
 import { IconButton } from "../typography/IconButton.js";
 import { IoIosClose } from "react-icons/io";
