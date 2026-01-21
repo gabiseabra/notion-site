@@ -1,10 +1,10 @@
-import * as zN from "@notion-site/common/dto/notion/schema.js";
+import * as zn from "@notion-site/common/dto/notion/schema.js";
 import { match } from "ts-pattern";
 import { IconButton, IconButtonProps } from "../../typography/IconButton.js";
 
 type IconProps = {
   size: IconButtonProps["size"];
-  icon: zN.icon;
+  icon: zn.icon;
 };
 
 /**

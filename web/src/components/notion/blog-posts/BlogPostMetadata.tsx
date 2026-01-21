@@ -1,11 +1,11 @@
-import { match } from "ts-pattern";
-import { Link } from "react-router";
 import {
   BlogPost,
   BlogPostStatus,
 } from "@notion-site/common/dto/notion/blog-post.js";
-import { Badge } from "../../typography/Badge.js";
+import { Link } from "react-router";
+import { match } from "ts-pattern";
 import { ColProps, Row } from "../../layout/FlexBox.js";
+import { Badge } from "../../typography/Badge.js";
 import { Span } from "../../typography/Text.js";
 import { ResourceMetadata } from "../resources/ResourceMetadata.js";
 

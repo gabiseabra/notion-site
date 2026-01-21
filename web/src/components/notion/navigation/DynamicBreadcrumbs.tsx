@@ -1,16 +1,16 @@
-import { suspend } from "suspend-react";
-import { Link } from "react-router";
-import { titleToString } from "@notion-site/common/utils/notion.js";
-import { SuspenseBoundary } from "../../feedback/SuspenseBoundary.js";
-import { useOrpc } from "../../../providers/OrpcProvider.js";
-import { RichText } from "../typography/RichText.js";
-import { Spinner } from "../../feedback/Spinner.js";
-import { Alert } from "../../feedback/Banner.js";
+import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
+import { titleToString } from "@notion-site/common/utils/notion.js";
+import { ReactNode } from "react";
+import { Link } from "react-router";
+import { suspend } from "suspend-react";
+import { useOrpc } from "../../../providers/OrpcProvider.js";
+import { Alert } from "../../feedback/Banner.js";
+import { Spinner } from "../../feedback/Spinner.js";
+import { SuspenseBoundary } from "../../feedback/SuspenseBoundary.js";
 import { Breadcrumbs } from "../../navigation/Breadcrumbs.js";
 import { Icon } from "../typography/Icon.js";
-import { ReactNode } from "react";
-import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
+import { RichText } from "../typography/RichText.js";
 
 type DynamicBreadcrumbsProps = {
   id: string;

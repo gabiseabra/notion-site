@@ -1,11 +1,11 @@
+import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
+import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { ReactNode } from "react";
 import { Link } from "react-router";
-import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
-import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
-import { RichText } from "../typography/RichText.js";
 import { Col, ColProps } from "../../layout/FlexBox.js";
-import { Icon } from "../typography/Icon.js";
 import { Text } from "../../typography/Text.js";
+import { Icon } from "../typography/Icon.js";
+import { RichText } from "../typography/RichText.js";
 
 export function ResourceMetadata<T extends NotionResource>({
   as: Component,

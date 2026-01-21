@@ -1,10 +1,10 @@
-import { ReactNode } from "react";
-import { titleToString } from "@notion-site/common/utils/notion.js";
 import { GetNotionPageOutput } from "@notion-site/common/orpc/notion/pages.js";
-import { ResourceLoader } from "../resources/ResourceLoader.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
-import { Favicon } from "../typography/Favicon.js";
+import { titleToString } from "@notion-site/common/utils/notion.js";
+import { ReactNode } from "react";
 import { Head } from "../../../providers/HeadProvider.js";
+import { ResourceLoader } from "../resources/ResourceLoader.js";
+import { Favicon } from "../typography/Favicon.js";
 
 export type NotionPageLoaderProps = {
   id: string;

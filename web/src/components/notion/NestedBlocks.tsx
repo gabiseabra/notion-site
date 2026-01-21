@@ -5,13 +5,13 @@
  * produces a top-level render stream where consecutive list items are grouped into
  * list containers (bulleted/numbered).
  */
+import * as zn from "@notion-site/common/dto/notion/schema.js";
 import { Fragment } from "react";
-import * as zN from "@notion-site/common/dto/notion/schema.js";
 import { match } from "ts-pattern";
 import { Banner } from "../feedback/Banner.js";
 import { BlockAnnotations, Text } from "../typography/Text.js";
-import { RichText } from "./typography/RichText.js";
 import { LinkToPage } from "./navigation/LinkToPage.js";
+import { RichText } from "./typography/RichText.js";
 
 /**
  * Accepts a flat block array and renders it recursively.
@@ -21,7 +21,7 @@ import { LinkToPage } from "./navigation/LinkToPage.js";
 export function NestedBlocks({
   blocks,
   indent = 0,
-}: { blocks: zN.block[] } & Partial<BlockAnnotations>) {
+}: { blocks: zn.block[] } & Partial<BlockAnnotations>) {
   return (
     <>
       {getRootBlocks(blocks).map((block) =>
@@ -70,7 +70,7 @@ export function NestedBlocks({
 /**
  * Renders a single block node according to its type.
  */
-function Block({ data, indent }: { data: zN.block; indent?: number }) {
+function Block({ data, indent }: { data: zn.block; indent?: number }) {
   return (
     <>
       {match(data)
@@ -152,14 +152,14 @@ export type RootBlock =
 /**
  * A Notion block augmented with the descendant blocks present in the same response set.
  */
-export type NestedBlock = zN.block & {
-  children: zN.block[];
+export type NestedBlock = zn.block & {
+  children: zn.block[];
 };
 
 /**
  * Builds the top-level render stream from a flat Notion block array.
  */
-function getRootBlocks(blocks: zN.block[]) {
+function getRootBlocks(blocks: zn.block[]) {
   const isNested = blocks.every((block) => block.parent.type === "block_id");
 
   return blocks
@@ -175,8 +175,8 @@ function getRootBlocks(blocks: zN.block[]) {
 }
 
 const mapNestedBlock =
-  (blocks: zN.block[]) =>
-  (block: zN.block): NestedBlock => ({
+  (blocks: zn.block[]) =>
+  (block: zn.block): NestedBlock => ({
     ...block,
     // includes all of the deeply nested blocks of children
     children: blocks

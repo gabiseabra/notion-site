@@ -1,15 +1,15 @@
-import React, { ReactNode, useMemo, useState } from "react";
-import { FaArrowsRotate } from "react-icons/fa6";
+import { shuffle } from "@notion-site/common/utils/array.js";
 import {
   extractErrorMessage,
   isErrorRecoverable,
 } from "@notion-site/common/utils/error.js";
-import { shuffle } from "@notion-site/common/utils/array.js";
-import { Col } from "../layout/FlexBox.js";
-import { SimlishSpinner } from "./SimlishSpinner.js";
+import React, { ReactNode, useMemo, useState } from "react";
+import { FaArrowsRotate } from "react-icons/fa6";
 import { Button } from "../form/Button.js";
-import { Text } from "../typography/Text.js";
+import { Col } from "../layout/FlexBox.js";
 import { IconButton } from "../typography/IconButton.js";
+import { Text } from "../typography/Text.js";
+import { SimlishSpinner } from "./SimlishSpinner.js";
 
 export type SuspenseBoundaryProps = {
   children: ReactNode;

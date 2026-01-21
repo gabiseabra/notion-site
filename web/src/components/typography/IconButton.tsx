@@ -1,6 +1,6 @@
-import { CSSProperties, ReactNode } from "react";
-import { isTruthy } from "@notion-site/common/utils/guards.js";
 import * as zn from "@notion-site/common/dto/notion/schema.js";
+import { isTruthy } from "@notion-site/common/utils/guards.js";
+import { CSSProperties, ReactNode } from "react";
 import styles from "./IconButton.module.scss";
 
 export type IconButtonProps = {

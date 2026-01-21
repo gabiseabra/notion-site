@@ -1,7 +1,7 @@
 import * as zn from "@notion-site/common/dto/notion/schema.js";
 import { Row } from "../layout/FlexBox.js";
-import { Badge, BadgeProps } from "../typography/Badge.js";
 import { Tooltip } from "../layout/Tooltip.js";
+import { Badge, BadgeProps } from "../typography/Badge.js";
 import { Text } from "../typography/Text.js";
 
 export type TagsFilterProps<T extends string> = {

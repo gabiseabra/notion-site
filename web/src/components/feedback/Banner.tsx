@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { match } from "ts-pattern";
 import { PiWarningBold, PiWarningCircleBold } from "react-icons/pi";
+import { match } from "ts-pattern";
 import { Col } from "../layout/FlexBox.js";
 import styles from "./Banner.module.scss";
 

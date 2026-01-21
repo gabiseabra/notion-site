@@ -1,6 +1,6 @@
-import { NotionResource } from "./resource.js";
-import * as zN from "./schema.js";
 import { z } from "zod";
+import { NotionResource } from "./resource.js";
+import * as zn from "./schema.js";
 
 const zBlogPostStatus = z.enum(["Published", "Archived", "Draft", "In Review"]);
 export type BlogPostStatus = z.infer<typeof zBlogPostStatus>;
@@ -19,9 +19,9 @@ export const BlogPostStatus = Object.assign(zBlogPostStatus, {
 });
 
 export const BlogPost = NotionResource({
-  Title: zN.title,
-  "Publish Date": zN.date,
-  Tags: zN._multi_select,
-  Status: zN.status(BlogPostStatus.options),
+  Title: zn.title,
+  "Publish Date": zn.date,
+  Tags: zn._multi_select,
+  Status: zn.status(BlogPostStatus.options),
 });
 export type BlogPost = z.infer<typeof BlogPost>;

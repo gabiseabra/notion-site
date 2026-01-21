@@ -1,5 +1,5 @@
 import { z } from "zod";
-import * as zN from "./schema.js";
+import * as zn from "./schema.js";
 
 /**
  * Creates a Zod schema for a Notion database entry.
@@ -12,13 +12,13 @@ export const NotionResource = <T extends z.ZodRawShape>(shape: T) =>
   z.object({
     id: z.string(),
     url: z.string().transform((url) => URL.parse(url)?.pathname ?? url),
-    parent: z.union([zN.database_id, zN.page_id, zN.workspace]),
-    icon: zN.icon.nullable(),
-    cover: zN.cover.nullable(),
+    parent: z.union([zn.database_id, zn.page_id, zn.workspace]),
+    icon: zn.icon.nullable(),
+    cover: zn.cover.nullable(),
     properties: z.object(shape),
   });
 export type NotionResource<
-  T extends Record<string, zN.property> = Record<string, zN.property>,
+  T extends Record<string, zn.property> = Record<string, zn.property>,
 > = {
   properties: T;
 } & Omit<
@@ -32,8 +32,8 @@ export type NotionResource<
 export const _NotionResource = z.object({
   id: z.string(),
   url: z.string().transform((url) => URL.parse(url)?.pathname ?? url),
-  parent: z.union([zN.database_id, zN.page_id, zN.workspace]),
-  icon: zN.icon.nullable(),
-  cover: zN.cover.nullable(),
-  properties: z.record(zN.property),
+  parent: z.union([zn.database_id, zn.page_id, zn.workspace]),
+  icon: zn.icon.nullable(),
+  cover: zn.cover.nullable(),
+  properties: z.record(zn.property),
 });

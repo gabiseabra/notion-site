@@ -1,7 +1,7 @@
-import * as list from "./list.js";
-import * as get from "./get.js";
-import * as tag from "./tag.js";
 import { Outlet } from "react-router";
+import * as get from "./get.js";
+import * as list from "./list.js";
+import * as tag from "./tag.js";
 
 export const path = "/blog";
 

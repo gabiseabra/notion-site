@@ -1,4 +1,8 @@
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
+import * as zn from "@notion-site/common/dto/notion/schema.js";
+import { showError } from "@notion-site/common/utils/error.js";
+import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
+import { DistributiveOmit } from "@notion-site/common/utils/types.js";
 import {
   APIResponseError,
   Client as NotionClient,
@@ -6,16 +10,12 @@ import {
   isFullDatabase,
   isFullPage,
 } from "@notionhq/client";
-import z from "zod";
 import {
   type ListBlockChildrenResponse,
   QueryDatabaseParameters,
 } from "@notionhq/client/build/src/api-endpoints.js";
-import { DistributiveOmit } from "@notion-site/common/utils/types.js";
-import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
-import * as zN from "@notion-site/common/dto/notion/schema.js";
-import { showError } from "@notion-site/common/utils/error.js";
 import { match } from "ts-pattern";
+import z from "zod";
 
 const notionToken = process.env.NOTION_TOKEN;
 const notion = new NotionClient({ auth: notionToken });
@@ -32,7 +32,7 @@ type NotionTimestampFilter = Extract<
  * Property filter variants compatible with a specific Notion property type.
  * Inferred from the Notion SDK’s `QueryDatabaseParameters["filter"]` union.
  */
-type NotionPropertyFilter<Prop extends zN.property> = Extract<
+type NotionPropertyFilter<Prop extends zn.property> = Extract<
   QueryDatabaseParameters["filter"],
   { type?: Prop["type"] }
 >;
@@ -134,7 +134,7 @@ export async function getDatabaseSelectOptions(
 ): Promise<
   {
     name: string;
-    color: zN.color;
+    color: zn.color;
     description: string | null;
   }[]
 > {
@@ -208,7 +208,7 @@ export async function getNotionPage<DB extends NotionResource>(
  * Recursively fetches all blocks for a page (depth-first) and parses them.
  */
 export async function getNotionBlocks(id: string) {
-  const blocks: zN.block[] = [];
+  const blocks: zn.block[] = [];
   const errors: { id: string; error: Error }[] = [];
 
   let cursor = undefined;
@@ -237,7 +237,7 @@ export async function getNotionBlocks(id: string) {
         continue;
       }
 
-      const parseResult = zN.block.safeParse(block);
+      const parseResult = zn.block.safeParse(block);
 
       if (!parseResult.success) {
         errors.push({ id: block.id, error: parseResult.error });

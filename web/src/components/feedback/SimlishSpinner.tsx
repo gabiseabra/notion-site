@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Col } from "../layout/FlexBox.js";
-import { Spinner } from "./Spinner.js";
-import { Span } from "../typography/Text.js";
 import { shuffle } from "@notion-site/common/utils/array.js";
+import { useEffect, useMemo, useState } from "react";
+import { Col } from "../layout/FlexBox.js";
+import { Span } from "../typography/Text.js";
+import { Spinner } from "./Spinner.js";
 
 const TICK_INTERNAL = 3_000;
 

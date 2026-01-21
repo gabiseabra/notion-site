@@ -1,7 +1,7 @@
 import { useLocation } from "react-router";
 import { PageSuspenseBoundary } from "../components/feedback/SuspenseBoundary.js";
-import { NotionPageLoader } from "../components/notion/pages/PageLoader.js";
 import { DynamicBreadcrumbs } from "../components/notion/navigation/DynamicBreadcrumbs.js";
+import { NotionPageLoader } from "../components/notion/pages/PageLoader.js";
 
 export const path = "*";
 

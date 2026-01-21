@@ -1,6 +1,6 @@
-import fs from "fs";
-import { never } from "@notion-site/common/utils/error.js";
 import { Route } from "@notion-site/common/dto/route.js";
+import { never } from "@notion-site/common/utils/error.js";
+import fs from "fs";
 import JSON5 from "json5";
 
 export const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;

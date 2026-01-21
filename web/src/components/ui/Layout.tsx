@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
-import { SiteLogo } from "./SiteLogo.js";
-import { GithubRibbon } from "./GithubRibbon.js";
 import { Link } from "react-router";
+import { GithubRibbon } from "./GithubRibbon.js";
 import styles from "./Layout.module.scss";
+import { SiteLogo } from "./SiteLogo.js";
 
 export function Layout({ children }: { children: ReactNode }) {
   return (

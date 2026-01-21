@@ -1,13 +1,13 @@
-import { suspend } from "suspend-react";
-import { Link, LinkProps } from "react-router";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
-import { SuspenseBoundary } from "../../feedback/SuspenseBoundary.js";
+import { Link, LinkProps } from "react-router";
+import { suspend } from "suspend-react";
 import { useOrpc } from "../../../providers/OrpcProvider.js";
-import { RichText } from "../typography/RichText.js";
-import { Icon } from "../typography/Icon.js";
-import styles from "./LinkToPage.module.scss";
-import { Spinner } from "../../feedback/Spinner.js";
 import { Alert } from "../../feedback/Banner.js";
+import { Spinner } from "../../feedback/Spinner.js";
+import { SuspenseBoundary } from "../../feedback/SuspenseBoundary.js";
+import { Icon } from "../typography/Icon.js";
+import { RichText } from "../typography/RichText.js";
+import styles from "./LinkToPage.module.scss";
 
 /**
  * Renders a link to a Notion page by id.

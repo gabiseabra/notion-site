@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
-import styles from "./Input.module.scss";
-import { IconButton } from "../typography/IconButton.js";
 import { IoIosClose } from "react-icons/io";
+import { IconButton } from "../typography/IconButton.js";
+import styles from "./Input.module.scss";
 
 type InputProps = {
   type: "search" | "text";

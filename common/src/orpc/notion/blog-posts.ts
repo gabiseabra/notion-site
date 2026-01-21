@@ -1,7 +1,7 @@
 import { oc } from "@orpc/contract";
+import z from "zod";
 import { BlogPost, BlogPostStatus } from "../../dto/notion/blog-post.js";
 import * as zn from "../../dto/notion/schema.js";
-import z from "zod";
 
 export const QueryBlogPostsInput = z.object({
   query: z.string(),

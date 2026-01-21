@@ -1,8 +1,8 @@
 import { oc } from "@orpc/contract";
-import { NotionPage } from "../../dto/notion/page.js";
-import * as zN from "../../dto/notion/schema.js";
 import z from "zod";
+import { NotionPage } from "../../dto/notion/page.js";
 import { _NotionResource } from "../../dto/notion/resource.js";
+import * as zn from "../../dto/notion/schema.js";
 import { Route } from "../../dto/route.js";
 
 export const GetNotionPageOutput = NotionPage.extend({
@@ -48,5 +48,5 @@ export const pages = oc.prefix("/pages").router({
       description: "Get the content of a Notion resource",
     })
     .input(z.object({ id: z.string().nonempty() }))
-    .output(z.object({ blocks: zN.block.array() })),
+    .output(z.object({ blocks: zn.block.array() })),
 });

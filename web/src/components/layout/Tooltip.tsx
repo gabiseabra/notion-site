@@ -1,5 +1,5 @@
-import { PopoverProps, Popover } from "./Popover.js";
 import { useState } from "react";
+import { Popover, PopoverProps } from "./Popover.js";
 
 export type TooltipProps = Omit<
   PopoverProps,

@@ -1,9 +1,9 @@
-import path from "path";
-import express from "express";
-import cors from "cors";
-import morgan from "morgan";
-import { RPCHandler } from "@orpc/server/node";
 import { onError } from "@orpc/server";
+import { RPCHandler } from "@orpc/server/node";
+import cors from "cors";
+import express from "express";
+import morgan from "morgan";
+import path from "path";
 import { router } from "./orpc/index.js";
 import * as env from "./utils/env.js";
 

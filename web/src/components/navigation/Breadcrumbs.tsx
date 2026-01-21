@@ -1,5 +1,5 @@
-import styles from "./Breadcrumbs.module.scss";
 import { ReactNode } from "react";
+import styles from "./Breadcrumbs.module.scss";
 
 /**
  * @direction block

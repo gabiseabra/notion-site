@@ -2,10 +2,10 @@ import "./css/global.scss";
 
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { OrpcProvider } from "./providers/OrpcProvider.js";
 import { createBrowserRouter, RouterProvider } from "react-router";
-import * as route from "./routes/index.js";
 import { HeadProvider } from "./providers/HeadProvider.js";
+import { OrpcProvider } from "./providers/OrpcProvider.js";
+import * as route from "./routes/index.js";
 
 const router = createBrowserRouter([route]);
 

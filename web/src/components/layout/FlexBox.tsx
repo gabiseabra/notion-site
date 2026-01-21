@@ -1,7 +1,7 @@
-import { ComponentProps, CSSProperties } from "react";
 import { omit } from "@notion-site/common/utils/object.js";
-import styles from "./FlexBox.module.scss";
+import { ComponentProps, CSSProperties } from "react";
 import * as css from "../../css/index.js";
+import styles from "./FlexBox.module.scss";
 
 export type RowProps = {
   as?: "div" | "section";

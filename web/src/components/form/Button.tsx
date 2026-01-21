@@ -1,5 +1,5 @@
-import { ComponentProps } from "react";
 import * as zn from "@notion-site/common/dto/notion/schema.js";
+import { ComponentProps } from "react";
 import { Spinner } from "../feedback/Spinner.js";
 import styles from "./Button.module.scss";
 

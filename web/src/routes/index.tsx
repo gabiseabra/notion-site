@@ -1,9 +1,9 @@
 import { Outlet } from "react-router";
+import { Favicon } from "../components/notion/typography/Favicon.js";
 import { Layout } from "../components/ui/Layout.js";
+import { Head } from "../providers/HeadProvider.js";
 import * as blog from "./blog/index.js";
 import * as page from "./page.js";
-import { Favicon } from "../components/notion/typography/Favicon.js";
-import { Head } from "../providers/HeadProvider.js";
 
 export const element = (
   <Layout>

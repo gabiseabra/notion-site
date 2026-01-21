@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
-import { OrpcContext, useOrpc } from "../../../providers/OrpcProvider.js";
-import { clear, suspend } from "suspend-react";
-import { NestedBlocks } from "../NestedBlocks.js";
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
+import { ReactNode } from "react";
+import { clear, suspend } from "suspend-react";
+import { OrpcContext, useOrpc } from "../../../providers/OrpcProvider.js";
+import { NestedBlocks } from "../NestedBlocks.js";
 import { ResourceMetadata } from "./ResourceMetadata.js";
 
 export type ResourceLoaderProps<T = NotionResource> = {

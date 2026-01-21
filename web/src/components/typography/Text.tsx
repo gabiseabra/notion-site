@@ -1,7 +1,7 @@
-import { CSSProperties, ReactNode } from "react";
-import * as zN from "@notion-site/common/dto/notion/schema.js";
+import * as zn from "@notion-site/common/dto/notion/schema.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { omit } from "@notion-site/common/utils/object.js";
+import { CSSProperties, ReactNode } from "react";
 import * as css from "../../css/index.js";
 import styles from "./Text.module.scss";
 
@@ -24,7 +24,7 @@ export type TextElement =
   | "h4";
 
 export type TextColor =
-  | zN.annotations["color"]
+  | zn.annotations["color"]
   | "primary"
   | "secondary"
   | "disabled"
@@ -36,7 +36,7 @@ export type TextSize = "caption" | "body" | "h1" | "h2" | "h3" | "h4";
 export type InlineAnnotations = {
   size: TextSize;
   color: TextColor;
-} & Omit<zN.annotations, "color">;
+} & Omit<zn.annotations, "color">;
 
 export type BlockAnnotations = {
   size: TextSize;
