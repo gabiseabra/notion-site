@@ -12,31 +12,30 @@ export function BlogPostListLoader({
 }: {
   filters: QueryBlogPostsInput;
 }) {
-  const [previousPosts, setPreviousPosts] = useState<BlogPost[]>([]);
-  const [after, setAfter] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [previousPosts, setPreviousPosts] = useState<BlogPost[]>([]);
+  const [input, setInput] = useState({ ...filters });
 
+  // Reset pagination if filters change
   useEffect(() => {
-    setAfter(null);
+    setInput({ ...filters });
     setPreviousPosts([]);
   }, [hash(filters)]);
 
   const orpc = useOrpc();
   const { posts, pageInfo } = suspend(
-    () =>
-      orpc.notion.blogPosts.queryBlogPosts({
-        after: after ?? undefined,
-        ...filters,
-      }),
-    [after, hash(filters), orpc],
+    () => orpc.notion.blogPosts.queryBlogPosts(input),
+    ["blog-posts", hash(input)],
   );
 
   function onFetchNextPage() {
-    if (!pageInfo.nextCursor) return;
+    const after = pageInfo.nextCursor;
+
+    if (!after) return;
 
     startTransition(() => {
-      setAfter(pageInfo.nextCursor);
       setPreviousPosts((prev) => [...prev, ...posts]);
+      setInput({ after, ...filters });
     });
   }
 
@@ -49,9 +48,9 @@ export function BlogPostListLoader({
           variant="plain"
           color="primary"
           onClick={onFetchNextPage}
-          disabled={isPending}
+          loading={isPending}
         >
-          {isPending ? "Loading…" : "Load more posts"}
+          Load more posts
         </Button>
       ) : (
         <Button variant="plain" disabled>

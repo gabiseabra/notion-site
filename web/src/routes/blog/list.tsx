@@ -7,6 +7,7 @@ import { BlogPostListLoader } from "../../components/notion/blog-posts/BlogPostL
 import { Favicon } from "../../components/notion/typography/Favicon.js";
 import { Head } from "../../providers/HeadProvider.js";
 import { BlogPostFilters } from "../../components/filters/BlogPostFilters.js";
+import { clear } from "suspend-react";
 
 // export const path = "/blog";
 export const index = true;
@@ -32,7 +33,7 @@ export function Component() {
         <BlogPostFilters value={filters} onChange={setFilters} />
       </Col>
 
-      <PageSuspenseBoundary resourceName="blog posts">
+      <PageSuspenseBoundary resourceName="blog posts" onRetry={() => clear()}>
         <BlogPostListLoader filters={{ ...filters, query }} />
       </PageSuspenseBoundary>
     </Col>
