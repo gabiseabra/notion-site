@@ -15,7 +15,7 @@ export const index = true;
 export function Component() {
   const [filters, setFilters] = useState<QueryBlogPostsInput>({
     query: "",
-    limit: 5,
+    limit: 25,
   });
 
   const query = useDebounce(filters.query, 250);
