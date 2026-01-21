@@ -1,10 +1,14 @@
 import { PopoverProps, Popover } from "./Popover.js";
 import { useState } from "react";
 
-export type TooltipProps = Omit<PopoverProps, "open" | "role">;
+export type TooltipProps = Omit<PopoverProps, "open" | "role"> & {
+  disabled?: boolean;
+};
 
-export function Tooltip(props: TooltipProps) {
+export function Tooltip({ disabled, ...props }: TooltipProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  if (disabled) return <>{props.children}</>;
 
   return (
     <span
