@@ -37,18 +37,7 @@ export function Input({
     >
       {!!label && !hiddenLabel && <div className={styles.label}>{label}</div>}
 
-      <div
-        className={styles.input}
-        onClick={(e) => {
-          if (
-            !isEventFromMatchingDescendant(e, "a") &&
-            !isEventFromMatchingDescendant(e, "button") &&
-            !isEventFromMatchingDescendant(e, "input")
-          ) {
-            e.currentTarget.querySelector("input")?.focus();
-          }
-        }}
-      >
+      <div className={styles.input}>
         {left}
 
         <input
