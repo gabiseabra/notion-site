@@ -44,7 +44,7 @@ function TagPageLoader({ tag: tagName }: { tag: string }) {
         </span>
 
         <span>
-          <Link to={`/blog/tag/${tag}`}>
+          <Link to={`/blog/tag/${tag.name}`}>
             <Badge size="xs" color={tag.color}>
               {tag.name}
             </Badge>
