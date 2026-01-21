@@ -100,7 +100,7 @@ export function PageSuspenseBoundary({
 
             <p>&nbsp;</p>
 
-            <Text as="h3">Danm,</Text>
+            <Text as="h3">Damn,</Text>
             <Text as="p">{`There was an error loading ${resourceName}. It says:`}</Text>
 
             <Text as="p">"{extractErrorMessage(error)}"</Text>
