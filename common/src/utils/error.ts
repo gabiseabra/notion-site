@@ -19,8 +19,12 @@ export function extractErrorMessage(
 
 export function extractErrorCode(error: unknown) {
   if (error instanceof ORPCError) {
-    return error.code;
+    return error.status;
   }
+}
+
+export function isErrorRecoverable(error: unknown) {
+  return ![404].includes(extractErrorCode(error) ?? -1);
 }
 
 /**

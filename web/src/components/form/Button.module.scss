@@ -1,22 +1,22 @@
 @use "../../css/theme" as theme;
+@use "../../css/mixins/shadow" as shadow;
 
-// Button base styles
+// Button reset
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: calc(var(--space) * 1.25);
+  gap: var(--space);
 
   padding: calc(var(--space) * 1.25) calc(var(--space) * 2);
-  border-radius: var(--radius);
   border: 1px solid transparent;
+  background: transparent;
 
-  font: inherit;
+  font: var(--font-body);
   font-size: 0.9em;
   line-height: 1;
 
   cursor: pointer;
-  user-select: none;
   -webkit-tap-highlight-color: transparent;
 
   transition: background-color 120ms ease,
@@ -30,39 +30,20 @@
   }
 }
 
-.icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 0;
-
-  svg {
-    width: 1em;
-    height: 1em;
-    opacity: 0.85;
-  }
-}
-
 .variant-solid {
   color: var(--button-color);
-  background-color: color-mix(in srgb, var(--button-bg) 70%, white);
-  border-color: color-mix(in srgb, var(--button-color) 35%, transparent);
-  font-weight: 600;
-
-  box-shadow: 0 1px 2px #0000001a;
+  background: var(--button-bg);
+  box-shadow: var(--button-border) 1px 2px 0px;
+  border: 1px solid var(--button-border);
+  border-radius: calc(var(--radius) * 2);
 
   &:hover:not(:disabled) {
-    background-color: color-mix(in srgb, var(--button-bg) 82%, white);
-    border-color: color-mix(in srgb, var(--button-color) 50%, transparent);
-    box-shadow: 0 2px 8px #0000001a;
+    filter: var(--button-filter);
   }
 
   &:active:not(:disabled) {
     transform: translateY(1px);
-  }
-
-  &:focus-visible {
-    box-shadow: 0 0 0 2px #00000012, 0 0 0 4px color-mix(in srgb, var(--button-color) 45%, white);
+    box-shadow: var(--button-border) 1px 1px 0px;
   }
 }
 
@@ -78,20 +59,31 @@
   }
 }
 
-
-@each $name, $_ in theme.$colors-codes {
-  .#{"color-" + $name} {
-    --button-color: var(#{"--color-" + $name});
-    --button-bg: var(#{"--bg-" + $name});
-  }
-}
-
 .button:disabled {
   --button-color: var(--color-disabled);
   --button-bg: var(--bg-gray);
 
-  opacity: 0.7;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+}
+
+@each $name, $_ in theme.$colors-codes {
+  .#{"color-" + $name} {
+    &.variant-solid {
+      --button-color: color-mix(in oklch, var(#{"--bg-" + $name}), white 25%);
+      --button-bg: var(#{"--color-" + $name});
+      --button-border: color-mix(in srgb, var(#{"--color-" + $name}), black 35%);
+      --button-filter: brightness(1.05);
+    }
+
+    &.variant-plain {
+      --button-color: var(#{"--color-" + $name});
+    }
+  }
+}
+
+.color-default {
+  --button-color: var(--color-text);
+  --button-bg: var(--bg-to);
+  --button-border: color-mix(in oklch, var(--color-text), white 25%);
+  --button-filter: brightness(1.015);
 }

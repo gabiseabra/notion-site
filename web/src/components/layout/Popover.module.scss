@@ -10,7 +10,7 @@
   z-index: 1000;
   border-radius: var(--radius);
   @include shadow.shadow(1);
-  @include shadow.shadow(0);
+  @include shadow.border;
 }
 
 .content {
@@ -31,7 +31,7 @@
   background: var(--bg-from);
 
   @include shadow.shadow(1);
-  @include shadow.shadow(0);
+  @include shadow.border;
 }
 
 /* Arrow placement (simple + clean). */
