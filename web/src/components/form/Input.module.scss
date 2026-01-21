@@ -1,3 +1,5 @@
+@use "../../css/mixins/shadow" as shadow;
+
 .input-wrapper {
   width: 100%;
 }
@@ -12,7 +14,8 @@
 
   background: var(--bg-from);
   border-radius: var(--radius);
-  box-shadow: #00000040 0 1px 3px;
+
+  @include shadow.shadow(1);
 
   > input {
     flex: 1;
