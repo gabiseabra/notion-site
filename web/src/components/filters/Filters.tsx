@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { Fragment, ReactNode, useState } from "react";
 import { IoFilter, IoSearch } from "react-icons/io5";
 import { Input } from "../form/Input.js";
 import { Col } from "../layout/FlexBox.js";
@@ -53,7 +53,7 @@ export function Filters({
             content={
               <Col p={2} style={{ width: 330 }}>
                 {filters?.map((filter, ix) => (
-                  <>
+                  <Fragment key={ix}>
                     {ix !== 0 && <hr />}
 
                     <Col gap={0}>
@@ -67,7 +67,7 @@ export function Filters({
                     </Col>
 
                     {filter.content}
-                  </>
+                  </Fragment>
                 ))}
               </Col>
             }

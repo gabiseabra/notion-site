@@ -24,6 +24,7 @@ export function TagsFilter<T extends string>({
     <Row wrap>
       {options.map((option) => (
         <Tooltip
+          key={option.name}
           disabled={!option.description}
           content={
             <Text
@@ -38,7 +39,6 @@ export function TagsFilter<T extends string>({
           }
         >
           <a
-            key={option.name}
             onClick={() =>
               onChange(
                 value.includes(option.name)
