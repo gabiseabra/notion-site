@@ -30,56 +30,57 @@
 
   background: var(--bg-from);
 
+  @include shadow.shadow(1);
   @include shadow.shadow(0);
 }
 
 /* Arrow placement (simple + clean). */
-.popover[data-placement^='top'] .arrow {
+.popover[data-placement^='top'] > .arrow {
   bottom: -5px;
   left: 50%;
   margin-left: -5px;
 }
 
-.popover[data-placement^='bottom'] .arrow {
+.popover[data-placement^='bottom'] > .arrow {
   top: -5px;
   left: 50%;
   margin-left: -5px;
 }
 
-.popover[data-placement^='left'] .arrow {
+.popover[data-placement^='left'] > .arrow {
   right: -5px;
   top: 50%;
   margin-top: -5px;
 }
 
-.popover[data-placement^='right'] .arrow {
+.popover[data-placement^='right'] > .arrow {
   left: -5px;
   top: 50%;
   margin-top: -5px;
 }
 
 /* Start/end variants nudge the arrow off-center. */
-.popover[data-placement$='-start'][data-placement^='top'] .arrow,
-.popover[data-placement$='-start'][data-placement^='bottom'] .arrow {
+.popover[data-placement$='-start'][data-placement^='top'] > .arrow,
+.popover[data-placement$='-start'][data-placement^='bottom'] > .arrow {
   left: 14px;
   margin-left: 0;
 }
 
-.popover[data-placement$='-end'][data-placement^='top'] .arrow,
-.popover[data-placement$='-end'][data-placement^='bottom'] .arrow {
+.popover[data-placement$='-end'][data-placement^='top'] > .arrow,
+.popover[data-placement$='-end'][data-placement^='bottom'] > .arrow {
   left: auto;
   right: 14px;
   margin-left: 0;
 }
 
-.popover[data-placement$='-start'][data-placement^='left'] .arrow,
-.popover[data-placement$='-start'][data-placement^='right'] .arrow {
+.popover[data-placement$='-start'][data-placement^='left'] > .arrow,
+.popover[data-placement$='-start'][data-placement^='right'] > .arrow {
   top: 14px;
   margin-top: 0;
 }
 
-.popover[data-placement$='-end'][data-placement^='left'] .arrow,
-.popover[data-placement$='-end'][data-placement^='right'] .arrow {
+.popover[data-placement$='-end'][data-placement^='left'] > .arrow,
+.popover[data-placement$='-end'][data-placement^='right'] > .arrow {
   top: auto;
   bottom: 14px;
   margin-top: 0;
