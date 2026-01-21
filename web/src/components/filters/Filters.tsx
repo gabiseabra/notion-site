@@ -77,7 +77,7 @@ export function Filters({
               size="s"
               title="Filters"
               color={activeFilters ? "secondary" : "default"}
-              onClick={() => setIsFilterOverlayOpen(true)}
+              onClick={() => setIsFilterOverlayOpen((x) => !x)}
               badge={activeFilters ? `${activeFilters}` : undefined}
             >
               <IoFilter />
