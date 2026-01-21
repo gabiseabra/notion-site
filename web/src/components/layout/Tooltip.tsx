@@ -3,19 +3,39 @@ import { useState } from "react";
 
 export type TooltipProps = Omit<PopoverProps, "open" | "role"> & {
   disabled?: boolean;
+  delay?: number;
 };
 
-export function Tooltip({ disabled, ...props }: TooltipProps) {
+export function Tooltip({ disabled, delay = 300, ...props }: TooltipProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [openTimeout, setOpenTimeout] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
   if (disabled) return <>{props.children}</>;
 
+  const onOpen = () => {
+    if (openTimeout) clearTimeout(openTimeout);
+
+    setOpenTimeout(
+      setTimeout(() => {
+        setIsOpen(true);
+      }, delay),
+    );
+  };
+
+  const onClose = () => {
+    if (openTimeout) clearTimeout(openTimeout);
+
+    setIsOpen(false);
+  };
+
   return (
     <span
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-      onFocus={() => setIsOpen(true)}
-      onBlur={() => setIsOpen(false)}
+      onMouseEnter={onOpen}
+      onMouseLeave={onClose}
+      onFocus={onOpen}
+      onBlur={onClose}
     >
       <Popover role="tooltip" open={isOpen} {...props} />
     </span>
