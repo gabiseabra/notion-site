@@ -36,16 +36,16 @@ traditional CMS backends.
 This is a monorepo using npm workspaces and typescript compose builds with following packages:
 
 - **common** - Shared types, schemas, and DTOs
-    - Location: [common](./common)
-    - Exports: API contracts, Notion schema definitions
+  - Location: [common](./common)
+  - Exports: API contracts, Notion schema definitions
 
 - **api** - Backend server (Express + ORPC)
-    - Location: [api](./api)
-    - Features: Notion API integration, RSS feed generation
+  - Location: [api](./api)
+  - Features: Notion API integration, RSS feed generation
 
 - **web** - Frontend app (React + Vite)
-    - Location: [web](./web)
-    - Features: Blog post listing and viewing
+  - Location: [web](./web)
+  - Features: Blog post listing and viewing
 
 ## Notion Database Schema
 
@@ -115,7 +115,6 @@ There are enhanced visibility tools in dev mode you help with editing:
 
 - [x] List hidden posts
 - [ ] Go to edit mode
-- [ ] Make a comment as an authenticated user
 
 ## Deploying
 
@@ -126,6 +125,9 @@ which starts the server serving static files from the [web](./web) and API route
 ## TODO / Roadmap
 
 - [ ] Support unsupported blocks (e.g. code, callout)
-- [ ] Add search bar and tags filter
-- [ ] Add RSS feed
+- [ ] Add RSS feed or mailing list
 - [ ] Don't show posts published in the future
+- [ ] Add feature flags
+- [ ] Optimize bundle size
+- [ ] Link previews
+- [ ] use nuqs
