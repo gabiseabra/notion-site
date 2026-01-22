@@ -39,6 +39,7 @@ export function TagsFilter<T extends string>({
           }
         >
           <a
+            style={{ cursor: "pointer" }}
             onClick={() =>
               onChange(
                 value.includes(option.name)
