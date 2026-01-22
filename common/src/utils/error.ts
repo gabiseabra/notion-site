@@ -24,7 +24,12 @@ export function extractErrorCode(error: unknown) {
 }
 
 export function isErrorRecoverable(error: unknown) {
-  return ![404].includes(extractErrorCode(error) ?? -1);
+  const code = extractErrorCode(error);
+
+  if (!code) return false;
+
+  // Can't recover from all 400's or 501 (not implemented)
+  return Math.floor(code / 100) !== 4 && code !== 501;
 }
 
 /**
