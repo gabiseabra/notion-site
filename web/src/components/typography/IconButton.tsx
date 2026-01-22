@@ -1,6 +1,9 @@
 import * as zn from "@notion-site/common/dto/notion/schema.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
+import { omit } from "@notion-site/common/utils/object.js";
 import { CSSProperties, ReactNode } from "react";
+import * as css from "../../css/index.js";
+import { MarginProps, PaddingProps } from "../../css/index.js";
 import styles from "./IconButton.module.scss";
 
 export type IconButtonProps = {
@@ -17,7 +20,8 @@ export type IconButtonProps = {
   title?: string;
 
   onClick?: () => void;
-};
+} & PaddingProps &
+  MarginProps;
 
 /**
  * @direction inline
@@ -29,6 +33,7 @@ export function IconButton({
   badge,
   children,
   className,
+  style,
   onClick,
   ...props
 }: IconButtonProps) {
@@ -43,8 +48,12 @@ export function IconButton({
       ]
         .filter(isTruthy)
         .join(" ")}
+      style={{
+        ...css.getPaddingStyles(props),
+        ...css.getMarginStyles(props),
+      }}
       onClick={() => onClick?.()}
-      {...props}
+      {...omit(props, [...css.paddingProps, ...css.marginProps])}
     >
       {children}
 
