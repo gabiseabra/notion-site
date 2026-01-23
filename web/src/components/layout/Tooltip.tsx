@@ -38,7 +38,12 @@ export function Tooltip({ disabled, delay = 300, ...props }: TooltipProps) {
       onTouchStart={onOpen}
       onTouchEnd={onClose}
       onTouchCancel={onClose}
-      style={{ userSelect: "none" }}
+      style={{
+        userSelect: "none",
+        WebkitUserSelect: "none",
+        WebkitTouchCallout: "none",
+        touchAction: "manipulation",
+      }}
     >
       <Popover
         role="tooltip"
