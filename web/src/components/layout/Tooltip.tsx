@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Popover, PopoverProps } from "./Popover.js";
 
 export type TooltipProps = Omit<
@@ -11,25 +11,23 @@ export type TooltipProps = Omit<
 
 export function Tooltip({ disabled, delay = 300, ...props }: TooltipProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [openTimeout, setOpenTimeout] = useState<ReturnType<
-    typeof setTimeout
-  > | null>(null);
+
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   if (disabled) return <>{props.children}</>;
 
   const onOpen = () => {
-    if (openTimeout) clearTimeout(openTimeout);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-    setOpenTimeout(
-      setTimeout(() => {
-        setIsOpen(true);
-      }, delay),
-    );
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(true);
+    }, delay);
   };
 
   const onClose = () => {
-    if (openTimeout) clearTimeout(openTimeout);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
+    timeoutRef.current = null;
     setIsOpen(false);
   };
 
@@ -38,7 +36,6 @@ export function Tooltip({ disabled, delay = 300, ...props }: TooltipProps) {
       onPointerEnter={onOpen}
       onPointerLeave={onClose}
       onTouchStart={onOpen}
-      onTouchMove={onOpen}
       onTouchEnd={onClose}
       onTouchCancel={onClose}
       style={{ userSelect: "none" }}
