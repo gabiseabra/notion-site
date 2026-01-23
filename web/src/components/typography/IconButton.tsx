@@ -49,6 +49,7 @@ export function IconButton({
         .filter(isTruthy)
         .join(" ")}
       style={{
+        ...style,
         ...css.getPaddingStyles(props),
         ...css.getMarginStyles(props),
       }}
