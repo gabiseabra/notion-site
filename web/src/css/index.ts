@@ -9,11 +9,19 @@ export const _space = "var(--space)";
 
 export const space = (n: number) => `calc(${_space} * ${n})`;
 
-export function computeSpace(element: Element, n: number = 1) {
-  const raw = getComputedStyle(element).getPropertyValue("--space").trim();
-  const value = parseFloat(raw);
-  const unit = raw.replace(String(value), "").trim() || "px";
-  return `${value * n}${unit}`;
+export const breakpoint = (size: "s" | "m") => `var(--breakpoint-${size})`;
+
+export function computeProperty(
+  variableOrProperty: string,
+  element: Element = document.documentElement,
+) {
+  return getComputedStyle(element)
+    .getPropertyValue(
+      variableOrProperty.startsWith("var")
+        ? variableOrProperty.slice(4, -1)
+        : variableOrProperty,
+    )
+    .trim();
 }
 
 export function toPx(

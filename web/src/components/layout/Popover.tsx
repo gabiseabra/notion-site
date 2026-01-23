@@ -1,5 +1,6 @@
 import { hash } from "@notion-site/common/utils/hash.js";
 import React, {
+  CSSProperties,
   useCallback,
   useId,
   useLayoutEffect,
@@ -7,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { computeSpace, toPx } from "../../css/index.js";
+import * as css from "../../css/index.js";
 import { useDocumentEventListener } from "../../hooks/useDocumentEventListener.js";
 import { useRafThrottledCallback } from "../../hooks/useRafThrottledCallback.js";
 import { useResizeObserver } from "../../hooks/useResizeObserver.js";
@@ -39,6 +40,7 @@ export type PopoverProps = {
   offset?: number; // space unit
 
   className?: string;
+  style?: CSSProperties;
 
   onClickOutside?: () => void;
   onOffScreen?: () => void;
@@ -61,7 +63,8 @@ export function Popover({
   placements = ["top", "bottom", "right", "left"],
   offset = 2,
 
-  className,
+  className = "",
+  style,
 
   onClickOutside,
   onOffScreen,
@@ -108,9 +111,9 @@ export function Popover({
     if (!triggerEl || !tipEl) return;
 
     const coords = getBestCoords(
-      toPx(computeSpace(triggerEl, offset)),
-      toPx(computeSpace(triggerEl, 2)),
-      toPx(computeSpace(triggerEl, 2)),
+      css.toPx(css.computeProperty(css._space)) * offset,
+      css.toPx(css.computeProperty(css._space)) * 2,
+      css.toPx(css.computeProperty(css._space)) * 2,
       placements,
       triggerEl.getBoundingClientRect(),
       tipEl.getBoundingClientRect(),
@@ -153,7 +156,7 @@ export function Popover({
   return (
     <span
       ref={triggerRef}
-      className={[styles.wrap, className].filter(Boolean).join(" ")}
+      className={styles.wrap}
       aria-describedby={open ? tooltipId : undefined}
     >
       {children}
@@ -163,12 +166,13 @@ export function Popover({
           ref={tipRef}
           id={tooltipId}
           role={role}
-          className={styles.popover}
+          className={[className, styles.popover].join(" ")}
           data-placement={coords?.placement ?? placements[0] ?? "top"}
           style={{
             top: coords?.top ?? 0,
             left: coords?.left ?? 0,
             opacity: coords ? 1 : 0,
+            ...style,
           }}
         >
           <div className={styles.content}>{content}</div>

@@ -35,7 +35,7 @@
   background: var(--button-bg);
   box-shadow: var(--button-border) 1px 2px 0px;
   border: 1px solid var(--button-border);
-  border-radius: calc(var(--radius) * 2);
+  border-radius: calc(var(--radius) * 1.25);
 
   &:hover:not(:disabled) {
     filter: var(--button-filter);
@@ -67,16 +67,18 @@
 }
 
 @each $name, $_ in theme.$colors-codes {
-  .#{"color-" + $name} {
-    &.variant-solid {
-      --button-color: color-mix(in oklch, var(#{"--bg-" + $name}), white 25%);
-      --button-bg: var(#{"--color-" + $name});
-      --button-border: color-mix(in srgb, var(#{"--color-" + $name}), black 35%);
-      --button-filter: brightness(1.05);
-    }
+  @if $name != "default" {
+    .#{"color-" + $name} {
+      &.variant-solid {
+        --button-color: color-mix(in oklch, var(#{"--bg-" + $name}), white 25%);
+        --button-bg: var(#{"--color-" + $name});
+        --button-border: color-mix(in srgb, var(#{"--color-" + $name}), black 35%);
+        --button-filter: brightness(1.05);
+      }
 
-    &.variant-plain {
-      --button-color: var(#{"--color-" + $name});
+      &.variant-plain {
+        --button-color: var(#{"--color-" + $name});
+      }
     }
   }
 }

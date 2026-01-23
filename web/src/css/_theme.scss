@@ -3,11 +3,6 @@
  **********************************************************************************************************************/
 
 $colors-codes: default, gray, brown, orange, yellow, green, blue, purple, pink, red, primary, secondary;
-// Layout body max width
-$max-content-width: 800px;
-// Min space between the body and the edge of the page
-$min-content-padding: 20px;
-$max-width: ($max-content-width - $min-content-padding * 2);
 
 :root {
   --space: 6px;

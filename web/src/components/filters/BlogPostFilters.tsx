@@ -18,15 +18,19 @@ export function BlogPostFilters({
 }) {
   return (
     <Filters
-      value={value.query}
-      onChange={(query) => onChange({ ...value, query })}
-      onClear={() => onChange({ ...value, query: "" })}
-      placeholder="Search blog posts"
+      title="Blog Posts Filters"
+      query={{
+        value: value.query,
+        onChange: (query) => onChange({ ...value, query }),
+        onClear: () => onChange({ ...value, query: "" }),
+        placeholder: "Search blog posts",
+      }}
       filters={[
         {
           label: "Status",
           description: "Show blog posts matching any of the statuses",
           active: !!value.statuses?.length,
+          onClear: () => onChange({ ...value, statuses: undefined }),
           content: (
             <BlogPostStatusesFilter
               value={value.statuses ?? []}
@@ -38,6 +42,7 @@ export function BlogPostFilters({
           label: "Tags",
           description: "Show blog posts matching all of the tags",
           active: !!value.tags?.length,
+          onClear: () => onChange({ ...value, tags: undefined }),
           content: (
             <BlogPostTagsFilter
               value={value.tags ?? []}

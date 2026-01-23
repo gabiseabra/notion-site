@@ -1,16 +1,17 @@
 @use "../../css/theme" as theme;
+@use "../../css/layout" as layout;
 @use "../../css/mixins/text" as text;
 
 .layout {
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-width: min(#{theme.$max-content-width}, 100vw);
+  max-width: min(#{layout.$content-width}, 100vw);
   margin: auto;
 
-  @media (max-width: #{theme.$max-content-width + theme.$min-content-padding * 2}) {
-    margin: 0 theme.$min-content-padding;
-    max-width: calc(100vw - #{theme.$min-content-padding * 2});
+  @include layout.fit-content {
+    margin: 0 layout.$content-gutter;
+    max-width: calc(100vw - #{layout.$content-gutter * 2});
   }
 
   & > header {

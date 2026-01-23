@@ -1,0 +1,62 @@
+/***********************************************************************************************************************
+ * [_layout.scss] Global CSS resets & layout configuration
+ **********************************************************************************************************************/
+
+$breakpoint-s: 450px;
+$breakpoint-m: 800px;
+$content-width: 800px;
+// Min. offset from the content to the edge of the viewport
+$content-gutter: 20px;
+
+:root {
+  --breakpoint-s: #{$breakpoint-s};
+  --breakpoint-m: #{$breakpoint-m};
+  --content-width: #{$content-width};
+  --content-gutter: #{$content-gutter};
+}
+
+@mixin breakpoint($size) {
+  @if $size == "s" {
+    @media screen and (max-width: $breakpoint-s) {
+      @content
+    }
+  } @else if $size == "m" {
+    @media screen and (max-width: $breakpoint-m) {
+      @content
+    }
+  } @else if $size == "l" {
+    @media screen and (min-width: $breakpoint-m + 1) {
+      @content
+    }
+  } @else {
+    @error "Invalid breakpoint #{size}"
+  }
+}
+
+// Applies the @content when the viewport fits the $content-width
+@mixin fit-content {
+  @media screen and (max-width: $content-width + ($content-gutter * 2)) {
+    @content
+  }
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: repeating-conic-gradient(#ccc 0% 25%, transparent 0% 50%) 50% / 20px 20px;
+  background-attachment: fixed;
+}
+
+body {
+  overflow: visible;
+}
+
+@page {
+  margin: 0;
+}

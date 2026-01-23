@@ -1,0 +1,80 @@
+@use "../../css/mixins/shadow" as shadow;
+@use "../../css/layout" as layout;
+
+.modal-wrapper {
+  z-index: 1000;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  z-index: 1;
+  width: 600px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  margin: var(--content-gutter);
+  border-radius: var(--radius);
+
+  background: var(--bg-from);
+
+  @include shadow.shadow(2);
+
+  @include layout.breakpoint("s") {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+
+    padding: var(--space);
+    margin: 0;
+
+    border-radius: 0;
+  }
+
+  & > header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: 1px solid color-mix(in oklch, var(--color-divider), var(--bg-from) 50%);
+  }
+
+  & > footer {
+    padding: calc(var(--space) * 2);
+    border-top: 1px solid color-mix(in oklch, var(--color-divider), var(--bg-from) 50%);
+  }
+
+  & > .body {
+    flex: 1;
+  }
+}
+
+.title {
+  display: inline-flex;
+  align-items: center;
+
+  margin: calc(var(--space) * 2);
+
+  font-size: 1.5em;
+}
+
+.shadow {
+  z-index: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: var(--color-shadow);
+}
