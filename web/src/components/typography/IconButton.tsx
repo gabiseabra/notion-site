@@ -29,7 +29,7 @@ export type IconButtonProps = {
 export function IconButton({
   as: Component,
   size,
-  color,
+  color = "default",
   badge,
   children,
   className,
