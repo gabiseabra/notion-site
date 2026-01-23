@@ -48,6 +48,10 @@
     flex-direction: row;
     justify-content: space-between;
     border-bottom: 1px solid color-mix(in oklch, var(--color-divider), var(--bg-from) 50%);
+
+    @include layout.breakpoint("s") {
+      padding: var(--space) 0;
+    }
   }
 
   & > footer {
