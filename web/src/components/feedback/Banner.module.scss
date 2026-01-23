@@ -41,7 +41,6 @@
 .icon {
   aspect-ratio: 1;
   display: inline-flex;
-  align-self: baseline;
 
   svg {
     width: 100%;
@@ -58,6 +57,14 @@
   &.size-l {
     width: 20px;
   }
+}
+
+.banner .icon {
+  align-self: baseline;
+}
+
+.alert .icon {
+  align-self: center;
 }
 
 .type-warning {
