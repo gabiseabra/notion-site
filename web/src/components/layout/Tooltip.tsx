@@ -34,12 +34,7 @@ export function Tooltip({ disabled, delay = 300, ...props }: TooltipProps) {
   };
 
   return (
-    <span
-      onMouseEnter={onOpen}
-      onMouseLeave={onClose}
-      onFocus={onOpen}
-      onBlur={onClose}
-    >
+    <span onMouseEnter={onOpen} onMouseLeave={onClose}>
       <Popover
         role="tooltip"
         open={isOpen}
