@@ -77,7 +77,7 @@ export function Filters({ title, query, filters }: FilterProps) {
                 placements={["bottom", "right", "left", "top"]}
                 offset={4}
                 content={
-                  <div style={{ width: 330 }}>
+                  <div style={{ width: 350 }}>
                     <FiltersFilters filters={filters} />
                   </div>
                 }
