@@ -1,43 +1,17 @@
 /***********************************************************************************************************************
  * [_layout.scss] Global CSS resets & layout configuration
  **********************************************************************************************************************/
-
-$breakpoint-s: 450px;
-$breakpoint-m: 800px;
-$content-width: 800px;
-// Min. offset from the content to the edge of the viewport
-$content-gutter: 20px;
+@use "mixins/layout" as layout;
 
 :root {
-  --breakpoint-s: #{$breakpoint-s};
-  --breakpoint-m: #{$breakpoint-m};
-  --content-width: #{$content-width};
-  --content-gutter: #{$content-gutter};
-}
+  --space: 6px;
+  --radius: 8px;
 
-@mixin breakpoint($size) {
-  @if $size == "s" {
-    @media screen and (max-width: $breakpoint-s) {
-      @content
-    }
-  } @else if $size == "m" {
-    @media screen and (max-width: $breakpoint-m) {
-      @content
-    }
-  } @else if $size == "l" {
-    @media screen and (min-width: $breakpoint-m + 1) {
-      @content
-    }
-  } @else {
-    @error "Invalid breakpoint #{size}"
-  }
-}
+  --breakpoint-s: #{layout.$breakpoint-s};
+  --breakpoint-m: #{layout.$breakpoint-m};
 
-// Applies the @content when the viewport fits the $content-width
-@mixin fit-content {
-  @media screen and (max-width: $content-width + ($content-gutter * 2)) {
-    @content
-  }
+  --content-width: #{layout.$content-width};
+  --content-gutter: #{layout.$content-gutter};
 }
 
 html, body, #root {

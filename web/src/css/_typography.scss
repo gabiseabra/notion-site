@@ -58,20 +58,16 @@ body {
   color: var(--color-text);
 }
 
-@mixin indent($indent: 0) {
-  padding: 0 calc(var(--indentation) * $indent);
-}
-
-p, %paragraph {
+p {
   margin: var(--paragraph-margin) 0;
 }
 
-ul, ol, %list {
+ul, ol {
   margin: var(--paragraph-margin) 0;
   padding: 0 var(--indentation);
 }
 
-hr, %divider {
+hr {
   box-shadow: none;
   text-shadow: none;
   border: none;
@@ -82,15 +78,8 @@ hr, %divider {
   margin: var(--paragraph-margin) auto;
 }
 
-code, %code {
-  padding: 0 var(--space);
-  color: var(--color-primary) !important;
-  background: var(--bg-from);
-  font-family: var(--font-monospace);
-}
-
-blockquote, %blockquote {
-  @include indent(1);
+blockquote {
+  @include text.indent(1);
 
   position: relative;
   margin: var(--paragraph-margin) 0;
@@ -109,7 +98,7 @@ blockquote, %blockquote {
   }
 }
 
-a, %link {
+a {
   color: var(--color-link);
   text-decoration: underline;
 

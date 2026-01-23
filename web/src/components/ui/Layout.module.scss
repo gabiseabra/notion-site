@@ -1,6 +1,4 @@
-@use "../../css/theme" as theme;
-@use "../../css/layout" as layout;
-@use "../../css/mixins/text" as text;
+@use "../../css/mixins/layout" as layout;
 
 .layout {
   display: flex;

@@ -2,12 +2,7 @@
  * [_theme.scss] Color and spacing configurations
  **********************************************************************************************************************/
 
-$colors-codes: default, gray, brown, orange, yellow, green, blue, purple, pink, red, primary, secondary;
-
 :root {
-  --space: 6px;
-  --radius: 8px;
-
   --color-shadow: rgba(21, 20, 30, 0.25);
 
   /* site palette */
@@ -68,7 +63,6 @@ $colors-codes: default, gray, brown, orange, yellow, green, blue, purple, pink, 
 }
 
 /** Gradient background */
-
 
 /**
  * this bit ensures that the gradient doesn't stop after 100vh

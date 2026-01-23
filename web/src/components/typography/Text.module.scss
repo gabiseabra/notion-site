@@ -1,6 +1,5 @@
 @use "../../css/mixins/text" as text;
-@use "../../css/theme" as theme;
-@use "../../css/typography" as typography;
+@use "../../css/mixins/color" as color;
 
 .italic {
   font-style: italic;
@@ -23,11 +22,14 @@
 }
 
 .code {
-  @extend %code;
+  padding: 0 var(--space);
+  color: var(--color-primary) !important;
+  background: var(--bg-from);
+  font-family: var(--font-monospace);
 }
 
 // Theme palette classes
-@each $name, $_ in theme.$colors-codes {
+@each $name, $_ in color.$colors-codes {
   .#{"color-" + $name} {
     @if ($name == "default") {
       color: currentColor;
@@ -43,7 +45,7 @@
 }
 
 // Semantic colour aliases
-@each $key in (primary, secondary, muted, disabled, link) {
+@each $key in (muted, disabled, link) {
   .#{"color-" + $key} {
     color: var(#{"--color-" + $key});
   }
@@ -69,6 +71,6 @@
 // Indents
 @for $i from 1 through 4 {
   .#{"indent-" + $i} {
-    @include typography.indent($i);
+    @include text.indent($i);
   }
 }

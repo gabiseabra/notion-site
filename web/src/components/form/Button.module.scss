@@ -1,5 +1,4 @@
-@use "../../css/theme" as theme;
-@use "../../css/mixins/shadow" as shadow;
+@use "../../css/mixins/color" as color;
 
 // Button reset
 .button {
@@ -66,7 +65,7 @@
   cursor: not-allowed;
 }
 
-@each $name, $_ in theme.$colors-codes {
+@each $name, $_ in color.$colors-codes {
   @if $name != "default" {
     .#{"color-" + $name} {
       &.variant-solid {

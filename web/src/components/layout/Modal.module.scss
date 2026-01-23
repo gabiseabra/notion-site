@@ -1,5 +1,5 @@
 @use "../../css/mixins/shadow" as shadow;
-@use "../../css/layout" as layout;
+@use "../../css/mixins/layout" as layout;
 
 .modal-wrapper {
   z-index: 1000;

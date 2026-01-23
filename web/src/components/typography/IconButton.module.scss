@@ -1,4 +1,4 @@
-@use "../../css/theme" as theme;
+@use "../../css/mixins/color" as color;
 
 .icon {
   position: relative;
@@ -40,7 +40,7 @@
   cursor: pointer;
 }
 
-@each $name, $_ in theme.$colors-codes {
+@each $name, $_ in color.$colors-codes {
   .#{"color-" + $name} {
     color: var(#{"--color-" + $name});
 
