@@ -1,6 +1,7 @@
 import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import { BlogPostStatus } from "@notion-site/common/dto/blog-posts/status.js";
 import { Link } from "react-router";
+import * as env from "../../../env.js";
 import { ColProps, Row } from "../../layout/FlexBox.js";
 import { Badge } from "../../typography/Badge.js";
 import { Span } from "../../typography/Text.js";
@@ -18,8 +19,7 @@ export function BlogPostHeader({
 }) {
   // Hide published status badge in production since only published posts are listed anyways
   hiddenProperties ??=
-    import.meta.env.DEV ||
-    blogPost.properties["Status"].status?.name !== "Published"
+    env.DEV || blogPost.properties["Status"].status?.name !== "Published"
       ? []
       : ["Status"];
 
