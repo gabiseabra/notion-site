@@ -6,7 +6,6 @@ import {
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { Route } from "@notion-site/common/dto/route.js";
 import { GenericObject } from "@notion-site/common/utils/types.js";
-import { isUuid } from "@notion-site/common/utils/uuid.js";
 import {
   Meta,
   ORPCErrorConstructorMap,
@@ -52,10 +51,6 @@ export function routeHandler<
 
     if (!route) {
       throw errors.NOT_FOUND({ data: { id: input.id } });
-    }
-
-    if (!isUuid(route.id)) {
-      throw errors.INVALID_ID({ data: { id: input.id } });
     }
 
     return fn({ ...args, errors, input, route });

@@ -85,11 +85,6 @@ export type DatabaseErrors = ErrorRecord<
 
 export function ResourceErrors(name: string) {
   return {
-    INVALID_ID: {
-      message: `Invalid ${name.toLowerCase()} id`,
-      status: 422,
-      data: ResourceId,
-    },
     NOT_FOUND: {
       message: `${sentenceCase(name)} not found`,
       status: 404,
