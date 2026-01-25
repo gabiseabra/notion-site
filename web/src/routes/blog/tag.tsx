@@ -68,7 +68,7 @@ function TagPageLoader({ tag: tagName }: { tag: string }) {
           query: "",
           limit: 25,
           tags: [tag.name],
-          statuses: ["Published"],
+          statuses: env.DEV ? [] : ["Published"],
         }}
       />
     </>
