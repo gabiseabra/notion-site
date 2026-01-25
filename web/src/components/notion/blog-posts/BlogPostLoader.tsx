@@ -1,19 +1,18 @@
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import { titleToString } from "@notion-site/common/utils/notion.js";
-import { ReactNode } from "react";
+import * as env from "../../../env.js";
 import { Head } from "../../../providers/HeadProvider.js";
-import { ResourceLoader } from "../resources/ResourceLoader.js";
+import {
+  ResourceLoader,
+  ResourceLoaderProps,
+} from "../resources/ResourceLoader.js";
 import { Favicon } from "../typography/Favicon.js";
-import { BlogPostMetadata } from "./BlogPostMetadata.js";
+import { BlogPostHeader } from "./BlogPostHeader.js";
 
-export type BlogPostLoaderProps = {
-  id: string;
-  head?: (blogPost: BlogPost) => ReactNode;
-  metadata?: (blogPost: BlogPost) => ReactNode;
-  header?: (blogPost: BlogPost) => ReactNode;
-  footer?: (blogPost: BlogPost) => ReactNode;
-};
-
+export type BlogPostLoaderProps = Omit<
+  ResourceLoaderProps<BlogPost>,
+  "resourceKey" | "fetch"
+>;
 /**
  * Fetches and renders an entry from the blog-posts database.
  * @async
@@ -26,15 +25,15 @@ export function BlogPostLoader({
       <title>
         {[
           titleToString(blogPost.properties.Title) ?? "Untitled Blog Post",
-          import.meta.env.VITE_SITE_TITLE,
+          env.SITE_TITLE,
         ].join(" • ")}
       </title>
 
       {blogPost.icon && <Favicon icon={blogPost.icon} />}
     </Head>
   ),
-  metadata = (blogPost) => (
-    <BlogPostMetadata as="header" size="l" blogPost={blogPost} />
+  header = (blogPost) => (
+    <BlogPostHeader as="header" size="l" blogPost={blogPost} />
   ),
   ...slots
 }: BlogPostLoaderProps) {
@@ -42,9 +41,9 @@ export function BlogPostLoader({
     <ResourceLoader
       id={id}
       resourceKey="blog-post"
-      fetch={(id, orpc) => orpc.notion.blogPosts.getBlogPost({ id })}
+      fetch={(id, orpc) => orpc.notion.getBlogPost({ id })}
       head={head}
-      metadata={metadata}
+      header={header}
       {...slots}
     />
   );

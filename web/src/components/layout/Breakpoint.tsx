@@ -1,7 +1,7 @@
-import { useWindowSize } from "@uidotdev/usehooks";
 import { ComponentProps, ReactElement, ReactNode, useMemo } from "react";
 import { match } from "ts-pattern";
 import * as css from "../../css/index.js";
+import { useWindowSize } from "../../hooks/useWindowSize.js";
 
 type Breakpoint = "s" | "m" | "l";
 

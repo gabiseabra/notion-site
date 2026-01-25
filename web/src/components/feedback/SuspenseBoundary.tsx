@@ -115,7 +115,7 @@ export function PageSuspenseBoundary({
                   onRetry();
                 }}
               >
-                <IconButton as="span" size="xs">
+                <IconButton color="currentColor" as="span" size="xs">
                   <FaArrowsRotate />
                 </IconButton>
                 Retry

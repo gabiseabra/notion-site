@@ -1,11 +1,11 @@
-import * as zn from "@notion-site/common/dto/notion/schema.js";
+import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { ComponentProps } from "react";
 import { Spinner } from "../feedback/Spinner.js";
 import styles from "./Button.module.scss";
 
 type ButtonProps = {
   variant?: "plain" | "solid";
-  color?: zn.color | "primary" | "secondary";
+  color?: zNotion.primitives.color | "primary" | "secondary";
   loading?: boolean;
 } & ComponentProps<"button">;
 

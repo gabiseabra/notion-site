@@ -1,5 +1,5 @@
+import { BlogPostsInput } from "@notion-site/common/dto/blog-posts/input.js";
 import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
-import { QueryBlogPostsInput } from "@notion-site/common/orpc/notion/blog-posts.js";
 import { hash } from "@notion-site/common/utils/hash.js";
 import { useEffect, useState, useTransition } from "react";
 import { suspend } from "suspend-react";
@@ -8,24 +8,24 @@ import { Button } from "../../form/Button.js";
 import { BlogPostList } from "./BlogPostList.js";
 
 export function BlogPostListLoader({
-  filters,
+  filters: initialFilters,
 }: {
-  filters: QueryBlogPostsInput;
+  filters: BlogPostsInput;
 }) {
   const [isPending, startTransition] = useTransition();
-  const [previousPosts, setPreviousPosts] = useState<BlogPost[]>([]);
-  const [input, setInput] = useState({ ...filters });
+  const [previousItems, setPreviousItems] = useState<BlogPost[]>([]);
+  const [filters, setFilters] = useState({ ...initialFilters });
 
   // Reset pagination if filters change
   useEffect(() => {
-    setInput({ ...filters });
-    setPreviousPosts([]);
-  }, [hash(filters)]);
+    setFilters({ ...initialFilters });
+    setPreviousItems([]);
+  }, [hash(initialFilters)]);
 
   const orpc = useOrpc();
-  const { posts, pageInfo } = suspend(
-    () => orpc.notion.blogPosts.queryBlogPosts(input),
-    ["blog-posts", hash(input)],
+  const { items, pageInfo } = suspend(
+    () => orpc.notion.queryBlogPosts(filters),
+    ["blog-posts", hash(filters)],
   );
 
   function onFetchNextPage() {
@@ -34,14 +34,14 @@ export function BlogPostListLoader({
     if (!after) return;
 
     startTransition(() => {
-      setPreviousPosts((prev) => [...prev, ...posts]);
-      setInput({ after, ...filters });
+      setPreviousItems((prev) => [...prev, ...items]);
+      setFilters({ after, ...filters });
     });
   }
 
   return (
     <>
-      <BlogPostList items={[...previousPosts, ...posts]} />
+      <BlogPostList items={[...previousItems, ...items]} />
 
       {pageInfo.hasNextPage ? (
         <Button

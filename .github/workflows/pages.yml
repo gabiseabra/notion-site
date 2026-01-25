@@ -39,17 +39,17 @@ jobs:
 
       - name: Verify dist exists
         run: |
-          ls -la web/dist
-          test -f web/dist/index.html
+          ls -la web/dist/client
+          test -f web/dist/client/index.html
 
-      - run: cp web/dist/index.html web/dist/404.html
-      - run: echo "${{ vars.PAGES_DOMAIN }}" > web/dist/CNAME
-      - run: touch web/dist/.nojekyll
+      - run: cp web/dist/client/index.html web/dist/client/404.html
+      - run: echo "${{ vars.PAGES_DOMAIN }}" > web/dist/client/CNAME
+      - run: touch web/dist/client/.nojekyll
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: web/dist
+          path: web/dist/client
 
   deploy:
     runs-on: ubuntu-latest

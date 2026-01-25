@@ -16,7 +16,7 @@ export function Component() {
     >
       <NotionPageLoader
         id={pathname}
-        header={(page) =>
+        before={(page) =>
           page.parent.type === "workspace" ? null : (
             <DynamicBreadcrumbs id={pathname} />
           )

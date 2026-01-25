@@ -1,14 +1,15 @@
-import * as zn from "@notion-site/common/dto/notion/schema.js";
+import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
+import { Status } from "@notion-site/common/dto/primitives.js";
 import { Row } from "../layout/FlexBox.js";
 import { Tooltip } from "../layout/Tooltip.js";
-import { Badge, BadgeProps } from "../typography/Badge.js";
+import { Badge } from "../typography/Badge.js";
 import { Text } from "../typography/Text.js";
 
 export type TagsFilterProps<T extends string> = {
   options: {
     name: T;
-    color: zn.color;
-    status?: BadgeProps["status"];
+    color: zNotion.primitives.color;
+    status?: Status | null;
     description?: string | null;
   }[];
   value: T[];
@@ -50,7 +51,7 @@ export function TagsFilter<T extends string>({
           >
             <Badge
               size="s"
-              status={option.status}
+              status={option.status ?? undefined}
               color={option.color}
               style={{
                 outline: value.includes(option.name)

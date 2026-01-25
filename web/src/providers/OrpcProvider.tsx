@@ -1,6 +1,7 @@
 import { api } from "@notion-site/common/orpc/index.js";
-import { createORPCClient, onError } from "@orpc/client";
-import { RPCLink } from "@orpc/client/fetch";
+import { hash } from "@notion-site/common/utils/hash.js";
+import { ClientContext, createORPCClient, onError } from "@orpc/client";
+import { RPCLink, RPCLinkOptions } from "@orpc/client/fetch";
 import { SimpleCsrfProtectionLinkPlugin } from "@orpc/client/plugins";
 import {
   ContractRouterClient,
@@ -21,13 +22,16 @@ export function useOrpc() {
   return client;
 }
 
-export function OrpcProvider({ children }: { children: ReactNode }) {
-  const url = `${import.meta.env.VITE_API_URL ?? window.location.origin}/api`;
-
+export function OrpcProvider({
+  children,
+  ...options
+}: {
+  children: ReactNode;
+} & Pick<RPCLinkOptions<ClientContext>, "url" | "fetch">) {
   const link = useMemo(
     () =>
       new RPCLink({
-        url,
+        ...options,
         method: inferRPCMethodFromContractRouter(api),
         plugins: [new SimpleCsrfProtectionLinkPlugin()],
         interceptors: [
@@ -36,7 +40,7 @@ export function OrpcProvider({ children }: { children: ReactNode }) {
           }),
         ],
       }),
-    [],
+    [fetch, hash(options)],
   );
 
   const client: ContractRouterClient<typeof api> = useMemo(

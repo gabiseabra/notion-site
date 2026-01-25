@@ -1,18 +1,18 @@
-import { GetNotionPageOutput } from "@notion-site/common/orpc/notion/pages.js";
+import { NotionPage } from "@notion-site/common/dto/pages/index.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { titleToString } from "@notion-site/common/utils/notion.js";
-import { ReactNode } from "react";
+import * as env from "../../../env.js";
 import { Head } from "../../../providers/HeadProvider.js";
-import { ResourceLoader } from "../resources/ResourceLoader.js";
+import {
+  ResourceLoader,
+  ResourceLoaderProps,
+} from "../resources/ResourceLoader.js";
 import { Favicon } from "../typography/Favicon.js";
 
-export type NotionPageLoaderProps = {
-  id: string;
-  head?: (blogPost: GetNotionPageOutput) => ReactNode;
-  metadata?: (blogPost: GetNotionPageOutput) => ReactNode;
-  header?: (blogPost: GetNotionPageOutput) => ReactNode;
-  footer?: (blogPost: GetNotionPageOutput) => ReactNode;
-};
+export type NotionPageLoaderProps = Omit<
+  ResourceLoaderProps<NotionPage>,
+  "resourceKey" | "fetch"
+>;
 
 /**
  * Fetches and renders a Notion page.
@@ -21,14 +21,14 @@ export type NotionPageLoaderProps = {
  */
 export function NotionPageLoader({
   id,
-  head = (page) => (
+  head = (page, { route }) => (
     <Head>
       <title>
         {[
-          page.route.title ??
+          route.title ??
             titleToString(page.properties.title) ??
             "Untitled Page",
-          import.meta.env.VITE_SITE_TITLE,
+          env.SITE_TITLE,
         ]
           .filter(isTruthy)
           .join(" • ")}
@@ -43,7 +43,7 @@ export function NotionPageLoader({
     <ResourceLoader
       id={id}
       resourceKey="page"
-      fetch={(id, orpc) => orpc.notion.pages.getPage({ id })}
+      fetch={(id, orpc) => orpc.notion.getPage({ id })}
       head={head}
       {...slots}
     />

@@ -37,11 +37,7 @@ function LinkToPageLoader({
   ...props
 }: { id: string } & Omit<LinkProps, "to">) {
   const orpc = useOrpc();
-  const resource = suspend(() => orpc.notion.pages.getMetadata({ id }), [id]);
-
-  const title = Object.values(resource.properties).find(
-    (prop) => prop.type === "title",
-  );
+  const resource = suspend(() => orpc.notion.getMetadata({ id }), [id]);
 
   return (
     <Link to={resource.url} {...props}>
@@ -52,7 +48,7 @@ function LinkToPageLoader({
         </>
       )}
 
-      {title && <RichText data={title.title} />}
+      {resource.title && <RichText data={resource.title.title} />}
     </Link>
   );
 }

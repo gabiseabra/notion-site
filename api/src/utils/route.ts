@@ -1,7 +1,7 @@
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { Route } from "@notion-site/common/dto/route.js";
 import { isUuid, uuidEquals } from "@notion-site/common/utils/uuid.js";
-import * as env from "./env.js";
+import * as env from "../env.js";
 
 export function getRouteById(id: string): Route | undefined {
   for (const route of env.routes) {

@@ -1,7 +1,7 @@
-import * as zn from "../dto/notion/schema.js";
+import { zNotion } from "../dto/notion/schema/index.js";
 import { hasPropertyValue } from "./guards.js";
 
-export function titleToString({ title }: zn.title) {
+export function titleToString({ title }: zNotion.properties.title) {
   return (
     title
       .filter(hasPropertyValue("type", "text"))

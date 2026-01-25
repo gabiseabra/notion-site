@@ -10,15 +10,15 @@
   ],
   "scripts": {
     "build": "npm run build -w common && npm run build -w api && npm run build -w web",
-    "clean": "npm run clean -w common && npm run clean -w api",
-    "start": "STATIC_DIR=\"$(pwd)/web/dist\" npm run start -w api",
+    "clean": "npm run clean -w common && npm run clean -w api && npm run clean -w web",
+    "start": "npm run start -w api",
     "dev": "concurrently \"npm run dev -w api\" \"npm run dev -w web\"",
     "lint": "eslint \"{api,web,common}/src/**/*.{ts,tsx}\"",
     "tsc": "tsc -b"
   },
   "engines": {
-    "node": ">=18",
-    "npm": ">=8"
+    "node": ">=22",
+    "npm": ">=10"
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.51.4",

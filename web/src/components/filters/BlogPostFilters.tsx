@@ -1,7 +1,8 @@
-import { BlogPostStatus } from "@notion-site/common/dto/notion/blog-post.js";
-import { QueryBlogPostsInput } from "@notion-site/common/orpc/notion/blog-posts.js";
+import { BlogPostsInput } from "@notion-site/common/dto/blog-posts/input.js";
+import { BlogPostStatus } from "@notion-site/common/dto/blog-posts/status.js";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { suspend } from "suspend-react";
+import * as env from "../../env.js";
 import { useOrpc } from "../../providers/OrpcProvider.js";
 import { Alert } from "../feedback/Banner.js";
 import { Spinner } from "../feedback/Spinner.js";
@@ -13,8 +14,8 @@ export function BlogPostFilters({
   value,
   onChange,
 }: {
-  value: QueryBlogPostsInput;
-  onChange: (value: QueryBlogPostsInput) => void;
+  value: BlogPostsInput;
+  onChange: (value: BlogPostsInput) => void;
 }) {
   return (
     <Filters
@@ -63,14 +64,10 @@ const statuses: TagsFilterProps<BlogPostStatus>["options"] = (
     { name: "Draft", color: "gray" },
   ] as const
 )
-  .filter(({ name }) => import.meta.env.DEV || BlogPostStatus.isComplete(name))
+  .filter(({ name }) => env.DEV || BlogPostStatus.isComplete(name))
   .map((option) => ({
     ...option,
-    status: BlogPostStatus.isComplete(option.name)
-      ? "complete"
-      : BlogPostStatus.isInProgress(option.name)
-        ? "in-progress"
-        : "empty",
+    status: BlogPostStatus.status(option.name),
   }));
 
 function BlogPostStatusesFilter({
@@ -113,7 +110,7 @@ function BlogPostTagsFilterLoader({
   onChange: (values: string[]) => void;
 }) {
   const orpc = useOrpc();
-  const allTags = suspend(() => orpc.notion.blogPosts.getAllTags(), [orpc]);
+  const allTags = suspend(() => orpc.notion.getBlogPostTags(), [orpc]);
 
   return <TagsFilter options={allTags} value={value} onChange={onChange} />;
 }

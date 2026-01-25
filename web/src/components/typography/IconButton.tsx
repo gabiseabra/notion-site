@@ -1,4 +1,4 @@
-import * as zn from "@notion-site/common/dto/notion/schema.js";
+import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { omit } from "@notion-site/common/utils/object.js";
 import { CSSProperties, ReactNode } from "react";
@@ -10,7 +10,7 @@ export type IconButtonProps = {
   as: "span" | "a" | "button";
 
   size: "xs" | "s" | "m" | "l";
-  color?: zn.color | "primary" | "secondary";
+  color: zNotion.primitives.color | "primary" | "secondary" | "currentColor";
 
   badge?: string;
 
@@ -29,7 +29,7 @@ export type IconButtonProps = {
 export function IconButton({
   as: Component,
   size,
-  color = "default",
+  color,
   badge,
   children,
   className,
@@ -43,7 +43,7 @@ export function IconButton({
         className,
         styles.icon,
         styles[`size-${size}`],
-        styles[`color-${color}`],
+        color && styles[`color-${color}`],
         onClick && styles.clickable,
       ]
         .filter(isTruthy)

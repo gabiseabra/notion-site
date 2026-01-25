@@ -8,17 +8,20 @@
   "scripts": {
     "build": "tsc -b",
     "clean": "tsc -b --clean",
-    "start": "node dist/server.js",
+    "start": "dotenvx run -f ../.env -- node dist/server.js",
     "dev": "nodemon --watch 'src/**' --watch '../common/src/**' --ext ts,tsx,js,json --exec 'npm run build && dotenvx run -f ../.env -- npm run start'"
   },
   "dependencies": {
     "@notion-site/common": "*",
+    "@notion-site/web": "*",
     "@notionhq/client": "^2.2.1",
-    "@orpc/server": "^1.13.2",
-    "cors": "^2.8.5",
+    "@orpc/server": "^1.13.4",
+    "cors": "^2.8.6",
     "express": "^4.18.2",
+    "feed": "^5.2.0",
     "json5": "^2.2.3",
     "morgan": "^1.10.1",
+    "vite": "^7.3.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {

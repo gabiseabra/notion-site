@@ -17,7 +17,7 @@ export function Component() {
     >
       <BlogPostLoader
         id={id}
-        header={() => (
+        before={() => (
           <DynamicBreadcrumbs
             id={id}
             parent={() => (

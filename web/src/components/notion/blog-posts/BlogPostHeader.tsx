@@ -1,15 +1,12 @@
-import {
-  BlogPost,
-  BlogPostStatus,
-} from "@notion-site/common/dto/notion/blog-post.js";
+import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
+import { BlogPostStatus } from "@notion-site/common/dto/blog-posts/status.js";
 import { Link } from "react-router";
-import { match } from "ts-pattern";
 import { ColProps, Row } from "../../layout/FlexBox.js";
 import { Badge } from "../../typography/Badge.js";
 import { Span } from "../../typography/Text.js";
-import { ResourceMetadata } from "../resources/ResourceMetadata.js";
+import { ResourceHeader } from "../resources/ResourceHeader.js";
 
-export function BlogPostMetadata({
+export function BlogPostHeader({
   blogPost,
   hiddenProperties,
   ...props
@@ -27,7 +24,7 @@ export function BlogPostMetadata({
       : ["Status"];
 
   return (
-    <ResourceMetadata
+    <ResourceHeader
       {...props}
       resource={blogPost}
       hiddenTitle={hiddenProperties?.includes("Title")}
@@ -45,14 +42,9 @@ export function BlogPostMetadata({
               <Badge
                 size="s"
                 color={blogPost.properties["Status"].status.color}
-                status={match(blogPost.properties["Status"].status.name)
-                  .when(BlogPostStatus.isComplete, () => "complete" as const)
-                  .when(
-                    BlogPostStatus.isInProgress,
-                    () => "in-progress" as const,
-                  )
-                  .when(BlogPostStatus.isEmpty, () => "empty" as const)
-                  .exhaustive()}
+                status={BlogPostStatus.status(
+                  blogPost.properties["Status"].status.name,
+                )}
               >
                 {blogPost.properties["Status"].status.name}
               </Badge>

@@ -6,6 +6,7 @@ import { BlogPostListLoader } from "../../components/notion/blog-posts/BlogPostL
 import { Favicon } from "../../components/notion/typography/Favicon.js";
 import { Badge } from "../../components/typography/Badge.js";
 import { Text } from "../../components/typography/Text.js";
+import * as env from "../../env.js";
 import { Head } from "../../providers/HeadProvider.js";
 import { useOrpc } from "../../providers/OrpcProvider.js";
 
@@ -23,7 +24,7 @@ export function Component() {
 
 function TagPageLoader({ tag: tagName }: { tag: string }) {
   const orpc = useOrpc();
-  const allTags = suspend(() => orpc.notion.blogPosts.getAllTags(), [orpc]);
+  const allTags = suspend(() => orpc.notion.getBlogPostTags(), [orpc]);
 
   const tag = allTags.find((tag) => compareTags(tagName, tag.name));
 
@@ -34,7 +35,7 @@ function TagPageLoader({ tag: tagName }: { tag: string }) {
   return (
     <>
       <Head>
-        <title>{[tag.name, import.meta.env.VITE_SITE_TITLE].join(" • ")}</title>
+        <title>{[tag.name, env.SITE_TITLE].join(" • ")}</title>
         <Favicon icon={{ type: "emoji", emoji: "🏷️" }} />
       </Head>
 
@@ -67,6 +68,7 @@ function TagPageLoader({ tag: tagName }: { tag: string }) {
           query: "",
           limit: 25,
           tags: [tag.name],
+          statuses: ["Published"],
         }}
       />
     </>

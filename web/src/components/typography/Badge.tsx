@@ -1,12 +1,13 @@
-import * as zn from "@notion-site/common/dto/notion/schema.js";
+import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
+import { Status } from "@notion-site/common/dto/primitives.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { CSSProperties, ReactNode } from "react";
 import styles from "./Badge.module.scss";
 
 export type BadgeProps = {
-  color: zn.color;
+  color: zNotion.primitives.color;
   size: "xs" | "s" | "m" | "l";
-  status?: "empty" | "in-progress" | "complete";
+  status?: Status;
 
   children: ReactNode;
   className?: string;

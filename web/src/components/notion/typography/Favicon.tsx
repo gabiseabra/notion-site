@@ -1,11 +1,11 @@
-import * as zn from "@notion-site/common/dto/notion/schema.js";
+import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { match } from "ts-pattern";
 
 /**
  * Renders a Notion icon as favicon.
  * @direction inline
  */
-export function Favicon({ icon }: { icon: zn.icon }) {
+export function Favicon({ icon }: { icon: zNotion.media.icon }) {
   return match(icon)
     .with({ type: "emoji" }, ({ emoji }) => (
       <link

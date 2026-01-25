@@ -5,3 +5,4 @@ routes.json
 node_modules
 dist
 tsconfig.tsbuildinfo
+NOTES.md

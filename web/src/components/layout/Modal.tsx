@@ -29,6 +29,7 @@ export function Modal({ open, onClose, children, title, footer }: ModalProps) {
 
           <IconButton
             as="button"
+            color="default"
             size="m"
             p={2}
             title="Close"

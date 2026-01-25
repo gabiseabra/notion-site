@@ -49,6 +49,7 @@ export function Input({
         {!!value && type === "search" && onClear && (
           <IconButton
             as="button"
+            color="default"
             title={label ? `Clear ${label}` : "Clear search"}
             size={({ m: "s", l: "m" } as const)[size]}
             onClick={onClear}

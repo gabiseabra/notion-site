@@ -1,4 +1,4 @@
-import * as zn from "@notion-site/common/dto/notion/schema.js";
+import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { match } from "ts-pattern";
 import { rewriteUrl } from "../../../utils/url.js";
 import { Banner } from "../../feedback/Banner.js";
@@ -9,7 +9,11 @@ import { Span } from "../../typography/Text.js";
  * Renders a single line of Notion rich-text.
  * @direction inline
  */
-export function RichText({ data }: { data: zn.rich_text_item }) {
+export function RichText({
+  data,
+}: {
+  data: zNotion.properties.rich_text_item;
+}) {
   return (
     <>
       {data.length ? (

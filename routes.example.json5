@@ -8,6 +8,15 @@
     "title": "",
   },
   {
+    // blog posts route
+    "path": "/blog/*",
+    "id": "*",
+    "parent" {
+      "type": "database_id",
+      "database_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+  }
+  {
     // fallback route
     "path": "/page/*",
     "id": "*",

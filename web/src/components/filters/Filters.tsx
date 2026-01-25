@@ -40,7 +40,7 @@ export function Filters({ title, query, filters }: FilterProps) {
       onClear={query.onClear}
       placeholder={query.placeholder}
       left={
-        <IconButton as="span" size="m">
+        <IconButton color="default" as="span" size="m">
           <IoSearch />
         </IconButton>
       }

@@ -1,4 +1,4 @@
-import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
+import { Metadata } from "@notion-site/common/dto/notion/contracts.js";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { titleToString } from "@notion-site/common/utils/notion.js";
 import { ReactNode } from "react";
@@ -14,7 +14,7 @@ import { RichText } from "../typography/RichText.js";
 
 type DynamicBreadcrumbsProps = {
   id: string;
-  parent?: (resource: NotionResource) => ReactNode;
+  parent?: (metadata: Metadata) => ReactNode;
 };
 
 export function DynamicBreadcrumbs(props: DynamicBreadcrumbsProps) {
@@ -48,40 +48,33 @@ DynamicBreadcrumbs.Crumb = function DynamicBreadcrumbsCrumb(
 
 DynamicBreadcrumbs.CrumbLoader = function DynamicBreadcrumbsCrumbLoader({
   id,
-  parent = (resource) =>
-    resource.parent.type === "page_id" && (
-      <DynamicBreadcrumbs.Crumb id={resource.parent.page_id} />
+  parent = (metadata) =>
+    metadata.parent.type === "page_id" && (
+      <DynamicBreadcrumbs.Crumb id={metadata.parent.page_id} />
     ),
 }: DynamicBreadcrumbsProps) {
   const orpc = useOrpc();
-  const resource = suspend(
-    () => orpc.notion.pages.getMetadata({ id: id }),
-    [id],
-  );
-
-  const title = Object.values(resource.properties).find(
-    (prop) => prop.type === "title",
-  );
+  const metadata = suspend(() => orpc.notion.getMetadata({ id: id }), [id]);
 
   return (
     <>
-      {parent(resource)}
+      {parent(metadata)}
 
       <span>
         <Link
-          to={resource.url}
-          title={title ? titleToString(title) : undefined}
+          to={metadata.url}
+          title={metadata.title ? titleToString(metadata.title) : undefined}
         >
-          {resource.route.crumb ?? (
+          {metadata.route.crumb ?? (
             <>
-              {resource.icon && (
+              {metadata.icon && (
                 <>
-                  <Icon icon={resource.icon} size="xs" />
+                  <Icon icon={metadata.icon} size="xs" />
                   &nbsp;
                 </>
               )}
 
-              {title && <RichText data={title.title} />}
+              {metadata.title && <RichText data={metadata.title.title} />}
             </>
           )}
         </Link>

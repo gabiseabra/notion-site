@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { EmptyState } from "../../feedback/EmptyState.js";
 import { Col } from "../../layout/FlexBox.js";
 import { ResourceList } from "../resources/ResourceList.js";
-import { BlogPostMetadata } from "./BlogPostMetadata.js";
+import { BlogPostHeader } from "./BlogPostHeader.js";
 
 export function BlogPostList({ items }: { items: BlogPost[] }) {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ export function BlogPostList({ items }: { items: BlogPost[] }) {
       emptyState={<EmptyState title="No blog posts found" />}
       render={(blogPost) => (
         <Col p={2}>
-          <BlogPostMetadata
+          <BlogPostHeader
             key={blogPost.id}
             as="section"
             size="s"

@@ -3,26 +3,43 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./env.js": {
+      "types": "./dist/ts/src/env.d.ts",
+      "default": "./dist/server/env.js"
+    },
+    "./server.js": {
+      "types": "./dist/ts/src/server.d.ts",
+      "default": "./dist/server/server.js"
+    },
+    "./rss.js": {
+      "types": "./dist/ts/src/rss.d.ts",
+      "default": "./dist/server/rss.js"
+    }
+  },
   "scripts": {
     "dev": "dotenvx run -f ../.env -- vite",
-    "build": "dotenvx run -f ../.env -- vite build",
+    "clean": "rm -rf ./dist",
+    "build": "npm run build:ts && npm run build:client && npm run build:server",
+    "build:ts": "tsc -b",
+    "build:client": "dotenvx run -f ../.env -- vite build",
+    "build:server": "dotenvx run -f ../.env -- vite build --ssr",
     "preview": "dotenvx run -f ../.env -- vite preview"
   },
   "dependencies": {
     "@notion-site/common": "*",
-    "@orpc/client": "^1.13.2",
-    "@uidotdev/usehooks": "^2.4.1",
+    "@orpc/client": "^1.13.4",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-icons": "^5.5.0",
-    "react-router": "^7.12.0",
+    "react-router": "^7.13.0",
     "suspend-react": "^0.1.3"
   },
   "devDependencies": {
-    "@types/react": "^19.2.8",
+    "@types/react": "^19.2.9",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^4.0.4",
-    "sass": "^1.69.0",
-    "vite": "^4.4.9"
+    "@vitejs/plugin-react": "^5.1.2",
+    "sass": "^1.97.3",
+    "vite": "^7.3.1"
   }
 }

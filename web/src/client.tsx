@@ -1,17 +1,24 @@
 import "./css/global.scss";
 
 import React from "react";
-import ReactDOM from "react-dom/client";
+import { hydrateRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
+import * as env from "./env.js";
 import { HeadProvider } from "./providers/HeadProvider.js";
 import { OrpcProvider } from "./providers/OrpcProvider.js";
 import * as route from "./routes/index.js";
 
 const router = createBrowserRouter([route]);
+const root = document.getElementById("root");
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+if (!root) {
+  throw new Error("Root element not found");
+}
+
+hydrateRoot(
+  root,
   <React.StrictMode>
-    <OrpcProvider>
+    <OrpcProvider url={env.API_URL}>
       <HeadProvider>
         <RouterProvider router={router} />
       </HeadProvider>

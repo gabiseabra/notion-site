@@ -4,6 +4,7 @@
  */
 import { omitUndefined } from "@notion-site/common/utils/object.js";
 import { CSSProperties } from "react";
+import * as env from "../env.js";
 
 export const _space = "var(--space)";
 
@@ -11,11 +12,12 @@ export const space = (n: number) => `calc(${_space} * ${n})`;
 
 export const breakpoint = (size: "s" | "m") => `var(--breakpoint-${size})`;
 
-export function computeProperty(
-  variableOrProperty: string,
-  element: Element = document.documentElement,
-) {
-  return getComputedStyle(element)
+export function computeProperty(variableOrProperty: string, element?: Element) {
+  if (env.SSR) {
+    return "";
+  }
+
+  return getComputedStyle(element ?? document.documentElement)
     .getPropertyValue(
       variableOrProperty.startsWith("var")
         ? variableOrProperty.slice(4, -1)
@@ -24,10 +26,11 @@ export function computeProperty(
     .trim();
 }
 
-export function toPx(
-  value: string,
-  element: Element = document.documentElement,
-): number {
+export function toPx(value: string, element?: Element): number {
+  if (env.SSR) {
+    return 0;
+  }
+
   if (value.endsWith("px")) return parseFloat(value);
 
   const probe = document.createElement("div");
@@ -36,10 +39,7 @@ export function toPx(
   probe.style.pointerEvents = "none";
   probe.style.width = value;
 
-  (element instanceof HTMLElement
-    ? element
-    : document.documentElement
-  ).appendChild(probe);
+  (element ?? document.documentElement).appendChild(probe);
 
   const px = probe.getBoundingClientRect().width;
   probe.remove();

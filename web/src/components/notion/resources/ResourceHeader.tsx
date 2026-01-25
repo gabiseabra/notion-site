@@ -7,7 +7,7 @@ import { Text } from "../../typography/Text.js";
 import { Icon } from "../typography/Icon.js";
 import { RichText } from "../typography/RichText.js";
 
-export function ResourceMetadata<T extends NotionResource>({
+export function ResourceHeader<DB extends NotionResource>({
   as: Component,
   size,
   resource,
@@ -17,7 +17,7 @@ export function ResourceMetadata<T extends NotionResource>({
 }: {
   as: ColProps["as"];
   size: "s" | "m" | "l";
-  resource: T;
+  resource: DB;
   hiddenTitle?: boolean;
   before?: ReactNode;
   after?: ReactNode;

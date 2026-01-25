@@ -1,6 +1,15 @@
-export type EmptyObject = { [k: string]: never };
+export type UnionToIntersection<U> = (
+  U extends unknown ? (k: U) => void : never
+) extends (k: infer I) => void
+  ? I
+  : never;
 
-export type GenericObject = { [k: string]: unknown };
+export type UnionToTuple<U> =
+  UnionToIntersection<U extends unknown ? (u: U) => void : never> extends (
+    v: infer V,
+  ) => void
+    ? [...UnionToTuple<Exclude<U, V>>, V]
+    : [];
 
 /**
  * Distributive version of {@link Omit}.

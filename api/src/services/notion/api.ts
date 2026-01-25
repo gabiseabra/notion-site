@@ -1,8 +1,8 @@
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
-import * as zn from "@notion-site/common/dto/notion/schema.js";
+import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
+import { DistributiveOmit } from "@notion-site/common/types/union.js";
 import { showError } from "@notion-site/common/utils/error.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
-import { DistributiveOmit } from "@notion-site/common/utils/types.js";
 import {
   APIResponseError,
   Client as NotionClient,
@@ -32,7 +32,7 @@ type NotionTimestampFilter = Extract<
  * Property filter variants compatible with a specific Notion property type.
  * Inferred from the Notion SDK’s `QueryDatabaseParameters["filter"]` union.
  */
-type NotionPropertyFilter<Prop extends zn.property> = Extract<
+type NotionPropertyFilter<Prop extends zNotion.properties.property> = Extract<
   QueryDatabaseParameters["filter"],
   { type?: Prop["type"] }
 >;
@@ -71,23 +71,20 @@ type NotionResourceSorting<DB extends NotionResource> =
       direction: "ascending" | "descending";
     };
 
+export type QueryNotionDatabaseOptions<DB extends NotionResource> = {
+  limit: number;
+  after?: string;
+  filter?: NotionResourceFilterExpr<DB>;
+  sorts?: NotionResourceSorting<DB>[];
+};
+
 /**
  * Queries a Notion database with filter types inferred from the provided zod schema, and parses results.
  */
 export async function queryNotionDatabase<DB extends NotionResource>(
   databaseId: string,
   schema: z.ZodSchema<DB>,
-  {
-    limit,
-    after,
-    filter,
-    sorts,
-  }: {
-    limit: number;
-    after?: string;
-    filter?: NotionResourceFilterExpr<DB>;
-    sorts?: NotionResourceSorting<DB>[];
-  },
+  { limit, after, filter, sorts }: QueryNotionDatabaseOptions<DB>,
 ) {
   const response = await notion.databases.query({
     database_id: databaseId,
@@ -128,13 +125,13 @@ export async function queryNotionDatabase<DB extends NotionResource>(
 /**
  * Returns all configured options for a database property of type "select", "multi_select", or "status".
  */
-export async function getDatabaseSelectOptions(
+export async function getNotionDatabaseProperty(
   databaseId: string,
   property: string,
 ): Promise<
   {
     name: string;
-    color: zn.color;
+    color: zNotion.primitives.color;
     description: string | null;
   }[]
 > {
@@ -208,7 +205,7 @@ export async function getNotionPage<DB extends NotionResource>(
  * Recursively fetches all blocks for a page (depth-first) and parses them.
  */
 export async function getNotionBlocks(id: string) {
-  const blocks: zn.block[] = [];
+  const blocks: zNotion.blocks.block[] = [];
   const errors: { id: string; error: Error }[] = [];
 
   let cursor = undefined;
@@ -225,7 +222,7 @@ export async function getNotionBlocks(id: string) {
           return null;
         });
 
-    if (!response) return { blocks, errors };
+    if (!response) return null;
 
     for (const block of response.results) {
       if (!isFullBlock(block)) {
@@ -237,7 +234,7 @@ export async function getNotionBlocks(id: string) {
         continue;
       }
 
-      const parseResult = zn.block.safeParse(block);
+      const parseResult = zNotion.blocks.block.safeParse(block);
 
       if (!parseResult.success) {
         errors.push({ id: block.id, error: parseResult.error });
@@ -247,7 +244,10 @@ export async function getNotionBlocks(id: string) {
         blocks.push(block);
 
         if (block.has_children && block.type !== "child_page") {
-          const children = await getNotionBlocks(block.id);
+          const children = (await getNotionBlocks(block.id)) ?? {
+            blocks: [],
+            errors: [],
+          };
 
           blocks.push(...children.blocks);
           errors.push(...children.errors);

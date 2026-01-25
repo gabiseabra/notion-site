@@ -1,0 +1,134 @@
+import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
+import { BlogPostStatus } from "@notion-site/common/dto/blog-posts/status.js";
+import { _NotionResource } from "@notion-site/common/dto/notion/resource.js";
+import { NotionPage } from "@notion-site/common/dto/pages/index.js";
+import { api } from "@notion-site/common/orpc/index.js";
+import {
+  hasPropertyValue,
+  isTruthy,
+} from "@notion-site/common/utils/guards.js";
+import { implement } from "@orpc/server";
+import * as env from "../../../env.js";
+import { getResourceUrl } from "../../../utils/route.js";
+import { getNotionBlocks, getNotionPage } from "../../notion/api.js";
+import {
+  getNotionDatabasePropertyHandler,
+  getNotionResourceHandler,
+  queryNotionDatabaseHandler,
+  routeHandler,
+} from "../../notion/orpc.js";
+
+const c = implement(api.notion);
+
+export const notion = c.router({
+  getBlocks: c.getBlocks.handler(
+    routeHandler(async ({ route, errors }) => {
+      const result = await getNotionBlocks(route.id);
+
+      if (!result) {
+        throw errors.NOT_FOUND({ data: { id: route.id } });
+      }
+
+      return { blocks: result.blocks };
+    }),
+  ),
+
+  getMetadata: c.getMetadata.handler(
+    routeHandler(async ({ route, errors }) => {
+      const resource = await getNotionPage(route.id, _NotionResource);
+
+      if (!resource) {
+        throw errors.NOT_FOUND({ data: { id: route.id } });
+      }
+
+      return {
+        id: resource.id,
+        cover: resource.cover,
+        icon: resource.icon,
+        parent: resource.parent,
+        url: getResourceUrl(resource) ?? resource.url,
+        title:
+          Object.values(resource.properties).find(
+            hasPropertyValue("type", "title"),
+          ) ?? null,
+        route,
+      };
+    }),
+  ),
+
+  getPage: c.getPage.handler(getNotionResourceHandler(NotionPage)),
+
+  getBlogPost: c.getBlogPost.handler(getNotionResourceHandler(BlogPost)),
+
+  getBlogPostTags: c.getBlogPostTags.handler(
+    getNotionDatabasePropertyHandler(
+      env.BLOG_POSTS_DATABASE_ID,
+      "Tags",
+      BlogPostStatus,
+    ),
+  ),
+
+  queryBlogPosts: c.queryBlogPosts.handler(
+    queryNotionDatabaseHandler(
+      env.BLOG_POSTS_DATABASE_ID,
+      BlogPost,
+      (input) => ({
+        limit: input.limit,
+        after: input.after,
+        sorts: [
+          {
+            property: "Publish Date",
+            direction: "descending",
+          },
+          {
+            timestamp: "created_time",
+            direction: "descending",
+          },
+        ],
+        filter: {
+          and: [
+            // Only show completed statuses in production
+            process.env.NODE_ENV === "development"
+              ? undefined
+              : {
+                  or: BlogPostStatus.options
+                    .filter(BlogPostStatus.isComplete)
+                    .map((status) => ({
+                      property: "Status" as const,
+                      status: { equals: status },
+                    })),
+                },
+
+            // Apply filters from request
+            // query
+            input.query &&
+              ({
+                property: "Title",
+                title: { contains: input.query },
+              } as const),
+
+            // tags
+            ...(input.tags ?? []).map(
+              (tag) =>
+                ({
+                  property: "Tags",
+                  multi_select: { contains: tag },
+                }) as const,
+            ),
+
+            // statuses
+            {
+              or: (input.statuses ?? []).map(
+                (status) =>
+                  ({
+                    property: "Status",
+                    status: { equals: status },
+                  }) as const,
+              ),
+            },
+          ].filter(isTruthy),
+        },
+      }),
+    ),
+  ),
+});
