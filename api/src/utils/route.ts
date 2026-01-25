@@ -3,67 +3,89 @@ import { Route } from "@notion-site/common/dto/route.js";
 import { isUuid, uuidEquals } from "@notion-site/common/utils/uuid.js";
 import * as env from "../env.js";
 
-export function getRouteById(id: string): Route | undefined {
+function getRouteById(pageId: string): Route | undefined {
+  const uuid = extractUuid(pageId);
+
   for (const route of env.routes) {
-    if (isUuid(route.id) && uuidEquals(route.id, id)) {
+    if (uuid && uuidEquals(route.id, uuid)) {
       return route;
-    } else if (route.path.endsWith("/*")) {
-      return { ...route, id, path: route.path.replace("*", id) };
     }
   }
 }
 
-export function getRouteByPath(path: string): Route | undefined {
+function getRouteByPath(path: string): Route | undefined {
   for (const route of env.routes) {
+    // route path matches exactly => pick
     if (route.path === path) return route;
-
+    // route is not wildcard => skip
     if (!route.path.endsWith("*")) continue;
-
     const prefix = route.path.slice(0, -1);
-
-    if (!path.startsWith(prefix)) continue;
+    // path doesn't start with prefix or is more deep => skip
+    if (!path.startsWith(prefix) || path.slice(prefix.length).includes("/"))
+      continue;
 
     const wildcardPart = path.slice(prefix.length);
-    const extractedId = extractId(wildcardPart);
-    const resolvedId = route.id.replace("*", extractedId);
+    const uuid = extractUuid(wildcardPart);
+    if (!uuid) continue;
 
-    return { ...route, id: resolvedId, path };
+    return {
+      ...route,
+      id: uuid,
+      path: route.path.replace("*", wildcardPart),
+    };
   }
 }
 
-export function getResourceUrl({ id, url, parent }: NotionResource) {
-  if (parent.type !== "database_id") {
-    return getRouteById(id)?.path;
-  } else if (
-    env.BLOG_POSTS_DATABASE_ID &&
-    uuidEquals(parent.database_id, env.BLOG_POSTS_DATABASE_ID)
-  ) {
-    return `/blog${url}`;
-  }
-}
+function getFallbackRoute(id: string) {
+  const uuid = extractUuid(id);
+  const fallbackRoute = env.routes.find((r) => r.id === "*" && !r.parent);
 
-export function matchRoute(pathOrId: string): Route | undefined {
-  if (pathOrId.startsWith("/")) return getRouteByPath(pathOrId);
-
-  const id = extractId(pathOrId);
-
-  if (!isUuid(id)) return;
-
-  const route = getRouteById(extractId(pathOrId));
-
-  if (route) return route;
-
-  const fallbackRoute = env.routes.find((r) => r.path.endsWith("/*"));
-
-  if (fallbackRoute) {
+  if (uuid && fallbackRoute) {
     return {
       ...fallbackRoute,
-      id: extractId(pathOrId),
+      id: uuid,
       path: fallbackRoute.path.replace("*", id),
     };
   }
 }
 
-export function extractId(path: string) {
-  return isUuid(path) ? path : path.split("-").pop()!;
+export function getRouteByResource({ id, url, parent }: NotionResource) {
+  return (
+    getRouteById(url) ??
+    env.routes
+      .filter(
+        (r) =>
+          r.parent &&
+          ((r.parent.type === "database_id" &&
+            parent.type === "database_id" &&
+            uuidEquals(r.parent.database_id, parent.database_id)) ||
+            (r.parent.type === "page_id" &&
+              parent.type === "page_id" &&
+              uuidEquals(r.parent.page_id, parent.page_id)) ||
+            r.parent.type === parent.type),
+      )
+      .map((route) => ({
+        ...route,
+        id,
+        path: route.path.replace("*", url),
+      }))
+      .pop() ??
+    getFallbackRoute(url)
+  );
+}
+
+export function matchRoute(pathOrId: string): Route | undefined {
+  return (
+    getRouteById(pathOrId) ??
+    getRouteByPath(pathOrId) ??
+    getFallbackRoute(pathOrId)
+  );
+}
+
+export function extractUuid(id: string) {
+  if (isUuid(id)) return id;
+  if (id.startsWith("/")) return;
+  const uuidPart = id.split("-").pop();
+  if (!uuidPart || !isUuid(uuidPart)) return;
+  return uuidPart;
 }

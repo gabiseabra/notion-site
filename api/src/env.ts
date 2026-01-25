@@ -1,5 +1,5 @@
 import { Route } from "@notion-site/common/dto/route.js";
-import { never } from "@notion-site/common/utils/error.js";
+import { isTruthy } from "@notion-site/common/utils/guards.js";
 import fs from "fs";
 import JSON5 from "json5";
 import path from "path";
@@ -29,12 +29,26 @@ export const BLOG_POSTS_DATABASE_ID = process.env.NOTION_BLOG_POSTS_DATABASE_ID;
 const ROUTES_FILE = process.env.ROUTES_FILE;
 const ROUTES_JSON = process.env.ROUTES_JSON;
 
-export const routes = Route.array().parse(
-  JSON5.parse(
-    ROUTES_JSON ??
-      fs.readFileSync(
-        ROUTES_FILE ?? never("Routes are not configured!"),
-        "utf8",
-      ),
+export const routes: Route[] = [
+  ...Route.array().parse(
+    JSON5.parse(
+      ROUTES_JSON
+        ? ROUTES_JSON
+        : ROUTES_FILE
+          ? fs.readFileSync(ROUTES_FILE, "utf8")
+          : "[]",
+    ),
   ),
-);
+  BLOG_POSTS_DATABASE_ID && {
+    path: "/blog/*",
+    id: "*",
+    parent: {
+      type: "database_id" as const,
+      database_id: BLOG_POSTS_DATABASE_ID,
+    },
+  },
+  {
+    path: "/page/*",
+    id: "*",
+  },
+].filter(isTruthy);

@@ -10,7 +10,7 @@ import {
 import { implement } from "@orpc/server";
 import z from "zod";
 import * as env from "../../../env.js";
-import { getResourceUrl } from "../../../utils/route.js";
+import { getRouteByResource } from "../../../utils/route.js";
 import { getNotionBlocks, getNotionPage } from "../../notion/api.js";
 import {
   getNotionDatabasePropertyHandler,
@@ -42,12 +42,14 @@ export const notion = c.router({
         throw errors.NOT_FOUND({ data: { id: route.id } });
       }
 
+      route = getRouteByResource(resource) ?? route;
+
       return {
         id: resource.id,
         cover: resource.cover,
         icon: resource.icon,
         parent: resource.parent,
-        url: getResourceUrl(resource) ?? resource.url,
+        url: route.path,
         title:
           Object.values(resource.properties).find(
             hasPropertyValue("type", "title"),

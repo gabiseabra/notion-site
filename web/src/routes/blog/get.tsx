@@ -3,12 +3,10 @@ import { PageSuspenseBoundary } from "../../components/feedback/SuspenseBoundary
 import { BlogPostLoader } from "../../components/notion/blog-posts/BlogPostLoader.js";
 import { DynamicBreadcrumbs } from "../../components/notion/navigation/DynamicBreadcrumbs.js";
 
-export const path = "/blog/:url";
+export const path = "/blog/:id";
 
 export function Component() {
-  const { url = "" } = useParams();
-
-  const id = url.split("-").pop() ?? "";
+  const { id = "" } = useParams();
 
   return (
     <PageSuspenseBoundary

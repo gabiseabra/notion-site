@@ -12,7 +12,7 @@ import {
   ProcedureHandlerOptions,
 } from "@orpc/server";
 import z from "zod";
-import { getResourceUrl, matchRoute } from "../../utils/route.js";
+import { getRouteByResource, matchRoute } from "../../utils/route.js";
 import {
   getNotionDatabaseProperty,
   getNotionPage,
@@ -67,10 +67,12 @@ export function getNotionResourceHandler<DB extends NotionResource>(
       throw errors.NOT_FOUND({ data: { id: route.id } });
     }
 
+    route = getRouteByResource(resource) ?? route;
+
     return {
       ...resource,
       route,
-      url: getResourceUrl(resource) ?? resource.url,
+      url: route.path,
     };
   });
 }
@@ -100,7 +102,7 @@ export function queryNotionDatabaseHandler<DB extends NotionResource, Input>(
     return {
       items: results.map((item) => ({
         ...item,
-        url: getResourceUrl(item) ?? item.url,
+        url: getRouteByResource(item)?.path ?? item.url,
       })),
       pageInfo,
     };

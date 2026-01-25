@@ -1,24 +1,24 @@
+// Backend routing configuration.
 [
+  // Home page
   {
-    // home page
-    "path": "/",
-    "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "crumb": "Home",
-    // Page top-level SEO title (appended to VITE_SITE_TITLE), use empty string to omit.
-    "title": "",
+    path: "/",
+    id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    crumb: "Home",
+    title: "",
   },
-  {
-    // blog posts route
-    "path": "/blog/*",
-    "id": "*",
-    "parent" {
-      "type": "database_id",
-      "database_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    },
-  }
-  {
-    // fallback route
-    "path": "/page/*",
-    "id": "*",
-  }
+  // Default routes
+  // @see api/src/env.ts
+  // {
+  //   "path": "/blog/*",
+  //   "id": "*",
+  //   "parent" {
+  //     "type": "database_id",
+  //     "database_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  //   },
+  // }
+  // {
+  //   "path": "/page/*",
+  //   "id": "*",
+  // }
 ]
