@@ -8,6 +8,7 @@ import {
   isTruthy,
 } from "@notion-site/common/utils/guards.js";
 import { implement } from "@orpc/server";
+import z from "zod";
 import * as env from "../../../env.js";
 import { getResourceUrl } from "../../../utils/route.js";
 import { getNotionBlocks, getNotionPage } from "../../notion/api.js";
@@ -64,7 +65,7 @@ export const notion = c.router({
     getNotionDatabasePropertyHandler(
       env.BLOG_POSTS_DATABASE_ID,
       "Tags",
-      BlogPostStatus,
+      z.string(),
     ),
   ),
 
