@@ -1,4 +1,4 @@
-import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
+import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import { useNavigate } from "react-router";
 import { EmptyState } from "../../feedback/EmptyState.js";
 import { Col } from "../../layout/FlexBox.js";

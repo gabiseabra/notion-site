@@ -1,5 +1,5 @@
+import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import { BlogPostsInput } from "@notion-site/common/dto/blog-posts/input.js";
-import { BlogPost } from "@notion-site/common/dto/notion/blog-post.js";
 import { hash } from "@notion-site/common/utils/hash.js";
 import { useEffect, useState, useTransition } from "react";
 import { suspend } from "suspend-react";
