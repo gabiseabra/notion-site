@@ -1,4 +1,4 @@
-import { EmptyObject } from "@notion-site/common/utils/types.js";
+import { EmptyObject } from "@notion-site/common/types/object.js";
 import { Fetch } from "@notion-site/web/server.js";
 import { RPCHandler } from "@orpc/server/fetch";
 

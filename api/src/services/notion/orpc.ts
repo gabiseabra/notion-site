@@ -5,7 +5,7 @@ import {
 } from "@notion-site/common/dto/notion/contracts.js";
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { Route } from "@notion-site/common/dto/route.js";
-import { GenericObject } from "@notion-site/common/utils/types.js";
+import { GenericObject } from "@notion-site/common/types/object.js";
 import {
   Meta,
   ORPCErrorConstructorMap,
