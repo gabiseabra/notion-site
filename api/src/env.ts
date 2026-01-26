@@ -9,7 +9,7 @@ export const DEV = process.env.NODE_ENV !== "production";
 
 export const API_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  DEV ? "../" : "../../",
+  "../",
 );
 
 export const WEB_ROOT = path.resolve(API_ROOT, "../web");
