@@ -1,8 +1,6 @@
 import { z } from "zod";
 import { zNotion } from "./schema/index.js";
 
-export type Properties = Record<string, zNotion.properties.property>;
-
 /**
  * Creates a Zod schema for a Notion database entry.
  * A Notion database is isomorphic to a Notion page with extra properties.
@@ -10,12 +8,16 @@ export type Properties = Record<string, zNotion.properties.property>;
  * database.
  * Use this to define schemas that parse and validate responses returned by the Notion SDK.
  */
-export const NotionResource = <S extends z.ZodRawShape>(shape: S) =>
+export const NotionResource = <Props extends zNotion.properties.zProperties>(
+  shape: Props,
+) =>
   _NotionResource.omit({ properties: true }).extend({
     properties: z.object(shape),
   });
 
-export type NotionResource<T extends Properties = Properties> = {
+export type NotionResource<
+  T extends zNotion.properties.Properties = zNotion.properties.Properties,
+> = {
   properties: T;
 } & Omit<z.infer<typeof _NotionResource>, "properties">;
 

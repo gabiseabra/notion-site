@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zDiscriminatedUnionOption } from "../../../types/zod.js";
 import { external, file } from "./media.js";
 import { api_color, color } from "./primitives.js";
 
@@ -48,96 +49,6 @@ export const title = z.object({
   title: rich_text_item,
 });
 export type title = z.infer<typeof title>;
-
-export function status<T extends [string, ...string[]]>(options: T) {
-  return z.object({
-    type: z.literal("status"),
-    status: z
-      .object({
-        name: z.enum(options),
-        color: color,
-      })
-      .nullable(),
-  });
-}
-
-export const _status = z.object({
-  type: z.literal("status"),
-  status: z
-    .object({
-      name: z.string(),
-      color: color,
-    })
-    .nullable(),
-});
-
-export type status<T extends string> = {
-  type: "status";
-  status: {
-    name: T;
-    color: color;
-  };
-};
-
-export const _select = z.object({
-  type: z.literal("select"),
-  select: z
-    .object({
-      name: z.string(),
-      color: color,
-    })
-    .nullable(),
-});
-
-export function select<T extends [string, ...string[]]>(options: T) {
-  return z.object({
-    type: z.literal("select"),
-    select: z
-      .object({
-        name: z.enum(options),
-        color: color,
-      })
-      .nullable(),
-  });
-}
-
-export type select<T extends string> = {
-  type: "select";
-  select: {
-    name: T;
-    color: color;
-  } | null;
-};
-
-export const _multi_select = z.object({
-  type: z.literal("multi_select"),
-  multi_select: z
-    .object({
-      name: z.string(),
-      color: color,
-    })
-    .array(),
-});
-
-export function multi_select<T extends [string, ...string[]]>(options: T) {
-  return z.object({
-    type: z.literal("multi_select"),
-    multi_select: z
-      .object({
-        name: z.enum(options),
-        color: color,
-      })
-      .array(),
-  });
-}
-
-export type multi_select<T extends string> = {
-  type: "multi_select";
-  multi_select: {
-    name: T;
-    color: color;
-  }[];
-};
 
 export const date = z.object({
   type: z.literal("date"),
@@ -231,6 +142,56 @@ export const last_edited_time = z.object({
 });
 export type last_edited_time = z.infer<typeof last_edited_time>;
 
+// selects
+
+export function status<T extends string>(options: z.ZodType<T>) {
+  return z.object({
+    type: z.literal("status"),
+    status: z
+      .object({
+        name: options,
+        color: color,
+      })
+      .nullable(),
+  });
+}
+
+export type status<T extends string> = z.infer<zStatus<T>>;
+export type zStatus<T extends string> = ReturnType<typeof status<T>>;
+
+export function select<T extends string>(options: z.ZodType<T>) {
+  return z.object({
+    type: z.literal("select"),
+    select: z
+      .object({
+        name: options,
+        color: color,
+      })
+      .nullable(),
+  });
+}
+
+export type select<T extends string> = z.infer<zSelect<T>>;
+export type zSelect<T extends string> = ReturnType<typeof select<T>>;
+
+export function multi_select<T extends string>(options: z.ZodType<T>) {
+  return z.object({
+    type: z.literal("multi_select"),
+    multi_select: z
+      .object({
+        name: options,
+        color: color,
+      })
+      .array(),
+  });
+}
+
+export type multi_select<T extends string> = z.infer<zMultiSelect<T>>;
+export type zMultiSelect<T extends string> = ReturnType<typeof multi_select<T>>;
+
+/////
+
+// schema
 export const property = z.union([
   text,
   number,
@@ -238,9 +199,9 @@ export const property = z.union([
   url,
   title,
   rich_text,
-  _status,
-  _select,
-  _multi_select,
+  status(z.string()),
+  select(z.string()),
+  multi_select(z.string()),
   email,
   phone_number,
   people,
@@ -254,4 +215,15 @@ export const property = z.union([
   last_edited_by,
   last_edited_time,
 ]);
+// concrete property type
 export type property = z.infer<typeof property>;
+// property schema union type
+export type zProperty<T extends property["type"] = property["type"]> = Extract<
+  (typeof property)["options"][number],
+  zDiscriminatedUnionOption<"type", T>
+>;
+
+export type Properties = Record<string, property>;
+export type zProperties<Props extends Properties = Properties> = {
+  [k in keyof Props]: zProperty<Props[k]["type"]>;
+};

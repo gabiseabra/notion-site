@@ -1,4 +1,5 @@
 import z from "zod";
+import { zDiscriminatedUnionOption } from "../../../types/zod.js";
 import { color } from "./primitives.js";
 
 const number_format = z.enum([
@@ -238,4 +239,16 @@ export const property_config = z.discriminatedUnion("type", [
 
 export type property_config = z.infer<typeof property_config>;
 
-export type property_config_type = z.infer<typeof property_config>["type"];
+// property schema union type
+export type zPropertyConfig<
+  T extends property_config["type"] = property_config["type"],
+> = Extract<
+  (typeof property_config)["options"][number],
+  zDiscriminatedUnionOption<"type", T>
+>;
+
+export type PropertyConfigs = Record<string, property_config>;
+export type zPropertyConfigs<Props extends PropertyConfigs = PropertyConfigs> =
+  {
+    [k in keyof Props]: zPropertyConfig<Props[k]["type"]>;
+  };
