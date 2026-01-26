@@ -44,7 +44,7 @@ function getFallbackRoute(id: string) {
     return {
       ...fallbackRoute,
       id: uuid,
-      path: fallbackRoute.path.replace("*", id),
+      path: fallbackRoute.path.replace("*", id.replace(/^\\/, "")),
     };
   }
 }
@@ -67,7 +67,7 @@ export function getRouteByResource({ id, url, parent }: NotionResource) {
       .map((route) => ({
         ...route,
         id,
-        path: route.path.replace("*", url),
+        path: route.path.replace("*", url.replace(/^\//, "")),
       }))
       .pop() ??
     getFallbackRoute(url)

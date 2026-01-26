@@ -7,10 +7,12 @@ import {
   hasPropertyValue,
   isTruthy,
 } from "@notion-site/common/utils/guards.js";
+import { replaceBlockUrls } from "@notion-site/common/utils/notion.js";
+import { isUuid } from "@notion-site/common/utils/uuid.js";
 import { implement } from "@orpc/server";
 import z from "zod";
 import * as env from "../../../env.js";
-import { getRouteByResource } from "../../../utils/route.js";
+import { extractUuid, getRouteByResource } from "../../../utils/route.js";
 import { getNotionBlocks, getNotionPage } from "../../notion/api.js";
 import {
   getNotionDatabasePropertyHandler,
@@ -30,7 +32,25 @@ export const notion = c.router({
         throw errors.NOT_FOUND({ data: { id: route.id } });
       }
 
-      return { blocks: result.blocks };
+      return {
+        blocks: await Promise.all(
+          // replace links in blocks with the canonical urls of pages
+          result.blocks.map((block) =>
+            replaceBlockUrls(block, async (url) => {
+              const id = extractUuid(url.replace(/^\//, ""));
+
+              if (id && isUuid(id)) {
+                const resource = await getNotionPage(id, _NotionResource);
+                if (resource) {
+                  return getRouteByResource(resource)?.path ?? url;
+                }
+              }
+
+              return url;
+            }),
+          ),
+        ),
+      };
     }),
   ),
 
