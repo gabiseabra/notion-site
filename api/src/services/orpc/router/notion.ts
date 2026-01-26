@@ -91,7 +91,7 @@ export const notion = c.router({
         filter: {
           and: [
             // Only show completed statuses in production
-            process.env.NODE_ENV === "development"
+            env.DEV
               ? undefined
               : {
                   or: BlogPostStatus.options
