@@ -1,17 +1,16 @@
 import { oc } from "@orpc/contract";
-import z from "zod";
 import { BlogPost } from "../dto/blog-posts/index.js";
 import { BlogPostsInput } from "../dto/blog-posts/input.js";
 import {
   Blocks,
   DatabaseErrors,
-  DatabasePropertyResponse,
   DatabaseResponse,
   Metadata,
   ResourceErrors,
   ResourceId,
   ResourceResponse,
 } from "../dto/notion/contracts.js";
+import { NotionDatabase } from "../dto/notion/database.js";
 import { NotionPage } from "../dto/pages/index.js";
 
 export const notion = oc.prefix("/notion").router({
@@ -47,12 +46,12 @@ export const notion = oc.prefix("/notion").router({
     .input(ResourceId)
     .output(ResourceResponse(BlogPost)),
 
-  getBlogPostTags: oc
+  describeBlogPosts: oc
     .route({
-      description: `Get blog post tag options`,
+      description: `Describe blog posts database`,
     })
     .errors(DatabaseErrors("blog posts"))
-    .output(DatabasePropertyResponse(z.string())),
+    .output(NotionDatabase.fromResource(BlogPost)),
 
   queryBlogPosts: oc
     .route({

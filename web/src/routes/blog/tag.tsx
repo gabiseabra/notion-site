@@ -24,9 +24,11 @@ export function Component() {
 
 function TagPageLoader({ tag: tagName }: { tag: string }) {
   const orpc = useOrpc();
-  const allTags = suspend(() => orpc.notion.getBlogPostTags(), [orpc]);
+  const database = suspend(() => orpc.notion.describeBlogPosts(), [orpc]);
 
-  const tag = allTags.find((tag) => compareTags(tagName, tag.name));
+  const tag = database.properties["Tags"].multi_select.options.find((tag) =>
+    compareTags(tagName, tag.name),
+  );
 
   if (!tag) {
     throw new Error(`Tag "${tagName}" does not exist.`);

@@ -3,6 +3,7 @@ import {
   ResourceErrors,
   ResourceId,
 } from "@notion-site/common/dto/notion/contracts.js";
+import { NotionDatabase } from "@notion-site/common/dto/notion/database.js";
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { Route } from "@notion-site/common/dto/route.js";
 import { GenericObject } from "@notion-site/common/types/object.js";
@@ -14,7 +15,7 @@ import {
 import z from "zod";
 import { getRouteByResource, matchRoute } from "../../utils/route.js";
 import {
-  getNotionDatabaseProperty,
+  getNotionDatabase,
   getNotionPage,
   queryNotionDatabase,
   QueryNotionDatabaseOptions,
@@ -109,10 +110,9 @@ export function queryNotionDatabaseHandler<DB extends NotionResource, Input>(
   };
 }
 
-export function getNotionDatabasePropertyHandler<T extends string>(
+export function describeNotionDatabaseHandler<DB extends NotionDatabase>(
   databaseId: string | undefined,
-  property: string,
-  schema: z.ZodType<T>,
+  schema: z.ZodType<DB>,
 ) {
   return async ({
     errors,
@@ -123,14 +123,12 @@ export function getNotionDatabasePropertyHandler<T extends string>(
       throw errors.NO_DATABASE();
     }
 
-    const options = await getNotionDatabaseProperty(databaseId, property);
+    const db = await getNotionDatabase(databaseId, schema);
 
-    return options.map(
-      ({ name, ...option }) =>
-        ({
-          name: schema.parse(name),
-          ...option,
-        }) as const,
-    );
+    if (!db) {
+      throw errors.NOT_FOUND({ data: { id: databaseId } });
+    }
+
+    return db;
   };
 }

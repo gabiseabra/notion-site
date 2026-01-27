@@ -1,3 +1,4 @@
+import { NotionDatabase } from "@notion-site/common/dto/notion/database.js";
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { DistributiveOmit } from "@notion-site/common/types/union.js";
@@ -14,7 +15,6 @@ import {
   type ListBlockChildrenResponse,
   QueryDatabaseParameters,
 } from "@notionhq/client/build/src/api-endpoints.js";
-import { match } from "ts-pattern";
 import z from "zod";
 
 const notionToken = process.env.NOTION_TOKEN;
@@ -123,47 +123,46 @@ export async function queryNotionDatabase<DB extends NotionResource>(
 }
 
 /**
- * Returns all configured options for a database property of type "select", "multi_select", or "status".
+ * Get a notion page by id and parse it with the given schema.
  */
-export async function getNotionDatabaseProperty(
-  databaseId: string,
-  property: string,
-): Promise<
-  {
-    name: string;
-    color: zNotion.primitives.color;
-    description: string | null;
-  }[]
-> {
-  const db = await notion.databases.retrieve({ database_id: databaseId });
-
-  if (!isFullDatabase(db)) {
-    throw new Error("Expected a full database object response.");
-  }
-
-  if (!db.properties[property]) {
-    throw new Error(`Database does not have property ${property}`);
-  }
-
-  return match(db.properties[property])
-    .with({ type: "select" }, (prop) => {
-      return prop.select.options;
+export async function getNotionDatabase<DB extends NotionDatabase>(
+  id: string,
+  schema: z.ZodSchema<DB>,
+) {
+  const response = await notion.databases
+    .retrieve({
+      database_id: id,
     })
-    .with({ type: "multi_select" }, (prop) => {
-      return prop.multi_select.options;
-    })
-    .with({ type: "status" }, (prop) => {
-      return prop.status.options;
-    })
-    .otherwise(() => {
-      throw new Error(
-        `Database property ${property} should be select, multi_select, or status`,
-      );
+    .catch((error) => {
+      if (error instanceof APIResponseError && error.status === 404) {
+        return null;
+      } else {
+        throw error;
+      }
     });
+
+  if (!response) return null;
+
+  if (!isFullDatabase(response)) {
+    throw new Error("Expected a full database response.");
+  }
+
+  const parseResult = schema.safeParse(response);
+
+  if (!parseResult.success) {
+    throw new Error(
+      `Failed to parse database ${id}: ${showError({
+        error: parseResult.error,
+        response,
+      })}`,
+    );
+  }
+
+  return parseResult.data;
 }
 
 /**
- * Get an arbitrary notion page by id and parse it with the given schema.
+ * Get a notion page by id and parse it with the given schema.
  */
 export async function getNotionPage<DB extends NotionResource>(
   id: string,

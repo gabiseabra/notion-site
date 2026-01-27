@@ -6,7 +6,6 @@ import { Route } from "../route.js";
 import { _NotionResource } from "./resource.js";
 
 export const Blocks = z.object({ blocks: zNotion.blocks.block.array() });
-
 export type Blocks = z.infer<typeof Blocks>;
 
 export const Metadata = _NotionResource
@@ -21,11 +20,9 @@ export const Metadata = _NotionResource
     route: Route,
     title: zNotion.properties.title.nullable(),
   });
-
 export type Metadata = z.infer<typeof Metadata>;
 
 export const ResourceId = z.object({ id: z.string().nonempty() });
-
 export type ResourceId = z.infer<typeof ResourceId>;
 
 export function ResourceResponse<DB>(schema: z.ZodSchema<DB>) {
@@ -35,7 +32,6 @@ export function ResourceResponse<DB>(schema: z.ZodSchema<DB>) {
     })
     .and(schema);
 }
-
 export type ResourceResponse<DB> = z.infer<
   ReturnType<typeof ResourceResponse<DB>>
 >;
@@ -54,27 +50,16 @@ export type DatabaseResponse<DB> = z.infer<
   ReturnType<typeof DatabaseResponse<DB>>
 >;
 
-export function DatabasePropertyResponse<T extends string>(
-  schema: z.ZodType<T>,
-) {
-  return z
-    .object({
-      name: schema,
-      color: zNotion.primitives.color,
-      description: z.string().nullable(),
-    })
-    .array();
-}
-
-export type DatabasePropertyResponse<T extends string> = z.infer<
-  ReturnType<typeof DatabasePropertyResponse<T>>
->;
-
 export function DatabaseErrors(name: string) {
   return {
     NO_DATABASE: {
       message: `${sentenceCase(name)} database not configured`,
       status: 501,
+    },
+    NOT_FOUND: {
+      message: `${sentenceCase(name)} database not found`,
+      status: 404,
+      data: ResourceId,
     },
   } as const;
 }

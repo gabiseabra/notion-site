@@ -110,7 +110,13 @@ function BlogPostTagsFilterLoader({
   onChange: (values: string[]) => void;
 }) {
   const orpc = useOrpc();
-  const allTags = suspend(() => orpc.notion.getBlogPostTags(), [orpc]);
+  const database = suspend(() => orpc.notion.describeBlogPosts(), [orpc]);
 
-  return <TagsFilter options={allTags} value={value} onChange={onChange} />;
+  return (
+    <TagsFilter
+      options={database.properties.Tags.multi_select.options}
+      value={value}
+      onChange={onChange}
+    />
+  );
 }

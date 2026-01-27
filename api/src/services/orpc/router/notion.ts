@@ -1,5 +1,6 @@
 import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import { BlogPostStatus } from "@notion-site/common/dto/blog-posts/status.js";
+import { NotionDatabase } from "@notion-site/common/dto/notion/database.js";
 import { _NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { NotionPage } from "@notion-site/common/dto/pages/index.js";
 import { api } from "@notion-site/common/orpc/index.js";
@@ -10,12 +11,11 @@ import {
 import { replaceBlockUrls } from "@notion-site/common/utils/notion.js";
 import { isUuid } from "@notion-site/common/utils/uuid.js";
 import { implement } from "@orpc/server";
-import z from "zod";
 import * as env from "../../../env.js";
 import { extractUuid, getRouteByResource } from "../../../utils/route.js";
 import { getNotionBlocks, getNotionPage } from "../../notion/api.js";
 import {
-  getNotionDatabasePropertyHandler,
+  describeNotionDatabaseHandler,
   getNotionResourceHandler,
   queryNotionDatabaseHandler,
   routeHandler,
@@ -83,11 +83,10 @@ export const notion = c.router({
 
   getBlogPost: c.getBlogPost.handler(getNotionResourceHandler(BlogPost)),
 
-  getBlogPostTags: c.getBlogPostTags.handler(
-    getNotionDatabasePropertyHandler(
+  describeBlogPosts: c.describeBlogPosts.handler(
+    describeNotionDatabaseHandler(
       env.BLOG_POSTS_DATABASE_ID,
-      "Tags",
-      z.string(),
+      NotionDatabase.fromResource(BlogPost),
     ),
   ),
 
