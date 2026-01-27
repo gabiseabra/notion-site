@@ -193,7 +193,6 @@ export type zMultiSelect<T extends string> = ReturnType<typeof multi_select<T>>;
 
 // schema
 export const property = z.union([
-  text,
   number,
   date,
   url,

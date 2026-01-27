@@ -52,12 +52,13 @@ const property_config_base = z.object({
   description: z.string().nullable(),
 });
 
-const select_option_config = z.object({
-  id: z.string(),
-  name: z.string(),
-  color: color,
-  description: z.string().nullable(),
-});
+const select_option_config = <T extends string>(name: z.ZodType<T>) =>
+  z.object({
+    id: z.string(),
+    name,
+    color: color,
+    description: z.string().nullable(),
+  });
 
 export const number = property_config_base.extend({
   type: z.literal("number"),
@@ -75,37 +76,49 @@ export const formula = property_config_base.extend({
 });
 export type formula = z.infer<typeof formula>;
 
-export const select = property_config_base.extend({
-  type: z.literal("select"),
-  select: z.object({
-    options: select_option_config.array(),
-  }),
-});
-export type select = z.infer<typeof select>;
+export function select<T extends string>(options: z.ZodType<T>) {
+  return property_config_base.extend({
+    type: z.literal("select"),
+    select: z.object({
+      options: select_option_config(options).array(),
+    }),
+  });
+}
 
-export const multi_select = property_config_base.extend({
-  type: z.literal("multi_select"),
-  multi_select: z.object({
-    options: select_option_config.array(),
-  }),
-});
-export type multi_select = z.infer<typeof multi_select>;
+export type select<T extends string> = z.infer<zSelect<T>>;
+export type zSelect<T extends string> = ReturnType<typeof select<T>>;
 
-export const status = property_config_base.extend({
-  type: z.literal("status"),
-  status: z.object({
-    options: select_option_config.array(),
-    groups: z
-      .object({
-        id: z.string(),
-        name: z.string(),
-        color: color,
-        option_ids: z.string().array(),
-      })
-      .array(),
-  }),
-});
-export type status = z.infer<typeof status>;
+export function multi_select<T extends string>(options: z.ZodType<T>) {
+  return property_config_base.extend({
+    type: z.literal("multi_select"),
+    multi_select: z.object({
+      options: select_option_config(options).array(),
+    }),
+  });
+}
+
+export type multi_select<T extends string> = z.infer<zMultiSelect<T>>;
+export type zMultiSelect<T extends string> = ReturnType<typeof multi_select<T>>;
+
+export function status<T extends string>(options: z.ZodType<T>) {
+  return property_config_base.extend({
+    type: z.literal("status"),
+    status: z.object({
+      options: select_option_config(options).array(),
+      groups: z
+        .object({
+          id: z.string(),
+          name: z.string(),
+          color: color,
+          option_ids: z.string().array(),
+        })
+        .array(),
+    }),
+  });
+}
+
+export type status<T extends string> = z.infer<zStatus<T>>;
+export type zStatus<T extends string> = ReturnType<typeof status<T>>;
 
 const single_property = z.object({
   type: z.literal("single_property"),
@@ -217,9 +230,9 @@ export type last_edited_time = z.infer<typeof last_edited_time>;
 export const property_config = z.discriminatedUnion("type", [
   number,
   formula,
-  select,
-  multi_select,
-  status,
+  select(z.string()),
+  multi_select(z.string()),
+  status(z.string()),
   relation,
   unique_id,
   title,
