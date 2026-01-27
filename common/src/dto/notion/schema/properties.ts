@@ -9,6 +9,27 @@ export const number = z.object({
 });
 export type Number = z.infer<typeof number>;
 
+// unsupported
+export const formula = z.object({
+  type: z.literal("formula"),
+});
+export type formula = z.infer<typeof formula>;
+
+export const relation = z.object({
+  type: z.literal("relation"),
+  relation: z.object({ id: z.string() }).array(),
+});
+export type relation = z.infer<typeof relation>;
+
+export const unique_id = z.object({
+  type: z.literal("unique_id"),
+  unique_id: z.object({
+    prefix: z.string().nullable(),
+    number: z.number().nullable(),
+  }),
+});
+export type unique_id = z.infer<typeof unique_id>;
+
 export const annotations = z.object({
   bold: z.boolean(),
   italic: z.boolean(),
@@ -29,20 +50,14 @@ export const text = z.object({
 });
 export type text = z.infer<typeof text>;
 
-// unsupposrted
+// unsupported
 export const mention = z.object({ type: z.literal("mention") });
 
-// unsupposrted
+// unsupported
 export const equation = z.object({ type: z.literal("equation") });
 
 export const rich_text_item = z.union([text, mention, equation]).array();
 export type rich_text_item = z.infer<typeof rich_text_item>;
-
-export const rich_text = z.object({
-  type: z.literal("rich_text"),
-  rich_text: rich_text_item,
-});
-export type rich_text = z.infer<typeof rich_text>;
 
 export const title = z.object({
   type: z.literal("title"),
@@ -50,22 +65,29 @@ export const title = z.object({
 });
 export type title = z.infer<typeof title>;
 
-export const date = z.object({
-  type: z.literal("date"),
-  date: z
-    .object({
-      start: z.coerce.date(),
-      end: z.coerce.date().nullable(),
-    })
-    .nullable(),
+export const rich_text = z.object({
+  type: z.literal("rich_text"),
+  rich_text: rich_text_item,
 });
-export type date = z.infer<typeof date>;
+export type rich_text = z.infer<typeof rich_text>;
 
 export const url = z.object({
   type: z.literal("url"),
   url: z.string().nullable(),
 });
 export type url = z.infer<typeof url>;
+
+export const people = z.object({
+  type: z.literal("people"),
+  people: z.object({ id: z.string() }).array(),
+});
+export type people = z.infer<typeof people>;
+
+export const files = z.object({
+  type: z.literal("files"),
+  files: z.union([external, file]).array(),
+});
+export type files = z.infer<typeof files>;
 
 export const email = z.object({
   type: z.literal("email"),
@@ -79,44 +101,22 @@ export const phone_number = z.object({
 });
 export type phone_number = z.infer<typeof phone_number>;
 
-export const files = z.object({
-  type: z.literal("files"),
-  files: z.union([external, file]).array(),
+export const date = z.object({
+  type: z.literal("date"),
+  date: z
+    .object({
+      start: z.coerce.date(),
+      end: z.coerce.date().nullable(),
+    })
+    .nullable(),
 });
-export type files = z.infer<typeof files>;
-
-// unsupported
-export const formula = z.object({
-  type: z.literal("formula"),
-});
-export type formula = z.infer<typeof formula>;
-
-export const unique_id = z.object({
-  type: z.literal("unique_id"),
-  unique_id: z.object({
-    prefix: z.string().nullable(),
-    number: z.number().nullable(),
-  }),
-});
-export type unique_id = z.infer<typeof unique_id>;
+export type date = z.infer<typeof date>;
 
 export const checkbox = z.object({
   type: z.literal("checkbox"),
   checkbox: z.boolean(),
 });
 export type checkbox = z.infer<typeof checkbox>;
-
-export const people = z.object({
-  type: z.literal("people"),
-  people: z.object({ id: z.string() }).array(),
-});
-export type people = z.infer<typeof people>;
-
-export const relation = z.object({
-  type: z.literal("relation"),
-  relation: z.object({ id: z.string() }).array(),
-});
-export type relation = z.infer<typeof relation>;
 
 export const created_by = z.object({
   type: z.literal("created_by"),
@@ -142,22 +142,7 @@ export const last_edited_time = z.object({
 });
 export type last_edited_time = z.infer<typeof last_edited_time>;
 
-// selects
-
-export function status<T extends string>(options: z.ZodType<T>) {
-  return z.object({
-    type: z.literal("status"),
-    status: z
-      .object({
-        name: options,
-        color: color,
-      })
-      .nullable(),
-  });
-}
-
-export type status<T extends string> = z.infer<zStatus<T>>;
-export type zStatus<T extends string> = ReturnType<typeof status<T>>;
+// Generics-heavy property types
 
 export function select<T extends string>(options: z.ZodType<T>) {
   return z.object({
@@ -189,40 +174,63 @@ export function multi_select<T extends string>(options: z.ZodType<T>) {
 export type multi_select<T extends string> = z.infer<zMultiSelect<T>>;
 export type zMultiSelect<T extends string> = ReturnType<typeof multi_select<T>>;
 
-/////
+export function status<T extends string>(options: z.ZodType<T>) {
+  return z.object({
+    type: z.literal("status"),
+    status: z
+      .object({
+        name: options,
+        color: color,
+      })
+      .nullable(),
+  });
+}
 
-// schema
+export type status<T extends string> = z.infer<zStatus<T>>;
+export type zStatus<T extends string> = ReturnType<typeof status<T>>;
+
+// Schema union
+
 export const property = z.union([
   number,
-  date,
-  url,
-  title,
-  rich_text,
-  status(z.string()),
-  select(z.string()),
-  multi_select(z.string()),
-  email,
-  phone_number,
-  people,
-  files,
   formula,
   relation,
   unique_id,
+  title,
+  rich_text,
+  url,
+  people,
+  files,
+  email,
+  phone_number,
+  date,
   checkbox,
   created_by,
   created_time,
   last_edited_by,
   last_edited_time,
+  select(z.string()),
+  multi_select(z.string()),
+  status(z.string()),
 ]);
-// concrete property type
 export type property = z.infer<typeof property>;
-// property schema union type
+
+/**
+ * Narrows the `property` union to the Zod schema for a specific `type`.
+ */
 export type zProperty<T extends property["type"] = property["type"]> = Extract<
   (typeof property)["options"][number],
   zDiscriminatedUnionOption<"type", T>
 >;
 
+/**
+ * A Notion page response `properties` object.
+ */
 export type Properties = Record<string, property>;
+
+/**
+ * Maps a concrete `Properties` shape to its corresponding Zod property schemas.
+ */
 export type zProperties<Props extends Properties = Properties> = {
   [k in keyof Props]: zProperty<Props[k]["type"]>;
 };

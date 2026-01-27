@@ -60,6 +60,21 @@ const select_option_config = <T extends string>(name: z.ZodType<T>) =>
     description: z.string().nullable(),
   });
 
+const single_property = z.object({
+  type: z.literal("single_property"),
+  single_property: z.object({}),
+  database_id: z.string(),
+});
+
+const dual_property = z.object({
+  type: z.literal("dual_property"),
+  dual_property: z.object({
+    synced_property_id: z.string(),
+    synced_property_name: z.string(),
+  }),
+  database_id: z.string(),
+});
+
 export const number = property_config_base.extend({
   type: z.literal("number"),
   number: z.object({
@@ -75,65 +90,6 @@ export const formula = property_config_base.extend({
   }),
 });
 export type formula = z.infer<typeof formula>;
-
-export function select<T extends string>(options: z.ZodType<T>) {
-  return property_config_base.extend({
-    type: z.literal("select"),
-    select: z.object({
-      options: select_option_config(options).array(),
-    }),
-  });
-}
-
-export type select<T extends string> = z.infer<zSelect<T>>;
-export type zSelect<T extends string> = ReturnType<typeof select<T>>;
-
-export function multi_select<T extends string>(options: z.ZodType<T>) {
-  return property_config_base.extend({
-    type: z.literal("multi_select"),
-    multi_select: z.object({
-      options: select_option_config(options).array(),
-    }),
-  });
-}
-
-export type multi_select<T extends string> = z.infer<zMultiSelect<T>>;
-export type zMultiSelect<T extends string> = ReturnType<typeof multi_select<T>>;
-
-export function status<T extends string>(options: z.ZodType<T>) {
-  return property_config_base.extend({
-    type: z.literal("status"),
-    status: z.object({
-      options: select_option_config(options).array(),
-      groups: z
-        .object({
-          id: z.string(),
-          name: z.string(),
-          color: color,
-          option_ids: z.string().array(),
-        })
-        .array(),
-    }),
-  });
-}
-
-export type status<T extends string> = z.infer<zStatus<T>>;
-export type zStatus<T extends string> = ReturnType<typeof status<T>>;
-
-const single_property = z.object({
-  type: z.literal("single_property"),
-  single_property: z.object({}),
-  database_id: z.string(),
-});
-
-const dual_property = z.object({
-  type: z.literal("dual_property"),
-  dual_property: z.object({
-    synced_property_id: z.string(),
-    synced_property_name: z.string(),
-  }),
-  database_id: z.string(),
-});
 
 export const relation = property_config_base.extend({
   type: z.literal("relation"),
@@ -227,12 +183,57 @@ export const last_edited_time = property_config_base.extend({
 });
 export type last_edited_time = z.infer<typeof last_edited_time>;
 
+// Generics-heavy property config types
+
+export function select<T extends string>(options: z.ZodType<T>) {
+  return property_config_base.extend({
+    type: z.literal("select"),
+    select: z.object({
+      options: select_option_config(options).array(),
+    }),
+  });
+}
+
+export type select<T extends string> = z.infer<zSelect<T>>;
+export type zSelect<T extends string> = ReturnType<typeof select<T>>;
+
+export function multi_select<T extends string>(options: z.ZodType<T>) {
+  return property_config_base.extend({
+    type: z.literal("multi_select"),
+    multi_select: z.object({
+      options: select_option_config(options).array(),
+    }),
+  });
+}
+
+export type multi_select<T extends string> = z.infer<zMultiSelect<T>>;
+export type zMultiSelect<T extends string> = ReturnType<typeof multi_select<T>>;
+
+export function status<T extends string>(options: z.ZodType<T>) {
+  return property_config_base.extend({
+    type: z.literal("status"),
+    status: z.object({
+      options: select_option_config(options).array(),
+      groups: z
+        .object({
+          id: z.string(),
+          name: z.string(),
+          color: color,
+          option_ids: z.string().array(),
+        })
+        .array(),
+    }),
+  });
+}
+
+export type status<T extends string> = z.infer<zStatus<T>>;
+export type zStatus<T extends string> = ReturnType<typeof status<T>>;
+
+// Schema union
+
 export const property_config = z.discriminatedUnion("type", [
   number,
   formula,
-  select(z.string()),
-  multi_select(z.string()),
-  status(z.string()),
   relation,
   unique_id,
   title,
@@ -248,11 +249,15 @@ export const property_config = z.discriminatedUnion("type", [
   created_time,
   last_edited_by,
   last_edited_time,
+  select(z.string()),
+  multi_select(z.string()),
+  status(z.string()),
 ]);
-
 export type property_config = z.infer<typeof property_config>;
 
-// property schema union type
+/**
+ * Narrows the `property_config` union to the Zod schema for a specific `type`.
+ */
 export type zPropertyConfig<
   T extends property_config["type"] = property_config["type"],
 > = Extract<
@@ -261,6 +266,10 @@ export type zPropertyConfig<
 >;
 
 export type PropertyConfigs = Record<string, property_config>;
+
+/**
+ * Maps a concrete `PropertyConfigs` shape to its corresponding Zod config schemas.
+ */
 export type zPropertyConfigs<Props extends PropertyConfigs = PropertyConfigs> =
   {
     [k in keyof Props]: zPropertyConfig<Props[k]["type"]>;
