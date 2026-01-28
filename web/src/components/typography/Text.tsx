@@ -36,6 +36,7 @@ export type TextSize = "caption" | "body" | "h1" | "h2" | "h3" | "h4";
 export type InlineAnnotations = {
   size: TextSize;
   color: TextColor;
+  redacted: boolean;
 } & Omit<zNotion.properties.annotations, "color">;
 
 export type BlockAnnotations = {
@@ -91,6 +92,7 @@ export function Span({
   underline,
   strikethrough,
   code,
+  redacted,
   color,
   size,
   style,
@@ -107,6 +109,7 @@ export function Span({
         underline && styles.underline,
         strikethrough && styles.strikethrough,
         code && styles.code,
+        redacted && styles.redacted,
         size && styles[`size-${size}`],
         color && styles[`color-${color}`],
       ]

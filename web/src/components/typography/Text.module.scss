@@ -28,6 +28,10 @@
   font-family: var(--font-monospace);
 }
 
+.redacted {
+  line-break: anywhere;
+}
+
 // Theme palette classes
 @each $name, $_ in color.$colors-codes {
   .#{"color-" + $name} {
@@ -52,14 +56,16 @@
 }
 
 // Sizes
-@each $name, $size in (caption: "var(--font-size-caption)", body: "var(--font-size)") {
+@each $name,
+  $size in (caption: "var(--font-size-caption)", body: "var(--font-size)")
+{
   .#{"size-" + $name} {
     font-size: #{$size};
   }
 }
 
 .size-caption {
-  line-height: calc(var(--line-height) * .75);
+  line-height: calc(var(--line-height) * 0.75);
 }
 
 @for $level from 1 through 4 {

@@ -1,4 +1,5 @@
 import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
+import { isRedacted } from "@notion-site/common/utils/notion.js";
 import { match } from "ts-pattern";
 import { rewriteUrl } from "../../../utils/url.js";
 import { Banner } from "../../feedback/Banner.js";
@@ -19,14 +20,22 @@ export function RichText({
       {data.length ? (
         data.map((item, ix) =>
           match(item)
-            .with({ type: "text" }, (item) => (
-              <MaybeLink
-                key={`${ix}`}
-                to={item.text.link ? rewriteUrl(item.text.link.url) : undefined}
-              >
-                <Span {...item.annotations}>{item.text.content}</Span>
-              </MaybeLink>
-            ))
+            .with({ type: "text" }, (item) =>
+              isRedacted(item) ? (
+                <Span key={ix} redacted>
+                  {item.text.content}
+                </Span>
+              ) : (
+                <MaybeLink
+                  key={`${ix}`}
+                  to={
+                    item.text.link ? rewriteUrl(item.text.link.url) : undefined
+                  }
+                >
+                  <Span {...item.annotations}>{item.text.content}</Span>
+                </MaybeLink>
+              ),
+            )
             .otherwise(() => (
               <Banner type="warning" size="m">
                 Unsupported block

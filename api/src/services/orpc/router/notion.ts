@@ -4,13 +4,20 @@ import { NotionDatabase } from "@notion-site/common/dto/notion/database.js";
 import { _NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { NotionPage } from "@notion-site/common/dto/pages/index.js";
 import { api } from "@notion-site/common/orpc/index.js";
+import { curry, liftM } from "@notion-site/common/utils/fp.js";
 import {
   hasPropertyValue,
   isTruthy,
 } from "@notion-site/common/utils/guards.js";
-import { replaceBlockUrls } from "@notion-site/common/utils/notion.js";
+import {
+  isRedacted,
+  mapBlockText,
+  replaceTextContent,
+  replaceTextUrl,
+} from "@notion-site/common/utils/notion.js";
 import { isUuid } from "@notion-site/common/utils/uuid.js";
 import { implement } from "@orpc/server";
+import { pipe } from "ts-functional-pipe";
 import * as env from "../../../env.js";
 import { extractUuid, getRouteByResource } from "../../../utils/route.js";
 import { getNotionBlocks, getNotionPage } from "../../notion/api.js";
@@ -34,20 +41,31 @@ export const notion = c.router({
 
       return {
         blocks: await Promise.all(
-          // replace links in blocks with the canonical urls of pages
-          result.blocks.map((block) =>
-            replaceBlockUrls(block, async (url) => {
-              const id = extractUuid(url.replace(/^\//, ""));
+          result.blocks.map(
+            pipe(
+              // replace links with the canonical urls
+              curry(liftM(mapBlockText))(
+                replaceTextUrl(async (url) => {
+                  const id = extractUuid(url.replace(/^\//, ""));
 
-              if (id && isUuid(id)) {
-                const resource = await getNotionPage(id, _NotionResource);
-                if (resource) {
-                  return getRouteByResource(resource)?.path ?? url;
-                }
-              }
+                  if (id && isUuid(id)) {
+                    const resource = await getNotionPage(id, _NotionResource);
+                    if (resource) {
+                      return getRouteByResource(resource)?.path ?? url;
+                    }
+                  }
 
-              return url;
-            }),
+                  return url;
+                }),
+              ),
+
+              // replace redacted text
+              curry(liftM(mapBlockText))(
+                replaceTextContent(async (content, text) =>
+                  isRedacted(text) ? "█".repeat(content.length) : content,
+                ),
+              ),
+            ),
           ),
         ),
       };
