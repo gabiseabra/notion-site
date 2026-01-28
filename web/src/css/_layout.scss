@@ -10,8 +10,8 @@
   --breakpoint-s: #{layout.$breakpoint-s};
   --breakpoint-m: #{layout.$breakpoint-m};
 
-  --content-width: #{layout.$content-width};
-  --content-gutter: #{layout.$content-gutter};
+  --width-content: #{layout.$width-content};
+  --gutter-content: #{layout.$gutter-content};
 }
 
 html, body, #root {

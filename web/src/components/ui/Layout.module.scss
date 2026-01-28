@@ -4,12 +4,12 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-width: min(#{layout.$content-width}, 100vw);
+  max-width: min(#{layout.$width-content}, 100vw);
   margin: auto;
 
   @include layout.fit-content {
-    margin: 0 layout.$content-gutter;
-    max-width: calc(100vw - #{layout.$content-gutter * 2});
+    margin: 0 layout.$gutter-content;
+    max-width: calc(100vw - #{layout.$gutter-content * 2});
   }
 
   & > header {

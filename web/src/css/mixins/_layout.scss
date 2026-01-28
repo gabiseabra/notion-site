@@ -1,8 +1,8 @@
 $breakpoint-s: 450px;
 $breakpoint-m: 800px;
-$content-width: 800px;
+$width-content: 800px;
 // Min. offset from the content to the edge of the viewport
-$content-gutter: 20px;
+$gutter-content: 20px;
 
 @mixin breakpoint($size) {
   @if $size == "s" {
@@ -24,7 +24,7 @@ $content-gutter: 20px;
 
 // Applies the @content when the viewport fits the $content-width
 @mixin fit-content {
-  @media screen and (max-width: $content-width + ($content-gutter * 2)) {
+  @media screen and (max-width: $width-content + ($gutter-content * 2)) {
     @content
   }
 }
