@@ -64,7 +64,7 @@ const statuses: TagsFilterProps<BlogPostStatus>["options"] = (
     { name: "Draft", color: "gray" },
   ] as const
 )
-  .filter(({ name }) => env.DEV || BlogPostStatus.isComplete(name))
+  .filter(({ name }) => env.DEV || BlogPostStatus.isCompleted(name))
   .map((option) => ({
     ...option,
     status: BlogPostStatus.status(option.name),

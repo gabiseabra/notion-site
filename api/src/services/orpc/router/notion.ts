@@ -114,7 +114,7 @@ export const notion = c.router({
               ? undefined
               : {
                   or: BlogPostStatus.options
-                    .filter(BlogPostStatus.isComplete)
+                    .filter(BlogPostStatus.isCompleted)
                     .map((status) => ({
                       property: "Status" as const,
                       status: { equals: status },

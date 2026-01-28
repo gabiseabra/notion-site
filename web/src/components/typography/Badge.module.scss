@@ -33,7 +33,7 @@
 
 .status-empty,
 .status-in-progress,
-.status-complete {
+.status-completed {
   position: relative;
   padding-left: calc(var(--space) * 2 + 6px);
 
@@ -70,7 +70,7 @@
   }
 }
 
-.status-complete {
+.status-completed {
   &::before {
     background: currentColor;
   }

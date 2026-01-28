@@ -15,13 +15,13 @@ export const BlogPostStatus = Object.assign(zBlogPostStatus, {
     return status === "In Review";
   },
 
-  isComplete(status: BlogPostStatus) {
+  isCompleted(status: BlogPostStatus) {
     return status === "Archived" || status === "Published";
   },
 
   status(status: BlogPostStatus): Status {
     return match(status)
-      .when(BlogPostStatus.isComplete, () => "completed" as const)
+      .when(BlogPostStatus.isCompleted, () => "completed" as const)
       .when(BlogPostStatus.isInProgress, () => "in-progress" as const)
       .when(BlogPostStatus.isEmpty, () => "empty" as const)
       .exhaustive();
