@@ -1,3 +1,12 @@
+/**
+ * Responsive helpers for conditional rendering by breakpoint.
+ *
+ * @example
+ * <Breakpoint.Switch>
+ *   <Breakpoint.UpTo size="m">Small or medium</Breakpoint.UpTo>
+ *   <Breakpoint.Else>Large</Breakpoint.Else>
+ * </Breakpoint.Switch>
+ */
 import { ComponentProps, ReactElement, ReactNode, useMemo } from "react";
 import { match } from "ts-pattern";
 import * as css from "../../css/index.js";
@@ -10,22 +19,33 @@ type BreakpointProps = {
   children: ReactNode;
 };
 
-function BreakpointOnly({ size, children }: BreakpointProps) {
+/**
+ * Render children only when the current breakpoint matches `size`.
+ */ function BreakpointOnly({ size, children }: BreakpointProps) {
   const bp = useBreakpoint();
 
   return bp && Breakpoint.compare(bp, size) == 0 ? children : null;
 }
 
+/**
+ * Render children when the current breakpoint is up to (<=) `size`.
+ */
 function BreakpointUpTo({ size, children }: BreakpointProps) {
   const bp = useBreakpoint();
 
   return bp && Breakpoint.compare(bp, size) <= 0 ? children : null;
 }
 
+/**
+ * Fallback branch for Breakpoint.Switch.
+ */
 function BreakpointElse({ children }: { children: ReactNode }) {
   return children;
 }
 
+/**
+ * Render the first matching breakpoint branch.
+ */
 function BreakpointSwitch({
   children,
 }: {
@@ -59,6 +79,9 @@ function BreakpointSwitch({
   );
 }
 
+/**
+ * Determine the current breakpoint from window width.
+ */
 function useBreakpoint() {
   const { width } = useWindowSize();
   const bp = useMemo(
@@ -76,6 +99,9 @@ function useBreakpoint() {
 }
 
 export const Breakpoint = {
+  /**
+   * Compare two breakpoints with s < m < l ordering.
+   */
   compare(a: Breakpoint, b: Breakpoint): 1 | 0 | -1 {
     const order = ["s", "m", "l"] as const;
     const diff = order.indexOf(a) - order.indexOf(b);

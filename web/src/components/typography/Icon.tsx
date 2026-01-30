@@ -2,11 +2,36 @@ import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { omit } from "@notion-site/common/utils/object.js";
 import { CSSProperties, ReactNode } from "react";
+import { match } from "ts-pattern";
 import * as css from "../../css/index.js";
 import { MarginProps, PaddingProps } from "../../css/index.js";
-import styles from "./IconButton.module.scss";
+import styles from "./Icon.module.scss";
 
-export type IconButtonProps = {
+type IconProps = {
+  size: IconControlProps["size"];
+  icon: zNotion.media.icon;
+};
+
+/**
+ * Renders a Notion icon.
+ * @direction inline
+ */
+export function Icon({ icon, size }: IconProps) {
+  return (
+    <IconControl as="span" color="currentColor" size={size}>
+      {match(icon)
+        .with({ type: "emoji" }, (icon) => icon.emoji)
+        .with({ type: "custom_emoji" }, (icon) => (
+          <img src={icon.custom_emoji.url} />
+        ))
+        .with({ type: "external" }, (icon) => <img src={icon.external.url} />)
+        .with({ type: "file" }, (icon) => <img src={icon.file.url} />)
+        .exhaustive()}
+    </IconControl>
+  );
+}
+
+export type IconControlProps = {
   as: "span" | "a" | "button";
 
   size: "xs" | "s" | "m" | "l";
@@ -26,7 +51,7 @@ export type IconButtonProps = {
 /**
  * @direction inline
  */
-export function IconButton({
+export function IconControl({
   as: Component,
   size,
   color,
@@ -36,7 +61,7 @@ export function IconButton({
   style,
   onClick,
   ...props
-}: IconButtonProps) {
+}: IconControlProps) {
   return (
     <Component
       className={[

@@ -5,7 +5,7 @@ import * as env from "../../../env.js";
 import { ColProps, Row } from "../../layout/FlexBox.js";
 import { Badge } from "../../typography/Badge.js";
 import { Span } from "../../typography/Text.js";
-import { ResourceHeader } from "../resources/ResourceHeader.js";
+import { ResourceHeader } from "../notion/ResourceHeader.js";
 
 export function BlogPostHeader({
   blogPost,

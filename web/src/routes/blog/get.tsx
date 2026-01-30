@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router";
 import { PageSuspenseBoundary } from "../../components/feedback/SuspenseBoundary.js";
-import { BlogPostLoader } from "../../components/notion/blog-posts/BlogPostLoader.js";
-import { DynamicBreadcrumbs } from "../../components/notion/navigation/DynamicBreadcrumbs.js";
+import { BlogPostLoader } from "../../components/modules/blog-posts/BlogPostLoader.js";
+import { DynamicBreadcrumbs } from "../../components/navigation/DynamicBreadcrumbs.js";
 
 export const path = "/blog/:id";
 

@@ -31,7 +31,7 @@ export function Favicon({ icon }: { icon: zNotion.media.icon }) {
     .with({ type: "external" }, ({ external }) => (
       <link rel="icon" type={getImageType(external.url)} href={external.url} />
     ))
-    .otherwise(() => null);
+    .exhaustive();
 }
 
 function getImageType(url: string) {

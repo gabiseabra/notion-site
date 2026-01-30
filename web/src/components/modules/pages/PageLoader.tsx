@@ -3,11 +3,11 @@ import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { titleToString } from "@notion-site/common/utils/notion.js";
 import * as env from "../../../env.js";
 import { Head } from "../../../providers/HeadProvider.js";
+import { Favicon } from "../../typography/Favicon.js";
 import {
   ResourceLoader,
   ResourceLoaderProps,
-} from "../resources/ResourceLoader.js";
-import { Favicon } from "../typography/Favicon.js";
+} from "../notion/ResourceLoader.js";
 
 export type NotionPageLoaderProps = Omit<
   ResourceLoaderProps<NotionPage>,

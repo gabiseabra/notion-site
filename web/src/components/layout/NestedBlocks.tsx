@@ -1,5 +1,5 @@
 /**
- * @module @notion-site/web/components/notion/NestedBlocks.ts
+ * @module @notion-site/web/components/layout/NestedBlocks.ts
  * Notion returns blocks as a flat list with parent references. This module derives a
  * hierarchy by resolving each block’s descendants from the same response set, then
  * produces a top-level render stream where consecutive list items are grouped into
@@ -9,13 +9,12 @@ import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { Fragment } from "react";
 import { match } from "ts-pattern";
 import { Banner } from "../feedback/Banner.js";
+import { LinkToPage } from "../navigation/LinkToPage.js";
+import { RichText } from "../typography/RichText.js";
 import { BlockAnnotations, Text } from "../typography/Text.js";
-import { LinkToPage } from "./navigation/LinkToPage.js";
-import { RichText } from "./typography/RichText.js";
 
 /**
  * Accepts a flat block array and renders it recursively.
- * Each top-leven block
  * @direction block
  */
 export function NestedBlocks({

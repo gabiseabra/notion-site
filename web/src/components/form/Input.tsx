@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { IoIosClose } from "react-icons/io";
-import { IconButton } from "../typography/IconButton.js";
+import { IconControl } from "../typography/Icon.js";
 import styles from "./Input.module.scss";
 
 type InputProps = {
@@ -47,7 +47,7 @@ export function Input({
         />
 
         {!!value && type === "search" && onClear && (
-          <IconButton
+          <IconControl
             as="button"
             color="default"
             title={label ? `Clear ${label}` : "Clear search"}
@@ -55,7 +55,7 @@ export function Input({
             onClick={onClear}
           >
             <IoIosClose />
-          </IconButton>
+          </IconControl>
         )}
 
         {right}

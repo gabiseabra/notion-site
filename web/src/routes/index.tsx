@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import { Favicon } from "../components/notion/typography/Favicon.js";
+import { Favicon } from "../components/typography/Favicon.js";
 import { Layout } from "../components/ui/Layout.js";
 import * as env from "../env.js";
 import { Head } from "../providers/HeadProvider.js";

@@ -7,7 +7,7 @@ import React, { ReactNode, useMemo, useState } from "react";
 import { FaArrowsRotate } from "react-icons/fa6";
 import { Button } from "../form/Button.js";
 import { Col } from "../layout/FlexBox.js";
-import { IconButton } from "../typography/IconButton.js";
+import { IconControl } from "../typography/Icon.js";
 import { Text } from "../typography/Text.js";
 import { SimlishSpinner } from "./SimlishSpinner.js";
 
@@ -115,9 +115,9 @@ export function PageSuspenseBoundary({
                   onRetry();
                 }}
               >
-                <IconButton color="currentColor" as="span" size="xs">
+                <IconControl color="currentColor" as="span" size="xs">
                   <FaArrowsRotate />
-                </IconButton>
+                </IconControl>
                 Retry
               </Button>
             )}

@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { IoIosClose } from "react-icons/io";
-import { IconButton } from "../typography/IconButton.js";
+import { IconControl } from "../typography/Icon.js";
 import styles from "./Modal.module.scss";
 
 export type ModalProps = {
@@ -27,7 +27,7 @@ export function Modal({ open, onClose, children, title, footer }: ModalProps) {
         <header>
           <h1 className={styles.title}>{title}</h1>
 
-          <IconButton
+          <IconControl
             as="button"
             color="default"
             size="m"
@@ -36,7 +36,7 @@ export function Modal({ open, onClose, children, title, footer }: ModalProps) {
             onClick={onClose}
           >
             <IoIosClose />
-          </IconButton>
+          </IconControl>
         </header>
 
         <div className={styles.body}>{children}</div>

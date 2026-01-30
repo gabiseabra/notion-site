@@ -14,6 +14,9 @@ export type BadgeProps = {
   style?: CSSProperties;
 };
 
+/**
+ * @direction inline
+ */
 export function Badge({
   color,
   size,

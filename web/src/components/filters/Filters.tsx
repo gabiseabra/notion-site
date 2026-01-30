@@ -6,7 +6,7 @@ import { Breakpoint } from "../layout/Breakpoint.js";
 import { Col, Row } from "../layout/FlexBox.js";
 import { Modal } from "../layout/Modal.js";
 import { Popover } from "../layout/Popover.js";
-import { IconButton } from "../typography/IconButton.js";
+import { IconControl } from "../typography/Icon.js";
 import { Span } from "../typography/Text.js";
 
 type FilterProps = {
@@ -40,9 +40,9 @@ export function Filters({ title, query, filters }: FilterProps) {
       onClear={query.onClear}
       placeholder={query.placeholder}
       left={
-        <IconButton color="default" as="span" size="m">
+        <IconControl color="default" as="span" size="m">
           <IoSearch />
-        </IconButton>
+        </IconControl>
       }
       right={
         !!filters?.length && (
@@ -103,7 +103,7 @@ function FiltersIcon({
   onClick: () => void;
 }) {
   return (
-    <IconButton
+    <IconControl
       as="button"
       size="s"
       title="Filters"
@@ -112,7 +112,7 @@ function FiltersIcon({
       badge={activeCount ? `${activeCount}` : undefined}
     >
       <IoFilter />
-    </IconButton>
+    </IconControl>
   );
 }
 

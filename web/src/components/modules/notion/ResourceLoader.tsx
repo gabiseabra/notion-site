@@ -3,7 +3,7 @@ import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { ReactNode } from "react";
 import { clear, suspend } from "suspend-react";
 import { OrpcContext, useOrpc } from "../../../providers/OrpcProvider.js";
-import { NestedBlocks } from "../NestedBlocks.js";
+import { NestedBlocks } from "../../layout/NestedBlocks.js";
 import { ResourceHeader } from "./ResourceHeader.js";
 
 export type ResourceLoaderProps<DB extends NotionResource> = {

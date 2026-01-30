@@ -2,7 +2,7 @@ import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import { useNavigate } from "react-router";
 import { EmptyState } from "../../feedback/EmptyState.js";
 import { Col } from "../../layout/FlexBox.js";
-import { ResourceList } from "../resources/ResourceList.js";
+import { ResourceList } from "../notion/ResourceList.js";
 import { BlogPostHeader } from "./BlogPostHeader.js";
 
 export function BlogPostList({ items }: { items: BlogPost[] }) {
