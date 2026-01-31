@@ -1,5 +1,5 @@
+import { Text } from "../display/Text.js";
 import { Col } from "../layout/FlexBox.js";
-import { Text } from "../typography/Text.js";
 
 export function EmptyState({ title }: { title: string }) {
   return (

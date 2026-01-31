@@ -1,11 +1,11 @@
 import { Link, useParams } from "react-router";
 import { suspend } from "suspend-react";
+import { Badge } from "../../components/display/Badge.js";
+import { Favicon } from "../../components/display/Favicon.js";
+import { Text } from "../../components/display/Text.js";
 import { PageSuspenseBoundary } from "../../components/feedback/SuspenseBoundary.js";
 import { BlogPostListLoader } from "../../components/modules/blog-posts/BlogPostListLoader.js";
 import { Breadcrumbs } from "../../components/navigation/Breadcrumbs.js";
-import { Badge } from "../../components/typography/Badge.js";
-import { Favicon } from "../../components/typography/Favicon.js";
-import { Text } from "../../components/typography/Text.js";
 import * as env from "../../env.js";
 import { Head } from "../../providers/HeadProvider.js";
 import { useOrpc } from "../../providers/OrpcProvider.js";

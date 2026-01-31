@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { IoIosClose } from "react-icons/io";
-import { IconControl } from "../typography/Icon.js";
+import { IconControl } from "../display/Icon.js";
 import styles from "./Modal.module.scss";
 
 export type ModalProps = {

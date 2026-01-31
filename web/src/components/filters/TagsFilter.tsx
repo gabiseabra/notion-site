@@ -1,9 +1,9 @@
 import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { Status } from "@notion-site/common/dto/primitives.js";
+import { Badge } from "../display/Badge.js";
+import { Text } from "../display/Text.js";
 import { Row } from "../layout/FlexBox.js";
-import { Tooltip } from "../layout/Tooltip.js";
-import { Badge } from "../typography/Badge.js";
-import { Text } from "../typography/Text.js";
+import { Tooltip } from "../overlays/Tooltip.js";
 
 export type TagsFilterProps<T extends string> = {
   options: {

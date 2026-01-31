@@ -1,11 +1,11 @@
 import { BlogPostsInput } from "@notion-site/common/dto/blog-posts/input.js";
 import { useState } from "react";
 import { clear } from "suspend-react";
+import { Favicon } from "../../components/display/Favicon.js";
 import { PageSuspenseBoundary } from "../../components/feedback/SuspenseBoundary.js";
 import { BlogPostFilters } from "../../components/filters/BlogPostFilters.js";
 import { Col } from "../../components/layout/FlexBox.js";
 import { BlogPostListLoader } from "../../components/modules/blog-posts/BlogPostListLoader.js";
-import { Favicon } from "../../components/typography/Favicon.js";
 import * as env from "../../env.js";
 import { useDebounce } from "../../hooks/useDebounce.js";
 import { Head } from "../../providers/HeadProvider.js";

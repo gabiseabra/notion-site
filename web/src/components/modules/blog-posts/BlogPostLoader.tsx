@@ -2,7 +2,7 @@ import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import { titleToString } from "@notion-site/common/utils/notion.js";
 import * as env from "../../../env.js";
 import { Head } from "../../../providers/HeadProvider.js";
-import { Favicon } from "../../typography/Favicon.js";
+import { Favicon } from "../../display/Favicon.js";
 import {
   ResourceLoader,
   ResourceLoaderProps,

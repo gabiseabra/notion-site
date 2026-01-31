@@ -4,7 +4,7 @@ import { hash } from "@notion-site/common/utils/hash.js";
 import { useEffect, useState, useTransition } from "react";
 import { suspend } from "suspend-react";
 import { useOrpc } from "../../../providers/OrpcProvider.js";
-import { Button } from "../../form/Button.js";
+import { Button } from "../../inputs/Button.js";
 import { BlogPostList } from "./BlogPostList.js";
 
 export function BlogPostListLoader({

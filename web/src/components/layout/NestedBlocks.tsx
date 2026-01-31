@@ -8,10 +8,10 @@
 import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { Fragment } from "react";
 import { match } from "ts-pattern";
+import { RichText } from "../display/RichText.js";
+import { BlockAnnotations, Text } from "../display/Text.js";
 import { Banner } from "../feedback/Banner.js";
 import { LinkToPage } from "../navigation/LinkToPage.js";
-import { RichText } from "../typography/RichText.js";
-import { BlockAnnotations, Text } from "../typography/Text.js";
 
 /**
  * Accepts a flat block array and renders it recursively.

@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { IoIosClose } from "react-icons/io";
-import { IconControl } from "../typography/Icon.js";
+import { IconControl } from "../display/Icon.js";
 import styles from "./Input.module.scss";
 
 type InputProps = {

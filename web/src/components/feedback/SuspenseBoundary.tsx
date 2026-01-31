@@ -1,14 +1,14 @@
-import { shuffle } from "@notion-site/common/utils/array.js";
 import {
   extractErrorMessage,
   isErrorRecoverable,
 } from "@notion-site/common/utils/error.js";
-import React, { ReactNode, useMemo, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { FaArrowsRotate } from "react-icons/fa6";
-import { Button } from "../form/Button.js";
+import { IconControl } from "../display/Icon.js";
+import { Text } from "../display/Text.js";
+import { Button } from "../inputs/Button.js";
 import { Col } from "../layout/FlexBox.js";
-import { IconControl } from "../typography/Icon.js";
-import { Text } from "../typography/Text.js";
+import { KaomojiBanner } from "./KaomojiBanner.js";
 import { SimlishSpinner } from "./SimlishSpinner.js";
 
 export type SuspenseBoundaryProps = {
@@ -55,33 +55,6 @@ export function PageSuspenseBoundary({
   ...props
 }: PageSuspenseBoundaryProps) {
   const [retryKey, setRetryKey] = useState(0);
-  const errorKaomoji = useMemo(
-    () =>
-      shuffle([
-        "∘ ∘ ∘ ( °ヮ° ) ?",
-        "(╥﹏╥)",
-        "｡°(°.◜ᯅ◝°)°｡",
-        "(｡ᵕ ◞ _◟)",
-        "( ‘• ω • `)",
-        "(ง ͠ಥ_ಥ)ง",
-        "ᕦ(˵ಥ_ಥ)ᕤ",
-        "⁽⁽(੭ꐦ •̀Д•́ )੭*⁾⁾",
-        "(๑•̀ㅁ•́๑)✧",
-        "(๑•́o•̀๑)",
-        "( ｡ •̀ ᴖ •́ ｡)",
-        "(ノಠ益ಠ)ノ彡┻━┻",
-        "(ಥ益ಥ)ノ彡┻━┻",
-        "(｡•ˇ‸ˇ•｡)",
-        "(💧́ಠ‸ಠ )",
-        "(ꐦ•̀ㅁ•́) ! ! !",
-        "(ಠ ʖ̯ ಠ)",
-        "(ಥ﹏ಥ)ノ",
-        "(ᕤಠᗣಠ)ᕤ",
-        "(🤌ಠ益ಠ)🤌",
-      ]).pop()!,
-    [retryKey],
-  );
-
   return (
     <SuspenseBoundary
       key={retryKey}
@@ -92,37 +65,28 @@ export function PageSuspenseBoundary({
         </Col>
       }
       error={(error) => (
-        <Col flex={1} alignX="center" alignY="center">
-          <div style={{ textAlign: "center" }}>
-            <Text as="p" size="h1">
-              {errorKaomoji}
-            </Text>
+        <KaomojiBanner key={retryKey}>
+          <Text as="p">{`There was an error loading ${resourceName}. It says:`}</Text>
 
-            <p>&nbsp;</p>
+          <Text as="p">"{extractErrorMessage(error)}"</Text>
 
-            <Text as="h3">Damn,</Text>
-            <Text as="p">{`There was an error loading ${resourceName}. It says:`}</Text>
+          <p>&nbsp;</p>
 
-            <Text as="p">"{extractErrorMessage(error)}"</Text>
-
-            <p>&nbsp;</p>
-
-            {onRetry && isErrorRecoverable(error) && (
-              <Button
-                color="red"
-                onClick={() => {
-                  setRetryKey((k) => k + 1);
-                  onRetry();
-                }}
-              >
-                <IconControl color="currentColor" as="span" size="xs">
-                  <FaArrowsRotate />
-                </IconControl>
-                Retry
-              </Button>
-            )}
-          </div>
-        </Col>
+          {onRetry && isErrorRecoverable(error) && (
+            <Button
+              color="red"
+              onClick={() => {
+                setRetryKey((k) => k + 1);
+                onRetry();
+              }}
+            >
+              <IconControl color="currentColor" as="span" size="xs">
+                <FaArrowsRotate />
+              </IconControl>
+              Retry
+            </Button>
+          )}
+        </KaomojiBanner>
       )}
     />
   );

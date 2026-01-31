@@ -2,9 +2,9 @@ import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import { BlogPostStatus } from "@notion-site/common/dto/blog-posts/status.js";
 import { Link } from "react-router";
 import * as env from "../../../env.js";
+import { Badge } from "../../display/Badge.js";
+import { Span } from "../../display/Text.js";
 import { ColProps, Row } from "../../layout/FlexBox.js";
-import { Badge } from "../../typography/Badge.js";
-import { Span } from "../../typography/Text.js";
 import { ResourceHeader } from "../notion/ResourceHeader.js";
 
 export function BlogPostHeader({
