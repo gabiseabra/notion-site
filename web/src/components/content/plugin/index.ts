@@ -27,7 +27,7 @@ export type ContentEditorPlugin<TDetail = ContentEditableProps> = (
 export const defaultPlugin = composePlugins(
   setupPlugin({}),
   historyPlugin,
-  plainTextPlugin({}),
+  plainTextPlugin({ multiline: true }),
   blockNavigationPlugin,
   blockMutationPlugin,
 );
