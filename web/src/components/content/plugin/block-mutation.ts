@@ -35,40 +35,40 @@ export const blockMutationPlugin: ContentEditorPlugin =
         const prevBlock = editor.blocks[index - 1];
         const prevElement =
           prevBlock && editor.blocksRef.current.get(prevBlock.id);
+        const currentBlock = editor.flush()
+          ? editor.history.getState().find((b) => b.id === block.id)
+          : block;
 
-        if (!prevBlock || !prevElement) return;
+        if (
+          !prevBlock ||
+          !prevElement ||
+          !currentBlock ||
+          !narrowBlock(
+            currentBlock,
+            ...zNotion.blocks.rich_text_type.options,
+          ) ||
+          !narrowBlock(prevBlock, ...zNotion.blocks.rich_text_type.options)
+        )
+          return;
 
         const nextSelection = {
           start: getMaxSelectionOffset(prevElement),
           end: null,
         };
 
-        if (getMaxSelectionOffset(e.currentTarget) === 0) {
-          // delete empty block
-          editor.flush();
-          editor.remove(block);
-        } else {
-          // merge with previous block
-          if (
-            !narrowBlock(block, ...zNotion.blocks.rich_text_type.options) ||
-            !narrowBlock(prevBlock, ...zNotion.blocks.rich_text_type.options)
-          )
-            return;
-
-          editor.flush();
-          editor.transaction(() => {
-            editor.update(
-              mapBlock(prevBlock, (node) => ({
-                ...node,
-                rich_text: [
-                  ...node.rich_text,
-                  ...extractBlock(block).rich_text,
-                ],
-              })),
-            );
-            editor.remove(block);
-          });
-        }
+        editor.transaction(() => {
+          // merge any text on the tail of this block into the previous block
+          editor.update(
+            mapBlock(prevBlock, (node) => ({
+              ...node,
+              rich_text: [
+                ...node.rich_text,
+                ...extractBlock(currentBlock).rich_text,
+              ],
+            })),
+          );
+          editor.remove(currentBlock);
+        });
 
         editor.commit((editor) => {
           const element = editor.blocksRef.current.get(prevBlock.id);
@@ -79,13 +79,18 @@ export const blockMutationPlugin: ContentEditorPlugin =
 
         e.preventDefault();
       } else if (e.key === "Enter" && !e.shiftKey) {
+        const currentBlock = editor.flush()
+          ? editor.history.getState().find((b) => b.id === block.id)
+          : block;
+
+        if (!currentBlock) return;
+
         const { left, right } = splitBlock(
-          block,
+          currentBlock,
           selection.start,
           selection.end ? selection.start - selection.end : undefined,
         );
 
-        editor.flush();
         editor.split(left, right);
 
         editor.commit((editor) => {
