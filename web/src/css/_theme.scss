@@ -75,11 +75,7 @@ html {
 
 body {
   margin: 0;
-  background-image: linear-gradient(
-      to bottom,
-      var(--bg-from),
-      var(--bg-to)
-  );
+  background-image: linear-gradient(to bottom, var(--bg-from), var(--bg-to));
   background-repeat: no-repeat;
   background-attachment: fixed;
 }

@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 export function uuidEquals(a: string, b: string) {
   return normalizeUuid(a) === normalizeUuid(b);
 }
@@ -10,4 +12,8 @@ export function isUuid(uuid: string) {
   return /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i.test(
     uuid,
   );
+}
+
+export function uuid() {
+  return uuidv4();
 }

@@ -1,6 +1,6 @@
 import { NotionPage } from "@notion-site/common/dto/pages/index.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
-import { titleToString } from "@notion-site/common/utils/notion.js";
+import { titleToString } from "@notion-site/common/utils/notion/properties.js";
 import * as env from "../../../env.js";
 import { Head } from "../../../providers/HeadProvider.js";
 import { Favicon } from "../../display/Favicon.js";

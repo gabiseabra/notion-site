@@ -51,10 +51,16 @@ export const text = z.object({
 export type text = z.infer<typeof text>;
 
 // unsupported
-export const mention = z.object({ type: z.literal("mention") });
+export const mention = z.object({
+  type: z.literal("mention"),
+  mention: z.object({}),
+});
 
 // unsupported
-export const equation = z.object({ type: z.literal("equation") });
+export const equation = z.object({
+  type: z.literal("equation"),
+  equation: z.object({}),
+});
 
 export const rich_text_item = z.union([text, mention, equation]).array();
 export type rich_text_item = z.infer<typeof rich_text_item>;

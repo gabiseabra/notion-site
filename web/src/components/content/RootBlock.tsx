@@ -1,36 +1,43 @@
 /**
- * @module @notion-site/web/components/layout/NestedBlocks.ts
  * Notion returns blocks as a flat list with parent references. This module derives a
  * hierarchy by resolving each block’s descendants from the same response set, then
  * produces a top-level render stream where consecutive list items are grouped into
  * list containers (bulleted/numbered).
  */
 import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
-import { Fragment } from "react";
+import { Fragment, ReactNode } from "react";
 import { match } from "ts-pattern";
-import { RichText } from "../display/RichText.js";
-import { BlockAnnotations, Text } from "../display/Text.js";
-import { Banner } from "../feedback/Banner.js";
-import { LinkToPage } from "../navigation/LinkToPage.js";
+import { Block } from "./Block.js";
+
+type RootBlockProps = {
+  value: zNotion.blocks.block[];
+  render?: (block: zNotion.blocks.block, path: BlockPath) => ReactNode;
+  path?: BlockPath;
+};
 
 /**
  * Accepts a flat block array and renders it recursively.
  * @direction block
  */
-export function NestedBlocks({
-  blocks,
-  indent = 0,
-}: { blocks: zNotion.blocks.block[] } & Partial<BlockAnnotations>) {
+export function RootBlock({
+  value,
+  render = (block, { indent }) => <Block value={block} indent={indent} />,
+  path = new BlockPath(),
+}: RootBlockProps) {
   return (
     <>
-      {getRootBlocks(blocks).map((block) =>
+      {getRootBlocks(value).map((block) =>
         match(block)
           .with({ type: "paragraph" }, ({ block }) => (
             <Fragment key={block.id}>
-              <Block data={block} indent={indent} />
+              {render(block, path)}
 
               {block.children.length ? (
-                <NestedBlocks blocks={block.children} indent={indent + 1} />
+                <RootBlock
+                  value={block.children}
+                  render={render}
+                  path={path.concat(block)}
+                />
               ) : null}
             </Fragment>
           ))
@@ -38,10 +45,14 @@ export function NestedBlocks({
             <ul key={block.id}>
               {children.map((block) => (
                 <li key={block.id}>
-                  <Block data={block} />
+                  {render(block, path)}
 
                   {block.children.length ? (
-                    <NestedBlocks blocks={block.children} />
+                    <RootBlock
+                      value={block.children}
+                      render={render}
+                      path={path.concat(block)}
+                    />
                   ) : null}
                 </li>
               ))}
@@ -51,10 +62,14 @@ export function NestedBlocks({
             <ol key={block.id}>
               {children.map((block) => (
                 <li key={block.id}>
-                  <Block data={block} />
+                  {render(block, path)}
 
                   {block.children.length ? (
-                    <NestedBlocks blocks={block.children} />
+                    <RootBlock
+                      value={block.children}
+                      render={render}
+                      path={path.concat(block)}
+                    />
                   ) : null}
                 </li>
               ))}
@@ -62,69 +77,6 @@ export function NestedBlocks({
           ))
           .exhaustive(),
       )}
-    </>
-  );
-}
-
-/**
- * Renders a single block node according to its type.
- */
-function Block({
-  data,
-  indent,
-}: {
-  data: zNotion.blocks.block;
-  indent?: number;
-}) {
-  return (
-    <>
-      {match(data)
-        .with({ type: "paragraph" }, (data) => (
-          <Text as="p" indent={indent} color={data.paragraph.color}>
-            <RichText data={data.paragraph.rich_text} />
-          </Text>
-        ))
-        .with({ type: "bulleted_list_item" }, (data) => (
-          <Text as="p" indent={indent} color={data.bulleted_list_item.color}>
-            <RichText data={data.bulleted_list_item.rich_text} />
-          </Text>
-        ))
-        .with({ type: "numbered_list_item" }, (data) => (
-          <Text as="p" indent={indent} color={data.numbered_list_item.color}>
-            <RichText data={data.numbered_list_item.rich_text} />
-          </Text>
-        ))
-        .with({ type: "heading_1" }, (data) => (
-          <Text as="h2" indent={indent}>
-            <RichText data={data.heading_1.rich_text} />
-          </Text>
-        ))
-        .with({ type: "heading_2" }, (data) => (
-          <Text as="h3" indent={indent}>
-            <RichText data={data.heading_2.rich_text} />
-          </Text>
-        ))
-        .with({ type: "heading_3" }, (data) => (
-          <Text as="h4" indent={indent}>
-            <RichText data={data.heading_3.rich_text} />
-          </Text>
-        ))
-        .with({ type: "quote" }, (data) => (
-          <Text as="blockquote" indent={indent}>
-            <RichText data={data.quote.rich_text} />
-          </Text>
-        ))
-        .with({ type: "divider" }, () => <hr />)
-        .with({ type: "link_to_page" }, (data) => (
-          <LinkToPage id={data.link_to_page.page_id} />
-        ))
-        .with({ type: "child_page" }, (data) => <LinkToPage id={data.id} />)
-        .with({ type: "unsupported_block" }, () => (
-          <Banner type="warning" size="m">
-            Unsupported block
-          </Banner>
-        ))
-        .exhaustive()}
     </>
   );
 }
@@ -231,4 +183,27 @@ function rootBlockReducer(acc: RootBlock[], block: NestedBlock): RootBlock[] {
   }
 
   return [...acc, { id: block.id, type: "paragraph", block }];
+}
+
+export class BlockPath extends Array<zNotion.blocks.block> {
+  /**
+   * Get the visual indent level of the block who has this path.
+   */
+  get indent() {
+    return this.filter(
+      (block) =>
+        block.type === "bulleted_list_item" ||
+        block.type === "numbered_list_item",
+    ).length;
+  }
+
+  concat(
+    ...items: (zNotion.blocks.block | ConcatArray<zNotion.blocks.block>)[]
+  ): BlockPath {
+    return new BlockPath(...super.concat(...items));
+  }
+
+  append(block: zNotion.blocks.block): BlockPath {
+    return new BlockPath(...this, block);
+  }
 }

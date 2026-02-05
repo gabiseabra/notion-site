@@ -2,8 +2,8 @@ import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { ReactNode } from "react";
 import { Link } from "react-router";
+import { RichText } from "../../content/RichText.js";
 import { Icon } from "../../display/Icon.js";
-import { RichText } from "../../display/RichText.js";
 import { Text } from "../../display/Text.js";
 import { Col, ColProps } from "../../layout/FlexBox.js";
 
@@ -46,7 +46,7 @@ export function ResourceHeader<DB extends NotionResource>({
               </>
             )}
 
-            {title && <RichText data={title.title} />}
+            {title && <RichText value={title.title} />}
           </Text>
         </Link>
       )}

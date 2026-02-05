@@ -1,9 +1,9 @@
 import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { Status } from "@notion-site/common/dto/primitives.js";
-import { Badge } from "../display/Badge.js";
-import { Text } from "../display/Text.js";
-import { Row } from "../layout/FlexBox.js";
-import { Tooltip } from "../overlays/Tooltip.js";
+import { Badge } from "../../display/Badge.js";
+import { Text } from "../../display/Text.js";
+import { Row } from "../../layout/FlexBox.js";
+import { Tooltip } from "../../overlays/Tooltip.js";
 
 export type TagsFilterProps<T extends string> = {
   options: {
@@ -29,10 +29,11 @@ export function TagsFilter<T extends string>({
           disabled={!option.description}
           content={
             <Text
-              as="div"
+              as="p"
               size="caption"
               color="muted"
               p={1}
+              m={0}
               style={{ maxWidth: 250 }}
             >
               {option.description}

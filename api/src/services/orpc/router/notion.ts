@@ -2,22 +2,16 @@ import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import { BlogPostStatus } from "@notion-site/common/dto/blog-posts/status.js";
 import { NotionDatabase } from "@notion-site/common/dto/notion/database.js";
 import { _NotionResource } from "@notion-site/common/dto/notion/resource.js";
+import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { NotionPage } from "@notion-site/common/dto/pages/index.js";
 import { api } from "@notion-site/common/orpc/index.js";
-import { curry, liftM } from "@notion-site/common/utils/fp.js";
 import {
   hasPropertyValue,
   isTruthy,
 } from "@notion-site/common/utils/guards.js";
-import {
-  isRedacted,
-  mapBlockText,
-  replaceTextContent,
-  replaceTextUrl,
-} from "@notion-site/common/utils/notion.js";
+import { isRedacted } from "@notion-site/common/utils/notion/properties.js";
 import { isUuid } from "@notion-site/common/utils/uuid.js";
 import { implement } from "@orpc/server";
-import { pipe } from "ts-functional-pipe";
 import * as env from "../../../env.js";
 import { extractUuid, getRouteByResource } from "../../../utils/route.js";
 import { getNotionBlocks, getNotionPage } from "../../notion/api.js";
@@ -27,6 +21,12 @@ import {
   queryNotionDatabaseHandler,
   routeHandler,
 } from "../../notion/orpc.js";
+
+import {
+  narrowBlock,
+  traverseBlock,
+} from "@notion-site/common/utils/notion/blocks.js";
+import { traverseRichTextText } from "@notion-site/common/utils/notion/rich-text.js";
 
 const c = implement(api.notion);
 
@@ -41,32 +41,19 @@ export const notion = c.router({
 
       return {
         blocks: await Promise.all(
-          result.blocks.map(
-            pipe(
-              // replace links with the canonical urls
-              curry(liftM(mapBlockText))(
-                replaceTextUrl(async (url) => {
-                  const id = extractUuid(url.replace(/^\//, ""));
-
-                  if (id && isUuid(id)) {
-                    const resource = await getNotionPage(id, _NotionResource);
-                    if (resource) {
-                      return getRouteByResource(resource)?.path ?? url;
-                    }
-                  }
-
-                  return url;
-                }),
-              ),
-
-              // replace redacted text
-              curry(liftM(mapBlockText))(
-                replaceTextContent(async (content, text) =>
-                  isRedacted(text) ? "█".repeat(content.length) : content,
+          result.blocks.map(async (block) => {
+            if (!narrowBlock(block, ...zNotion.blocks.rich_text_type.options)) {
+              return block;
+            } else {
+              return traverseBlock(block, async (node) => ({
+                ...node,
+                rich_text: await traverseRichTextText(
+                  node.rich_text,
+                  mapTextItem,
                 ),
-              ),
-            ),
-          ),
+              }));
+            }
+          }),
         ),
       };
     }),
@@ -172,3 +159,31 @@ export const notion = c.router({
     ),
   ),
 });
+
+async function replaceUrl(url: string) {
+  const id = extractUuid(url.replace(/^\//, ""));
+
+  if (id && isUuid(id)) {
+    const resource = await getNotionPage(id, _NotionResource);
+    if (resource) {
+      return getRouteByResource(resource)?.path ?? url;
+    }
+  }
+
+  return url;
+}
+
+async function mapTextItem(item: zNotion.properties.text) {
+  return {
+    ...item,
+    text: {
+      link: item.text.link
+        ? { url: await replaceUrl(item.text.link.url) }
+        : null,
+      content:
+        isRedacted(item) && !env.DEV
+          ? "█".repeat(item.text.content.length)
+          : item.text.content,
+    },
+  };
+}

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { external, file } from "./media.js";
 import { api_color } from "./primitives.js";
 import { rich_text_item } from "./properties.js";
 import { block_id, page_id } from "./references.js";
@@ -17,7 +18,7 @@ export const heading_1 = z.object({
   heading_1: z.object({
     rich_text: rich_text_item,
     color: api_color,
-    is_toggleable: z.boolean(),
+    // is_toggleable: z.boolean(),
   }),
 });
 export type heading_1 = z.infer<typeof heading_1>;
@@ -27,7 +28,7 @@ export const heading_2 = z.object({
   heading_2: z.object({
     rich_text: rich_text_item,
     color: api_color,
-    is_toggleable: z.boolean(),
+    // is_toggleable: z.boolean(),
   }),
 });
 export type heading_2 = z.infer<typeof heading_2>;
@@ -37,7 +38,7 @@ export const heading_3 = z.object({
   heading_3: z.object({
     rich_text: rich_text_item,
     color: api_color,
-    is_toggleable: z.boolean(),
+    // is_toggleable: z.boolean(),
   }),
 });
 export type heading_3 = z.infer<typeof heading_3>;
@@ -71,6 +72,7 @@ export type quote = z.infer<typeof quote>;
 
 export const divider = z.object({
   type: z.literal("divider"),
+  divider: z.object({}),
 });
 export type divider = z.infer<typeof divider>;
 
@@ -86,13 +88,24 @@ export const child_page = z.object({
 });
 export type child_page = z.infer<typeof child_page>;
 
-const base_block_shape = {
+const caption = {
+  caption: rich_text_item,
+} as const;
+
+export const image = z.object({
+  type: z.literal("image"),
+  image: z.union([file.extend(caption), external.extend(caption)]),
+});
+export type image = z.infer<typeof child_page>;
+
+export const base_block_shape = {
   id: z.string(),
   parent: z.union([page_id, block_id]),
   has_children: z.boolean(),
 };
+export type base_block_shape = z.infer<z.ZodObject<typeof base_block_shape>>;
 
-export const block = z.union([
+export const block = z.discriminatedUnion("type", [
   paragraph.extend(base_block_shape),
   heading_1.extend(base_block_shape),
   heading_2.extend(base_block_shape),
@@ -103,9 +116,23 @@ export const block = z.union([
   quote.extend(base_block_shape),
   link_to_page.extend(base_block_shape),
   child_page.extend(base_block_shape),
-  z.object(base_block_shape).transform((block) => ({
-    type: "unsupported_block" as const,
-    ...block,
-  })),
+  image.extend(base_block_shape),
 ]);
 export type block = z.infer<typeof block>;
+
+export const block_type = z.enum([
+  block.options[0].shape.type.value,
+  ...block.options.slice(1).map((option) => option.shape.type.value),
+] as const);
+export type block_type = z.infer<typeof block_type>;
+
+export const rich_text_type = z.enum([
+  "paragraph",
+  "heading_1",
+  "heading_2",
+  "heading_3",
+  "quote",
+  "bulleted_list_item",
+  "numbered_list_item",
+]);
+export type rich_text_type = z.infer<typeof rich_text_type>;

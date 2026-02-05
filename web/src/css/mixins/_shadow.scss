@@ -1,5 +1,12 @@
-@mixin shadow($distance: 1) {
-  box-shadow: var(--color-shadow) 0 calc(1px * $distance) calc(3px * $distance);
+@use "sass:list" as list;
+
+@mixin shadow($distance: 1, $intensity: 1) {
+  $one: var(--color-shadow) 0 calc(1px * #{$distance}) calc(3px * #{$distance});
+  $shadows: ();
+  @for $i from 1 through $intensity {
+    $shadows: list.append($shadows, $one, comma);
+  }
+  box-shadow: $shadows;
 }
 
 @mixin border {

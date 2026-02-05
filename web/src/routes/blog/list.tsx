@@ -3,7 +3,7 @@ import { useState } from "react";
 import { clear } from "suspend-react";
 import { Favicon } from "../../components/display/Favicon.js";
 import { PageSuspenseBoundary } from "../../components/feedback/SuspenseBoundary.js";
-import { BlogPostFilters } from "../../components/filters/BlogPostFilters.js";
+import { BlogPostFilters } from "../../components/inputs/filters/BlogPostFilters.js";
 import { Col } from "../../components/layout/FlexBox.js";
 import { BlogPostListLoader } from "../../components/modules/blog-posts/BlogPostListLoader.js";
 import * as env from "../../env.js";

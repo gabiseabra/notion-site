@@ -4,6 +4,7 @@ import { Layout } from "../components/layout/Layout.js";
 import * as env from "../env.js";
 import { Head } from "../providers/HeadProvider.js";
 import * as blog from "./blog/index.js";
+import * as editor from "./editor.js";
 import * as page from "./page.js";
 
 export const element = (
@@ -17,4 +18,4 @@ export const element = (
   </Layout>
 );
 
-export const children = [blog, page];
+export const children = [blog, editor, page];

@@ -60,6 +60,7 @@ body {
 
 p {
   margin: var(--paragraph-margin) 0;
+  white-space: pre-wrap;
 }
 
 ul, ol {

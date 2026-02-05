@@ -3,7 +3,7 @@ import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { ReactNode } from "react";
 import { clear, suspend } from "suspend-react";
 import { OrpcContext, useOrpc } from "../../../providers/OrpcProvider.js";
-import { NestedBlocks } from "../../layout/NestedBlocks.js";
+import { RootBlock } from "../../content/RootBlock.js";
 import { ResourceHeader } from "./ResourceHeader.js";
 
 export type ResourceLoaderProps<DB extends NotionResource> = {
@@ -69,7 +69,7 @@ export function ResourceLoader<T extends NotionResource>({
 
       {header?.(resource, metadata)}
 
-      <NestedBlocks blocks={blocks} />
+      <RootBlock value={blocks} />
 
       {footer?.(resource, metadata)}
 

@@ -1,29 +1,22 @@
 import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { omit } from "@notion-site/common/utils/object.js";
-import { CSSProperties, ReactNode } from "react";
+import { ComponentPropsWithoutRef, HTMLAttributes } from "react";
 import * as css from "../../css/index.js";
 import styles from "./Text.module.scss";
 
 export type TextProps = {
-  as: TextElement;
-  children?: ReactNode;
-  className?: string;
-  style?: CSSProperties;
-} & Partial<BlockAnnotations> &
-  css.MarginProps &
-  css.PaddingProps;
+  as: TextTag;
+  size?: TextSize;
+  color?: TextColor;
+  indent?: number;
+} & css.MarginProps &
+  css.PaddingProps &
+  HTMLAttributes<HTMLElement>;
 
-export type TextElement =
-  | "div"
-  | "p"
-  | "blockquote"
-  | "h1"
-  | "h2"
-  | "h3"
-  | "h4";
+type TextTag = "div" | "p" | "blockquote" | "h1" | "h2" | "h3" | "h4";
 
-export type TextColor =
+type TextColor =
   | zNotion.primitives.api_color
   | "primary"
   | "secondary"
@@ -31,19 +24,7 @@ export type TextColor =
   | "muted"
   | "link";
 
-export type TextSize = "caption" | "body" | "h1" | "h2" | "h3" | "h4";
-
-export type InlineAnnotations = {
-  size: TextSize;
-  color: TextColor;
-  redacted: boolean;
-} & Omit<zNotion.properties.annotations, "color">;
-
-export type BlockAnnotations = {
-  size: TextSize;
-  color: TextColor;
-  indent: number;
-};
+type TextSize = "caption" | "body" | "h1" | "h2" | "h3" | "h4";
 
 /**
  * A block element meant for wrapping around text.
@@ -51,9 +32,9 @@ export type BlockAnnotations = {
  */
 export function Text({
   as: Tag,
-  indent,
-  color,
   size,
+  color,
+  indent,
   children,
   className,
   style = {},
@@ -81,6 +62,17 @@ export function Text({
   );
 }
 
+export type SpanProps = {
+  size?: TextSize;
+  color?: TextColor;
+  redacted?: boolean;
+  bold?: boolean;
+  italic?: boolean;
+  strikethrough?: boolean;
+  underline?: boolean;
+  code?: boolean;
+} & ComponentPropsWithoutRef<"span">;
+
 /**
  * An inline element for text with annotations.
  * @direction inline
@@ -96,14 +88,14 @@ export function Span({
   color,
   size,
   style,
-}: {
-  children: string;
-  style?: CSSProperties;
-} & Partial<InlineAnnotations>) {
+  className,
+  ...props
+}: SpanProps) {
   return (
     <span
       style={style}
       className={[
+        className,
         bold && styles.bold,
         italic && styles.italic,
         underline && styles.underline,
@@ -115,6 +107,7 @@ export function Span({
       ]
         .filter(isTruthy)
         .join(" ")}
+      {...props}
     >
       {children}
     </span>

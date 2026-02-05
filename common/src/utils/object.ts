@@ -1,4 +1,11 @@
-export function omit<T extends object, const K extends readonly (keyof T)[]>(
+import { GenericObject } from "../types/object.js";
+import { DistributiveOmit } from "../types/union.js";
+
+export function omit<T extends object, const K extends (keyof T)[]>(
+  obj: T,
+  keys: K,
+): DistributiveOmit<T, K[number]>;
+export function omit<T extends object, const K extends (keyof T)[]>(
   obj: T,
   keys: K,
 ): Omit<T, K[number]> {
@@ -21,4 +28,8 @@ export function omitUndefined<T>(object: Partial<T>): Partial<T> {
   }
 
   return out;
+}
+
+export function keys<T extends GenericObject>(object: T): (keyof T)[] {
+  return Object.keys(object);
 }

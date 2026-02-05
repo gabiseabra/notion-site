@@ -5,8 +5,7 @@ import {
   createStaticRouter,
   StaticRouterProvider,
 } from "react-router";
-import { HeadProvider } from "./providers/HeadProvider.js";
-import { OrpcProvider } from "./providers/OrpcProvider.js";
+import { RootPovider } from "./providers/RootProvider.js";
 import * as route from "./routes/index.js";
 
 const routes = [route];
@@ -50,11 +49,9 @@ export async function render(
 
     const { pipe, abort } = renderToPipeableStream(
       <React.StrictMode>
-        <OrpcProvider url={apiUrl} fetch={fetch}>
-          <HeadProvider>
-            <StaticRouterProvider router={router} context={context} />
-          </HeadProvider>
-        </OrpcProvider>
+        <RootPovider url={apiUrl} fetch={fetch}>
+          <StaticRouterProvider router={router} context={context} />
+        </RootPovider>
       </React.StrictMode>,
       {
         onShellReady() {

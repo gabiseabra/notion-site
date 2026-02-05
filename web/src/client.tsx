@@ -4,8 +4,7 @@ import React from "react";
 import { hydrateRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import * as env from "./env.js";
-import { HeadProvider } from "./providers/HeadProvider.js";
-import { OrpcProvider } from "./providers/OrpcProvider.js";
+import { RootPovider } from "./providers/RootProvider.js";
 import * as route from "./routes/index.js";
 
 const router = createBrowserRouter([route]);
@@ -18,10 +17,8 @@ if (!root) {
 hydrateRoot(
   root,
   <React.StrictMode>
-    <OrpcProvider url={env.API_URL}>
-      <HeadProvider>
-        <RouterProvider router={router} />
-      </HeadProvider>
-    </OrpcProvider>
+    <RootPovider url={env.API_URL}>
+      <RouterProvider router={router} />
+    </RootPovider>
   </React.StrictMode>,
 );

@@ -2,8 +2,8 @@ import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { Link, LinkProps } from "react-router";
 import { suspend } from "suspend-react";
 import { useOrpc } from "../../providers/OrpcProvider.js";
+import { RichText } from "../content/RichText.js";
 import { Icon } from "../display/Icon.js";
-import { RichText } from "../display/RichText.js";
 import { Alert } from "../feedback/Banner.js";
 import { Spinner } from "../feedback/Spinner.js";
 import { SuspenseBoundary } from "../feedback/SuspenseBoundary.js";
@@ -48,7 +48,7 @@ function LinkToPageLoader({
         </>
       )}
 
-      {resource.title && <RichText data={resource.title.title} />}
+      {resource.title && <RichText value={resource.title.title} />}
     </Link>
   );
 }

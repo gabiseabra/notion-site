@@ -1,28 +1,30 @@
 import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
-import { isRedacted } from "@notion-site/common/utils/notion.js";
+import { isRedacted } from "@notion-site/common/utils/notion/properties.js";
 import { match } from "ts-pattern";
 import { rewriteUrl } from "../../utils/url.js";
+import { Span, TextProps } from "../display/Text.js";
 import { Alert } from "../feedback/Banner.js";
 import { MaybeLink } from "../navigation/MaybeLink.js";
-import { Span } from "./Text.js";
+import { ContentEditableProps } from "./hooks/use-content-editable.js";
+
+export type RichTextProps = {
+  value: zNotion.properties.rich_text_item;
+  size?: TextProps["size"];
+} & ContentEditableProps;
 
 /**
  * Renders a single line of Notion rich-text.
  * @direction inline
  */
-export function RichText({
-  data,
-}: {
-  data: zNotion.properties.rich_text_item;
-}) {
+export function RichText({ value, ...props }: RichTextProps) {
   return (
     <>
-      {data.length ? (
-        data.map((item, ix) =>
+      {value.length ? (
+        value.map((item, ix) =>
           match(item)
             .with({ type: "text" }, (item) =>
               isRedacted(item) ? (
-                <Span key={ix} redacted>
+                <Span key={ix} redacted {...props}>
                   {item.text.content}
                 </Span>
               ) : (
@@ -32,14 +34,16 @@ export function RichText({
                     item.text.link ? rewriteUrl(item.text.link.url) : undefined
                   }
                 >
-                  <Span {...item.annotations}>{item.text.content}</Span>
+                  <Span {...item.annotations} {...props}>
+                    {item.text.content}
+                  </Span>
                 </MaybeLink>
               ),
             )
             .otherwise(() => <Alert type="warning">Unsupported block</Alert>),
         )
       ) : (
-        <span>&nbsp;</span>
+        <span {...props}>&nbsp;</span>
       )}
     </>
   );

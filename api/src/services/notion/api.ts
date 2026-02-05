@@ -237,6 +237,7 @@ export async function getNotionBlocks(id: string) {
 
       if (!parseResult.success) {
         errors.push({ id: block.id, error: parseResult.error });
+        console.warn(`Failed to parse block`, block);
       } else {
         const block = parseResult.data;
 

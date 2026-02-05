@@ -1,12 +1,12 @@
 import { Metadata } from "@notion-site/common/dto/notion/contracts.js";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
-import { titleToString } from "@notion-site/common/utils/notion.js";
+import { titleToString } from "@notion-site/common/utils/notion/properties.js";
 import { ReactNode } from "react";
 import { Link } from "react-router";
 import { suspend } from "suspend-react";
 import { useOrpc } from "../../providers/OrpcProvider.js";
+import { RichText } from "../content/RichText.js";
 import { Icon } from "../display/Icon.js";
-import { RichText } from "../display/RichText.js";
 import { Alert } from "../feedback/Banner.js";
 import { Spinner } from "../feedback/Spinner.js";
 import { SuspenseBoundary } from "../feedback/SuspenseBoundary.js";
@@ -74,7 +74,7 @@ DynamicBreadcrumbs.CrumbLoader = function DynamicBreadcrumbsCrumbLoader({
                 </>
               )}
 
-              {metadata.title && <RichText data={metadata.title.title} />}
+              {metadata.title && <RichText value={metadata.title.title} />}
             </>
           )}
         </Link>

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { IoIosClose } from "react-icons/io";
 import { IconControl } from "../display/Icon.js";
@@ -14,6 +14,10 @@ export type ModalProps = {
 
 export function Modal({ open, onClose, children, title, footer }: ModalProps) {
   const modalPortal = document.querySelector("#modal-portal");
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "unset";
+  }, [open]);
 
   if (!open) return null;
 
