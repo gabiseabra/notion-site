@@ -96,6 +96,7 @@ export function Span({
       style={style}
       className={[
         className,
+        styles.span,
         bold && styles.bold,
         italic && styles.italic,
         underline && styles.underline,

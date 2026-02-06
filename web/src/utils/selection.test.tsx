@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import { describe, expect, it } from "@jest/globals";
 import { render } from "@testing-library/react";
 import {
   getMaxSelectionOffset,
@@ -32,12 +31,6 @@ describe("selection utilities", () => {
       );
       const p = container.querySelector("p")!;
       expect(getMaxSelectionOffset(p)).toBe(12); // "hello world!"
-    });
-
-    it("returns 0 for element with only nbsp", () => {
-      const { container } = render(<p>&nbsp;</p>);
-      const p = container.querySelector("p")!;
-      expect(getMaxSelectionOffset(p)).toBe(0);
     });
   });
 

@@ -3,7 +3,9 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "types": [
-      "vite/client"
+      "vite/client",
+      "jest",
+      "@testing-library/jest-dom"
     ],
     "outDir": "./dist/ts",
     "tsBuildInfoFile": "dist/ts/.tsbuildinfo"

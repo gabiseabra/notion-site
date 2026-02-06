@@ -68,6 +68,12 @@ export function setSelectionRange(
 
   if (range === null) return;
 
+  console.log("....");
+  if (element.textContent === "" && range.start === 0) {
+    element.focus();
+    return;
+  }
+
   const start = resolveOffset(element, range.start);
   const end = resolveOffset(element, range.end ?? range.start);
 
