@@ -8,14 +8,30 @@ Existing editors for Notion-type blocks are overcomplicated and badly typed. I m
 
 ## React + contenteditable
 
-React wants full control over the DOM. Contenteditable modifies the DOM without telling React.
-This is a problem - React may clobber your edits on re-render.
+React wants full control over the DOM, but its reconciliation loop is too expensive to update on every keystroke.
+Contenteditable is made for that and runs super smooth, but it modifies the DOM without telling React, which causes
+several issues, as React's reconciliation may conflict with native edits on re-render: your changes will be overwritten
+mid-typing if the model decides to update and is not in sync with the actual state, and your selection state may be lost
+between updates.
 
-This is solved this by only re-rendering on block-level mutations (adding, removing, splitting blocks).
-Inline text changes happen in the contenteditable and are preserved until a block-level change forces a re-render.
+Theoretically, you _could_ register input events in a block node such as `p`, let content-editable do its thing and only
+update the state `onblur`, or when the cursor goes idle for a while, or when you must perform a block mutation (like
+adding or deleting a block). This is assuming that we could make inline editing stable under the control of
+content-editable, while block elements would be fully controlled by React.
 
-We use `contentEditable="plaintext-only"` to avoid the browser's native rich text editing (which creates messy DOM).
-Formatting is handled by translating keyboard events to changes in the model and rendered as styled spans.
+This actually works if you're dealing with plain-text: you can use `content-editable="plaintext-only"` to disable the
+DOM from creating inline nodes such as `b` on `ctrl+b`, and if you pass only `string` to the block node's `children`
+prop, then there will be no more nodes to reconcile beyond the block-level, therefore no problem. But then your content
+editor would essentially work like a `textarea` 🤷‍♀️
+[//]: # (can I demonstrate this? can I make the editor generic enough to model a textarea, and create a textarea
+plugin?)
+
+But this approach doesn't work if you're dealing with more complex data that render into more HTML. Even if you're extra
+careful to keep inline and block mutations handled separately, React's reconciliation still has to perform unmount
+effects on its managed nodes, so rendering inline nodes in React is challenging here. Theoretically you could render the
+rich text content in a separate React root and unmount it when its parent block unmounts, but this isn't needed if you'
+re able to render the data into HTML (which is the case for Notion), then it's as simple as using
+`dangerouslySetInnerHTML` in your block node to render the content.
 
 ## Core Concepts
 
