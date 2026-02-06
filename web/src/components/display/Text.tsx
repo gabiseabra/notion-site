@@ -62,7 +62,7 @@ export function Text({
   );
 }
 
-export type SpanProps = {
+export type Annotations = {
   size?: TextSize;
   color?: TextColor;
   redacted?: boolean;
@@ -71,46 +71,46 @@ export type SpanProps = {
   strikethrough?: boolean;
   underline?: boolean;
   code?: boolean;
-} & ComponentPropsWithoutRef<"span">;
+};
+export type SpanProps = Annotations & ComponentPropsWithoutRef<"span">;
 
 /**
  * An inline element for text with annotations.
  * @direction inline
  */
-export function Span({
-  children,
-  bold,
-  italic,
-  underline,
-  strikethrough,
-  code,
-  redacted,
-  color,
-  size,
-  style,
-  className,
-  ...props
-}: SpanProps) {
+export function Span({ children, style, className, ...props }: SpanProps) {
   return (
     <span
       style={style}
-      className={[
-        className,
-        styles.span,
-        bold && styles.bold,
-        italic && styles.italic,
-        underline && styles.underline,
-        strikethrough && styles.strikethrough,
-        code && styles.code,
-        redacted && styles.redacted,
-        size && styles[`size-${size}`],
-        color && styles[`color-${color}`],
-      ]
-        .filter(isTruthy)
-        .join(" ")}
+      className={[className, Span.className(props)].filter(isTruthy).join(" ")}
       {...props}
     >
       {children}
     </span>
   );
 }
+
+Span.className = ({
+  bold,
+  italic,
+  underline,
+  strikethrough,
+  code,
+  color,
+  redacted,
+  size,
+}: Annotations) => {
+  return [
+    styles.span,
+    bold && styles.bold,
+    italic && styles.italic,
+    underline && styles.underline,
+    strikethrough && styles.strikethrough,
+    code && styles.code,
+    redacted && styles.redacted,
+    size && styles[`size-${size}`],
+    color && styles[`color-${color}`],
+  ]
+    .filter(isTruthy)
+    .join(" ");
+};
