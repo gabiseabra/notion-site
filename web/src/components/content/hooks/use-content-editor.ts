@@ -236,6 +236,8 @@ export function useContentEditor({
     if (selectionAfter && element && !selectionEquals) {
       setSelectionRange(element, selectionAfter);
     }
+
+    console.info("post-commit", { selectionAfter, currentSelection });
   }, [snapshot]);
 
   useEffect(() => {
