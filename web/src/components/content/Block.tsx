@@ -6,7 +6,7 @@ import { Image } from "../display/Image.js";
 import { Span, Text } from "../display/Text.js";
 import { LinkToPage } from "../navigation/LinkToPage.js";
 import { RichText, RichTextProps } from "./RichText.js";
-import { ContentEditableProps } from "./hooks/use-content-editable.js";
+import { ContentEditableProps } from "./editable/types.js";
 
 type BlockProps = {
   indent?: number;
@@ -122,7 +122,7 @@ function richTextToString(rich_text: zNotion.properties.rich_text_item) {
     .filter(hasPropertyValue("type", "text"))
     .map((item) =>
       item.text.link
-        ? `<a class="${Span.className(item.annotations)}">${item.text.content}</a>`
+        ? `<a href="${item.text.link.url}" class="${Span.className(item.annotations)}">${item.text.content}</a>`
         : `<span class="${Span.className(item.annotations)}">${item.text.content}</span>`,
     )
     .join("");

@@ -1,6 +1,6 @@
 import { isNonNullable } from "@notion-site/common/utils/guards.js";
 import { useEffect } from "react";
-import { ContentEditorPlugin } from "../index.js";
+import { ContentEditorPlugin } from "./types.js";
 
 /**
  * Creates a plugin that attaches a native DOM event listener to all editor blocks.

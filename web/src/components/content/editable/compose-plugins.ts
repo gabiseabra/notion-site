@@ -1,4 +1,4 @@
-import { ContentEditorPlugin } from "../index.js";
+import { ContentEditorPlugin } from "./types.js";
 
 /**
  * Composes multiple plugins into a single plugin.

@@ -10,7 +10,7 @@ import {
 } from "../../../utils/selection.js";
 import { ContentEditor } from "../ContentEditor.js";
 
-describe("blockNavigationPlugin", () => {
+describe("useBlockNavigationPlugin", () => {
   it("moves caret to next block on ArrowRight at end", () => {
     const blocks = [p("a", span("First")), p("b", span("Second"))];
 

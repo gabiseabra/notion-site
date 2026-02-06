@@ -5,7 +5,7 @@ import { rewriteUrl } from "../../utils/url.js";
 import { Span, TextProps } from "../display/Text.js";
 import { Alert } from "../feedback/Banner.js";
 import { MaybeLink } from "../navigation/MaybeLink.js";
-import { ContentEditableProps } from "./hooks/use-content-editable.js";
+import { ContentEditableProps } from "./editable/types.js";
 
 export type RichTextProps = {
   value: zNotion.properties.rich_text_item;

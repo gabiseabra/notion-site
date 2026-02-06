@@ -23,9 +23,9 @@ Formatting is handled by translating keyboard events to changes in the model and
 content-editable element and managed by the editor, while _rich-text_ is an array of text elements containing a link
 annotations.
 
-[**ContentEditor**](./hooks/use-content-editor.ts): The editor instance that centralizes the state.
+[**ContentEditor**](editor/use-content-editor.ts): The editor instance that centralizes the state.
 
-[**ContentEditorPlugin**](./plugin/index.ts): A function that implements a piece of editor functionality by bridging
+[**ContentEditorPlugin**](editable/types.ts): A hook that implements a piece of editor functionality by bridging
 component props and editor state. Plugins return DOM props (event handlers, refs) that get spread onto block elements.
 
 ## Plugin Architecture
@@ -44,14 +44,14 @@ full React hooks capabilities and shared state and context.
 **Generics:**
 
 - `TDetail` - Return type of the block factory. Defaults to `ContentEditableProps`. Plugin factories may use a different
-  type which gets transformed into ContentEditableProps before being ready to use with `useContentEditable`.
+  type which gets transformed into ContentEditableProps before being ready to use.
 
 ### Phase 1: Editor Setup
 
 ```typescript
-const myPlugin: ContentEditorPlugin = (editor) => {
+const useMyPlugin: ContentEditorPlugin = (editor) => {
   // This is Phase 1
-  // Called once inside useContentEditable()
+  // Called once when the plugin hook is invoked
   // React hooks work here - this IS a hook body
 
   useEffect(() => {
@@ -63,10 +63,10 @@ const myPlugin: ContentEditorPlugin = (editor) => {
 };
 ```
 
-Phase 1 runs when `useContentEditable(editor, plugin, ctx)` is called. Since `useContentEditable` is a hook, phase 1
-executes as part of that hook's body. This is why React hooks are allowed - you're inside a hook.
+Phase 1 runs when the plugin hook is called with the editor (e.g., `useMyPlugin(editor)`). Since plugins are hooks,
+phase 1 executes as part of that hook's body. This is why React hooks are allowed - you're inside a hook.
 
-Phase 1 captures `editor` and `ctx` in a closure. Any refs, callbacks, or effects you create here persist for the
+Phase 1 captures `editor` in a closure. Any refs, callbacks, or effects you create here persist for the
 lifetime of the editor component.
 
 ### Phase 2: Block Props Factory
@@ -107,21 +107,18 @@ When plugins are composed with `composePlugins(a, b, c)`:
 - `ref` callbacks all run (not chained)
 
 ```typescript
-const combined = composePlugins(
-  pluginA,  // requires { db: Database }
-  pluginB,  // requires { api: ApiClient }
+const useCombinedPlugin = composePlugins(
+  usePluginA,
+  usePluginB,
 );
-// combined requires { db: Database } & { api: ApiClient }
 ```
-
-The `TContext` types are intersected - the composed plugin requires all contexts.
 
 ## Writing a Plugin
 
 ### Basic Example: Keyboard Shortcut
 
 ```typescript
-const boldPlugin: ContentEditorPlugin = (editor) => {
+const useBoldPlugin: ContentEditorPlugin = (editor) => {
   return (block) => ({
     onKeyDown(e) {
       if (e.key === "b" && e.metaKey) {
@@ -131,22 +128,6 @@ const boldPlugin: ContentEditorPlugin = (editor) => {
         editor.update(updated);
         editor.commit();
       }
-    },
-  });
-};
-```
-
-### With Shared State (Refs)
-
-```typescript
-const trackingPlugin: ContentEditorPlugin = (editor) => {
-  // Phase 1: create ref for mutable state
-  const lastInputRef = useRef<string | null>(null);
-
-  return (block) => ({
-    onBeforeInput(e) {
-      // Phase 2: access ref via closure
-      lastInputRef.current = e.data;
     },
   });
 };

@@ -1,12 +1,12 @@
 import { useEffect } from "react";
-import { ContentEditorPlugin } from "./index.js";
+import { ContentEditorPlugin } from "./types.js";
 
 /**
  * This plugin should typically be included first in any composition as it:
  * - Manages the block ref registry (maps block IDs to DOM elements)
  * - Enables block-level contentEditable functionality
  */
-export const setupPlugin =
+export const useSetupPlugin =
   ({ disabled }: { disabled?: boolean }): ContentEditorPlugin =>
   (editor) => {
     // clear refs on unmount

@@ -10,7 +10,7 @@ import {
   getSelectionRange,
   setSelectionRange,
 } from "../../../utils/selection.js";
-import { ContentEditorPlugin } from "./index.js";
+import { ContentEditorPlugin } from "./types.js";
 
 /**
  * Plugin that handles block-level mutations: deletion and splitting.
@@ -20,7 +20,7 @@ import { ContentEditorPlugin } from "./index.js";
  * | `Backspace` | Caret at position 0 | Merge with previous or delete empty block |
  * | `Enter` | Any position | Split block at caret position |
  */
-export const blockMutationPlugin: ContentEditorPlugin =
+export const useBlockMutationPlugin: ContentEditorPlugin =
   (editor) => (block) => ({
     onKeyDown(e) {
       const selectionBefore = getSelectionRange(e.target as HTMLElement);

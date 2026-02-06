@@ -3,13 +3,12 @@ import { memo, Ref, useCallback, useImperativeHandle } from "react";
 import { useEventListener } from "../../hooks/useEventListener.js";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
-import { useContentEditable } from "./hooks/use-content-editable.js";
+import { useDefaultPlugin } from "./editable/use-default-plugin.js";
+import { EditorEvent } from "./editor/event.js";
 import {
-  EditorEvent,
   ContentEditor as TContentEditor,
   useContentEditor,
-} from "./hooks/use-content-editor.js";
-import { defaultPlugin } from "./plugin/index.js";
+} from "./editor/use-content-editor.js";
 
 export type { TContentEditor };
 
@@ -25,7 +24,7 @@ export const ContentEditor = memo(function ContentEditor({
   onChange,
 }: ContentEditorProps) {
   const editor = useContentEditor({ initialValue });
-  const editable = useContentEditable(editor, defaultPlugin);
+  const editable = useDefaultPlugin(editor, {});
 
   useImperativeHandle(ref, () => editor, [editor]);
 

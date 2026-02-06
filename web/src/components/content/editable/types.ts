@@ -1,6 +1,6 @@
+import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { FocusEvent, FormEvent, InputEvent, KeyboardEvent } from "react";
-import { ContentEditorPlugin } from "../plugin/index.js";
-import { ContentEditor } from "./use-content-editor.js";
+import { ContentEditor } from "../editor/use-content-editor.js";
 
 /**
  * These props are spread onto the block's DOM element to enable editing.
@@ -43,26 +43,17 @@ export type ContentEditableProps = {
 };
 
 /**
- * Hook that bridges editor state and plugin system.
- * Applies a plugin to the editor, returning a block props factory.
+ * A plugin that extends the content editor's behavior.
  *
- * This hook executes Phase 1 of the plugin (editor setup) and returns
- * the Phase 2 function. The returned function should be called for each
- * block to get its editable props.
+ * Plugins are curried functions following a two-phase pattern:
+ * 1. **Editor phase**: Receives the editor instance, can use React hooks
+ * 2. **Block phase**: Receives a block, returns DOM props for that block
  *
- * ## Usage Flow
- *
- * ```
- * useContentEditor() → ContentEditor
- *                          ↓
- * useContentEditable(editor, plugin) → (block) => ContentEditableProps
- *                                          ↓
- * render: blocks.map(block => <Block {...editable(block)} />)
- * ```
+ * @typeParam TContext - Shared context between the plugins.
+ * @typeParam TDetail  - Properties to replace the base block props.
+ *                       Note that u have to handle this before using with
+ *                      `useContentEditable` . . . for use in factories.
  */
-export function useContentEditable(
+export type ContentEditorPlugin<TDetail = ContentEditableProps> = (
   editor: ContentEditor,
-  plugin: ContentEditorPlugin,
-) {
-  return plugin(editor);
-}
+) => (block: zNotion.blocks.block) => TDetail;

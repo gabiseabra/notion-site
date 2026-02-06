@@ -1,5 +1,5 @@
 import { setSelectionRange } from "../../../utils/selection.js";
-import { ContentEditorPlugin } from "./index.js";
+import { ContentEditorPlugin } from "./types.js";
 
 /**
  * Plugin that handles undo/redo keyboard shortcuts.
@@ -8,7 +8,7 @@ import { ContentEditorPlugin } from "./index.js";
  * - `Ctrl+Shift+Z` / `Cmd+Shift+Z`: Redo
  * - `Ctrl+Y` / `Cmd+Y`: Redo (alternative)
  */
-export const historyPlugin: ContentEditorPlugin = (editor) => () => ({
+export const useHistoryPlugin: ContentEditorPlugin = (editor) => () => ({
   onKeyDown(e) {
     const cmd = editor.history.action;
     const isMod = e.ctrlKey || e.metaKey;

@@ -9,8 +9,8 @@ import { useCallback, useRef } from "react";
 import { useEventListener } from "../../../hooks/useEventListener.js";
 import { getInputEventSpliceParams } from "../../../utils/event.js";
 import { getSelectionRange, Selection } from "../../../utils/selection.js";
-import { createEventListenerPlugin } from "./combinator/event-listener.js";
-import { ContentEditorPlugin } from "./index.js";
+import { createEventListenerPlugin } from "./create-event-listener-plugin.js";
+import { ContentEditorPlugin } from "./types.js";
 
 const FLUSH_DEBOUNCE_MS = 150;
 // const COMMIT_DEBOUNCE_MS = 400;
@@ -24,7 +24,7 @@ export type PlainTextPluginOptions = {
  *
  * Uses native `beforeinput` to get inputType (React's synthetic event lacks it).
  */
-export const plainTextPlugin = ({
+export const usePlainTextPlugin = ({
   multiline,
 }: PlainTextPluginOptions): ContentEditorPlugin =>
   createEventListenerPlugin("beforeinput", (editor) => {

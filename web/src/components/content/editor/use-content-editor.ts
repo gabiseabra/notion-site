@@ -2,13 +2,12 @@ import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { WithOptional } from "@notion-site/common/types/object.js";
 import { isNonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
-import { TypedEventTarget } from "typescript-event-target";
-import { History } from "../../../utils/history.js";
 import {
   getSelectionRange,
-  Selection,
   setSelectionRange,
 } from "../../../utils/selection.js";
+import { EditorEvent, EditorEventTarget } from "./event.js";
+import { BlockSelection, EditorCommand, EditorHistory } from "./history.js";
 
 /**
  * Optional selection overrides for editor commands.
@@ -29,15 +28,15 @@ export type SelectionOptions = {
  */
 export type ContentEditor = {
   /** Current snapshot of the state */
-  blocks: Blocks;
+  blocks: zNotion.blocks.block[];
   /** Changes every time that the snapshot is updated (so react is going to update) */
   revision: number;
   /** Block ID → DOM element. Populated by plugins via the `ref` prop. */
   blocksRef: RefObject<Map<string, HTMLElement | null>>;
   /** Event target for editor commands. */
-  bus: TypedEventTarget<EditorEventMap>;
+  bus: EditorEventTarget;
   /** Command history for undo/redo. */
-  history: History<Blocks, EditorCommand>;
+  history: EditorHistory;
   /**
    * True if the current snapshot is stale.
    * Need to flush before making changes if you're reading from blocks.
@@ -47,20 +46,24 @@ export type ContentEditor = {
   // Helpers to read blocks from state
 
   /** Returns block data from the current snapshot by id. */
-  get(id: string): Block | null;
+  get(id: string): zNotion.blocks.block | null;
   /** Flushes pending changes if needed, then returns block data from the latest history state. */
-  peek(id: string): Block | null;
+  peek(id: string): zNotion.blocks.block | null;
   /** Returns block's registered DOM element by id. */
   ref(id: string): HTMLElement | null;
 
   // Methods to update the state
 
   /** Replace a block by ID. Pushes to history. */
-  update(block: Block, options?: SelectionOptions): void;
+  update(block: zNotion.blocks.block, options?: SelectionOptions): void;
   /** Remove a block by ID. Pushes to history. */
-  remove(block: Block, options?: SelectionOptions): void;
+  remove(block: zNotion.blocks.block, options?: SelectionOptions): void;
   /** Replace block `left` with `[left, right]`. Pushes to history. */
-  split(left: Block, right: Block, options?: SelectionOptions): void;
+  split(
+    left: zNotion.blocks.block,
+    right: zNotion.blocks.block,
+    options?: SelectionOptions,
+  ): void;
   /** Batch multiple operations as a single history entry. */
   transaction(fn: () => void): void;
   /** Notify plugins to commit pending changes, returning true if the event was handled. */
@@ -78,13 +81,10 @@ export type ContentEditor = {
 export function useContentEditor({
   initialValue,
 }: {
-  initialValue: Blocks;
+  initialValue: zNotion.blocks.block[];
 }): ContentEditor {
-  const bus = useMemo(() => new TypedEventTarget<EditorEventMap>(), []);
-  const history = useMemo(
-    () => new History<Blocks, EditorCommand>(initialValue, applyCommand),
-    [],
-  );
+  const bus = useMemo(() => new EditorEventTarget(), []);
+  const history = useMemo(() => new EditorHistory(initialValue), []);
   const [snapshot, setSnapshot] = useState(() => history.snapshot());
 
   const blocksRef = useRef<Map<string, HTMLElement | null>>(new Map());
@@ -245,81 +245,4 @@ export function useContentEditor({
   }, []);
 
   return editor;
-}
-
-/** Event listener stuff */
-
-export type EventMap = { [k: string]: Event };
-
-export interface EditorEventMap extends EventMap {
-  flush: EditorEvent;
-  commit: EditorEvent;
-}
-
-export class EditorEvent extends Event {
-  constructor(
-    type: keyof EditorEventMap & string,
-    public editor: ContentEditor,
-  ) {
-    super(type);
-  }
-}
-
-/** History sutff */
-
-type Block = zNotion.blocks.block;
-type Blocks = Block[];
-
-type BlockSelection = { id: string } & Selection;
-
-/**
- * Commands for history tracking. Each command can be applied forward
- * to reconstruct state from a snapshot.
- */
-export type EditorCommand =
-  | {
-      type: "update";
-      block: Block;
-      selectionBefore?: BlockSelection;
-      selectionAfter?: BlockSelection;
-    }
-  | {
-      type: "remove";
-      block: Pick<Block, "id">;
-      selectionBefore?: BlockSelection;
-      selectionAfter?: BlockSelection;
-    }
-  | {
-      type: "split";
-      left: Block;
-      right: Block;
-      selectionBefore?: BlockSelection;
-      selectionAfter?: BlockSelection;
-    }
-  | {
-      type: "apply";
-      commands: EditorCommand[];
-      selectionBefore?: BlockSelection;
-      selectionAfter?: BlockSelection;
-    };
-
-/**
- * Applies a command to the blocks state.
- */
-function applyCommand(blocks: Blocks, cmd: EditorCommand): Blocks {
-  switch (cmd.type) {
-    case "update":
-      return blocks.map((b) => (b.id === cmd.block.id ? cmd.block : b));
-    case "remove":
-      return blocks.filter((b) => b.id !== cmd.block.id);
-    case "split": {
-      const index = blocks.findIndex((b) => b.id === cmd.left.id);
-      if (index === -1) return blocks;
-      const result = [...blocks];
-      result.splice(index, 1, cmd.left, cmd.right);
-      return result;
-    }
-    case "apply":
-      return cmd.commands.reduce(applyCommand, blocks);
-  }
 }
