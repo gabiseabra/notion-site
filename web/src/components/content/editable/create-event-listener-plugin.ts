@@ -4,9 +4,6 @@ import { ContentEditorPlugin } from "./types.js";
 
 /**
  * Creates a plugin that attaches a native DOM event listener to all editor blocks.
- *
- * @param eventType - DOM event type to listen for
- * @param plugin - Plugin that provides an `onEvent` handler per block
  */
 export function createEventListenerPlugin<K extends keyof HTMLElementEventMap>(
   eventType: K,

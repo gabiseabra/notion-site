@@ -8,11 +8,14 @@ import { EditorCommand } from "../editor/history.js";
 import { ContentEditorPlugin } from "./types.js";
 
 /**
- * Plugin that handles undo/redo keyboard shortcuts.
+ * Plugin that handles undo/redo keyboard shortcuts and restores the default
+ * selection inferred from history metadata.
  *
- * - `Ctrl+Z` / `Cmd+Z`: Undo
- * - `Ctrl+Shift+Z` / `Cmd+Shift+Z`: Redo
- * - `Ctrl+Y` / `Cmd+Y`: Redo (alternative)
+ * | Key | Behavior |
+ * |-----|----------|
+ * | `Ctrl+Z` | `Cmd+Z`: Undo
+ * | `Ctrl+Shift+Z` | `Cmd+Shift+Z`: Redo
+ * | `Ctrl+Y` | `Cmd+Y`: Redo (alternative)
  */
 export const useHistoryPlugin: ContentEditorPlugin = (editor) => {
   useEventListener(
