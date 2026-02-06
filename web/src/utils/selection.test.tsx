@@ -158,7 +158,7 @@ describe("selection utilities", () => {
       expect(getSelectionRange(textarea)).toEqual({ start: 3, end: 8 });
     });
 
-    it.only("focuses on an empty element", () => {
+    it("focuses on an empty element", () => {
       const { container } = render(<p tabIndex={1}></p>);
       const p = container.querySelector("p")!;
       p.onfocus = jest.fn();

@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import { describe, expect, it } from "@jest/globals";
 import { p, span } from "@notion-site/common/test-utils/mock-block.js";
 import { fireEvent, render } from "@testing-library/react";
 import {
@@ -11,7 +10,7 @@ import {
 } from "../../../utils/selection.js";
 import { ContentEditor } from "../ContentEditor.js";
 
-describe("navigationPlugin", () => {
+describe("blockNavigationPlugin", () => {
   it("moves caret to next block on ArrowRight at end", () => {
     const blocks = [p("a", span("First")), p("b", span("Second"))];
 

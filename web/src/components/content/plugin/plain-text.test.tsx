@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import { describe, expect, it } from "@jest/globals";
 import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { p, span } from "@notion-site/common/test-utils/mock-block.js";
 import { getRichTextContent } from "@notion-site/common/utils/notion/rich-text.js";
