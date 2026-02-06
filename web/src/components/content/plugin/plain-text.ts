@@ -4,31 +4,27 @@ import {
   mapBlock,
   narrowBlock,
 } from "@notion-site/common/utils/notion/blocks.js";
-import {
-  getRichTextLength,
-  spliceRichText,
-} from "@notion-site/common/utils/notion/rich-text.js";
+import { spliceRichText } from "@notion-site/common/utils/notion/rich-text.js";
 import { useCallback, useRef } from "react";
 import { useEventListener } from "../../../hooks/useEventListener.js";
 import { getInputEventSpliceParams } from "../../../utils/event.js";
-import {
-  getSelectionRange,
-  Selection,
-  setSelectionRange,
-} from "../../../utils/selection.js";
-import { composePlugins } from "./combinator/compose.js";
+import { getSelectionRange, Selection } from "../../../utils/selection.js";
 import { createEventListenerPlugin } from "./combinator/event-listener.js";
 import { ContentEditorPlugin } from "./index.js";
 
 const FLUSH_DEBOUNCE_MS = 150;
-const COMMIT_DEBOUNCE_MS = 400;
+// const COMMIT_DEBOUNCE_MS = 400;
+
+export type PlainTextPluginOptions = {
+  multiline?: boolean;
+};
 
 /**
  * Plugin that handles text input, preserving rich_text formatting.
  *
  * Uses native `beforeinput` to get inputType (React's synthetic event lacks it).
  */
-const flushPlugin = ({
+export const plainTextPlugin = ({
   multiline,
 }: PlainTextPluginOptions): ContentEditorPlugin =>
   createEventListenerPlugin("beforeinput", (editor) => {
@@ -37,20 +33,18 @@ const flushPlugin = ({
       selectionBefore?: Selection;
       selectionAfter?: Selection;
     }>(null);
-    const timerRef = useRef<number>(null);
 
     const update = useCallback(
       (block: zNotion.blocks.block, selection: Selection) => {
         if (pendingRef.current && pendingRef.current.block.id !== block.id) {
           flush();
-          pendingRef.current = null;
         }
 
         pendingRef.current ??= {
           block,
           selectionBefore:
             (() => {
-              const element = editor.blocksRef.current.get(block.id);
+              const element = editor.ref(block.id);
               return element && getSelectionRange(element);
             })() ?? undefined,
         };
@@ -60,9 +54,12 @@ const flushPlugin = ({
       [],
     );
 
+    const flushTimerRef = useRef<number>(null);
+
     const flush = useCallback(() => {
       if (pendingRef.current) {
-        if (timerRef.current) clearTimeout(timerRef.current);
+        if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
+
         editor.update(pendingRef.current.block, {
           selectionAfter: pendingRef.current.selectionAfter,
           selectionBefore: pendingRef.current.selectionBefore,
@@ -75,12 +72,12 @@ const flushPlugin = ({
     }, [editor]);
 
     const cancelFlush = useCallback(() => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
     }, []);
 
     const scheduleFlush = useCallback(() => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = window.setTimeout(flush, FLUSH_DEBOUNCE_MS);
+      if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
+      flushTimerRef.current = window.setTimeout(flush, FLUSH_DEBOUNCE_MS);
     }, [flush]);
 
     useEventListener(editor.bus, "flush", flush);
@@ -92,39 +89,49 @@ const flushPlugin = ({
       }, []),
     );
 
+    // const commitTimerRef = useRef<number | null>(null);
+    //
+    // const cancelCommit = useCallback(() => {}, []);
+    //
+    // const scheduleCommit = useCallback(() => {
+    //   if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
+    //
+    //   commitTimerRef.current = window.setTimeout(() => {
+    //     if (editor.flush()) {
+    //       editor.commit();
+    //     }
+    //   }, COMMIT_DEBOUNCE_MS);
+    // }, [editor]);
+
     return (block) => (e) => {
       cancelFlush();
       try {
-        const currentBlock =
-          pendingRef.current && pendingRef.current.block.id === block.id
-            ? pendingRef.current.block
-            : block;
-
-        if (
-          !narrowBlock(currentBlock, ...zNotion.blocks.rich_text_type.options)
-        )
-          return;
-
         const selection = getSelectionRange(e.target as HTMLElement);
         if (!selection) return;
 
-        const node = extractBlock(currentBlock);
-        const rich_text = node.rich_text;
-        const spliceParams = getInputEventSpliceParams(
-          e,
-          getRichTextLength(rich_text),
-          selection,
-        );
+        const spliceParams = getInputEventSpliceParams(e, selection);
 
         if (spliceParams?.insert === "\n" && !multiline) {
-          spliceParams.insert = "";
+          e.preventDefault();
+          return;
         }
 
         if (spliceParams) {
+          const currentBlock =
+            pendingRef.current?.block.id === block.id
+              ? pendingRef.current.block
+              : editor.peek(block.id);
+
+          if (
+            !currentBlock ||
+            !narrowBlock(currentBlock, ...zNotion.blocks.rich_text_type.options)
+          )
+            return;
+
           const newBlock = mapBlock(currentBlock, (node) => ({
             ...node,
             rich_text: spliceRichText(
-              rich_text,
+              extractBlock(currentBlock).rich_text,
               spliceParams.offset,
               spliceParams.deleteCount,
               spliceParams.insert,
@@ -143,36 +150,3 @@ const flushPlugin = ({
       }
     };
   });
-
-const commitPlugin: ContentEditorPlugin = (editor) => {
-  const commitTimerRef = useRef<number | null>(null);
-  const scheduleCommit = useCallback(
-    (block: zNotion.blocks.block) => {
-      if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
-      commitTimerRef.current = window.setTimeout(() => {
-        const element = editor.blocksRef.current.get(block.id);
-        const selection = element && getSelectionRange(element);
-
-        if (element && selection && editor.isDirty) {
-          commitTimerRef.current = null;
-          editor.flush();
-          editor.commit(() => setSelectionRange(element, selection));
-        }
-      }, COMMIT_DEBOUNCE_MS);
-    },
-    [editor],
-  );
-
-  return (block) => ({
-    onKeyDown: () => {
-      scheduleCommit(block);
-    },
-  });
-};
-
-export type PlainTextPluginOptions = {
-  multiline?: boolean;
-};
-
-export const plainTextPlugin = (options: PlainTextPluginOptions) =>
-  composePlugins(flushPlugin(options), commitPlugin);

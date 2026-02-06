@@ -40,7 +40,6 @@ export type SpliceParams = {
  */
 export function getInputEventSpliceParams(
   event: InputEvent,
-  contentLength: number,
   selection: Selection,
 ): SpliceParams | null {
   const { inputType, data } = event;
@@ -76,11 +75,11 @@ export function getInputEventSpliceParams(
     case "deleteContentForward":
     case "deleteWordForward":
     case "deleteSoftLineForward": {
-      const deleteCount = selectionLength > 0 ? selectionLength : 1;
-      if (start + deleteCount <= contentLength) {
-        return { offset: start, deleteCount, insert: "" };
-      }
-      return null;
+      return {
+        offset: start,
+        deleteCount: selectionLength > 0 ? selectionLength : 1,
+        insert: "",
+      };
     }
 
     // Cut

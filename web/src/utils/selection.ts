@@ -68,7 +68,6 @@ export function setSelectionRange(
 
   if (range === null) return;
 
-  console.log("....");
   if (element.textContent === "" && range.start === 0) {
     element.focus();
     return;

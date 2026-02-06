@@ -4,7 +4,11 @@ import { isNonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { TypedEventTarget } from "typescript-event-target";
 import { History } from "../../../utils/history.js";
-import { Selection } from "../../../utils/selection.js";
+import {
+  getSelectionRange,
+  Selection,
+  setSelectionRange,
+} from "../../../utils/selection.js";
 
 /**
  * Optional selection overrides for editor commands.
@@ -24,15 +28,32 @@ export type SelectionOptions = {
  * `Record<string, never>` which errors if you try to use events without typing.
  */
 export type ContentEditor = {
+  /** Current snapshot of the state */
   blocks: Blocks;
+  /** Changes every time that the snapshot is updated (so react is going to update) */
+  revision: number;
   /** Block ID → DOM element. Populated by plugins via the `ref` prop. */
   blocksRef: RefObject<Map<string, HTMLElement | null>>;
-  /** Typed event target for plugin communication. */
+  /** Event target for editor commands. */
   bus: TypedEventTarget<EditorEventMap>;
   /** Command history for undo/redo. */
   history: History<Blocks, EditorCommand>;
-
+  /**
+   * True if the current snapshot is stale.
+   * Need to flush before making changes if you're reading from blocks.
+   */
   isDirty: boolean;
+
+  // Helpers to read blocks from state
+
+  /** Returns block data from the current snapshot by id. */
+  get(id: string): Block | null;
+  /** Flushes pending changes if needed, then returns block data from the latest history state. */
+  peek(id: string): Block | null;
+  /** Returns block's registered DOM element by id. */
+  ref(id: string): HTMLElement | null;
+
+  // Methods to update the state
 
   /** Replace a block by ID. Pushes to history. */
   update(block: Block, options?: SelectionOptions): void;
@@ -68,12 +89,12 @@ export function useContentEditor({
 
   const blocksRef = useRef<Map<string, HTMLElement | null>>(new Map());
   const txRef = useRef<EditorCommand[] | null>(null);
-  const postCommitRef = useRef<((editor: ContentEditor) => void)[]>([]);
 
   const editorRef = useRef<ContentEditor>(null);
   const editor = useMemo<ContentEditor>(
     () => ({
       blocks: snapshot.state,
+      revision: snapshot.position,
       blocksRef,
       bus,
       history,
@@ -82,7 +103,26 @@ export function useContentEditor({
         return history.currentPosition !== snapshot.position;
       },
 
+      get(id) {
+        return snapshot.state.find((block) => block.id === id) ?? null;
+      },
+
+      peek(id) {
+        editorRef.current?.flush();
+        if (editorRef.current?.isDirty) {
+          return history.getState().find((block) => block.id === id) ?? null;
+        } else {
+          return snapshot.state.find((block) => block.id === id) ?? null;
+        }
+      },
+
+      ref(id) {
+        return blocksRef.current.get(id) ?? null;
+      },
+
       update(block, options) {
+        console.info("update", { block, options });
+
         const cmd: EditorCommand = {
           type: "update",
           block,
@@ -98,6 +138,8 @@ export function useContentEditor({
       },
 
       remove(block, options) {
+        console.info("remove", { block, options });
+
         const cmd: EditorCommand = {
           type: "remove",
           block,
@@ -113,6 +155,8 @@ export function useContentEditor({
       },
 
       split(left, right, options) {
+        console.info("split", { right, left, options });
+
         const cmd: EditorCommand = {
           type: "split",
           left,
@@ -147,32 +191,56 @@ export function useContentEditor({
       },
 
       flush() {
-        return (
+        const flushed =
           !!editorRef.current &&
           bus.dispatchTypedEvent(
             "flush",
             new EditorEvent("flush", editorRef.current),
-          )
-        );
+          );
+
+        console.info("flush", { flushed });
+
+        return flushed;
       },
 
-      commit(afterCommit = () => {}) {
-        postCommitRef.current.push(afterCommit);
-        setSnapshot(history.snapshot());
+      commit() {
+        const snapshot = history.snapshot();
+
+        console.info("commit", { snapshot });
+
+        editorRef.current?.flush();
+        setSnapshot(snapshot);
       },
     }),
     [snapshot, bus, history],
   );
   editorRef.current = editor;
 
+  const isInitialRef = useRef(true);
+
+  // Set `selectionAfter` of last action after commit
   useEffect(() => {
-    const callbacks = postCommitRef.current;
-    if (callbacks.length) {
-      bus.dispatchTypedEvent("commit", new EditorEvent("commit", editor));
-      callbacks.forEach((fn) => fn(editor));
-      postCommitRef.current = [];
+    if (isInitialRef.current) return;
+
+    bus.dispatchTypedEvent("commit", new EditorEvent("commit", editor));
+
+    const { selectionAfter } = history.action ?? {};
+    const element = selectionAfter && editor.ref(selectionAfter.id);
+    const currentSelection = element && getSelectionRange(element);
+    const selectionEquals =
+      selectionAfter &&
+      currentSelection &&
+      selectionAfter.start === currentSelection.start &&
+      selectionAfter.end === currentSelection.end;
+
+    if (selectionAfter && element && !selectionEquals) {
+      setSelectionRange(element, selectionAfter);
     }
   }, [snapshot]);
+
+  useEffect(() => {
+    isInitialRef.current = false;
+  }, []);
 
   return editor;
 }

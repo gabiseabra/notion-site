@@ -100,8 +100,7 @@ async function forwardInputEvents(
         if (!(e instanceof InputEvent) || e.defaultPrevented) return;
         const selection = getSelectionRange(proxy);
         const spliceParams =
-          selection &&
-          getInputEventSpliceParams(e, proxy.value.length, selection);
+          selection && getInputEventSpliceParams(e, selection);
         if (spliceParams) {
           element.innerHTML = spliceElementText(
             element,

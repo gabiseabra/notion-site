@@ -35,9 +35,7 @@ export const blockMutationPlugin: ContentEditorPlugin =
         const prevBlock = editor.blocks[index - 1];
         const prevElement =
           prevBlock && editor.blocksRef.current.get(prevBlock.id);
-        const currentBlock = editor.flush()
-          ? editor.history.getState().find((b) => b.id === block.id)
-          : block;
+        const currentBlock = editor.peek(block.id);
 
         if (
           !prevBlock ||
@@ -74,18 +72,11 @@ export const blockMutationPlugin: ContentEditorPlugin =
           });
         });
 
-        editor.commit((editor) => {
-          const element = editor.blocksRef.current.get(prevBlock.id);
-          if (element) {
-            setSelectionRange(element, selectionAfter);
-          }
-        });
+        editor.commit();
 
         e.preventDefault();
       } else if (e.key === "Enter" && !e.shiftKey) {
-        const currentBlock = editor.flush()
-          ? editor.history.getState().find((b) => b.id === block.id)
-          : block;
+        const currentBlock = editor.peek(block.id);
 
         if (!currentBlock) return;
 
@@ -103,8 +94,8 @@ export const blockMutationPlugin: ContentEditorPlugin =
         });
 
         editor.commit((editor) => {
-          const blockRef = editor.blocksRef.current.get(right.id);
-          if (blockRef) setSelectionRange(blockRef, { start: 0, end: null });
+          const element = editor.ref(right.id);
+          if (element) setSelectionRange(element, { start: 0, end: null });
         });
 
         e.preventDefault();
