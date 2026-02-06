@@ -18,11 +18,14 @@ export const historyPlugin: ContentEditorPlugin = (editor) => () => ({
     if (e.key === "z" && !e.shiftKey) {
       if (!editor.history.undo()) return;
       editor.commit((editor) => {
-        const element = editor.blocksRef.current.get(cmd.selection.id);
-        if (element) {
-          element.focus();
-          setSelectionRange(element, cmd.selection);
-        }
+        const sel = cmd.selectionBefore;
+        if (!sel) return;
+
+        const element = editor.blocksRef.current.get(sel.id);
+        if (!element) return;
+
+        element.focus();
+        setSelectionRange(element, sel);
       });
       e.preventDefault();
       return;
@@ -32,11 +35,14 @@ export const historyPlugin: ContentEditorPlugin = (editor) => () => ({
       if (!editor.history.redo()) return;
 
       editor.commit((editor) => {
-        const element = editor.blocksRef.current.get(cmd.selection.id);
-        if (element) {
-          element.focus();
-          setSelectionRange(element, cmd.selection);
-        }
+        const sel = cmd.selectionAfter;
+        if (!sel) return;
+
+        const element = editor.blocksRef.current.get(sel.id);
+        if (!element) return;
+
+        element.focus();
+        setSelectionRange(element, sel);
       });
       e.preventDefault();
       return;

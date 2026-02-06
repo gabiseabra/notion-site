@@ -23,13 +23,13 @@ import { ContentEditorPlugin } from "./index.js";
 export const blockMutationPlugin: ContentEditorPlugin =
   (editor) => (block) => ({
     onKeyDown(e) {
-      const selection = getSelectionRange(e.currentTarget);
-      if (!selection) return;
+      const selectionBefore = getSelectionRange(e.target as HTMLElement);
+      if (!selectionBefore) return;
 
       if (
         e.key === "Backspace" &&
-        selection.start === 0 &&
-        selection.end === null
+        selectionBefore.start === 0 &&
+        selectionBefore.end === null
       ) {
         const index = editor.blocks.findIndex((b) => b.id === block.id);
         const prevBlock = editor.blocks[index - 1];
@@ -51,7 +51,8 @@ export const blockMutationPlugin: ContentEditorPlugin =
         )
           return;
 
-        const nextSelection = {
+        const selectionAfter = {
+          id: prevBlock.id,
           start: getMaxSelectionOffset(prevElement),
           end: null,
         };
@@ -67,13 +68,16 @@ export const blockMutationPlugin: ContentEditorPlugin =
               ],
             })),
           );
-          editor.remove(currentBlock);
+          editor.remove(currentBlock, {
+            selectionBefore,
+            selectionAfter,
+          });
         });
 
         editor.commit((editor) => {
           const element = editor.blocksRef.current.get(prevBlock.id);
           if (element) {
-            setSelectionRange(element, nextSelection);
+            setSelectionRange(element, selectionAfter);
           }
         });
 
@@ -87,11 +91,16 @@ export const blockMutationPlugin: ContentEditorPlugin =
 
         const { left, right } = splitBlock(
           currentBlock,
-          selection.start,
-          selection.end ? selection.start - selection.end : undefined,
+          selectionBefore.start,
+          selectionBefore.end
+            ? selectionBefore.start - selectionBefore.end
+            : undefined,
         );
 
-        editor.split(left, right);
+        editor.split(left, right, {
+          selectionBefore,
+          selectionAfter: { id: right.id, start: 0, end: null },
+        });
 
         editor.commit((editor) => {
           const blockRef = editor.blocksRef.current.get(right.id);

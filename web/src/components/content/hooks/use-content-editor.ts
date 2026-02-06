@@ -1,12 +1,21 @@
 import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
+import { WithOptional } from "@notion-site/common/types/object.js";
+import { isNonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { TypedEventTarget } from "typescript-event-target";
 import { History } from "../../../utils/history.js";
-import {
-  getSelectionRange,
-  mergeSelections,
-  Selection,
-} from "../../../utils/selection.js";
+import { Selection } from "../../../utils/selection.js";
+
+/**
+ * Optional selection overrides for editor commands.
+ * If not provided, defaults to current DOM selection.
+ */
+export type SelectionOptions = {
+  /** Selection before the change (for undo). */
+  selectionBefore?: WithOptional<BlockSelection, "id">;
+  /** Selection after the change (for redo). */
+  selectionAfter?: WithOptional<BlockSelection, "id">;
+};
 
 /**
  * Shared state passed to plugins in their editor setup phase.
@@ -26,11 +35,11 @@ export type ContentEditor = {
   isDirty: boolean;
 
   /** Replace a block by ID. Pushes to history. */
-  update(block: Block): void;
+  update(block: Block, options?: SelectionOptions): void;
   /** Remove a block by ID. Pushes to history. */
-  remove(block: Block): void;
+  remove(block: Block, options?: SelectionOptions): void;
   /** Replace block `left` with `[left, right]`. Pushes to history. */
-  split(left: Block, right: Block): void;
+  split(left: Block, right: Block, options?: SelectionOptions): void;
   /** Batch multiple operations as a single history entry. */
   transaction(fn: () => void): void;
   /** Notify plugins to commit pending changes, returning true if the event was handled. */
@@ -61,25 +70,6 @@ export function useContentEditor({
   const txRef = useRef<EditorCommand[] | null>(null);
   const postCommitRef = useRef<((editor: ContentEditor) => void)[]>([]);
 
-  function getFocusedBlock() {
-    const active = document.activeElement;
-    if (!active) return null;
-    for (const [id, element] of blocksRef.current) {
-      if (element?.contains(active)) {
-        return { id, element, block: snapshot.state.find((b) => b.id === id) };
-      }
-    }
-    return null;
-  }
-
-  function getCurrentSelection(): BlockSelection | null {
-    const focused = getFocusedBlock();
-    if (!focused?.element) return null;
-    const selection = getSelectionRange(focused.element);
-    if (!selection) return null;
-    return { id: focused.id, ...selection };
-  }
-
   const editorRef = useRef<ContentEditor>(null);
   const editor = useMemo<ContentEditor>(
     () => ({
@@ -92,26 +82,48 @@ export function useContentEditor({
         return history.currentPosition !== snapshot.position;
       },
 
-      update(block) {
-        const selection = getCurrentSelection();
-        if (!selection) return;
-        const cmd: EditorCommand = { type: "update", block, selection };
+      update(block, options) {
+        const cmd: EditorCommand = {
+          type: "update",
+          block,
+          selectionBefore: options?.selectionBefore
+            ? { id: block.id, ...options.selectionBefore }
+            : undefined,
+          selectionAfter: options?.selectionAfter
+            ? { id: block.id, ...options.selectionAfter }
+            : undefined,
+        };
         if (txRef.current) txRef.current.push(cmd);
         else history.push(cmd);
       },
 
-      remove(block) {
-        const selection = getCurrentSelection();
-        if (!selection) return;
-        const cmd: EditorCommand = { type: "remove", block, selection };
+      remove(block, options) {
+        const cmd: EditorCommand = {
+          type: "remove",
+          block,
+          selectionBefore: options?.selectionBefore
+            ? { id: block.id, ...options.selectionBefore }
+            : undefined,
+          selectionAfter: options?.selectionAfter
+            ? { id: block.id, ...options.selectionAfter }
+            : undefined,
+        };
         if (txRef.current) txRef.current.push(cmd);
         else history.push(cmd);
       },
 
-      split(left, right) {
-        const selection = getCurrentSelection();
-        if (!selection) return;
-        const cmd: EditorCommand = { type: "split", left, right, selection };
+      split(left, right, options) {
+        const cmd: EditorCommand = {
+          type: "split",
+          left,
+          right,
+          selectionBefore: options?.selectionBefore
+            ? { id: left.id, ...options.selectionBefore }
+            : undefined,
+          selectionAfter: options?.selectionAfter
+            ? { id: right.id, ...options.selectionAfter }
+            : undefined,
+        };
         if (txRef.current) txRef.current.push(cmd);
         else history.push(cmd);
       },
@@ -121,17 +133,15 @@ export function useContentEditor({
         fn();
         const commands = txRef.current;
         txRef.current = null;
-        if (commands.length > 0) {
+        if (isNonEmpty(commands)) {
           history.push({
             type: "apply",
             commands,
-            selection: {
-              id: commands[0].selection.id,
-              ...mergeSelections(
-                commands[0].selection,
-                ...commands.slice(1).map((cmd) => cmd.selection),
-              ),
-            },
+            selectionBefore: commands.find((cmd) => cmd.selectionBefore)
+              ?.selectionBefore,
+            selectionAfter: [...commands]
+              .reverse()
+              .find((cmd) => cmd.selectionAfter)?.selectionAfter,
           });
         }
       },
@@ -197,15 +207,31 @@ type BlockSelection = { id: string } & Selection;
  * to reconstruct state from a snapshot.
  */
 export type EditorCommand =
-  | { type: "update"; block: Block; selection: BlockSelection }
-  | { type: "remove"; block: Pick<Block, "id">; selection: BlockSelection }
+  | {
+      type: "update";
+      block: Block;
+      selectionBefore?: BlockSelection;
+      selectionAfter?: BlockSelection;
+    }
+  | {
+      type: "remove";
+      block: Pick<Block, "id">;
+      selectionBefore?: BlockSelection;
+      selectionAfter?: BlockSelection;
+    }
   | {
       type: "split";
       left: Block;
       right: Block;
-      selection: BlockSelection;
+      selectionBefore?: BlockSelection;
+      selectionAfter?: BlockSelection;
     }
-  | { type: "apply"; commands: EditorCommand[]; selection: BlockSelection };
+  | {
+      type: "apply";
+      commands: EditorCommand[];
+      selectionBefore?: BlockSelection;
+      selectionAfter?: BlockSelection;
+    };
 
 /**
  * Applies a command to the blocks state.

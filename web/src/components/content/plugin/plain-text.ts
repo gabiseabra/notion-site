@@ -13,13 +13,14 @@ import { useEventListener } from "../../../hooks/useEventListener.js";
 import { getInputEventSpliceParams } from "../../../utils/event.js";
 import {
   getSelectionRange,
+  Selection,
   setSelectionRange,
 } from "../../../utils/selection.js";
 import { composePlugins } from "./combinator/compose.js";
 import { createEventListenerPlugin } from "./combinator/event-listener.js";
 import { ContentEditorPlugin } from "./index.js";
 
-const FLUSH_DEBOUNCE_MS = 250;
+const FLUSH_DEBOUNCE_MS = 150;
 const COMMIT_DEBOUNCE_MS = 400;
 
 /**
@@ -31,21 +32,41 @@ const flushPlugin = ({
   multiline,
 }: PlainTextPluginOptions): ContentEditorPlugin =>
   createEventListenerPlugin("beforeinput", (editor) => {
-    const pendingRef = useRef<Record<string, zNotion.blocks.block>>({});
+    const pendingRef = useRef<{
+      block: zNotion.blocks.block;
+      selectionBefore?: Selection;
+      selectionAfter?: Selection;
+    }>(null);
     const timerRef = useRef<number>(null);
 
-    const update = useCallback((block: zNotion.blocks.block) => {
-      pendingRef.current[block.id] = block;
-    }, []);
+    const update = useCallback(
+      (block: zNotion.blocks.block, selection: Selection) => {
+        if (pendingRef.current && pendingRef.current.block.id !== block.id) {
+          flush();
+          pendingRef.current = null;
+        }
+
+        pendingRef.current ??= {
+          block,
+          selectionBefore:
+            (() => {
+              const element = editor.blocksRef.current.get(block.id);
+              return element && getSelectionRange(element);
+            })() ?? undefined,
+        };
+        pendingRef.current.block = block;
+        pendingRef.current.selectionAfter = selection;
+      },
+      [],
+    );
 
     const flush = useCallback(() => {
       if (pendingRef.current) {
         if (timerRef.current) clearTimeout(timerRef.current);
-        const blocks = pendingRef.current;
-
-        for (const block of Object.values(blocks)) {
-          editor.update(block);
-        }
+        editor.update(pendingRef.current.block, {
+          selectionAfter: pendingRef.current.selectionAfter,
+          selectionBefore: pendingRef.current.selectionBefore,
+        });
 
         return true;
       } else {
@@ -67,14 +88,17 @@ const flushPlugin = ({
       editor.bus,
       "commit",
       useCallback(() => {
-        pendingRef.current = {};
+        pendingRef.current = null;
       }, []),
     );
 
     return (block) => (e) => {
       cancelFlush();
       try {
-        const currentBlock = pendingRef.current[block.id] ?? block;
+        const currentBlock =
+          pendingRef.current && pendingRef.current.block.id === block.id
+            ? pendingRef.current.block
+            : block;
 
         if (
           !narrowBlock(currentBlock, ...zNotion.blocks.rich_text_type.options)
@@ -107,7 +131,10 @@ const flushPlugin = ({
             ),
           }));
 
-          update(newBlock);
+          update(newBlock, {
+            start: spliceParams.offset + spliceParams.insert.length,
+            end: null,
+          });
 
           return true;
         }
