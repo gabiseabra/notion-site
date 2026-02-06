@@ -1,4 +1,10 @@
-import { setSelectionRange } from "../../../utils/selection.js";
+import { useCallback } from "react";
+import { useEventListener } from "../../../hooks/useEventListener.js";
+import {
+  getSelectionRange,
+  setSelectionRange,
+} from "../../../utils/selection.js";
+import { EditorCommand } from "../editor/history.js";
 import { ContentEditorPlugin } from "./types.js";
 
 /**
@@ -8,44 +14,54 @@ import { ContentEditorPlugin } from "./types.js";
  * - `Ctrl+Shift+Z` / `Cmd+Shift+Z`: Redo
  * - `Ctrl+Y` / `Cmd+Y`: Redo (alternative)
  */
-export const useHistoryPlugin: ContentEditorPlugin = (editor) => () => ({
-  onKeyDown(e) {
-    const cmd = editor.history.action;
-    const isMod = e.ctrlKey || e.metaKey;
+export const useHistoryPlugin: ContentEditorPlugin = (editor) => {
+  useEventListener(
+    editor.bus,
+    "push",
+    useCallback(({ editor }) => {
+      const cmd = editor.history.command;
+      if (!cmd) return;
 
-    if (!cmd || !isMod) return;
+      const id = EditorCommand.id(cmd, editor.history.direction);
+      const selection = {
+        undo: cmd.selectionBefore,
+        redo: cmd.selectionAfter,
+      }[editor.history.direction];
+      const element = editor.ref(id);
+      const currentSelection = element && getSelectionRange(element);
+      if (
+        !element ||
+        !selection ||
+        (selection.start === currentSelection?.start &&
+          selection.end === currentSelection?.end)
+      )
+        return;
 
-    if (e.key === "z" && !e.shiftKey) {
-      if (!editor.history.undo()) return;
-      editor.commit((editor) => {
-        const sel = cmd.selectionBefore;
-        if (!sel) return;
+      setSelectionRange(element, selection);
+    }, []),
+  );
 
-        const element = editor.blocksRef.current.get(sel.id);
-        if (!element) return;
+  return () => ({
+    onKeyDown(e) {
+      const cmd = editor.history.command;
+      const isMod = e.ctrlKey || e.metaKey;
 
-        element.focus();
-        setSelectionRange(element, sel);
-      });
-      e.preventDefault();
-      return;
-    }
+      if (!cmd || !isMod) return;
 
-    if ((e.key === "z" && e.shiftKey) || e.key === "y") {
-      if (!editor.history.redo()) return;
+      if (e.key === "z" && !e.shiftKey) {
+        if (!editor.history.undo()) return;
+        editor.commit();
+        e.preventDefault();
+        return;
+      }
 
-      editor.commit((editor) => {
-        const sel = cmd.selectionAfter;
-        if (!sel) return;
+      if ((e.key === "z" && e.shiftKey) || e.key === "y") {
+        if (!editor.history.redo()) return;
 
-        const element = editor.blocksRef.current.get(sel.id);
-        if (!element) return;
-
-        element.focus();
-        setSelectionRange(element, sel);
-      });
-      e.preventDefault();
-      return;
-    }
-  },
-});
+        editor.commit();
+        e.preventDefault();
+        return;
+      }
+    },
+  });
+};

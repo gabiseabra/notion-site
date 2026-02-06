@@ -25,12 +25,11 @@ export const useBlockNavigationPlugin: ContentEditorPlugin =
 
       const currentIndex = editor.blocks.findIndex((b) => b.id === block.id);
       const prevBlock = editor.blocks[currentIndex - 1];
-      const prevElement =
-        prevBlock && editor.blocksRef.current.get(prevBlock.id);
+      const prevElement = prevBlock && editor.ref(prevBlock.id);
       const nextBlock = editor.blocks[currentIndex + 1];
-      const nextElement =
-        nextBlock && editor.blocksRef.current.get(nextBlock.id);
+      const nextElement = nextBlock && editor.ref(nextBlock.id);
 
+      console.log({ currentIndex, prevBlock, nextBlock });
       switch (e.key) {
         case "ArrowLeft":
           if (!(prevElement && selection.start === 0 && selection.end === null))

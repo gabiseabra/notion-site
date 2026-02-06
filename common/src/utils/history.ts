@@ -51,11 +51,15 @@ export class History<State, Cmd> {
     return { state: this.getState(), position: this.position };
   }
 
-  get action(): Cmd | null {
+  get command(): Cmd | null {
     return this.commands[this.position - 1] ?? null;
   }
 
   get currentPosition() {
     return this.position;
+  }
+
+  get direction() {
+    return this.commands.length === this.position ? "redo" : "undo";
   }
 }

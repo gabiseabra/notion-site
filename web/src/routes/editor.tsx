@@ -53,7 +53,6 @@ export function Component() {
   );
 
   const onChange = (blocks: zNotion.blocks.block[]) => {
-    console.info("onChange", blocks);
     setBlocks(blocks);
   };
 

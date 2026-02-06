@@ -1,13 +1,9 @@
 import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
-import { WithOptional } from "@notion-site/common/types/object.js";
 import { isNonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
-import {
-  getSelectionRange,
-  setSelectionRange,
-} from "../../../utils/selection.js";
+import { Selection } from "../../../utils/selection.js";
 import { EditorEvent, EditorEventTarget } from "./event.js";
-import { BlockSelection, EditorCommand, EditorHistory } from "./history.js";
+import { EditorCommand, EditorHistory } from "./history.js";
 
 /**
  * Optional selection overrides for editor commands.
@@ -15,9 +11,9 @@ import { BlockSelection, EditorCommand, EditorHistory } from "./history.js";
  */
 export type SelectionOptions = {
   /** Selection before the change (for undo). */
-  selectionBefore?: WithOptional<BlockSelection, "id">;
+  selectionBefore?: Selection;
   /** Selection after the change (for redo). */
-  selectionAfter?: WithOptional<BlockSelection, "id">;
+  selectionAfter?: Selection;
 };
 
 /**
@@ -66,14 +62,17 @@ export type ContentEditor = {
   ): void;
   /** Batch multiple operations as a single history entry. */
   transaction(fn: () => void): void;
-  /** Notify plugins to commit pending changes, returning true if the event was handled. */
+  /**
+   * Notify plugins to commit pending changes, returning true if the event was handled.
+   * @return false is the event default was prevented.
+   */
   flush(): boolean;
   /** Commit the current state of history to DOM. Callback runs after render is done. */
-  commit(afterCommit?: (editor: ContentEditor) => void): void;
+  commit(): void;
 };
 
 /**
- * Creates shared state for the editor plugins.
+ * Creates shared state & controller for the editor plugins.
  *
  * @typeParam TEventMap - Map of event types. Must be explicitly provided when
  * using plugins that emit events.
@@ -121,94 +120,103 @@ export function useContentEditor({
       },
 
       update(block, options) {
-        console.info("update", { block, options });
+        if (!editorRef.current) return;
 
         const cmd: EditorCommand = {
           type: "update",
           block,
-          selectionBefore: options?.selectionBefore
-            ? { id: block.id, ...options.selectionBefore }
-            : undefined,
-          selectionAfter: options?.selectionAfter
-            ? { id: block.id, ...options.selectionAfter }
-            : undefined,
+          selectionBefore: options?.selectionBefore,
+          selectionAfter: options?.selectionAfter,
         };
+
+        const event = new EditorEvent("edit", editorRef.current, cmd);
+        bus.dispatchTypedEvent("edit", event);
+        if (event.defaultPrevented) return;
+
         if (txRef.current) txRef.current.push(cmd);
         else history.push(cmd);
       },
 
       remove(block, options) {
-        console.info("remove", { block, options });
+        if (!editorRef.current) return;
 
         const cmd: EditorCommand = {
           type: "remove",
           block,
-          selectionBefore: options?.selectionBefore
-            ? { id: block.id, ...options.selectionBefore }
-            : undefined,
-          selectionAfter: options?.selectionAfter
-            ? { id: block.id, ...options.selectionAfter }
-            : undefined,
+          selectionBefore: options?.selectionBefore,
+          selectionAfter: options?.selectionAfter,
         };
+
+        const event = new EditorEvent("edit", editorRef.current, cmd);
+        bus.dispatchTypedEvent("edit", event);
+        if (event.defaultPrevented) return;
+
         if (txRef.current) txRef.current.push(cmd);
         else history.push(cmd);
       },
 
       split(left, right, options) {
-        console.info("split", { right, left, options });
+        if (!editorRef.current) return;
 
         const cmd: EditorCommand = {
           type: "split",
           left,
           right,
-          selectionBefore: options?.selectionBefore
-            ? { id: left.id, ...options.selectionBefore }
-            : undefined,
-          selectionAfter: options?.selectionAfter
-            ? { id: right.id, ...options.selectionAfter }
-            : undefined,
+          selectionBefore: options?.selectionBefore,
+          selectionAfter: options?.selectionAfter,
         };
+
+        const event = new EditorEvent("edit", editorRef.current, cmd);
+        bus.dispatchTypedEvent("edit", event);
+        if (event.defaultPrevented) return;
+
         if (txRef.current) txRef.current.push(cmd);
         else history.push(cmd);
       },
 
       transaction(fn) {
-        txRef.current = [];
+        txRef.current ??= [];
         fn();
         const commands = txRef.current;
         txRef.current = null;
-        if (isNonEmpty(commands)) {
-          history.push({
-            type: "apply",
-            commands,
-            selectionBefore: commands.find((cmd) => cmd.selectionBefore)
-              ?.selectionBefore,
-            selectionAfter: [...commands]
-              .reverse()
-              .find((cmd) => cmd.selectionAfter)?.selectionAfter,
-          });
-        }
+
+        if (!isNonEmpty(commands)) return;
+
+        const cmd = {
+          type: "apply",
+          commands: EditorCommand.flat(commands),
+          selectionBefore: commands.find((cmd) => cmd.selectionBefore)
+            ?.selectionBefore,
+          selectionAfter: [...commands]
+            .reverse()
+            .find((cmd) => cmd.selectionAfter)?.selectionAfter,
+        } as const;
+
+        history.push(cmd);
       },
 
       flush() {
-        const flushed =
-          !!editorRef.current &&
-          bus.dispatchTypedEvent(
-            "flush",
-            new EditorEvent("flush", editorRef.current),
-          );
+        if (!editorRef.current) return false;
 
-        console.info("flush", { flushed });
+        const event = new EditorEvent("flush", editorRef.current, {});
+        bus.dispatchTypedEvent("flush", event);
 
-        return flushed;
+        return !event.defaultPrevented;
       },
 
       commit() {
+        if (!editorRef.current) return;
         const snapshot = history.snapshot();
 
-        console.info("commit", { snapshot });
+        const event = new EditorEvent(
+          "commit",
+          editorRef.current,
+          snapshot.state,
+        );
+        bus.dispatchTypedEvent("commit", event);
+        if (event.defaultPrevented) return;
 
-        editorRef.current?.flush();
+        editorRef.current.flush();
         setSnapshot(snapshot);
       },
     }),
@@ -218,26 +226,12 @@ export function useContentEditor({
 
   const isInitialRef = useRef(true);
 
-  // Set `selectionAfter` of last action after commit
   useEffect(() => {
-    if (isInitialRef.current) return;
-
-    bus.dispatchTypedEvent("commit", new EditorEvent("commit", editor));
-
-    const { selectionAfter } = history.action ?? {};
-    const element = selectionAfter && editor.ref(selectionAfter.id);
-    const currentSelection = element && getSelectionRange(element);
-    const selectionEquals =
-      selectionAfter &&
-      currentSelection &&
-      selectionAfter.start === currentSelection.start &&
-      selectionAfter.end === currentSelection.end;
-
-    if (selectionAfter && element && !selectionEquals) {
-      setSelectionRange(element, selectionAfter);
-    }
-
-    console.info("post-commit", { selectionAfter, currentSelection });
+    const cmd = history.command;
+    const event = !cmd
+      ? new EditorEvent("reset", editor, {})
+      : new EditorEvent("push", editor, {});
+    bus.dispatchTypedEvent(event.eventType, event);
   }, [snapshot]);
 
   useEffect(() => {

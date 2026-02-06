@@ -89,20 +89,6 @@ export const usePlainTextPlugin = ({
       }, []),
     );
 
-    // const commitTimerRef = useRef<number | null>(null);
-    //
-    // const cancelCommit = useCallback(() => {}, []);
-    //
-    // const scheduleCommit = useCallback(() => {
-    //   if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
-    //
-    //   commitTimerRef.current = window.setTimeout(() => {
-    //     if (editor.flush()) {
-    //       editor.commit();
-    //     }
-    //   }, COMMIT_DEBOUNCE_MS);
-    // }, [editor]);
-
     return (block) => (e) => {
       cancelFlush();
       try {

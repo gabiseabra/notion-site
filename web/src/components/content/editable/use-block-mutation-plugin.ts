@@ -8,7 +8,6 @@ import {
 import {
   getMaxSelectionOffset,
   getSelectionRange,
-  setSelectionRange,
 } from "../../../utils/selection.js";
 import { ContentEditorPlugin } from "./types.js";
 
@@ -55,8 +54,12 @@ export const useBlockMutationPlugin: ContentEditorPlugin =
           end: null,
         };
 
+        // merge any text on the tail of this block into the previous block
         editor.transaction(() => {
-          // merge any text on the tail of this block into the previous block
+          editor.remove(currentBlock, {
+            selectionBefore,
+            selectionAfter,
+          });
           editor.update(
             mapBlock(prevBlock, (node) => ({
               ...node,
@@ -66,10 +69,6 @@ export const useBlockMutationPlugin: ContentEditorPlugin =
               ],
             })),
           );
-          editor.remove(currentBlock, {
-            selectionBefore,
-            selectionAfter,
-          });
         });
 
         editor.commit();
@@ -90,13 +89,10 @@ export const useBlockMutationPlugin: ContentEditorPlugin =
 
         editor.split(left, right, {
           selectionBefore,
-          selectionAfter: { id: right.id, start: 0, end: null },
+          selectionAfter: { start: 0, end: null },
         });
 
-        editor.commit((editor) => {
-          const element = editor.ref(right.id);
-          if (element) setSelectionRange(element, { start: 0, end: null });
-        });
+        editor.commit();
 
         e.preventDefault();
       }
