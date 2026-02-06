@@ -157,6 +157,14 @@ describe("selection utilities", () => {
       setSelectionRange(textarea, { start: 3, end: 8 });
       expect(getSelectionRange(textarea)).toEqual({ start: 3, end: 8 });
     });
+
+    it.only("focuses on an empty element", () => {
+      const { container } = render(<p tabIndex={1}></p>);
+      const p = container.querySelector("p")!;
+      p.onfocus = jest.fn();
+      setSelectionRange(p, { start: 0, end: null });
+      expect(p.onfocus).toHaveBeenCalled();
+    });
   });
 
   describe("mergeSelections", () => {
