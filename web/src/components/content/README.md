@@ -18,11 +18,10 @@ Theoretically, you _could_ register input events in a block node such as `p`, le
 update the state `onblur`, or when the cursor goes idle for a while, or when you must perform a block mutation (like
 adding or deleting a block). This is assuming that we could make inline editing stable under the control of
 content-editable, while block elements would be fully controlled by React.
-
 This actually works if you're dealing with plain-text: you can use `content-editable="plaintext-only"` to disable the
 DOM from creating inline nodes such as `b` on `ctrl+b`, and if you pass only `string` to the block node's `children`
 prop, then there will be no more nodes to reconcile beyond the block-level, therefore no problem. But then your content
-editor would essentially work like a `textarea` 🤷‍♀️
+editor would essentially work like a `textarea` 🤷‍♀️ (this is true, @see [use-plain-text-plugin.test.tsx](./editable/use-plain-text-plugin.test.tsx))
 
 But this approach doesn't work if you're dealing with more complex data that render into more HTML. Even if you're extra
 careful to keep inline and block mutations handled separately, React's reconciliation still has to perform unmount
