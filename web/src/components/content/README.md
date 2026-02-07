@@ -23,8 +23,6 @@ This actually works if you're dealing with plain-text: you can use `content-edit
 DOM from creating inline nodes such as `b` on `ctrl+b`, and if you pass only `string` to the block node's `children`
 prop, then there will be no more nodes to reconcile beyond the block-level, therefore no problem. But then your content
 editor would essentially work like a `textarea` 🤷‍♀️
-[//]: # (can I demonstrate this? can I make the editor generic enough to model a textarea, and create a textarea
-plugin?)
 
 But this approach doesn't work if you're dealing with more complex data that render into more HTML. Even if you're extra
 careful to keep inline and block mutations handled separately, React's reconciliation still has to perform unmount

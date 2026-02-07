@@ -1,5 +1,15 @@
 # Test Style Guide
 
+## Test Names
+
+Use "it [does something]" format that reads as a sentence:
+
+```ts
+it("returns range when navigating down between two empty elements", () => {
+  // ...
+})
+```
+
 ## Document Before Testing
 
 When adding tests for a function that lacks documentation, write JSDoc first. Tests should verify documented behavior,
@@ -59,10 +69,15 @@ const { container } = render(<ContentEditor value={blocks} onChange={() => {
 }} />);
 ```
 
-## Test Names
+## Type Narrowing in Tests
 
-Use "it [does something]" format that reads as a sentence:
+Jest assertions don't narrow types for TypeScript. It's fine to use non-null assertions in tests, but do it in sequence:
 
 ```ts
-it("returns range when navigating down between two empty elements", () => {
+// 1. Capture non-null variable with a TypeScript assertion at assignment
+const el = container.querySelector("p")!;
+// 2. Assert that it is actually non-null with Jest
+expect(el).toBeTruthy();
+// 3. Continue to use the value as if it were non-null
+expect(el.textContent).toBe("Hello");
 ```

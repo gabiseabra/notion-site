@@ -13,9 +13,12 @@ export type PlainTextBlock = {
   content: string;
 };
 
+/**
+ * ContentEditor plugin stack for blocks shaped as `{ id, content }`.
+ */
 export const usePlainTextPlugin = (editor: ContentEditor<PlainTextBlock>) =>
   composePlugins<PlainTextBlock>(
-    useSetupPlugin({}),
+    useSetupPlugin,
     useAutoCommitPlugin(600),
     useHistoryPlugin,
     useInlineMutationPlugin({

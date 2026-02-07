@@ -21,12 +21,20 @@ export const useNotionPlugin = (
   },
 ) =>
   composePlugins<Notion.Block>(
+    () => () =>
+      options.disabled
+        ? {}
+        : {
+            contentEditable: "plaintext-only",
+            suppressContentEditableWarning: true,
+            tabIndex: 0,
+          },
     useLoggerPlugin((event) => {
       if (!options.logging) return;
       if (options.logging === "verbose" && event.eventType === "flush") return;
       console.info(event.eventType, event.detail);
     }),
-    useSetupPlugin({ disabled: options.disabled }),
+    useSetupPlugin,
     useAutoCommitPlugin(600),
     useHistoryPlugin,
     useInlineMutationPlugin({
