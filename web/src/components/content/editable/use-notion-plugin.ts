@@ -1,10 +1,10 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import * as env from "../../../env.js";
 import { ContentEditor } from "../editor/types.js";
-import { useBlockNavigationPlugin } from "./block-navigation.js";
 import { composePlugins } from "./compose-plugins.js";
 import { useAutoCommitPlugin } from "./use-auto-commit-plugin.js";
 import { useBlockMutationPlugin } from "./use-block-mutation-plugin.js";
+import { useBlockNavigationPlugin } from "./use-block-navigation-plugin.js";
 import { useHistoryPlugin } from "./use-history-plugin.js";
 import { useInlineMutationPlugin } from "./use-inline-mutation-plugin.js";
 import { useLoggerPlugin } from "./use-logger-plugin.js";
@@ -20,13 +20,18 @@ export const useNotionPlugin = (
     logging: !env.TEST,
   },
 ) =>
-  composePlugins(
+  composePlugins<Notion.Block>(
+    useLoggerPlugin((event) => {
+      if (!options.logging) return;
+      if (options.logging === "verbose" && event.eventType === "flush") return;
+      console.info(event.eventType, event.detail);
+    }),
     useSetupPlugin({ disabled: options.disabled }),
     useAutoCommitPlugin(600),
     useHistoryPlugin,
     useInlineMutationPlugin({
       multiline: options.multiline,
-      splice: (block, ...params) => {
+      splice(block, ...params) {
         if (!Notion.Block.isRichText(block)) return block;
         return Notion.Block.map(block, (node) => ({
           ...node,
@@ -35,10 +40,23 @@ export const useNotionPlugin = (
       },
     }),
     useBlockNavigationPlugin,
-    useBlockMutationPlugin,
-    useLoggerPlugin((event) => {
-      if (!options.logging) return;
-      if (options.logging === "verbose" && event.eventType === "flush") return;
-      console.info(event.eventType, event.detail);
+    useBlockMutationPlugin({
+      merge(left, right) {
+        if (!Notion.Block.isRichText(left) || !Notion.Block.isRichText(right))
+          return null;
+
+        return Notion.Block.map(left, (node) => ({
+          ...node,
+          rich_text: [
+            ...node.rich_text,
+            ...Notion.Block.extract(right).rich_text,
+          ],
+        }));
+      },
+      split(block, offset, deleteRange) {
+        if (!Notion.Block.isRichText(block)) return null;
+
+        return Notion.Block.split(block, offset, deleteRange);
+      },
     }),
   )(editor);

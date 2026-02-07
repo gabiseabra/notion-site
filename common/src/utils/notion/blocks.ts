@@ -115,6 +115,10 @@ export function traverse<T extends BlockType>(
   return f(extract(block)).then((node) => map(block, () => node));
 }
 
+/**
+ * Split `Notion.Block` in ltr direction, preserving the current block on the left side.
+ * @todo support rtl
+ */
 export function split(
   block: Block,
   offset: number,

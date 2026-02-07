@@ -6,10 +6,9 @@ import { AnyBlock } from "../editor/types.js";
 import { createEventListenerPlugin } from "./create-event-listener-plugin.js";
 import { ContentEditorPlugin } from "./types.js";
 
-const FLUSH_DEBOUNCE_MS = 150;
-
 export type InlineMutationPluginOptions<TBlock extends AnyBlock> = {
   multiline?: boolean;
+  debounceMs?: number;
   splice: (
     block: TBlock,
     offset: number,
@@ -23,8 +22,9 @@ export type InlineMutationPluginOptions<TBlock extends AnyBlock> = {
  *
  * Uses native `beforeinput` to get inputType (React's synthetic event lacks it).
  */
-export const useInlineMutationPlugin = <TBlock extends { id: string }>({
+export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   multiline,
+  debounceMs = 150,
   splice,
 }: InlineMutationPluginOptions<TBlock>): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
@@ -74,7 +74,7 @@ export const useInlineMutationPlugin = <TBlock extends { id: string }>({
 
     const scheduleFlush = useCallback(() => {
       if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
-      flushTimerRef.current = window.setTimeout(flush, FLUSH_DEBOUNCE_MS);
+      flushTimerRef.current = window.setTimeout(flush, debounceMs);
     }, [flush]);
 
     useEventListener(editor.bus, "flush", flush);
