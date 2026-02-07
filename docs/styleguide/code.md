@@ -128,7 +128,7 @@ If the function is being exported, be more descriptive and add **`@note`** s abo
 - **You don't need to use `@internal`**: Internal helpers are not exported. Just write a one line explanation, it's
   fine!
 - **You don't need to use `@params`**: Params should already be clear by the type annotations.
-- **You can use `@return`** to explain how to explain the return type.
+- **You can use `@return`** to explain how to interpret the return type.
 
 ```ts
 // Internal helper - one line
