@@ -6,8 +6,8 @@ import { composePlugins } from "./compose-plugins.js";
 import { useAutoCommitPlugin } from "./use-auto-commit-plugin.js";
 import { useBlockMutationPlugin } from "./use-block-mutation-plugin.js";
 import { useHistoryPlugin } from "./use-history-plugin.js";
+import { useInlineMutationPlugin } from "./use-inline-mutation-plugin.js";
 import { useLoggerPlugin } from "./use-logger-plugin.js";
-import { usePlainTextPlugin } from "./use-plain-text-plugin.js";
 import { useSetupPlugin } from "./use-setup-plugin.js";
 
 export const useNotionPlugin = (
@@ -24,7 +24,7 @@ export const useNotionPlugin = (
     useSetupPlugin({ disabled: options.disabled }),
     useAutoCommitPlugin(600),
     useHistoryPlugin,
-    usePlainTextPlugin({
+    useInlineMutationPlugin({
       multiline: options.multiline,
       splice: (block, ...params) => {
         if (!Notion.Block.isRichText(block)) return block;

@@ -8,7 +8,7 @@ import { ContentEditorPlugin } from "./types.js";
 
 const FLUSH_DEBOUNCE_MS = 150;
 
-export type PlainTextPluginOptions<TBlock extends AnyBlock> = {
+export type InlineMutationPluginOptions<TBlock extends AnyBlock> = {
   multiline?: boolean;
   splice: (
     block: TBlock,
@@ -23,10 +23,10 @@ export type PlainTextPluginOptions<TBlock extends AnyBlock> = {
  *
  * Uses native `beforeinput` to get inputType (React's synthetic event lacks it).
  */
-export const usePlainTextPlugin = <TBlock extends { id: string }>({
+export const useInlineMutationPlugin = <TBlock extends { id: string }>({
   multiline,
   splice,
-}: PlainTextPluginOptions<TBlock>): ContentEditorPlugin<TBlock> =>
+}: InlineMutationPluginOptions<TBlock>): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
     const pendingRef = useRef<{
       block: TBlock;

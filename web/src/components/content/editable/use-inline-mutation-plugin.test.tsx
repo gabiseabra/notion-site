@@ -9,7 +9,7 @@ import { act, RefObject } from "react";
 import { setupUserEvent } from "../../../test-utils/user-event.js";
 import { ContentEditor, TContentEditor } from "../ContentEditor.js";
 
-describe("usePlainTextPlugin", () => {
+describe("useInlineMutationPlugin", () => {
   it("handles typing sequence", async () => {
     const user = setupUserEvent();
 
