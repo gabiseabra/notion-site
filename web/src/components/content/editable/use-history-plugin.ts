@@ -5,7 +5,7 @@ import {
   setSelectionRange,
 } from "../../../utils/selection.js";
 import { EditorCommand } from "../editor/history.js";
-import { ContentEditorPlugin } from "./types.js";
+import { AnyContentEditorPlugin } from "./types.js";
 
 /**
  * Plugin that handles undo/redo keyboard shortcuts and restores the default
@@ -17,7 +17,7 @@ import { ContentEditorPlugin } from "./types.js";
  * | `Ctrl+Shift+Z` | `Cmd+Shift+Z`: Redo
  * | `Ctrl+Y` | `Cmd+Y`: Redo (alternative)
  */
-export const useHistoryPlugin: ContentEditorPlugin = (editor) => {
+export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
   useEventListener(
     editor.bus,
     "push",

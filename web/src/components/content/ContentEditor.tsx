@@ -1,21 +1,19 @@
-import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { memo, Ref, useCallback, useImperativeHandle } from "react";
 import { useEventListener } from "../../hooks/useEventListener.js";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
-import { useDefaultPlugin } from "./editable/use-default-plugin.js";
+import { useNotionPlugin } from "./editable/use-notion-plugin.js";
 import { EditorEvent } from "./editor/event.js";
-import {
-  ContentEditor as TContentEditor,
-  useContentEditor,
-} from "./editor/use-content-editor.js";
+import { ContentEditor as TContentEditor } from "./editor/types.js";
+import { useContentEditor } from "./editor/use-content-editor.js";
 
 export type { TContentEditor };
 
 type ContentEditorProps = {
-  ref?: Ref<TContentEditor | null>;
-  value: zNotion.blocks.block[];
-  onChange: (block: zNotion.blocks.block[]) => void;
+  ref?: Ref<TContentEditor<Notion.Block> | null>;
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
 };
 
 export const ContentEditor = memo(function ContentEditor({
@@ -24,12 +22,12 @@ export const ContentEditor = memo(function ContentEditor({
   onChange,
 }: ContentEditorProps) {
   const editor = useContentEditor({ initialValue });
-  const editable = useDefaultPlugin(editor, {});
+  const editable = useNotionPlugin(editor);
 
   useImperativeHandle(ref, () => editor, [editor]);
 
   const onCommit = useCallback(
-    (e: EditorEvent) => onChange(e.editor.blocks),
+    (e: EditorEvent<Notion.Block>) => onChange(e.editor.blocks),
     [onChange],
   );
   useEventListener(editor.bus, "commit", onCommit);

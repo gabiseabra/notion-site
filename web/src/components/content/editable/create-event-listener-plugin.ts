@@ -1,14 +1,18 @@
 import { isNonNullable } from "@notion-site/common/utils/guards.js";
 import { useEffect } from "react";
+import { AnyBlock } from "../editor/types.js";
 import { ContentEditorPlugin } from "./types.js";
 
 /**
  * Creates a plugin that attaches a native DOM event listener to all editor blocks.
  */
-export function createEventListenerPlugin<K extends keyof HTMLElementEventMap>(
+export function createEventListenerPlugin<
+  TBlock extends AnyBlock,
+  K extends keyof HTMLElementEventMap,
+>(
   eventType: K,
-  plugin: ContentEditorPlugin<(e: HTMLElementEventMap[K]) => void>,
-): ContentEditorPlugin {
+  plugin: ContentEditorPlugin<TBlock, (e: HTMLElementEventMap[K]) => void>,
+): ContentEditorPlugin<TBlock> {
   return (editor) => {
     const editable = plugin(editor);
 
@@ -20,7 +24,7 @@ export function createEventListenerPlugin<K extends keyof HTMLElementEventMap>(
         })
         .filter(isNonNullable);
 
-      return blocks.reduce(
+      return blocks.reduce<() => void>(
         (next, { element, block }) => {
           if (!element) return next;
 

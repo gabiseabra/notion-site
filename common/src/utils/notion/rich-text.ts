@@ -1,16 +1,11 @@
 import { zNotion } from "../../dto/notion/schema/index.js";
 import { hasPropertyValue } from "../guards.js";
 
-type RichText = zNotion.properties.rich_text_item;
-type RichTextItemType = zNotion.properties.rich_text_item[number]["type"];
-type RichTextItem<T extends RichTextItemType = RichTextItemType> = Extract<
-  zNotion.properties.rich_text_item[number],
-  { type: T }
->;
+export type RichText = zNotion.rich_text.rich_text_item;
 
-export function traverseRichTextText(
+export function traverseText(
   rich_text: RichText,
-  f: (item: RichTextItem<"text">) => Promise<RichTextItem<"text">>,
+  f: (item: Item<"text">) => Promise<Item<"text">>,
 ) {
   return Promise.all(
     rich_text.map(async (item) => {
@@ -20,7 +15,7 @@ export function traverseRichTextText(
   );
 }
 
-export function findRichTextItemByOffset(rich_text: RichText, offset: number) {
+export function findByOffset(rich_text: RichText, offset: number) {
   let index = 0,
     start = 0;
 
@@ -40,14 +35,17 @@ export function findRichTextItemByOffset(rich_text: RichText, offset: number) {
   return null;
 }
 
-export function getRichTextContent(rich_text: RichText) {
+export function getContent(rich_text: RichText) {
   return rich_text
     .filter(hasPropertyValue("type", "text"))
     .map(({ text }) => text.content)
     .join("");
 }
 
-export function getRichTextLength(rich_text: RichText) {
+/**
+ * @deprecated use `Notion.RTF.getContent(rich_text).length` instead
+ */
+export function getLength(rich_text: RichText) {
   return rich_text.reduce((acc, item) => {
     if (item.type !== "text") return acc;
     return acc + item.text.content.length;
@@ -57,15 +55,15 @@ export function getRichTextLength(rich_text: RichText) {
 /**
  * Extracts a portion of rich text by character offset, preserving annotations.
  */
-export function sliceRichText(
+export function slice(
   rich_text: RichText,
   start: number,
   end?: number,
 ): RichText {
   if (end === start) return [];
 
-  const startItem = findRichTextItemByOffset(rich_text, start);
-  const endItem = end ? findRichTextItemByOffset(rich_text, end) : undefined;
+  const startItem = findByOffset(rich_text, start);
+  const endItem = end ? findByOffset(rich_text, end) : undefined;
 
   if (!startItem) return [];
 
@@ -97,7 +95,7 @@ export function sliceRichText(
 /**
  * Applies a text delta (insert/delete) to rich text, preserving annotations.
  */
-export function spliceRichText(
+export function splice(
   rich_text: RichText,
   offset: number,
   deleteCount: number,
@@ -105,36 +103,35 @@ export function spliceRichText(
 ): RichText {
   if (deleteCount === 0 && insert === "") return rich_text;
 
-  if (getRichTextLength(rich_text) === 0) {
+  if (getLength(rich_text) === 0) {
     if (insert === "") return [];
-    return [replaceTextContent(default_text_item, () => insert)];
+    return [replaceTextContent(empty_text, () => insert)];
   }
 
-  const length = getRichTextLength(rich_text);
+  const length = getLength(rich_text);
 
   // Clamp offset to valid range
   const safeOffset = Math.max(0, Math.min(offset, length));
   const safeEnd = Math.min(safeOffset + deleteCount, length);
 
   // Get the slices before and after the affected range
-  const before = safeOffset > 0 ? sliceRichText(rich_text, 0, safeOffset) : [];
-  const after =
-    safeEnd < length ? sliceRichText(rich_text, safeEnd, length) : [];
+  const before = safeOffset > 0 ? slice(rich_text, 0, safeOffset) : [];
+  const after = safeEnd < length ? slice(rich_text, safeEnd, length) : [];
 
   // If inserting, inherit annotations from the item at the insert point
   let insertItems: RichText = [];
   if (insert !== "") {
-    const itemAtOffset = findRichTextItemByOffset(rich_text, safeOffset);
+    const itemAtOffset = findByOffset(rich_text, safeOffset);
 
     insertItems = [
-      replaceTextContent(itemAtOffset?.node ?? default_text_item, () => insert),
+      replaceTextContent(itemAtOffset?.node ?? empty_text, () => insert),
     ];
   }
 
-  return normalizeRichText([...before, ...insertItems, ...after]);
+  return normalize([...before, ...insertItems, ...after]);
 }
 
-export function normalizeRichText(rich_text: RichText) {
+export function normalize(rich_text: RichText) {
   return rich_text.reduce<RichText>((acc, item) => {
     const last = acc[acc.length - 1];
 
@@ -142,7 +139,7 @@ export function normalizeRichText(rich_text: RichText) {
       last &&
       last.type === "text" &&
       item.type === "text" &&
-      richTextItemEquals(
+      itemEquals(
         replaceTextContent(last, () => ""),
         replaceTextContent(item, () => ""),
       )
@@ -156,30 +153,51 @@ export function normalizeRichText(rich_text: RichText) {
   }, []);
 }
 
-function richTextItemEquals(a: RichTextItem, b: RichTextItem) {
+/** Item stuff */
+
+export type ItemType = zNotion.rich_text.rich_text_item[number]["type"];
+export type Item<T extends ItemType = ItemType> = Extract<
+  zNotion.rich_text.rich_text_item[number],
+  { type: T }
+>;
+
+export function itemEquals(a: Item, b: Item) {
   return a.type === "text" && b.type === "text"
     ? a.text.content === b.text.content &&
-        a.text.link?.url === b.text.link?.url &&
-        a.annotations.bold === b.annotations.bold &&
-        a.annotations.code === b.annotations.code &&
-        a.annotations.italic === b.annotations.italic &&
-        a.annotations.color === b.annotations.color &&
-        a.annotations.underline === b.annotations.underline &&
-        a.annotations.strikethrough === b.annotations.strikethrough
+        annotationsEquals(a.annotations, b.annotations)
     : a.type === b.type;
 }
 
 function replaceTextContent(
-  item: RichTextItem<"text">,
+  item: Item<"text">,
   f: (content: string) => string,
-): RichTextItem<"text"> {
+): Item<"text"> {
   return {
     ...item,
     text: { ...item.text, content: f(item.text.content) },
   };
 }
 
-const default_text_item: RichTextItem<"text"> = {
+/** Annotations stuff */
+
+export type Annotations = zNotion.rich_text.annotations;
+
+export function annotationsEquals(a: Annotations, b: Annotations) {
+  return (
+    a.bold === b.bold &&
+    a.code === b.code &&
+    a.italic === b.italic &&
+    a.color === b.color &&
+    a.underline === b.underline &&
+    a.strikethrough === b.strikethrough
+  );
+}
+
+export function isRedacted({ text: { link } }: Item<"text">) {
+  return link?.url === "REDACTED";
+}
+
+export const empty_text: Item<"text"> = {
   type: "text",
   text: { content: "", link: null },
   annotations: {

@@ -1,6 +1,5 @@
-import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
-import { getRichTextContent } from "@notion-site/common/utils/notion/rich-text.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { match } from "ts-pattern";
 import { Image } from "../display/Image.js";
 import { Span, Text } from "../display/Text.js";
@@ -10,7 +9,7 @@ import { ContentEditableProps } from "./editable/types.js";
 
 type BlockProps = {
   indent?: number;
-  value: zNotion.blocks.block;
+  value: Notion.Block;
   inline?: Partial<RichTextProps>;
 } & ContentEditableProps;
 
@@ -23,11 +22,11 @@ export function Block({
   inline: inlineProps,
   ...blockProps
 }: BlockProps) {
-  const contentProps = (rich_text: zNotion.properties.rich_text_item) =>
+  const contentProps = (rich_text: Notion.RichText) =>
     blockProps.contentEditable
       ? {
           dangerouslySetInnerHTML: {
-            __html: richTextToString(rich_text),
+            __html: richTextToHTML(rich_text),
           },
         }
       : {
@@ -100,7 +99,7 @@ export function Block({
         .with({ type: "child_page" }, (data) => <LinkToPage id={data.id} />)
         .with({ type: "image" }, (data) => (
           <Image
-            title={getRichTextContent(data.image.caption) || undefined}
+            title={Notion.RTF.getContent(data.image.caption) || undefined}
             caption={
               data.image.caption.length > 0 && (
                 <RichText size="caption" value={data.image.caption} />
@@ -117,7 +116,7 @@ export function Block({
   );
 }
 
-function richTextToString(rich_text: zNotion.properties.rich_text_item) {
+function richTextToHTML(rich_text: Notion.RichText) {
   return rich_text
     .filter(hasPropertyValue("type", "text"))
     .map((item) =>

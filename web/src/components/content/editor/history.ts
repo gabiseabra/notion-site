@@ -1,41 +1,41 @@
-import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { History } from "@notion-site/common/utils/history.js";
 import { match } from "ts-pattern";
 import { Selection } from "../../../utils/selection.js";
+import { AnyBlock } from "./types.js";
 
 /**
  * Commands for history tracking. Each command can be applied forward
  * to reconstruct state from a snapshot.
  */
-export type EditorCommandCmd =
+export type EditorCommandCmd<TBlock extends AnyBlock> =
   | {
       type: "update";
-      block: zNotion.blocks.block;
+      block: TBlock;
       selectionBefore?: Selection;
       selectionAfter?: Selection;
     }
   | {
       type: "remove";
-      block: Pick<zNotion.blocks.block, "id">;
+      block: TBlock;
       selectionBefore?: Selection;
       selectionAfter?: Selection;
     }
   | {
       type: "split";
-      left: zNotion.blocks.block;
-      right: zNotion.blocks.block;
+      left: TBlock;
+      right: TBlock;
       selectionBefore?: Selection;
       selectionAfter?: Selection;
     };
 
-export type EditorCommand =
+export type EditorCommand<TBlock extends AnyBlock> =
   | {
       type: "apply";
-      commands: EditorCommandCmd[];
+      commands: EditorCommandCmd<TBlock>[];
       selectionBefore?: Selection;
       selectionAfter?: Selection;
     }
-  | EditorCommandCmd;
+  | EditorCommandCmd<TBlock>;
 
 export const EditorCommand = {
   /**
@@ -44,7 +44,10 @@ export const EditorCommand = {
    * - undo: first non-empty { selectionBefore, block: { id } }
    * - redo: last non-empty { selectionAfter, block: { id } }
    */
-  id(cmd: EditorCommand, direction: "undo" | "redo"): string {
+  id<TBlock extends { id: string }>(
+    cmd: EditorCommand<TBlock>,
+    direction: "undo" | "redo",
+  ): string {
     return match(cmd)
       .with({ type: "apply" }, (cmd) =>
         direction === "undo"
@@ -66,24 +69,26 @@ export const EditorCommand = {
       .otherwise((cmd) => cmd.block.id);
   },
 
-  flat(cmds: EditorCommand[]): EditorCommandCmd[] {
+  flat<TBlock extends { id: string }>(
+    cmds: EditorCommand<TBlock>[],
+  ): EditorCommandCmd<TBlock>[] {
     return cmds.flatMap((cmd) => (cmd.type === "apply" ? cmd.commands : [cmd]));
   },
 };
 
-export class EditorHistory extends History<
-  zNotion.blocks.block[],
-  EditorCommand
+export class EditorHistory<TBlock extends { id: string }> extends History<
+  TBlock[],
+  EditorCommand<TBlock>
 > {
-  constructor(initialValue: zNotion.blocks.block[]) {
-    super(initialValue, applyCommand);
+  constructor(initialValue: TBlock[]) {
+    super(initialValue, (blocks, cmd) => applyCommand(blocks, cmd));
   }
 }
 
-function applyCommand(
-  blocks: zNotion.blocks.block[],
-  cmd: EditorCommand,
-): zNotion.blocks.block[] {
+function applyCommand<TBlock extends { id: string }>(
+  blocks: TBlock[],
+  cmd: EditorCommand<TBlock>,
+): TBlock[] {
   switch (cmd.type) {
     case "update":
       return blocks.map((b) => (b.id === cmd.block.id ? cmd.block : b));

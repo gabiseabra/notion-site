@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { p, span } from "@notion-site/common/test-utils/mock-block.js";
+import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { fireEvent, render } from "@testing-library/react";
 import {
   getMaxSelectionOffset,

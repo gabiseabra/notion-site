@@ -1,8 +1,40 @@
 import { zNotion } from "../../dto/notion/schema/index.js";
 import { UnionToTuple } from "../../types/union.js";
-import { sliceRichText } from "./rich-text.js";
+import * as RTF from "./rich-text.js";
+import { create } from "./wip.js";
 
-export function narrowBlock<T extends BlockType>(
+export type BlockType = zNotion.blocks.block["type"];
+export type RichTextType = zNotion.blocks.rich_text_type;
+export const RichTextType = [
+  "paragraph",
+  "heading_1",
+  "heading_2",
+  "heading_3",
+  "quote",
+  "bulleted_list_item",
+  "numbered_list_item",
+] as const;
+
+/** Block restricted to a union type */
+export type Block<T extends BlockType = BlockType> = Extract<
+  zNotion.blocks.block,
+  { type: T }
+>;
+
+/** Node restricted to a union type */
+export type Node<T extends BlockType = BlockType> = T extends BlockType
+  ? Block<T> extends { [i in T]: infer X }
+    ? X
+    : never
+  : never;
+
+/** Node restricted to a type, but if the resulting type is a union it explodes */
+export type UniqueNode<T extends BlockType> =
+  UnionToTuple<Node<T>> extends [Node<T>] ? Node<T> : never;
+
+/** Block utilities */
+
+export function narrow<T extends BlockType>(
   block: Block,
   ...types: [T, ...T[]]
 ): block is Extract<Block, { type: T }> {
@@ -12,10 +44,14 @@ export function narrowBlock<T extends BlockType>(
   return false;
 }
 
-export function extractBlock<T extends BlockType>(
-  block: Block<T>,
-): UniqueNode<T>;
-export function extractBlock(block: Block): Node {
+export function isRichText(
+  block: Block,
+): block is Block<zNotion.blocks.rich_text_type> {
+  return narrow(block, ...RichTextType);
+}
+
+export function extract<T extends BlockType>(block: Block<T>): UniqueNode<T>;
+export function extract(block: Block): Node {
   switch (block.type) {
     case "paragraph":
       return block.paragraph;
@@ -42,44 +78,44 @@ export function extractBlock(block: Block): Node {
   }
 }
 
-export function mapBlock<T extends BlockType>(
+export function map<T extends BlockType>(
   block: Block<T>,
   f: (node: UniqueNode<T>) => UniqueNode<T>,
 ): Block<T> {
   switch (block.type) {
     case "paragraph":
-      return { ...block, paragraph: f(extractBlock(block)) };
+      return { ...block, paragraph: f(extract(block)) };
     case "heading_1":
-      return { ...block, heading_1: f(extractBlock(block)) };
+      return { ...block, heading_1: f(extract(block)) };
     case "heading_2":
-      return { ...block, heading_2: f(extractBlock(block)) };
+      return { ...block, heading_2: f(extract(block)) };
     case "heading_3":
-      return { ...block, heading_3: f(extractBlock(block)) };
+      return { ...block, heading_3: f(extract(block)) };
     case "quote":
-      return { ...block, quote: f(extractBlock(block)) };
+      return { ...block, quote: f(extract(block)) };
     case "divider":
-      return { ...block, divider: f(extractBlock(block)) };
+      return { ...block, divider: f(extract(block)) };
     case "bulleted_list_item":
-      return { ...block, bulleted_list_item: f(extractBlock(block)) };
+      return { ...block, bulleted_list_item: f(extract(block)) };
     case "numbered_list_item":
-      return { ...block, numbered_list_item: f(extractBlock(block)) };
+      return { ...block, numbered_list_item: f(extract(block)) };
     case "link_to_page":
-      return { ...block, link_to_page: f(extractBlock(block)) };
+      return { ...block, link_to_page: f(extract(block)) };
     case "child_page":
-      return { ...block, child_page: f(extractBlock(block)) };
+      return { ...block, child_page: f(extract(block)) };
     case "image":
-      return { ...block, image: f(extractBlock(block)) };
+      return { ...block, image: f(extract(block)) };
   }
 }
 
-export function traverseBlock<T extends BlockType>(
+export function traverse<T extends BlockType>(
   block: Block<T>,
   f: (node: UniqueNode<T>) => Promise<UniqueNode<T>>,
 ): Promise<Block<T>> {
-  return f(extractBlock(block)).then((node) => mapBlock(block, () => node));
+  return f(extract(block)).then((node) => map(block, () => node));
 }
 
-export function splitBlock(
+export function split(
   block: Block,
   offset: number,
   deleteRange: number = 0,
@@ -87,47 +123,26 @@ export function splitBlock(
   left: Block;
   right: Block;
 } {
-  if (!narrowBlock(block, ...zNotion.blocks.rich_text_type.options)) {
+  if (!narrow(block, ...RichTextType)) {
     return {
       left: block,
-      right: zNotion.wip.wip_block({ type: "paragraph" }),
+      right: create({ type: "paragraph" }),
     };
   }
 
-  const node = extractBlock(block);
+  const node = extract(block);
 
   return {
-    left: mapBlock(block, () => ({
+    left: map(block, () => ({
       ...node,
-      rich_text: sliceRichText(node.rich_text, 0, offset),
+      rich_text: RTF.slice(node.rich_text, 0, offset),
     })),
-    right: zNotion.wip.wip_block({
+    right: create({
       type: "paragraph",
       paragraph: {
         ...node,
-        rich_text: sliceRichText(node.rich_text, offset + deleteRange),
+        rich_text: RTF.slice(node.rich_text, offset + deleteRange),
       },
     }),
   };
 }
-
-/** Utilities */
-
-type BlockType = zNotion.blocks.block["type"];
-
-/** Block restricted to a union type */
-type Block<T extends BlockType = BlockType> = Extract<
-  zNotion.blocks.block,
-  { type: T }
->;
-
-/** Node restricted to a union type */
-type Node<T extends BlockType = BlockType> = T extends BlockType
-  ? Block<T> extends { [i in T]: infer X }
-    ? X
-    : never
-  : never;
-
-/** Node restricted to a type, but if the resulting type is a union it explodes */
-type UniqueNode<T extends BlockType> =
-  UnionToTuple<Node<T>> extends [Node<T>] ? Node<T> : never;

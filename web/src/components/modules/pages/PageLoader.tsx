@@ -1,6 +1,6 @@
 import { NotionPage } from "@notion-site/common/dto/pages/index.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
-import { titleToString } from "@notion-site/common/utils/notion/properties.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import * as env from "../../../env.js";
 import { Head } from "../../../providers/HeadProvider.js";
 import { Favicon } from "../../display/Favicon.js";
@@ -26,7 +26,7 @@ export function NotionPageLoader({
       <title>
         {[
           route.title ??
-            titleToString(page.properties.title) ??
+            Notion.titleToString(page.properties.title) ??
             "Untitled Page",
           env.SITE_TITLE,
         ]

@@ -1,34 +1,41 @@
-import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { EmptyObject } from "@notion-site/common/types/object.js";
 import { TypedEventTarget } from "typescript-event-target";
 import { EditorCommandCmd } from "./history.js";
-import { ContentEditor } from "./use-content-editor.js";
+import { AnyBlock, ContentEditor } from "./types.js";
 
-type EditorEventMap = {
+type EditorEventMap<TBlock extends AnyBlock> = {
   /** Command will be pushed to history. */
-  edit: EditorCommandCmd;
+  edit: EditorCommandCmd<TBlock>;
   /** Snapshot of history will be saved to state. */
-  commit: zNotion.blocks.block[];
+  commit: {
+    blocks: TBlock[];
+    revision: number;
+  };
   /** DOM has been updated. */
   push: EmptyObject;
   /** Notify plugins to save changes before commit. */
   flush: EmptyObject;
   /** You have reached the end of history. */
   reset: EmptyObject;
+  /** Fired once after editor setup is done. */
+  ready: EmptyObject;
 };
 
 export class EditorEvent<
-  T extends keyof EditorEventMap = keyof EditorEventMap,
+  TBlock extends AnyBlock,
+  E extends keyof EditorEventMap<TBlock> = keyof EditorEventMap<TBlock>,
 > extends Event {
   constructor(
-    public eventType: T,
-    public editor: ContentEditor,
-    public detail: EditorEventMap[T],
+    public eventType: E,
+    public editor: ContentEditor<TBlock>,
+    public detail: EditorEventMap<TBlock>[E],
   ) {
     super(eventType);
   }
 }
 
-export class EditorEventTarget extends TypedEventTarget<{
-  [T in keyof EditorEventMap]: EditorEvent<T>;
+export class EditorEventTarget<
+  TBlock extends AnyBlock,
+> extends TypedEventTarget<{
+  [E in keyof EditorEventMap<TBlock>]: EditorEvent<TBlock, E>;
 }> {}

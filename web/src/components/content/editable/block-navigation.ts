@@ -4,7 +4,7 @@ import {
   getVerticalNavigationRange,
   setSelectionRange,
 } from "../../../utils/selection.js";
-import { ContentEditorPlugin } from "./types.js";
+import { AnyContentEditorPlugin } from "./types.js";
 
 /**
  * Plugin that enables arrow key navigation between blocks.
@@ -16,7 +16,7 @@ import { ContentEditorPlugin } from "./types.js";
  * | `ArrowUp` | Move to previous block, maintaining horizontal position |
  * | `ArrowDown` | Move to next block, maintaining horizontal position |
  */
-export const useBlockNavigationPlugin: ContentEditorPlugin =
+export const useBlockNavigationPlugin: AnyContentEditorPlugin =
   (editor) => (block) => ({
     onKeyDown(e) {
       const selection = getSelectionRange(e.currentTarget);

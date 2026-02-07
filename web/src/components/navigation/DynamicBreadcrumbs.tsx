@@ -1,6 +1,6 @@
 import { Metadata } from "@notion-site/common/dto/notion/contracts.js";
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
-import { titleToString } from "@notion-site/common/utils/notion/properties.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { ReactNode } from "react";
 import { Link } from "react-router";
 import { suspend } from "suspend-react";
@@ -63,7 +63,9 @@ DynamicBreadcrumbs.CrumbLoader = function DynamicBreadcrumbsCrumbLoader({
       <span>
         <Link
           to={metadata.url}
-          title={metadata.title ? titleToString(metadata.title) : undefined}
+          title={
+            metadata.title ? Notion.titleToString(metadata.title) : undefined
+          }
         >
           {metadata.route.crumb ?? (
             <>

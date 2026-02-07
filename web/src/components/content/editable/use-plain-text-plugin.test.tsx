@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
-import { p, span } from "@notion-site/common/test-utils/mock-block.js";
-import { getRichTextContent } from "@notion-site/common/utils/notion/rich-text.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
+import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { render } from "@testing-library/react";
 import { act, RefObject } from "react";
 import { setupUserEvent } from "../../../test-utils/user-event.js";
@@ -14,7 +14,9 @@ describe("usePlainTextPlugin", () => {
     const user = setupUserEvent();
 
     const blocks = [p("420", span("hey"))];
-    const editorRef: RefObject<TContentEditor | null> = { current: null };
+    const editorRef: RefObject<TContentEditor<Notion.Block> | null> = {
+      current: null,
+    };
 
     const { container } = render(
       <ContentEditor ref={editorRef} value={blocks} onChange={() => {}} />,
@@ -37,6 +39,6 @@ describe("usePlainTextPlugin", () => {
     const rich_text = zNotion.blocks.paragraph.parse(
       editorRef.current?.blocks[0],
     ).paragraph.rich_text;
-    expect(getRichTextContent(rich_text)).toBe("hello");
+    expect(Notion.RTF.getContent(rich_text)).toBe("hello");
   });
 });

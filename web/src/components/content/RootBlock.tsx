@@ -4,14 +4,14 @@
  * produces a top-level render stream where consecutive list items are grouped into
  * list containers (bulleted/numbered).
  */
-import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { Fragment, ReactNode } from "react";
 import { match } from "ts-pattern";
 import { Block } from "./Block.js";
 
 type RootBlockProps = {
-  value: zNotion.blocks.block[];
-  render?: (block: zNotion.blocks.block, path: BlockPath) => ReactNode;
+  value: Notion.Block[];
+  render?: (block: Notion.Block, path: BlockPath) => ReactNode;
   path?: BlockPath;
 };
 
@@ -109,14 +109,14 @@ export type RootBlock =
 /**
  * A Notion block augmented with the descendant blocks present in the same response set.
  */
-export type NestedBlock = zNotion.blocks.block & {
-  children: zNotion.blocks.block[];
+export type NestedBlock = Notion.Block & {
+  children: Notion.Block[];
 };
 
 /**
  * Builds the top-level render stream from a flat Notion block array.
  */
-function getRootBlocks(blocks: zNotion.blocks.block[]) {
+function getRootBlocks(blocks: Notion.Block[]) {
   const isNested = blocks.every((block) => block.parent.type === "block_id");
 
   return blocks
@@ -132,8 +132,8 @@ function getRootBlocks(blocks: zNotion.blocks.block[]) {
 }
 
 const mapNestedBlock =
-  (blocks: zNotion.blocks.block[]) =>
-  (block: zNotion.blocks.block): NestedBlock => ({
+  (blocks: Notion.Block[]) =>
+  (block: Notion.Block): NestedBlock => ({
     ...block,
     // includes all of the deeply nested blocks of children
     children: blocks
@@ -185,7 +185,7 @@ function rootBlockReducer(acc: RootBlock[], block: NestedBlock): RootBlock[] {
   return [...acc, { id: block.id, type: "paragraph", block }];
 }
 
-export class BlockPath extends Array<zNotion.blocks.block> {
+export class BlockPath extends Array<Notion.Block> {
   /**
    * Get the visual indent level of the block who has this path.
    */
@@ -197,13 +197,11 @@ export class BlockPath extends Array<zNotion.blocks.block> {
     ).length;
   }
 
-  concat(
-    ...items: (zNotion.blocks.block | ConcatArray<zNotion.blocks.block>)[]
-  ): BlockPath {
+  concat(...items: (Notion.Block | ConcatArray<Notion.Block>)[]): BlockPath {
     return new BlockPath(...super.concat(...items));
   }
 
-  append(block: zNotion.blocks.block): BlockPath {
+  append(block: Notion.Block): BlockPath {
     return new BlockPath(...this, block);
   }
 }

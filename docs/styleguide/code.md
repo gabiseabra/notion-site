@@ -1,5 +1,72 @@
 # Code Style Guide
 
+## Naming Conventions
+
+### `common/`
+
+- Schemas and types derived from external resources should keep the source naming convention.
+  - Notion object types are `snake_case` to match Notion’s source shape.
+- Variable names should follow the naming style of their type.
+  - Example: for `zNotion.blocks.heading_1`, a variable like `my_heading_1_block` is good.
+- Export inferred types together with their Zod schema using aligned names.
+  - `type property = z.infer<typeof property>`: types inferred from schemas should be the same.
+  - `zProperty = typeof property`: type of the Zod schemas should be prefixed by `z`. 
+- Function/helper exports use `camelCase`.
+- File names use `kebab-case`.
+- Higher-level DTOs (for example `NotionResource`) and namespaces use `PascalCase`.
+
+### `web/`
+
+- Component file names use `PascalCase`.
+- Component exports use `PascalCase`.
+- CSS Module files should match component casing.
+- SCSS partials should be prefixed with `_` (for example `_theme.scss`).
+
+## Typescript
+
+- **DO NOT USE ANY ANY ( •̀ ᴖ •́ ) ! ! !**
+  - Use `unknown` for untrusted input, narrow with type guards before use.
+- **Prefer inference over manual typing.**
+  - Let TypeScript infer types whenever possible.
+  - Use `as const` for scalar/object literals when you need literal preservation.
+  - Use `satisfies` to validate shape compatibility without widening the inferred type.
+- **Derive types instead of repeating them.**
+  - Use `Extract`, `Omit`, and `Pick` to refine unions and build derived shapes.
+  - Prefer composition from existing types over re-defining property lists.
+  - @see helpers in `@notion-site/common/types/union.js`.
+- **Keep function inputs flexible.**
+  - If a function only needs part of an object, type the parameter with `Pick<...>`. This reduces coupling and makes functions easier to reuse and test.
+- **Prefer `type` aliases for exported shapes.**
+  - Use `type` for object types. Reserve `interface` for global augmentation.
+
+### Generics
+
+- **Use generics when behaviour depends on input type.**
+  - Use generics to preserve input/output relationships (identity, transforms, keyed access, etc.).
+  - Prefer truly generic parameters first (`<T>`), without `extends` and without defaults, when no real domain constraint exists.
+  - Add constraints only when they are semantically required by the domain, not just to make implementation easier.
+- **When a generic constraint is required, name and export the constraint shape.** Reuse that same constraint type in helpers/utilities that consume the generic family. This keeps related generics composable across modules.
+  - Example pattern:
+  ```ts
+  type AnyData = { ... };
+  type MyType<TData extends AnyData>;
+  ```
+- **Use constrained generics for finite domains (for example unions).**
+  - For closed sets, constrain with `extends` the union of allowed values.
+  - In those cases, prefer a default to the full union (`<T extends U = U>`) so callers can omit type application when they do not care about specialisation.
+  - @see e.g. `Notion.Block<T>`.
+- **Provide overloads to avoid `as` casts.** Generic functions can be challenging to implement without running into TS errors, even for perfectly valid implementations, especially when you're using operations that don't preserve the generics, like `Array.map`. If you run into such errors, you can use this pattern to get around issues without having to resort to typecast: 
+  - Add an overload that exposes the generic parameter for callers who need explicit control.
+  - Add a second overload with the generic applied to the default followed by implementation. No generic, no probleme 👍
+  ```ts
+  // common/src/utils/notion/blocks.ts
+  export function extract<T extends BlockType>(block: Block<T>): UniqueNode<T>;
+  export function extract(block: Block): Node {
+    // ...
+  }
+  ```
+
+
 ## Check the Real Condition, Not a Proxy
 
 ```ts
@@ -88,39 +155,115 @@ export function getVerticalNavigationRange(
 
 ## Pattern: Flat Functions
 
-This is a pattern that works well in some cases:
+### Motivation
 
-1. Gather variables
-2. Do one conditional check
-3. Return or continue
+Logic is hard: it is almost too difficult for my little monkey brain sometimes (although I do make up with perseverence and enough creativity to never run out of options)... imagine how hard it must be for a little machine who doesn't even have a brain, though. That's why this document exists.
 
-Use cases:
+I like to keep my logic linear, rhythmic, and nice to read (kinda like how I like to write in real life), and follow patterns. I found this pattern easy to reason with, and used it widely across the codebase. Let us start with a practical example:
 
-- **Helper functions:** This works well for helper functions exist to avoid too much complexity in one place. Since they
-  already isolate complex logic, it makes sense to break that logic down further into comprehensible steps.
-- **Loops and switch-case:** This avoids over-complicating already complex cases: loops, switches, if/else chains, match
-  branches... these are already complex, adding more branches inside creates cognitive overhead for the reviewer.
+### Basic Structure
 
  ```ts
+// use-block-mutation-plugin.ts
 switch (e.key) {
   case "ArrowUp": {
+    // Early return specific for this case
     if (!prevElement) return;
+
+    // Get variable
     const range = getVerticalNavigationRange(
       e.currentTarget,
       prevElement,
       "up",
     );
+
+    // Conditional return
     if (!range) return;
 
+    // The variable is narrowed now, you can use it to do some side effects.
     prevElement.focus();
     setSelectionRange(prevElement, range);
 
+    // Handle what happens with the event next and return
     e.preventDefault();
     e.stopPropagation();
-
     return;
   }
   // . . . more cases
 }
 
 ```
+
+Keep a space around each return and block of side-effects
+so I don't have to insert a `\n` when I decide to drop in a `console.log` to see what's going on there.
+
+###  Use Cases
+
+- **Helper functions:** This works well for helper functions to avoid too much complexity in one place,
+  especially the ones mede to isolate complex logic,
+  the type of code that tends to turn into spaghetti.
+- **Loops and switch-case:** This avoids over-complicating already complex cases:
+  loops, switches, if/else chains, match branches... these are already complex
+  adding more branches inside creates for the reviewer some cognitive overhead.
+
+
+
+### Pattern: Type + Helper Object
+
+#### Motivation
+
+Keeping a type and its helpers together makes usage predictable and keeps naming simple.
+
+The type defines the shape.
+The object defines operations over that same shape.
+Both are exported with the same name from the same file.
+
+This avoids scattering logic across multiple files and reduces import noise.
+When you see `X`, you immediately know where `X.parse`, `X.is`, `X.options`, or other helpers live.
+
+#### Basic Structure
+
+```ts
+// history.ts
+export type EditorCommand =
+  | { type: "undo" }
+  | { type: "redo" }
+  | { type: "insert"; text: string };
+
+export const EditorCommand = {
+  isUndo: (cmd: EditorCommand) => cmd.type === "undo",
+  isRedo: (cmd: EditorCommand) => cmd.type === "redo",
+  isInsert: (cmd: EditorCommand): cmd is Extract<EditorCommand, { type: "insert" }> =>
+    cmd.type === "insert",
+};
+```
+
+Keep this flat.
+No classes.
+No namespace nesting.
+Just one type and one object with focused helpers.
+
+#### Use Cases
+
+- **Simple case:** Use this when the type is simple and concrete
+  (i.e. not generic, based on simple union / intersection of records and scalars),
+  and the helpers are small predicates that operate directly on that type.
+- **Zod schema case:** It is nice to infer types uding z.infer,
+  but then you also have to define the helpers in the same file.
+  In order to avoid name collision and export everything as a nice little bundle,
+  you can use `Object.assign(ctor, { ... })`
+
+```ts
+import { z } from "zod";
+
+const zStatus = z.enum(["draft", "published", "archived"]);
+
+export type Status = z.infer<typeof zStatus>;
+
+export const Status = Object.assign(zStatus, {
+  isPublished: (s: Status) => s === "published",
+  isCompleted: (s: Status) => s === "published" || s === "archived",
+});
+```
+
+

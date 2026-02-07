@@ -1,15 +1,17 @@
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import * as env from "../../../env.js";
-import { ContentEditor } from "../editor/use-content-editor.js";
+import { ContentEditor } from "../editor/types.js";
 import { useBlockNavigationPlugin } from "./block-navigation.js";
 import { composePlugins } from "./compose-plugins.js";
+import { useAutoCommitPlugin } from "./use-auto-commit-plugin.js";
 import { useBlockMutationPlugin } from "./use-block-mutation-plugin.js";
 import { useHistoryPlugin } from "./use-history-plugin.js";
 import { useLoggerPlugin } from "./use-logger-plugin.js";
 import { usePlainTextPlugin } from "./use-plain-text-plugin.js";
 import { useSetupPlugin } from "./use-setup-plugin.js";
 
-export const useDefaultPlugin = (
-  editor: ContentEditor,
+export const useNotionPlugin = (
+  editor: ContentEditor<Notion.Block>,
   options: {
     disabled?: boolean;
     multiline?: boolean;
@@ -20,8 +22,18 @@ export const useDefaultPlugin = (
 ) =>
   composePlugins(
     useSetupPlugin({ disabled: options.disabled }),
+    useAutoCommitPlugin(600),
     useHistoryPlugin,
-    usePlainTextPlugin({ multiline: options.multiline }),
+    usePlainTextPlugin({
+      multiline: options.multiline,
+      splice: (block, ...params) => {
+        if (!Notion.Block.isRichText(block)) return block;
+        return Notion.Block.map(block, (node) => ({
+          ...node,
+          rich_text: Notion.RTF.splice(node.rich_text, ...params),
+        }));
+      },
+    }),
     useBlockNavigationPlugin,
     useBlockMutationPlugin,
     useLoggerPlugin((event) => {

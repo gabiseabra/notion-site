@@ -1,5 +1,5 @@
 import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
-import { titleToString } from "@notion-site/common/utils/notion/properties.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import * as env from "../../../env.js";
 import { Head } from "../../../providers/HeadProvider.js";
 import { Favicon } from "../../display/Favicon.js";
@@ -25,7 +25,8 @@ export function BlogPostLoader({
     <Head>
       <title>
         {[
-          titleToString(blogPost.properties.Title) ?? "Untitled Blog Post",
+          Notion.titleToString(blogPost.properties.Title) ??
+            "Untitled Blog Post",
           env.SITE_TITLE,
         ].join(" • ")}
       </title>

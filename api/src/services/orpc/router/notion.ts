@@ -2,14 +2,13 @@ import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import { BlogPostStatus } from "@notion-site/common/dto/blog-posts/status.js";
 import { NotionDatabase } from "@notion-site/common/dto/notion/database.js";
 import { _NotionResource } from "@notion-site/common/dto/notion/resource.js";
-import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { NotionPage } from "@notion-site/common/dto/pages/index.js";
 import { api } from "@notion-site/common/orpc/index.js";
 import {
   hasPropertyValue,
   isTruthy,
 } from "@notion-site/common/utils/guards.js";
-import { isRedacted } from "@notion-site/common/utils/notion/properties.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { isUuid } from "@notion-site/common/utils/uuid.js";
 import { implement } from "@orpc/server";
 import * as env from "../../../env.js";
@@ -21,12 +20,6 @@ import {
   queryNotionDatabaseHandler,
   routeHandler,
 } from "../../notion/orpc.js";
-
-import {
-  narrowBlock,
-  traverseBlock,
-} from "@notion-site/common/utils/notion/blocks.js";
-import { traverseRichTextText } from "@notion-site/common/utils/notion/rich-text.js";
 
 const c = implement(api.notion);
 
@@ -42,12 +35,12 @@ export const notion = c.router({
       return {
         blocks: await Promise.all(
           result.blocks.map(async (block) => {
-            if (!narrowBlock(block, ...zNotion.blocks.rich_text_type.options)) {
+            if (!Notion.Block.isRichText(block)) {
               return block;
             } else {
-              return traverseBlock(block, async (node) => ({
+              return Notion.Block.traverse(block, async (node) => ({
                 ...node,
-                rich_text: await traverseRichTextText(
+                rich_text: await Notion.RTF.traverseText(
                   node.rich_text,
                   mapTextItem,
                 ),
@@ -173,7 +166,7 @@ async function replaceUrl(url: string) {
   return url;
 }
 
-async function mapTextItem(item: zNotion.properties.text) {
+async function mapTextItem(item: Notion.RTF.Item<"text">) {
   return {
     ...item,
     text: {
@@ -181,7 +174,7 @@ async function mapTextItem(item: zNotion.properties.text) {
         ? { url: await replaceUrl(item.text.link.url) }
         : null,
       content:
-        isRedacted(item) && !env.DEV
+        Notion.RTF.isRedacted(item) && !env.DEV
           ? "█".repeat(item.text.content.length)
           : item.text.content,
     },

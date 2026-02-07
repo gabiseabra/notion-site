@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { external, file } from "./media.js";
 import { api_color } from "./primitives.js";
-import { rich_text_item } from "./properties.js";
 import { block_id, page_id } from "./references.js";
+import { rich_text_item } from "./rich-text.js";
 
 export const paragraph = z.object({
   type: z.literal("paragraph"),

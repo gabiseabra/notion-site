@@ -51,7 +51,7 @@ const [first, second] = Array.from(container.querySelectorAll("p"));
 For testing plugin behavior or component integration, use `ContentEditor` with mock blocks:
 
 ```tsx
-import { p, span } from "@notion-site/common/test-utils/mock-block.js";
+import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { ContentEditor } from "../ContentEditor.js";
 
 const blocks = [p("a", span("First")), p("b", span("Second"))];

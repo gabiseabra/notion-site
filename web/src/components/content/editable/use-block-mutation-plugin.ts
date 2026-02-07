@@ -1,10 +1,4 @@
-import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
-import {
-  extractBlock,
-  mapBlock,
-  narrowBlock,
-  splitBlock,
-} from "@notion-site/common/utils/notion/blocks.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import {
   getMaxSelectionOffset,
   getSelectionRange,
@@ -19,7 +13,7 @@ import { ContentEditorPlugin } from "./types.js";
  * | `Backspace` | Caret at position 0 | Merge with previous or delete empty block |
  * | `Enter` | Any position | Split block at caret position |
  */
-export const useBlockMutationPlugin: ContentEditorPlugin =
+export const useBlockMutationPlugin: ContentEditorPlugin<Notion.Block> =
   (editor) => (block) => ({
     onKeyDown(e) {
       const selectionBefore = getSelectionRange(e.target as HTMLElement);
@@ -40,11 +34,8 @@ export const useBlockMutationPlugin: ContentEditorPlugin =
           !prevBlock ||
           !prevElement ||
           !currentBlock ||
-          !narrowBlock(
-            currentBlock,
-            ...zNotion.blocks.rich_text_type.options,
-          ) ||
-          !narrowBlock(prevBlock, ...zNotion.blocks.rich_text_type.options)
+          !Notion.Block.isRichText(currentBlock) ||
+          !Notion.Block.isRichText(prevBlock)
         )
           return;
 
@@ -61,11 +52,11 @@ export const useBlockMutationPlugin: ContentEditorPlugin =
             selectionAfter,
           });
           editor.update(
-            mapBlock(prevBlock, (node) => ({
+            Notion.Block.map(prevBlock, (node) => ({
               ...node,
               rich_text: [
                 ...node.rich_text,
-                ...extractBlock(currentBlock).rich_text,
+                ...Notion.Block.extract(currentBlock).rich_text,
               ],
             })),
           );
@@ -79,7 +70,7 @@ export const useBlockMutationPlugin: ContentEditorPlugin =
 
         if (!currentBlock) return;
 
-        const { left, right } = splitBlock(
+        const { left, right } = Notion.Block.split(
           currentBlock,
           selectionBefore.start,
           selectionBefore.end

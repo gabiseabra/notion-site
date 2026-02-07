@@ -1,3 +1,4 @@
+import { AnyBlock } from "../editor/types.js";
 import { ContentEditorPlugin } from "./types.js";
 
 /**
@@ -12,9 +13,9 @@ import { ContentEditorPlugin } from "./types.js";
  * @param plugins - Plugins to compose, in priority order (first has highest priority)
  * @returns A single composed plugin with merged event maps
  */
-export function composePlugins(
-  ...plugins: ContentEditorPlugin[]
-): ContentEditorPlugin {
+export function composePlugins<TBlock extends AnyBlock>(
+  ...plugins: ContentEditorPlugin<TBlock>[]
+): ContentEditorPlugin<TBlock> {
   return (editor) => {
     const appliedPlugins = plugins.map((p) => p(editor));
 

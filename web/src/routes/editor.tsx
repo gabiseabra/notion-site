@@ -1,5 +1,5 @@
-import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
-import { a, p, span } from "@notion-site/common/test-utils/mock-block.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
+import { a, p, span } from "@notion-site/common/utils/notion/wip.js";
 import { useLocalStorage } from "usehooks-ts";
 import {
   ContentEditor,
@@ -14,45 +14,40 @@ export const path = "/editor";
 
 declare global {
   interface Window {
-    editor?: TContentEditor;
+    editor?: TContentEditor<Notion.Block>;
   }
 }
 
 export function Component() {
-  const [blocks, setBlocks] = useLocalStorage<zNotion.blocks.block[]>(
-    "editor",
-    [
-      p(
-        "1",
-        span("Hi 👋, welcome to my "),
-        span("awesome ", { bold: true, color: "pink" }),
-        span("content ", { italic: true, color: "blue_background" }),
-        span("editor ", { underline: true, color: "purple" }),
-        span("demo!", { code: true }),
+  const [blocks, setBlocks] = useLocalStorage<Notion.Block[]>("editor", [
+    p(
+      "1",
+      span("Hi 👋, welcome to my "),
+      span("awesome ", { bold: true, color: "pink" }),
+      span("content ", { italic: true, color: "blue_background" }),
+      span("editor ", { underline: true, color: "purple" }),
+      span("demo!", { code: true }),
+    ),
+    p("2", span("Here is an almost blank canvas for you to start.")),
+    p(
+      "3",
+      span("Write something! ! !", {
+        bold: true,
+        underline: true,
+        italic: true,
+      }),
+      span(" Your changes will be saved to localstorage for the next session."),
+    ),
+    p(
+      "5",
+      a(
+        "Let me know if you find a bug.",
+        "https://github.com/gabiseabra/notion-site/issues",
       ),
-      p("2", span("Here is an almost blank canvas for you to start.")),
-      p(
-        "3",
-        span("Write something! ! !", {
-          bold: true,
-          underline: true,
-          italic: true,
-        }),
-        span(
-          " Your changes will be saved to localstorage for the next session.",
-        ),
-      ),
-      p(
-        "5",
-        a(
-          "Let me know if you find a bug.",
-          "https://github.com/gabiseabra/notion-site/issues",
-        ),
-      ),
-    ],
-  );
+    ),
+  ]);
 
-  const onChange = (blocks: zNotion.blocks.block[]) => {
+  const onChange = (blocks: Notion.Block[]) => {
     setBlocks(blocks);
   };
 

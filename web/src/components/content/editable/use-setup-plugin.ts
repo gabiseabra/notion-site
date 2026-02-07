@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { ContentEditorPlugin } from "./types.js";
+import { AnyContentEditorPlugin } from "./types.js";
 
 /**
  * This plugin should typically be included first in any composition as it:
@@ -7,7 +7,7 @@ import { ContentEditorPlugin } from "./types.js";
  * - Enables block-level contentEditable functionality
  */
 export const useSetupPlugin =
-  ({ disabled }: { disabled?: boolean }): ContentEditorPlugin =>
+  ({ disabled }: { disabled?: boolean }): AnyContentEditorPlugin =>
   (editor) => {
     // clear refs on unmount
     useEffect(() => {

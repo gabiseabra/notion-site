@@ -1,5 +1,4 @@
-import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
-import { isRedacted } from "@notion-site/common/utils/notion/properties.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { match } from "ts-pattern";
 import { rewriteUrl } from "../../utils/url.js";
 import { Span, TextProps } from "../display/Text.js";
@@ -8,7 +7,7 @@ import { MaybeLink } from "../navigation/MaybeLink.js";
 import { ContentEditableProps } from "./editable/types.js";
 
 export type RichTextProps = {
-  value: zNotion.properties.rich_text_item;
+  value: Notion.RichText;
   size?: TextProps["size"];
 } & ContentEditableProps;
 
@@ -23,7 +22,7 @@ export function RichText({ value, ...props }: RichTextProps) {
         value.map((item, ix) =>
           match(item)
             .with({ type: "text" }, (item) =>
-              isRedacted(item) ? (
+              Notion.RTF.isRedacted(item) ? (
                 <Span key={ix} redacted {...props}>
                   {item.text.content}
                 </Span>

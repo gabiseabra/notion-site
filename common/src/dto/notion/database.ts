@@ -18,8 +18,8 @@ export const _NotionDatabase = z.object({
     zNotion.references.workspace,
   ]),
 
-  title: zNotion.properties.rich_text_item,
-  description: zNotion.properties.rich_text_item,
+  title: zNotion.rich_text.rich_text_item,
+  description: zNotion.rich_text.rich_text_item,
   icon: zNotion.media.icon.nullable(),
   cover: zNotion.media.cover.nullable(),
 
@@ -48,56 +48,57 @@ export type NotionDatabase<
 } & Omit<z.infer<typeof _NotionDatabase>, "properties">;
 
 export const NotionDatabase = Object.assign(zNotionDatabase, {
-  /**
-   * Infers a database object schema from a page object schema.
-   */
-  fromResource<Properties extends zNotion.properties.zProperties>(schema: {
-    shape: { properties: { shape: Properties } };
-  }) {
-    // this is actually really simple, I promise . . .
-    return zNotionDatabase(
-      Object.fromEntries(
-        // just map each property key/value pair of the resource schema,
-        Object.entries(schema.shape.properties.shape).map(([key, prop]) => [
-          key,
-          // replacing the schema of each property with a matching property_config schema.
-          match(prop.shape)
-            // in the case of properties with generic types, u also need to map the thing.
-            .with({ type: { value: "status" } }, (status) =>
-              zNotion.database.status(status.status.unwrap().shape.name),
-            )
-            .with({ type: { value: "select" } }, (select) =>
-              zNotion.database.select(select.select.unwrap().shape.name),
-            )
-            .with({ type: { value: "multi_select" } }, (multi_select) =>
-              zNotion.database.multi_select(
-                multi_select.multi_select.element.shape.name,
-              ),
-            )
-            // otherwise just map to an option with the same discriminant and you should be fine.
-            .otherwise((prop) =>
-              zNotion.database.property_config.options.find(
-                (option) => option.shape.type.value === prop.type.value,
-              ),
-            ),
-        ]),
-      ) as {
-        // this type does the same as the match above: mapping property types to their respective database types while
-        // also handling special cases for generics.
-        [k in keyof Properties]: Properties[k] extends zNotion.properties.zStatus<
-          infer Options
-        >
-          ? zNotion.database.zStatus<Options>
-          : Properties[k] extends zNotion.properties.zSelect<infer Options>
-            ? zNotion.database.zSelect<Options>
-            : Properties[k] extends zNotion.properties.zMultiSelect<
-                  infer Options
-                >
-              ? zNotion.database.zMultiSelect<Options>
-              : zNotion.database.zPropertyConfig<
-                  Properties[k]["shape"]["type"]["value"]
-                >;
-      },
-    );
-  },
+  fromResource,
 });
+
+/**
+ * Infers a database object schema from a page object schema.
+ * @note type of NotionDatabase gets too long if this defined inline without explicit type annotation 😢
+ */
+function fromResource<
+  Properties extends zNotion.properties.zProperties,
+>(schema: { shape: { properties: { shape: Properties } } }) {
+  // this is actually really simple, I promise . . .
+  return zNotionDatabase(
+    Object.fromEntries(
+      // just map each property key/value pair of the resource schema,
+      Object.entries(schema.shape.properties.shape).map(([key, prop]) => [
+        key,
+        // replacing the schema of each property with a matching property_config schema.
+        match(prop.shape)
+          // in the case of properties with generic types, u also need to map the thing.
+          .with({ type: { value: "status" } }, (status) =>
+            zNotion.database.status(status.status.unwrap().shape.name),
+          )
+          .with({ type: { value: "select" } }, (select) =>
+            zNotion.database.select(select.select.unwrap().shape.name),
+          )
+          .with({ type: { value: "multi_select" } }, (multi_select) =>
+            zNotion.database.multi_select(
+              multi_select.multi_select.element.shape.name,
+            ),
+          )
+          // otherwise just map to an option with the same discriminant and you should be fine.
+          .otherwise((prop) =>
+            zNotion.database.property_config.options.find(
+              (option) => option.shape.type.value === prop.type.value,
+            ),
+          ),
+      ]),
+    ) as {
+      // this type does the same as the match above: mapping property types to their respective database types while
+      // also handling special cases for generics.
+      [k in keyof Properties]: Properties[k] extends zNotion.properties.zStatus<
+        infer Options
+      >
+        ? zNotion.database.zStatus<Options>
+        : Properties[k] extends zNotion.properties.zSelect<infer Options>
+          ? zNotion.database.zSelect<Options>
+          : Properties[k] extends zNotion.properties.zMultiSelect<infer Options>
+            ? zNotion.database.zMultiSelect<Options>
+            : zNotion.database.zPropertyConfig<
+                Properties[k]["shape"]["type"]["value"]
+              >;
+    },
+  );
+}
