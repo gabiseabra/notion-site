@@ -1,5 +1,7 @@
 # Content Editor
 
+`@see` [web/src/components/content](../web/src/components/content)
+
 A React-based rich text editor for Notion-style block content.
 
 ## Motivation
@@ -21,7 +23,8 @@ content-editable, while block elements would be fully controlled by React.
 This actually works if you're dealing with plain-text: you can use `content-editable="plaintext-only"` to disable the
 DOM from creating inline nodes such as `b` on `ctrl+b`, and if you pass only `string` to the block node's `children`
 prop, then there will be no more nodes to reconcile beyond the block-level, therefore no problem. But then your content
-editor would essentially work like a `textarea` 🤷‍♀️ (this is true, @see [use-plain-text-plugin.test.tsx](./editable/use-plain-text-plugin.test.tsx))
+editor would essentially work like a `textarea` 🤷‍♀️ (
+`@see` [use-plain-text-plugin.test.tsx](../web/src/components/content/editable/use-plain-text-plugin.test.tsx))
 
 But this approach doesn't work if you're dealing with more complex data that render into more HTML. Even if you're extra
 careful to keep inline and block mutations handled separately, React's reconciliation still has to perform unmount
@@ -36,10 +39,12 @@ re able to render the data into HTML (which is the case for Notion), then it's a
 content-editable element and managed by the editor, while _rich-text_ is an array of text elements containing a link
 annotations.
 
-[**ContentEditor**](editor/use-content-editor.ts): The editor instance that centralizes the state.
+[**ContentEditor**](../web/src/components/content/editor/types.ts): The editor instance that centralizes
+the state.
 
-[**ContentEditorPlugin**](editable/types.ts): A hook that implements a piece of editor functionality by bridging
-component props and editor state. Plugins return DOM props (event handlers, refs) that get spread onto block elements.
+[**ContentEditorPlugin**](../web/src/components/content/editable/types.ts): A hook that implements a piece of editor
+functionality by bridging component props and editor state. Plugins return DOM props (event handlers, refs) that get
+spread onto block elements.
 
 ## Plugin Architecture
 
