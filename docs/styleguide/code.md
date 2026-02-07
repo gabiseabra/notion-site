@@ -158,7 +158,6 @@ export function getVerticalNavigationRange(
 ### Motivation
 
 Logic is hard: it is almost too difficult for my little monkey brain sometimes (although I do make up with perseverence and enough creativity to never run out of options)... imagine how hard it must be for a little machine who doesn't even have a brain, though. That's why this document exists.
-
 I like to keep my logic linear, rhythmic, and nice to read (kinda like how I like to write in real life), and follow patterns. I found this pattern easy to reason with, and used it widely across the codebase. Let us start with a practical example:
 
 ### Basic Structure
@@ -213,13 +212,8 @@ so I don't have to insert a `\n` when I decide to drop in a `console.log` to see
 #### Motivation
 
 Keeping a type and its helpers together makes usage predictable and keeps naming simple.
-
-The type defines the shape.
-The object defines operations over that same shape.
-Both are exported with the same name from the same file.
-
-This avoids scattering logic across multiple files and reduces import noise.
-When you see `X`, you immediately know where `X.parse`, `X.is`, `X.options`, or other helpers live.
+The type defines the shape. The object defines operations over that same shape. Both are exported with the same name from the same file.
+This avoids scattering logic across multiple files and reduces import noise. When you see `X`, you immediately know where `X.parse`, `X.is`, `X.options`, or other helpers live.
 
 #### Basic Structure
 
