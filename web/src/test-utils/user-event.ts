@@ -4,7 +4,11 @@ import { userEvent } from "@testing-library/user-event";
 import { JSDOM } from "jsdom";
 import { spliceElementText } from "../utils/dom-splice.js";
 import { getInputEventSpliceParams } from "../utils/event.js";
-import { getSelectionRange, setSelectionRange } from "../utils/selection.js";
+import {
+  getSelectionRange,
+  setSelectionRange,
+  setSelectionRangeMaybe,
+} from "../utils/selection.js";
 
 export function setupUserEvent() {
   const user = userEvent.setup();
@@ -83,7 +87,7 @@ async function forwardInputEvents(
       eventType,
       (e) => {
         // Copy selection from proxy to target before dispatching
-        setSelectionRange(element, getSelectionRange(proxy));
+        setSelectionRangeMaybe(element, getSelectionRange(proxy));
 
         if (
           hash(getSelectionRange(proxy)) !== hash(getSelectionRange(element))
@@ -116,7 +120,7 @@ async function forwardInputEvents(
   // Copy text content and selection state to the proxy
   proxy.value = element.textContent ?? "";
   proxy.focus();
-  setSelectionRange(proxy, getSelectionRange(element));
+  setSelectionRangeMaybe(proxy, getSelectionRange(element));
 
   await act(proxy, user.proxy);
 

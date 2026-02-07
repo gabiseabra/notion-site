@@ -1,3 +1,4 @@
+import * as env from "../../../env.js";
 import { ContentEditor } from "../editor/use-content-editor.js";
 import { useBlockNavigationPlugin } from "./block-navigation.js";
 import { composePlugins } from "./compose-plugins.js";
@@ -12,15 +13,20 @@ export const useDefaultPlugin = (
   options: {
     disabled?: boolean;
     multiline?: boolean;
+    logging?: boolean | "verbose";
+  } = {
+    logging: !env.TEST,
   },
 ) =>
   composePlugins(
     useSetupPlugin({ disabled: options.disabled }),
-    useLoggerPlugin((event) => {
-      // console.info(event.eventType, event.detail);
-    }),
     useHistoryPlugin,
     usePlainTextPlugin({ multiline: options.multiline }),
     useBlockNavigationPlugin,
     useBlockMutationPlugin,
+    useLoggerPlugin((event) => {
+      if (!options.logging) return;
+      if (options.logging === "verbose" && event.eventType === "flush") return;
+      console.info(event.eventType, event.detail);
+    }),
   )(editor);

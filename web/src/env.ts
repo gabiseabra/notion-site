@@ -1,3 +1,5 @@
+export const TEST = false;
+
 export const DEV = import.meta.env.DEV;
 
 export const SSR = import.meta.env.SSR;

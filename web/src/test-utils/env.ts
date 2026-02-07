@@ -1,3 +1,4 @@
+export const TEST = true;
 export const DEV = false;
 export const SSR = false;
 export const API_URL = "http://localhost/api";

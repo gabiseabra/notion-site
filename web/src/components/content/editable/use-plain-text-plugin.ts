@@ -101,36 +101,36 @@ export const usePlainTextPlugin = ({
           e.preventDefault();
           return;
         }
+        if (!spliceParams) return;
 
-        if (spliceParams) {
-          const currentBlock =
-            pendingRef.current?.block.id === block.id
-              ? pendingRef.current.block
-              : editor.peek(block.id);
+        const currentBlock =
+          pendingRef.current?.block.id === block.id
+            ? pendingRef.current.block
+            : editor.peek(block.id);
 
-          if (
-            !currentBlock ||
-            !narrowBlock(currentBlock, ...zNotion.blocks.rich_text_type.options)
-          )
-            return;
+        if (
+          !currentBlock ||
+          !narrowBlock(currentBlock, ...zNotion.blocks.rich_text_type.options)
+        )
+          return;
 
-          const newBlock = mapBlock(currentBlock, (node) => ({
+        const rich_text = spliceRichText(
+          extractBlock(currentBlock).rich_text,
+          spliceParams.offset,
+          spliceParams.deleteCount,
+          spliceParams.insert,
+        );
+
+        update(
+          mapBlock(currentBlock, (node) => ({
             ...node,
-            rich_text: spliceRichText(
-              extractBlock(currentBlock).rich_text,
-              spliceParams.offset,
-              spliceParams.deleteCount,
-              spliceParams.insert,
-            ),
-          }));
-
-          update(newBlock, {
+            rich_text,
+          })),
+          {
             start: spliceParams.offset + spliceParams.insert.length,
             end: null,
-          });
-
-          return true;
-        }
+          },
+        );
       } finally {
         scheduleFlush();
       }

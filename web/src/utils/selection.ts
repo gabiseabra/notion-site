@@ -42,11 +42,21 @@ export function getSelectionRange(element: HTMLElement): Selection | null {
   return { start, end };
 }
 
+/** Unselects all elements. Handles the appropriate DOM instance for the given element. */
+export function removeSelection(element: HTMLElement) {
+  const doc = element.ownerDocument;
+  const win =
+    doc.defaultView || (doc as { parentWindow?: Window }).parentWindow;
+
+  const sel = win?.getSelection();
+  if (!sel) return;
+
+  sel.removeAllRanges();
+  element.blur();
+}
+
 /** Set the selection within `element` by text offsets. */
-export function setSelectionRange(
-  element: HTMLElement,
-  range: Selection | null,
-) {
+export function setSelectionRange(element: HTMLElement, selection: Selection) {
   const doc = element.ownerDocument;
   const win =
     doc.defaultView || (doc as { parentWindow?: Window }).parentWindow;
@@ -55,26 +65,27 @@ export function setSelectionRange(
     isElementWithTag(element, "input") ||
     isElementWithTag(element, "textarea")
   ) {
-    if (!range) element.blur();
-    else element.setSelectionRange(range.start, range.end ?? range.start);
+    element.setSelectionRange(
+      selection.start,
+      selection.end ?? selection.start,
+    );
     return;
   }
 
-  const sel = win?.getSelection();
+  removeSelection(element);
 
+  const sel = win?.getSelection();
   if (!sel) return;
 
   sel.removeAllRanges();
 
-  if (range === null) return;
-
-  if (element.textContent === "" && range.start === 0) {
+  if (element.textContent === "" && selection.start === 0) {
     element.focus();
     return;
   }
 
-  const start = resolveOffset(element, range.start);
-  const end = resolveOffset(element, range.end ?? range.start);
+  const start = resolveOffset(element, selection.start);
+  const end = resolveOffset(element, selection.end ?? selection.start);
 
   if (!start || !end) return;
 
@@ -82,6 +93,14 @@ export function setSelectionRange(
   r.setStart(start.node, start.offset);
   r.setEnd(end.node, end.offset);
   sel.addRange(r);
+}
+
+export function setSelectionRangeMaybe(
+  element: HTMLElement,
+  selection: Selection | null,
+) {
+  if (!selection) removeSelection(element);
+  else setSelectionRange(element, selection);
 }
 
 /** Max selectable offset (text length) for `element`. */

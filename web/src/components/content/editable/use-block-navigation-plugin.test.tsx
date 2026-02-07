@@ -54,4 +54,42 @@ describe("useBlockNavigationPlugin", () => {
     });
     expect(getSelectionRange(second)).toBeNull();
   });
+
+  // @todo fix: TypeError: range.getClientRects is not a function
+  // JSDOM does not implement getClientRects, need to mock.
+  it.skip("moves caret to previous block on ArrowDown", () => {
+    const blocks = [p("a", span("First")), p("b", span("Second"))];
+    const { container } = render(
+      <ContentEditor value={blocks} onChange={() => {}} />,
+    );
+
+    const [first, second] = Array.from(container.querySelectorAll("p"));
+    expect(first).toBeTruthy();
+    expect(second).toBeTruthy();
+
+    setSelectionRange(first, { start: 2, end: null });
+
+    fireEvent.keyDown(first, { key: "ArrowDown" });
+
+    expect(getSelectionRange(first)).toBeNull();
+    expect(getSelectionRange(second)).toBeTruthy();
+  });
+
+  it.skip("moves caret to previous block on ArrowUp", () => {
+    const blocks = [p("a", span("First")), p("b", span("Second"))];
+    const { container } = render(
+      <ContentEditor value={blocks} onChange={() => {}} />,
+    );
+
+    const [first, second] = Array.from(container.querySelectorAll("p"));
+    expect(first).toBeTruthy();
+    expect(second).toBeTruthy();
+
+    setSelectionRange(second, { start: 2, end: null });
+
+    fireEvent.keyDown(second, { key: "ArrowUp" });
+
+    expect(getSelectionRange(first)).toBeTruthy();
+    expect(getSelectionRange(second)).toBeNull();
+  });
 });
