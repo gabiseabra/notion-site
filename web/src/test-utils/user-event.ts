@@ -4,11 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import { JSDOM } from "jsdom";
 import { spliceElementText } from "../utils/dom-splice.js";
 import { getInputEventSpliceParams } from "../utils/event.js";
-import {
-  getSelectionRange,
-  setSelectionRange,
-  setSelectionRangeMaybe,
-} from "../utils/selection.js";
+import { Selection } from "../utils/selection.js";
 
 export function setupUserEvent() {
   const user = userEvent.setup();
@@ -87,11 +83,9 @@ async function forwardInputEvents(
       eventType,
       (e) => {
         // Copy selection from proxy to target before dispatching
-        setSelectionRangeMaybe(element, getSelectionRange(proxy));
+        Selection.applyMaybe(element, Selection.read(proxy));
 
-        if (
-          hash(getSelectionRange(proxy)) !== hash(getSelectionRange(element))
-        ) {
+        if (hash(Selection.read(proxy)) !== hash(Selection.read(element))) {
           never(
             "failed to copy selection from proxy to target! this shouldn't happen . . .",
           );
@@ -102,7 +96,7 @@ async function forwardInputEvents(
       (e) => {
         // process beforeinput to apply text insertions / deletions to content-editable element
         if (!(e instanceof InputEvent) || e.defaultPrevented) return;
-        const selection = getSelectionRange(proxy);
+        const selection = Selection.read(proxy);
         const spliceParams =
           selection && getInputEventSpliceParams(e, selection);
         if (spliceParams) {
@@ -120,11 +114,11 @@ async function forwardInputEvents(
   // Copy text content and selection state to the proxy
   proxy.value = element.textContent ?? "";
   proxy.focus();
-  setSelectionRangeMaybe(proxy, getSelectionRange(element));
+  Selection.applyMaybe(proxy, Selection.read(element));
 
   await act(proxy, user.proxy);
 
-  setSelectionRange(element, {
+  Selection.apply(element, {
     start: proxy.selectionStart ?? 0,
     end:
       proxy.selectionEnd === proxy.selectionStart ? null : proxy.selectionEnd,

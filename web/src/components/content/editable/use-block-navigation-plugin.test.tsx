@@ -3,11 +3,7 @@
  */
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { fireEvent, render } from "@testing-library/react";
-import {
-  getMaxSelectionOffset,
-  getSelectionRange,
-  setSelectionRange,
-} from "../../../utils/selection.js";
+import { Selection } from "../../../utils/selection.js";
 import { ContentEditor } from "../ContentEditor.js";
 
 describe("useBlockNavigationPlugin", () => {
@@ -22,15 +18,18 @@ describe("useBlockNavigationPlugin", () => {
     expect(first).toBeTruthy();
     expect(second).toBeTruthy();
 
-    setSelectionRange(first, {
-      start: getMaxSelectionOffset(first),
+    Selection.apply(first, {
+      start: Selection.maxOffset(first),
       end: null,
     });
 
     fireEvent.keyDown(first, { key: "ArrowRight" });
 
-    expect(getSelectionRange(second)).toEqual({ start: 0, end: null });
-    expect(getSelectionRange(first)).toBeNull();
+    expect(Selection.read(second)).toEqual({
+      start: 0,
+      end: null,
+    });
+    expect(Selection.read(first)).toBeNull();
   });
 
   it("moves caret to previous block on ArrowLeft at start", () => {
@@ -43,16 +42,16 @@ describe("useBlockNavigationPlugin", () => {
     expect(first).toBeTruthy();
     expect(second).toBeTruthy();
 
-    setSelectionRange(second, { start: 0, end: null });
+    Selection.apply(second, { start: 0, end: null });
 
     fireEvent.keyDown(second, { key: "ArrowLeft" });
 
-    const range = getSelectionRange(first);
+    const range = Selection.read(first);
     expect(range).toEqual({
-      start: getMaxSelectionOffset(first),
+      start: Selection.maxOffset(first),
       end: null,
     });
-    expect(getSelectionRange(second)).toBeNull();
+    expect(Selection.read(second)).toBeNull();
   });
 
   // @todo fix: TypeError: range.getClientRects is not a function
@@ -67,12 +66,12 @@ describe("useBlockNavigationPlugin", () => {
     expect(first).toBeTruthy();
     expect(second).toBeTruthy();
 
-    setSelectionRange(first, { start: 2, end: null });
+    Selection.apply(first, { start: 2, end: null });
 
     fireEvent.keyDown(first, { key: "ArrowDown" });
 
-    expect(getSelectionRange(first)).toBeNull();
-    expect(getSelectionRange(second)).toBeTruthy();
+    expect(Selection.read(first)).toBeNull();
+    expect(Selection.read(second)).toBeTruthy();
   });
 
   it.skip("moves caret to previous block on ArrowUp", () => {
@@ -85,11 +84,11 @@ describe("useBlockNavigationPlugin", () => {
     expect(first).toBeTruthy();
     expect(second).toBeTruthy();
 
-    setSelectionRange(second, { start: 2, end: null });
+    Selection.apply(second, { start: 2, end: null });
 
     fireEvent.keyDown(second, { key: "ArrowUp" });
 
-    expect(getSelectionRange(first)).toBeTruthy();
-    expect(getSelectionRange(second)).toBeNull();
+    expect(Selection.read(first)).toBeTruthy();
+    expect(Selection.read(second)).toBeNull();
   });
 });

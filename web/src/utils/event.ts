@@ -1,4 +1,4 @@
-import { Selection } from "./selection.js";
+import type { Selection } from "./selection.js";
 
 /**
  * Did the event originate inside an element matching selector that is within the element handling the event?

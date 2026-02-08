@@ -1,8 +1,18 @@
 /** Text offsets within an element; end is null for a collapsed caret. */
 export type Selection = { start: number; end: number | null };
 
+export const Selection = {
+  read,
+  clear,
+  apply,
+  applyMaybe,
+  maxOffset,
+  moveVertically,
+  merge,
+};
+
 /** Get selection offsets within `element`, or null if selection is outside. */
-export function getSelectionRange(element: HTMLElement): Selection | null {
+function read(element: HTMLElement): Selection | null {
   // Inputs are pretty straightforward
   if (
     isElementWithTag(element, "input") ||
@@ -43,7 +53,7 @@ export function getSelectionRange(element: HTMLElement): Selection | null {
 }
 
 /** Unselects all elements. Handles the appropriate DOM instance for the given element. */
-export function removeSelection(element: HTMLElement) {
+function clear(element: HTMLElement) {
   const doc = element.ownerDocument;
   const win =
     doc.defaultView || (doc as { parentWindow?: Window }).parentWindow;
@@ -56,7 +66,7 @@ export function removeSelection(element: HTMLElement) {
 }
 
 /** Set the selection within `element` by text offsets. */
-export function setSelectionRange(element: HTMLElement, selection: Selection) {
+function apply(element: HTMLElement, selection: Selection) {
   const doc = element.ownerDocument;
   const win =
     doc.defaultView || (doc as { parentWindow?: Window }).parentWindow;
@@ -72,7 +82,7 @@ export function setSelectionRange(element: HTMLElement, selection: Selection) {
     return;
   }
 
-  removeSelection(element);
+  clear(element);
 
   const sel = win?.getSelection();
   if (!sel) return;
@@ -98,23 +108,20 @@ export function setSelectionRange(element: HTMLElement, selection: Selection) {
   sel.addRange(r);
 }
 
-export function setSelectionRangeMaybe(
-  element: HTMLElement,
-  selection: Selection | null,
-) {
-  if (!selection) removeSelection(element);
-  else setSelectionRange(element, selection);
+function applyMaybe(element: HTMLElement, selection: Selection | null) {
+  if (!selection) clear(element);
+  else apply(element, selection);
 }
 
 /** Max selectable offset (text length) for `element`. */
-export function getMaxSelectionOffset(element: HTMLElement): number {
+function maxOffset(element: HTMLElement): number {
   const text = element.textContent ?? "";
   // Empty rich text renders as &nbsp; (char 160)
   return text === String.fromCharCode(160) ? 0 : text.length;
 }
 
 /** Compute the caret range when moving up/down between blocks. */
-export function getVerticalNavigationRange(
+function moveVertically(
   currentElement: HTMLElement,
   targetElement: HTMLElement,
   direction: "up" | "down",
@@ -157,12 +164,12 @@ export function getVerticalNavigationRange(
     );
 
   return {
-    start:
-      targetOffset ??
-      (direction === "up" ? getMaxSelectionOffset(targetElement) : 0),
+    start: targetOffset ?? (direction === "up" ? maxOffset(targetElement) : 0),
     end: null,
   };
 }
+
+/** Internals */
 
 /** Line rectangles for the element's text layout. */
 function getLineRects(element: HTMLElement): DOMRect[] {
@@ -254,10 +261,7 @@ function resolveOffset(
   return null;
 }
 
-export function mergeSelections(
-  selection: Selection,
-  ...selections: Selection[]
-): Selection {
+function merge(selection: Selection, ...selections: Selection[]): Selection {
   return selections.reduce(
     (acc, sel) => ({
       start: Math.min(acc.start, sel.start),

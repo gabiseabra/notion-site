@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 import { useEventListener } from "../../../hooks/useEventListener.js";
 import { getInputEventSpliceParams } from "../../../utils/event.js";
-import { getSelectionRange, Selection } from "../../../utils/selection.js";
+import { Selection } from "../../../utils/selection.js";
 import { AnyBlock } from "../editor/types.js";
 import { createEventListenerPlugin } from "./create-event-listener-plugin.js";
 import { ContentEditorPlugin } from "./types.js";
@@ -49,7 +49,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
         selectionBefore:
           (() => {
             const element = editor.ref(block.id);
-            return element && getSelectionRange(element);
+            return element && Selection.read(element);
           })() ?? undefined,
       };
       pendingRef.current.block = block;
@@ -89,7 +89,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
     return (block) => (e) => {
       cancelFlush();
       try {
-        const selection = getSelectionRange(e.target as HTMLElement);
+        const selection = Selection.read(e.target as HTMLElement);
         if (!selection) return;
 
         const spliceParams = getInputEventSpliceParams(e, selection);

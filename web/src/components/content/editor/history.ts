@@ -1,6 +1,6 @@
 import { History } from "@notion-site/common/utils/history.js";
 import { match } from "ts-pattern";
-import { Selection } from "../../../utils/selection.js";
+import type { Selection } from "../../../utils/selection.js";
 import { AnyBlock } from "./types.js";
 
 /**

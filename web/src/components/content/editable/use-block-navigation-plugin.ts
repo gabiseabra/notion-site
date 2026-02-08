@@ -1,9 +1,4 @@
-import {
-  getMaxSelectionOffset,
-  getSelectionRange,
-  getVerticalNavigationRange,
-  setSelectionRange,
-} from "../../../utils/selection.js";
+import { Selection } from "../../../utils/selection.js";
 import { AnyContentEditorPlugin } from "./types.js";
 
 /**
@@ -19,7 +14,7 @@ import { AnyContentEditorPlugin } from "./types.js";
 export const useBlockNavigationPlugin: AnyContentEditorPlugin =
   (editor) => (block) => ({
     onKeyDown(e) {
-      const selection = getSelectionRange(e.currentTarget);
+      const selection = Selection.read(e.currentTarget);
 
       if (e.shiftKey || !selection) return;
 
@@ -35,8 +30,8 @@ export const useBlockNavigationPlugin: AnyContentEditorPlugin =
             return;
 
           prevElement.focus();
-          setSelectionRange(prevElement, {
-            start: getMaxSelectionOffset(prevElement),
+          Selection.apply(prevElement, {
+            start: Selection.maxOffset(prevElement),
             end: null,
           });
 
@@ -49,14 +44,14 @@ export const useBlockNavigationPlugin: AnyContentEditorPlugin =
           if (
             !(
               nextElement &&
-              selection.start === getMaxSelectionOffset(e.currentTarget) &&
+              selection.start === Selection.maxOffset(e.currentTarget) &&
               selection.end === null
             )
           )
             return;
 
           nextElement.focus();
-          setSelectionRange(nextElement, { start: 0, end: null });
+          Selection.apply(nextElement, { start: 0, end: null });
 
           e.preventDefault();
           e.stopPropagation();
@@ -65,7 +60,7 @@ export const useBlockNavigationPlugin: AnyContentEditorPlugin =
 
         case "ArrowUp": {
           if (!prevElement) return;
-          const range = getVerticalNavigationRange(
+          const range = Selection.moveVertically(
             e.currentTarget,
             prevElement,
             "up",
@@ -73,7 +68,7 @@ export const useBlockNavigationPlugin: AnyContentEditorPlugin =
           if (!range) return;
 
           prevElement.focus();
-          setSelectionRange(prevElement, range);
+          Selection.apply(prevElement, range);
 
           e.preventDefault();
           e.stopPropagation();
@@ -83,7 +78,7 @@ export const useBlockNavigationPlugin: AnyContentEditorPlugin =
 
         case "ArrowDown": {
           if (!nextElement) return;
-          const range = getVerticalNavigationRange(
+          const range = Selection.moveVertically(
             e.currentTarget,
             nextElement,
             "down",
@@ -91,7 +86,7 @@ export const useBlockNavigationPlugin: AnyContentEditorPlugin =
           if (!range) return;
 
           nextElement.focus();
-          setSelectionRange(nextElement, range);
+          Selection.apply(nextElement, range);
 
           e.preventDefault();
           e.stopPropagation();

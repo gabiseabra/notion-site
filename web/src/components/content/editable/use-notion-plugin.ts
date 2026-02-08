@@ -17,7 +17,7 @@ export const useNotionPlugin = (
     multiline?: boolean;
     logging?: boolean | "verbose";
   } = {
-    logging: env.DEV,
+    logging: env.DEV && "verbose",
   },
 ) =>
   composePlugins<Notion.Block>(
