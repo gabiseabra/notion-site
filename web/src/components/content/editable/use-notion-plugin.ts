@@ -17,7 +17,7 @@ export const useNotionPlugin = (
     multiline?: boolean;
     logging?: boolean | "verbose";
   } = {
-    logging: !env.TEST,
+    logging: env.DEV,
   },
 ) =>
   composePlugins<Notion.Block>(
@@ -31,8 +31,10 @@ export const useNotionPlugin = (
           },
     useLoggerPlugin((event) => {
       if (!options.logging) return;
-      if (options.logging === "verbose" && event.eventType === "flush") return;
-      console.info(event.eventType, event.detail);
+      else if (options.logging == "verbose")
+        console.info(event.eventType, event.detail, event.editor);
+      else if (event.eventType !== "flush")
+        console.info(event.eventType, event.detail);
     }),
     useSetupPlugin,
     useAutoCommitPlugin(600),
