@@ -5,7 +5,7 @@ import { render } from "@testing-library/react";
 import { Selection } from "./selection.js";
 
 describe("selection utilities", () => {
-  describe("getMaxSelectionOffset", () => {
+  describe("Selection.maxOffset", () => {
     it("returns 0 for empty element", () => {
       const { container } = render(<p />);
       const p = container.querySelector("p")!;
@@ -29,7 +29,7 @@ describe("selection utilities", () => {
     });
   });
 
-  describe("setSelectionRange and getSelectionRange", () => {
+  describe("Selection.read and Selection.apply", () => {
     it("sets and gets caret at start", () => {
       const { container } = render(
         <p contentEditable suppressContentEditableWarning>
@@ -162,7 +162,7 @@ describe("selection utilities", () => {
     });
   });
 
-  describe("mergeSelections", () => {
+  describe("Selection.merge", () => {
     it("merges two collapsed selections", () => {
       expect(
         Selection.merge({ start: 5, end: null }, { start: 2, end: null }),
