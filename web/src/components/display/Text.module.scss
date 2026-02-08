@@ -32,6 +32,13 @@
   line-break: anywhere;
 }
 
+.span:empty {
+  &::after {
+    display: inline-block;
+    content: "\00a0";
+  }
+}
+
 // Theme palette classes
 @each $name, $_ in color.$colors-codes {
   .#{"color-" + $name} {
@@ -57,7 +64,8 @@
 
 // Sizes
 @each $name,
-$size in (caption: "var(--font-size-caption)", body: "var(--font-size)") {
+  $size in (caption: "var(--font-size-caption)", body: "var(--font-size)")
+{
   .#{"size-" + $name} {
     font-size: #{$size};
   }

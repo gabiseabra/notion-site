@@ -15,16 +15,6 @@ export type InlineMutationPluginOptions<TBlock extends AnyBlock> = {
     deleteCount: number,
     insert: string,
   ) => TBlock;
-  /**
-   * It is common to render empty editor blocks as an element containing `&nbsp;`,
-   * as applying/reading a selection range on a trully empty element can cause
-   * problems, but when the placeholder is present, the DOM selection offsets
-   * include that extra character.
-   * If your view renders empty blocks with nbsp, return true here if your block
-   * is empty so the plugin can normalize selectionBefore/After by shifting -1
-   * when applying changes.
-   */
-  nbspFix?: (block: TBlock, element: HTMLElement) => boolean;
 };
 
 /**
@@ -36,7 +26,6 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   multiline,
   debounceMs = 200,
   splice,
-  nbspFix,
 }: InlineMutationPluginOptions<TBlock>): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
     // while the editor manages a list of blocks, users only edit one block at a time,
@@ -46,7 +35,6 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
       block: TBlock;
       selectionBefore?: SelectionRange;
       selectionAfter?: SelectionRange;
-      nbspFix: boolean;
     }>(null);
 
     const update = useCallback(
@@ -57,13 +45,14 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
           flush();
         }
 
-        pendingRef.current ??= {
-          block,
-          selectionBefore: SelectionRange.read(element) ?? undefined,
-          nbspFix:
-            !!nbspFix?.(block, element) &&
-            element.textContent === String.fromCharCode(160),
-        };
+        pendingRef.current ??= (() => {
+          const selectionBefore = SelectionRange.read(element) ?? undefined;
+
+          return {
+            block,
+            selectionBefore,
+          };
+        })();
         pendingRef.current.block = block;
         pendingRef.current.selectionAfter = selectionAfter;
       },
@@ -74,19 +63,14 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
 
     const flush = useCallback(() => {
       if (pendingRef.current) {
-        const { block, selectionAfter, selectionBefore, nbspFix } =
-          pendingRef.current;
+        const { block, selectionAfter, selectionBefore } = pendingRef.current;
 
         if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
 
         editor.update(block, {
           data: "inline-mutation-plugin",
-          selectionAfter:
-            selectionAfter &&
-            SelectionRange.shift(selectionAfter, nbspFix ? -1 : 0),
-          selectionBefore:
-            selectionBefore &&
-            SelectionRange.shift(selectionBefore, nbspFix ? -1 : 0),
+          selectionAfter,
+          selectionBefore,
         });
         pendingRef.current = null;
 

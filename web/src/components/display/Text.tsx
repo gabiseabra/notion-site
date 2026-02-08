@@ -101,6 +101,7 @@ Span.className = ({
   size,
 }: Annotations) => {
   return [
+    styles.span,
     bold && styles.bold,
     italic && styles.italic,
     underline && styles.underline,

@@ -48,13 +48,6 @@ export const useNotionPlugin = (
           rich_text: Notion.RTF.splice(node.rich_text, ...params),
         }));
       },
-      nbspFix(block) {
-        return (
-          Notion.Block.isRichText(block) &&
-          Notion.RTF.getContent(Notion.Block.extract(block).rich_text) !==
-            String.fromCharCode(160)
-        );
-      },
     }),
     useBlockNavigationPlugin,
     useBlockMutationPlugin({

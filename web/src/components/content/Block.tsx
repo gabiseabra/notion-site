@@ -117,7 +117,7 @@ export function Block({
 }
 
 function richTextToHTML(rich_text: Notion.RichText) {
-  if (rich_text.length === 0) return `<span>&nbsp;</span>`;
+  if (rich_text.length === 0) return `<span class="${Span.className({})}" />`;
   return rich_text
     .filter(hasPropertyValue("type", "text"))
     .map((item) =>
