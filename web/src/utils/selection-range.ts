@@ -166,9 +166,12 @@ function moveVertically(
       ? currentLines[0]
       : currentLines[currentLines.length - 1];
 
-  if (Math.round(caretRect.top) !== Math.round(boundaryLine.top)) {
-    return null;
-  }
+  // When the element is empty, caretRect will be all 0, even though the element
+  // has a caret. We'll just assume that the move is valid and starts at the
+  // beginning of the line (since this line is empty).
+  if (caretRect.top === 0 && caretRect.height === 0)
+    return { start: 0, end: 0 };
+  if (Math.round(caretRect.top) !== Math.round(boundaryLine.top)) return null;
   if (!boundaryLine) {
     console.warn("Failed to resolve boundary line.", currentElement, {
       direction,
