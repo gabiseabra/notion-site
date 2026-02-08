@@ -118,13 +118,6 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
 
         if (!currentBlock) return;
 
-        // console.log("inline-mutation-plugin update", {
-        //   currentBlock,
-        //   spliceRange,
-        //   selection,
-        //   selectionAfter: SpliceRange.toSelectionRange(spliceRange, "redo"),
-        // });
-
         update(
           splice(
             currentBlock,
