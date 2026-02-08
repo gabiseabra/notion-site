@@ -59,7 +59,7 @@ export class History<State, Cmd> {
     return this.position;
   }
 
-  get direction() {
-    return this.commands.length === this.position ? "redo" : "undo";
+  get direction(): 1 | -1 {
+    return this.commands.length === this.position ? 1 : -1;
   }
 }

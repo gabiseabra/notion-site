@@ -6,7 +6,6 @@ export type SpliceRange = {
   insert: string;
 };
 
-type Direction = "backward" | "forward";
 type Unit = "char" | "word" | "softLine";
 
 const WORD_CHAR = /[\p{L}\p{N}_]/u;
@@ -27,9 +26,9 @@ export const SpliceRange = {
     };
   },
 
-  toSelectionRange(splice: SpliceRange, direction: "redo" | "undo") {
+  toSelectionRange(splice: SpliceRange, direction: 1 | -1) {
     const start =
-      direction === "redo"
+      direction === 1
         ? splice.offset - splice.deleteCount + splice.insert.length
         : splice.offset + splice.deleteCount - splice.insert.length;
 
@@ -57,22 +56,22 @@ export const SpliceRange = {
         return selected;
 
       case "deleteContentBackward":
-        return deleteFromCaret(text, selection, "backward", "char");
+        return deleteFromCaret(text, selection, -1, "char");
 
       case "deleteContentForward":
-        return deleteFromCaret(text, selection, "forward", "char");
+        return deleteFromCaret(text, selection, 1, "char");
 
       case "deleteWordBackward":
-        return deleteFromCaret(text, selection, "backward", "word");
+        return deleteFromCaret(text, selection, -1, "word");
 
       case "deleteWordForward":
-        return deleteFromCaret(text, selection, "forward", "word");
+        return deleteFromCaret(text, selection, 1, "word");
 
       case "deleteSoftLineBackward":
-        return deleteFromCaret(text, selection, "backward", "softLine");
+        return deleteFromCaret(text, selection, -1, "softLine");
 
       case "deleteSoftLineForward":
-        return deleteFromCaret(text, selection, "forward", "softLine");
+        return deleteFromCaret(text, selection, 1, "softLine");
 
       default:
         return null;
@@ -95,7 +94,7 @@ function insertAtSelection(
 function deleteFromCaret(
   text: string,
   selection: SelectionRange,
-  direction: Direction,
+  direction: 1 | -1,
   unit: Unit,
 ): SpliceRange | null {
   const selected = SpliceRange.fromSelectionRange(selection);
@@ -114,9 +113,9 @@ function deleteFromCaret(
 function getCharDeleteSpan(
   text: string,
   caret: number,
-  direction: Direction,
+  direction: 1 | -1,
 ): SpliceRange | null {
-  if (direction === "backward") {
+  if (direction === -1) {
     return caret > 0 ? { offset: caret - 1, deleteCount: 1, insert: "" } : null;
   }
 
@@ -128,9 +127,9 @@ function getCharDeleteSpan(
 function getWordDeleteSpan(
   text: string,
   caret: number,
-  direction: Direction,
+  direction: 1 | -1,
 ): SpliceRange | null {
-  if (direction === "backward") {
+  if (direction === -1) {
     return getWordDeleteSpanBackward(text, caret);
   }
 
@@ -180,9 +179,9 @@ function getWordDeleteSpanForward(
 function getSoftLineDeleteSpan(
   text: string,
   caret: number,
-  direction: Direction,
+  direction: 1 | -1,
 ): SpliceRange | null {
-  if (direction === "backward") {
+  if (direction === -1) {
     return getSoftLineDeleteSpanBackward(text, caret);
   }
 

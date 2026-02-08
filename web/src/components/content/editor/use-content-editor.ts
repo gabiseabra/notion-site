@@ -1,4 +1,4 @@
-import { isNonEmpty } from "@notion-site/common/utils/non-empty.js";
+import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ContentEditorPlugin } from "../editable/types.js";
 import { EditorEvent, EditorEventTarget } from "./event.js";
@@ -125,22 +125,18 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
         else history.push(event.detail.cmd);
       },
 
-      transaction(fn) {
+      transaction(fn, options) {
         txRef.current ??= [];
         fn();
         const commands = txRef.current;
         txRef.current = null;
 
-        if (!isNonEmpty(commands)) return;
+        if (!NonEmpty.isNonEmpty(commands)) return;
 
         history.push({
           type: "apply",
           commands: EditorCommand.flat(commands),
-          selectionBefore: commands.find((cmd) => cmd.selectionBefore)
-            ?.selectionBefore,
-          selectionAfter: [...commands]
-            .reverse()
-            .find((cmd) => cmd.selectionAfter)?.selectionAfter,
+          ...options,
         });
       },
 

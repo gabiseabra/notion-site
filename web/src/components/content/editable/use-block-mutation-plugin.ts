@@ -58,13 +58,19 @@ export const useBlockMutationPlugin =
         if (!mergedBlock) return;
 
         // merge any text on the tail of this block into the previous block
-        editor.transaction(() => {
-          editor.remove(currentBlock, {
-            selectionBefore,
+        editor.transaction(
+          () => {
+            editor.remove(currentBlock);
+            editor.update(mergedBlock);
+          },
+          {
             selectionAfter,
-          });
-          editor.update(mergedBlock);
-        });
+            selectionBefore: {
+              id: currentBlock.id,
+              ...selectionBefore,
+            },
+          },
+        );
 
         editor.commit("block-mutation-plugin: merge");
 

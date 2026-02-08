@@ -132,7 +132,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
             spliceRange.deleteCount,
             spliceRange.insert,
           ),
-          SpliceRange.toSelectionRange(spliceRange, "redo"),
+          SpliceRange.toSelectionRange(spliceRange, 1),
           e.target,
         );
       } finally {

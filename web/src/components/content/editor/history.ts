@@ -1,4 +1,5 @@
 import { History } from "@notion-site/common/utils/history.js";
+import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { match } from "ts-pattern";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { AnyBlock } from "./types.js";
@@ -31,9 +32,9 @@ export type EditorCommandCmd<TBlock extends AnyBlock> =
 export type EditorCommand<TBlock extends AnyBlock> =
   | {
       type: "apply";
-      commands: EditorCommandCmd<TBlock>[];
-      selectionBefore?: SelectionRange;
-      selectionAfter?: SelectionRange;
+      commands: NonEmpty<EditorCommandCmd<TBlock>>;
+      selectionBefore?: SelectionRange & { id: string };
+      selectionAfter?: SelectionRange & { id: string };
     }
   | EditorCommandCmd<TBlock>;
 
@@ -46,33 +47,31 @@ export const EditorCommand = {
    */
   id<TBlock extends { id: string }>(
     cmd: EditorCommand<TBlock>,
-    direction: "undo" | "redo",
+    direction: 1 | -1,
   ): string {
     return match(cmd)
-      .with({ type: "apply" }, (cmd) =>
-        direction === "undo"
-          ? EditorCommand.id(cmd.commands[0], direction)
-          : EditorCommand.id(cmd.commands[cmd.commands.length - 1], direction),
+      .with(
+        { type: "apply" },
+        (cmd) =>
+          cmd[direction === -1 ? "selectionBefore" : "selectionAfter"]?.id ??
+          EditorCommand.id(cmd.commands[0], direction),
       )
       .with(
         { type: "split" },
-        (cmd) =>
-          cmd[
-            (
-              {
-                redo: "right",
-                undo: "left",
-              } as const
-            )[direction]
-          ].id,
+        (cmd) => cmd[direction === -1 ? "left" : "right"].id,
       )
       .otherwise((cmd) => cmd.block.id);
   },
 
-  flat<TBlock extends { id: string }>(
-    cmds: EditorCommand<TBlock>[],
-  ): EditorCommandCmd<TBlock>[] {
-    return cmds.flatMap((cmd) => (cmd.type === "apply" ? cmd.commands : [cmd]));
+  flat<TBlock extends { id: string }>([cmd, ...cmds]: NonEmpty<
+    EditorCommand<TBlock>
+  >): NonEmpty<EditorCommandCmd<TBlock>> {
+    return NonEmpty.merge(
+      cmd.type === "apply"
+        ? EditorCommand.flat(cmd.commands)
+        : ([cmd] as const),
+      NonEmpty.isNonEmpty(cmds) ? EditorCommand.flat(cmds) : [],
+    );
   },
 };
 

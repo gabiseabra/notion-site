@@ -24,10 +24,8 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
       if (!cmd) return;
 
       const id = EditorCommand.id(cmd, direction);
-      const selection = {
-        undo: cmd.selectionBefore,
-        redo: cmd.selectionAfter,
-      }[direction];
+      const selection =
+        direction === -1 ? cmd.selectionBefore : cmd.selectionAfter;
       const element = editor.ref(id);
       const currentSelection = element && SelectionRange.read(element);
 
@@ -48,12 +46,12 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
       )
         return;
 
-      // console.log("history-plugin will restore the selection:", element, {
-      //   cmd,
-      //   direction: editor.history.direction,
-      //   selection,
-      //   content: element.textContent,
-      // });
+      console.log("history-plugin will restore the selection:", element, {
+        cmd,
+        direction: editor.history.direction,
+        selection,
+        content: element.textContent,
+      });
 
       SelectionRange.apply(element, selection);
     }, []),

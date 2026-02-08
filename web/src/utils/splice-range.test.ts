@@ -156,13 +156,13 @@ describe("SpliceRange", () => {
       expect(selectionRange).toEqual(
         SpliceRange.toSelectionRange(
           SpliceRange.fromSelectionRange(selectionRange)!,
-          "redo",
+          1,
         ),
       );
       expect(selectionRange).toEqual(
         SpliceRange.toSelectionRange(
           SpliceRange.fromSelectionRange(selectionRange)!,
-          "undo",
+          -1,
         ),
       );
     });

@@ -55,7 +55,13 @@ export type ContentEditor<TBlock extends AnyBlock> = {
   /** Replace block `left` with `[left, right]`. Pushes to history. */
   split(left: TBlock, right: TBlock, options?: EditOptions): void;
   /** Batch multiple operations as a single history entry. */
-  transaction(fn: () => void): void;
+  transaction(
+    fn: () => void,
+    options?: {
+      selectionBefore?: SelectionRange & { id: string };
+      selectionAfter?: SelectionRange & { id: string };
+    },
+  ): void;
   /** Commit the current state of history to DOM. Callback runs after render is done. */
   commit(data?: unknown): void;
 };
