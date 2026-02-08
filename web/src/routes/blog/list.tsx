@@ -7,7 +7,7 @@ import { BlogPostFilters } from "../../components/inputs/filters/BlogPostFilters
 import { Col } from "../../components/layout/FlexBox.js";
 import { BlogPostListLoader } from "../../components/modules/blog-posts/BlogPostListLoader.js";
 import * as env from "../../env.js";
-import { useDebounce } from "../../hooks/useDebounce.js";
+import { useDebounce } from "../../hooks/use-debounce.js";
 import { Head } from "../../providers/HeadProvider.js";
 
 // export const path = "/blog";

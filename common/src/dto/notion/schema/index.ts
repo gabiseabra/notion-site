@@ -4,7 +4,7 @@ import * as zMedia from "./media.js";
 import * as zPrimitives from "./primitives.js";
 import * as zProperties from "./properties.js";
 import * as zReferences from "./references.js";
-import * as zRichText from "./rich-text.js";
+import * as zRichText from "./rich_text.js";
 
 export namespace zNotion {
   export import blocks = zBlocks;

@@ -1,6 +1,6 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { memo, Ref, useCallback, useImperativeHandle } from "react";
-import { useEventListener } from "../../hooks/useEventListener.js";
+import { useEventListener } from "../../hooks/use-event-listener.js";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
 import { useNotionPlugin } from "./editable/use-notion-plugin.js";

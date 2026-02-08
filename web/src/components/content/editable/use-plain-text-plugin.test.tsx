@@ -10,7 +10,7 @@ import {
   useCallback,
   useImperativeHandle,
 } from "react";
-import { useEventListener } from "../../../hooks/useEventListener.js";
+import { useEventListener } from "../../../hooks/use-event-listener.js";
 import { setupUserEvent } from "../../../test-utils/user-event.js";
 import { EditorEvent } from "../editor/event.js";
 import { ContentEditor } from "../editor/types.js";

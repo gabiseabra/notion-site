@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { useEventListener } from "../../../hooks/useEventListener.js";
+import { useEventListener } from "../../../hooks/use-event-listener.js";
 import { getInputEventSpliceParams } from "../../../utils/event.js";
 import { Selection } from "../../../utils/selection.js";
 import { AnyBlock } from "../editor/types.js";

@@ -9,10 +9,10 @@ import React, {
   useState,
 } from "react";
 import * as css from "../../css/index.js";
-import { useDocumentEventListener } from "../../hooks/useDocumentEventListener.js";
-import { useRafThrottledCallback } from "../../hooks/useRafThrottledCallback.js";
-import { useResizeObserver } from "../../hooks/useResizeObserver.js";
-import { useWindowEventListener } from "../../hooks/useWindowEventListener.js";
+import { useDocumentEventListener } from "../../hooks/use-document-event-listener.js";
+import { useRafThrottledCallback } from "../../hooks/use-raf-throttled-callback.js";
+import { useResizeObserver } from "../../hooks/use-resize-observer.js";
+import { useWindowEventListener } from "../../hooks/use-window-event-listener.js";
 import { isEventFromElement } from "../../utils/event.js";
 import styles from "./Popover.module.scss";
 

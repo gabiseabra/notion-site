@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zDiscriminatedUnionOption } from "../../../types/zod.js";
 import { external, file } from "./media.js";
 import { color } from "./primitives.js";
-import { rich_text_item } from "./rich-text.js";
+import { rich_text_item } from "./rich_text.js";
 
 export const number = z.object({
   type: z.literal("number"),

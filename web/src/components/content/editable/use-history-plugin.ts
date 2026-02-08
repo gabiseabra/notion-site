@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useEventListener } from "../../../hooks/useEventListener.js";
+import { useEventListener } from "../../../hooks/use-event-listener.js";
 import { Selection } from "../../../utils/selection.js";
 import { EditorCommand } from "../editor/history.js";
 import { AnyContentEditorPlugin } from "./types.js";
