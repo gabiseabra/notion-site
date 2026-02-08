@@ -28,13 +28,18 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   splice,
 }: InlineMutationPluginOptions<TBlock>): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
+    // while the editor manages a list of blocks, users only edit one block at a time,
+    // so we remember the state of only one block, and make sure to clean-up properly
+    // before switching to another.
     const pendingRef = useRef<{
       block: TBlock;
       selectionBefore?: Selection;
       selectionAfter?: Selection;
     }>(null);
 
-    const update = useCallback((block: TBlock, selection: Selection) => {
+    const update = useCallback((block: TBlock, selectionAfter: Selection) => {
+      // if we switched to another block but there are still pending changes, we
+      // need to save the changes for that block first.
       if (pendingRef.current && pendingRef.current.block.id !== block.id) {
         flush();
       }
@@ -48,7 +53,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
           })() ?? undefined,
       };
       pendingRef.current.block = block;
-      pendingRef.current.selectionAfter = selection;
+      pendingRef.current.selectionAfter = selectionAfter;
     }, []);
 
     const flushTimerRef = useRef<number>(null);
@@ -58,9 +63,11 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
         if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
 
         editor.update(pendingRef.current.block, {
+          data: "inline-mutation-plugin",
           selectionAfter: pendingRef.current.selectionAfter,
           selectionBefore: pendingRef.current.selectionBefore,
         });
+        pendingRef.current = null;
 
         return true;
       } else {
@@ -78,13 +85,6 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
     }, [flush]);
 
     useEventListener(editor.bus, "flush", flush);
-    useEventListener(
-      editor.bus,
-      "commit",
-      useCallback(() => {
-        pendingRef.current = null;
-      }, []),
-    );
 
     return (block) => (e) => {
       cancelFlush();

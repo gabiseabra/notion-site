@@ -42,7 +42,7 @@ export function RichText({ value, ...props }: RichTextProps) {
             .otherwise(() => <Alert type="warning">Unsupported block</Alert>),
         )
       ) : (
-        <Span {...props} />
+        <Span {...props}>&nbsp;</Span>
       )}
     </>
   );

@@ -28,8 +28,10 @@ const TextareaEditor = memo(function PlainTextEditor({
   value: initialValue,
   onChange,
 }: PlainTextEditorProps) {
-  const editor = useContentEditor({ initialValue });
-  const editable = usePlainTextPlugin(editor);
+  const { editor, editable } = useContentEditor({
+    initialValue,
+    plugin: usePlainTextPlugin,
+  });
 
   useImperativeHandle(ref, () => editor, [editor]);
 
@@ -93,7 +95,6 @@ describe("usePlainTextPlugin", () => {
     await user.type(el, "llo");
 
     act(() => {
-      editorRef.current?.flush();
       editorRef.current?.commit();
     });
 

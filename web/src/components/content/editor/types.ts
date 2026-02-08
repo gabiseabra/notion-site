@@ -9,7 +9,8 @@ export type AnyBlock = { id: string };
  * Optional selection overrides for editor commands.
  * If not provided, defaults to current DOM selection.
  */
-export type SelectionOptions = {
+export type EditOptions = {
+  data?: unknown;
   /** Selection before the change (for undo). */
   selectionBefore?: Selection;
   /** Selection after the change (for redo). */
@@ -36,11 +37,11 @@ export type ContentEditor<TBlock extends AnyBlock> = {
    */
   isDirty: boolean;
 
-  // Helpers to read blocks from state
+  // Methods to read blocks from state
 
   /** Returns block data from the current snapshot by id. */
   get(id: string): TBlock | null;
-  /** Flushes pending changes if needed, then returns block data from the latest history state. */
+  /** Flushes pending changes if needed, then returns block data from the latest revision. */
   peek(id: string): TBlock | null;
   /** Returns block's registered DOM element by id. */
   ref(id: string): HTMLElement | null;
@@ -48,18 +49,13 @@ export type ContentEditor<TBlock extends AnyBlock> = {
   // Methods to update the state
 
   /** Replace a block by ID. Pushes to history. */
-  update(block: TBlock, options?: SelectionOptions): void;
+  update(block: TBlock, options?: EditOptions): void;
   /** Remove a block by ID. Pushes to history. */
-  remove(block: TBlock, options?: SelectionOptions): void;
+  remove(block: TBlock, options?: EditOptions): void;
   /** Replace block `left` with `[left, right]`. Pushes to history. */
-  split(left: TBlock, right: TBlock, options?: SelectionOptions): void;
+  split(left: TBlock, right: TBlock, options?: EditOptions): void;
   /** Batch multiple operations as a single history entry. */
   transaction(fn: () => void): void;
-  /**
-   * Notify plugins to commit pending changes, returning true if the event was handled.
-   * @return false is the event default was prevented.
-   */
-  flush(): boolean;
   /** Commit the current state of history to DOM. Callback runs after render is done. */
-  commit(): void;
+  commit(data?: unknown): void;
 };

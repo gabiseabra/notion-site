@@ -32,10 +32,6 @@
   line-break: anywhere;
 }
 
-.span:empty {
-  content: "&nbsp;"
-}
-
 // Theme palette classes
 @each $name, $_ in color.$colors-codes {
   .#{"color-" + $name} {

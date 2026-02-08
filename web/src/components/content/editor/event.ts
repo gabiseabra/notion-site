@@ -4,20 +4,41 @@ import { EditorCommandCmd } from "./history.js";
 import { AnyBlock, ContentEditor } from "./types.js";
 
 type EditorEventMap<TBlock extends AnyBlock> = {
-  /** Command will be pushed to history. */
-  edit: EditorCommandCmd<TBlock>;
-  /** Snapshot of history will be saved to state. */
+  /**
+   * Command will be pushed to history.
+   * @cancellable
+   */
+  edit: {
+    cmd: EditorCommandCmd<TBlock>;
+    inTransaction: boolean;
+    /** Data provided from the plugin that triggers it. You have to parse it */
+    data: unknown;
+  };
+  /**
+   * Snapshot of history will be saved to state.
+   * @cancellable
+   */
   commit: {
     blocks: TBlock[];
     revision: number;
+    /** Data provided from the plugin that triggers it. You have to parse it */
+    data: unknown;
   };
-  /** DOM has been updated. */
-  push: EmptyObject;
-  /** Notify plugins to save changes before commit. */
+  /**
+   * Runs after all plugin and editor effects, after the DOM has been updated from a commit.
+   */
+  postcommit: EmptyObject;
+  /**
+   * Notifies plugins to save changes before commit. Runs before commit.
+   */
   flush: EmptyObject;
-  /** You have reached the end of history. */
+  /**
+   * You have reached the end of history.
+   */
   reset: EmptyObject;
-  /** Fired once after editor setup is done. */
+  /**
+   * Runs once after editor setup is done.
+   */
   ready: EmptyObject;
 };
 

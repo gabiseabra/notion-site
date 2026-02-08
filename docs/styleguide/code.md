@@ -24,17 +24,20 @@
 
 ## Typescript
 
-- **DO NOT USE ANY ANY ( •̀ ᴖ •́ ) ! ! !**
-  - Use `unknown` for untrusted input, narrow with type guards before use.
-  - Actually avoid as casts altogether, prefer automatic inference.
-- **Prefer inference over manual typing.**
-  - Let TypeScript infer types whenever possible.
-  - Use `as const` for scalar/object literals when you need literal preservation.
-  - Use `satisfies` to validate shape compatibility without widening the inferred type.
-- **Derive types instead of repeating them.**
-  - Use `Extract`, `Omit`, and `Pick` to refine unions and build derived shapes.
-  - Prefer composition from existing types over re-defining property lists.
-  - @see helpers in `@notion-site/common/types/union.js`.
+- **Rule of thumb: If you don't need it, don't do it!**
+  - **DO NOT USE ANY ANY ( •̀ ᴖ •́ ) ! ! !**
+    - Use `unknown` for untrusted input, narrow with type guards before use.
+    - Avoid `satisfies` or `as` casts altogether. Prefer automatic inference instead.
+  - **Prefer inference over manual typing.**
+    - Let Typescript infer types whenever possible.
+    - _If_ Typescript complains about the type being too narrow, use `satisfies` to validate shape compatibility without
+      widening the inferred type too much.
+    - _If_ Typescript complains about the type being too wide, use `as const` for scalar/object literals when you need
+      literal preservation.
+  - **Derive types instead of repeating them.**
+    - Use `Extract`, `Omit`, and `Pick` to refine unions and build derived shapes.
+    - Prefer composition from existing types over re-defining property lists.
+    - @see helpers in `@notion-site/common/types/union.js`.
 - **Keep function inputs flexible.**
   - If a function only needs part of an object, type the parameter with `Pick<...>`. This reduces coupling and makes
     functions easier to reuse and test.
@@ -43,7 +46,7 @@
 
 ### Generics
 
-- **Use generics when behaviour depends on input type.**
+- **Use generics when stuff depends on input type.**
   - Use generics to preserve input/output relationships (identity, transforms, keyed access, etc.).
   - Prefer truly generic parameters first (`<T>`), without `extends` and without defaults, when no real domain
     constraint exists.
@@ -55,24 +58,28 @@
   type AnyData = { ... };
   type MyType<TData extends AnyData>;
   ```
+- **Provide overloads to avoid `as` casts.**
+  - Most cases should be simple enough to be able to operate on
+  - Generic functions can be challenging to implement without running into TS
+    errors, even for perfectly valid implementations, especially when you're using operations that don't preserve the
+    generics, like `Array.map`. If you run into such errors, you can use this pattern to get around issues without
+    having
+    to resort to typecast:
+    ```ts
+    // common/src/utils/notion/blocks.ts
+    // Add an overload that exposes the generic parameter for callers who need explicit control.
+    export function extract<T extends BlockType>(block: Block<T>): UniqueNode<T>;
+    // Add a second overload with the generic applied to the default followed by implementation.
+    // No generic, no probleme 👍
+    export function extract(block: Block): Node {
+      // ...
+    }
+    ```
 - **Use constrained generics for finite domains (for example unions).**
   - For closed sets, constrain with `extends` the union of allowed values.
   - In those cases, prefer a default to the full union (`<T extends U = U>`) so callers can omit type application when
     they do not care about specialisation.
   - @see e.g. `Notion.Block<T>`.
-- **Provide overloads to avoid `as` casts.** Generic functions can be challenging to implement without running into TS
-  errors, even for perfectly valid implementations, especially when you're using operations that don't preserve the
-  generics, like `Array.map`. If you run into such errors, you can use this pattern to get around issues without having
-  to resort to typecast:
-  - Add an overload that exposes the generic parameter for callers who need explicit control.
-  - Add a second overload with the generic applied to the default followed by implementation. No generic, no probleme 👍
-  ```ts
-  // common/src/utils/notion/blocks.ts
-  export function extract<T extends BlockType>(block: Block<T>): UniqueNode<T>;
-  export function extract(block: Block): Node {
-    // ...
-  }
-  ```
 
 ## Check the Real Condition, Not a Proxy
 

@@ -20,7 +20,7 @@ import { AnyContentEditorPlugin } from "./types.js";
 export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
   useEventListener(
     editor.bus,
-    "push",
+    "postcommit",
     useCallback(({ editor }) => {
       const cmd = editor.history.command;
       if (!cmd) return;
@@ -53,7 +53,7 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
 
       if (e.key === "z" && !e.shiftKey) {
         if (!editor.history.undo()) return;
-        editor.commit();
+        editor.commit("history-plugin: undo");
         e.preventDefault();
         return;
       }
@@ -61,7 +61,7 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
       if ((e.key === "z" && e.shiftKey) || e.key === "y") {
         if (!editor.history.redo()) return;
 
-        editor.commit();
+        editor.commit("history-plugin: redo");
         e.preventDefault();
         return;
       }

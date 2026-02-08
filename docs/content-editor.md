@@ -81,7 +81,7 @@ const useMyPlugin: ContentEditorPlugin = (editor) => {
 };
 ```
 
-Phase 1 runs when the plugin hook is called with the editor (e.g., `useMyPlugin(editor)`). Since plugins are hooks,
+Phase 1 runs when `useContentEditor` invokes the plugin internally with the editor instance. Since plugins are hooks,
 phase 1 executes as part of that hook's body. This is why React hooks are allowed - you're inside a hook.
 
 Phase 1 captures `editor` in a closure. Any refs, callbacks, or effects you create here persist for the

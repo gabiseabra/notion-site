@@ -30,14 +30,14 @@ export function getSelectionRange(element: HTMLElement): Selection | null {
 
   if (!element.contains(range.startContainer)) return null;
 
-  const start = getOffsetFromNode(
+  const start = getTextUpToNode(
     element,
     range.startContainer,
     range.startOffset,
-  );
+  ).length;
   const end = range.collapsed
     ? null
-    : getOffsetFromNode(element, range.endContainer, range.endOffset);
+    : getTextUpToNode(element, range.endContainer, range.endOffset).length;
 
   return { start, end };
 }
@@ -87,7 +87,10 @@ export function setSelectionRange(element: HTMLElement, selection: Selection) {
   const start = resolveOffset(element, selection.start);
   const end = resolveOffset(element, selection.end ?? selection.start);
 
-  if (!start || !end) return;
+  if (!start || !end) {
+    console.warn("Failed to resolve selection:", { start, end }, element);
+    return;
+  }
 
   const r = doc.createRange();
   r.setStart(start.node, start.offset);
@@ -198,29 +201,33 @@ function getOffsetFromPoint(
 
   const range = doc.caretRangeFromPoint?.(x, y);
   if (range && element.contains(range.startContainer)) {
-    return getOffsetFromNode(element, range.startContainer, range.startOffset);
+    return getTextUpToNode(element, range.startContainer, range.startOffset)
+      .length;
   }
 
   const pos = doc.caretPositionFromPoint?.(x, y);
   if (pos && element.contains(pos.offsetNode)) {
-    return getOffsetFromNode(element, pos.offsetNode, pos.offset);
+    return getTextUpToNode(element, pos.offsetNode, pos.offset).length;
   }
 
   return null;
 }
 
-/** Convert a DOM node/offset to a text offset within `element`. */
-function getOffsetFromNode(
+/**
+ * Get the text content from the start of `element` up to a specific DOM node + offset.
+ * Traverses the DOM and returns the plain text represented by that range.
+ */
+function getTextUpToNode(
   element: HTMLElement,
   node: Node,
   offset: number,
-): number {
+): string {
   const doc = element.ownerDocument;
 
   const pre = doc.createRange();
   pre.selectNodeContents(element);
   pre.setEnd(node, offset);
-  return pre.toString().length;
+  return pre.toString();
 }
 
 /** Resolve a text offset to a concrete text node and node offset. */

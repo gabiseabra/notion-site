@@ -13,7 +13,7 @@ export const useAutoCommitPlugin =
       if (commitTimeoutRef.current) clearTimeout(commitTimeoutRef.current);
       commitTimeoutRef.current = window.setTimeout(() => {
         if (editor.isDirty) {
-          editor.commit();
+          editor.commit("auto-commit-plugin");
         }
       }, debounceMs);
     };

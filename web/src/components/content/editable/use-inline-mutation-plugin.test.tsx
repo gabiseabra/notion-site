@@ -32,7 +32,6 @@ describe("useInlineMutationPlugin", () => {
     await user.input(el, "llo");
 
     act(() => {
-      editorRef.current?.flush();
       editorRef.current?.commit();
     });
 

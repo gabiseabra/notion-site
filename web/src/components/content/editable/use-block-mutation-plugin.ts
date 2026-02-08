@@ -38,8 +38,10 @@ export const useBlockMutationPlugin =
 
       if (
         e.key === "Backspace" &&
-        selectionBefore.start === 0 &&
-        selectionBefore.end === null
+        // current selection is at the start of the block
+        ((selectionBefore.start === 0 && selectionBefore.end === null) ||
+          // or the block only contains nbsp (is empty)
+          e.currentTarget.textContent === String.fromCharCode(160))
       ) {
         const index = editor.blocks.findIndex((b) => b.id === block.id);
         const prevBlock = editor.blocks[index - 1];
@@ -67,7 +69,7 @@ export const useBlockMutationPlugin =
           editor.update(mergedBlock);
         });
 
-        editor.commit();
+        editor.commit("block-mutation-plugin: merge");
 
         e.preventDefault();
       } else if (e.key === "Enter" && !e.shiftKey) {
@@ -87,7 +89,7 @@ export const useBlockMutationPlugin =
           selectionBefore,
           selectionAfter: { start: 0, end: null },
         });
-        editor.commit();
+        editor.commit("block-mutation: split");
 
         e.preventDefault();
       }
