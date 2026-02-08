@@ -36,7 +36,7 @@ export const useBlockMutationPlugin =
       if (
         e.key === "Backspace" &&
         // current selection is at the start of the block
-        ((selectionBefore.start === 0 && selectionBefore.end === null) ||
+        ((selectionBefore.start === 0 && selectionBefore.end === 0) ||
           // or the block only contains nbsp (is empty)
           e.currentTarget.textContent === String.fromCharCode(160))
       ) {
@@ -52,7 +52,7 @@ export const useBlockMutationPlugin =
         const selectionAfter = {
           id: prevBlock.id,
           start: SelectionRange.maxOffset(prevElement),
-          end: null,
+          end: SelectionRange.maxOffset(prevElement),
         };
 
         if (!mergedBlock) return;
@@ -77,14 +77,14 @@ export const useBlockMutationPlugin =
         const splitBlocks = split(
           currentBlock,
           selectionBefore.start,
-          selectionBefore.end ? selectionBefore.start - selectionBefore.end : 0,
+          Math.max(0, selectionBefore.end - selectionBefore.start),
         );
 
         if (!splitBlocks) return null;
 
         editor.split(splitBlocks.left, splitBlocks.right, {
           selectionBefore,
-          selectionAfter: { start: 0, end: null },
+          selectionAfter: { start: 0, end: 0 },
         });
         editor.commit("block-mutation: split");
 

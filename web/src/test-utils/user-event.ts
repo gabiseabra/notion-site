@@ -120,11 +120,9 @@ async function forwardInputEvents(
 
   await act(proxy, user.proxy);
 
-  SelectionRange.apply(element, {
-    start: proxy.selectionStart ?? 0,
-    end:
-      proxy.selectionEnd === proxy.selectionStart ? null : proxy.selectionEnd,
-  });
+  const start = proxy.selectionStart ?? 0;
+  const end = proxy.selectionEnd ?? start;
+  SelectionRange.apply(element, { start, end });
 }
 
 function forwardEvent<TEvent extends keyof HTMLElementEventMap>(

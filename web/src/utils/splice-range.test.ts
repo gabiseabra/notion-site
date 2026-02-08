@@ -12,7 +12,7 @@ describe("SpliceRange", () => {
           SpliceRange.fromInputEvent(
             new InputEvent("beforeinput", { inputType: "deleteWordBackward" }),
             "hello world",
-            { start: 11, end: null },
+            { start: 11, end: 11 },
           )!,
         ),
       ).toBe("hello ");
@@ -25,7 +25,7 @@ describe("SpliceRange", () => {
           SpliceRange.fromInputEvent(
             new InputEvent("beforeinput", { inputType: "deleteWordForward" }),
             "hello world",
-            { start: 0, end: null },
+            { start: 0, end: 0 },
           )!,
         ),
       ).toBe(" world");
@@ -40,7 +40,7 @@ describe("SpliceRange", () => {
               inputType: "deleteSoftLineBackward",
             }),
             "hello\nworld",
-            { start: 8, end: null },
+            { start: 8, end: 8 },
           )!,
         ),
       ).toBe("hello\nrld");
@@ -55,7 +55,7 @@ describe("SpliceRange", () => {
               inputType: "deleteSoftLineForward",
             }),
             "hello\nworld",
-            { start: 6, end: null },
+            { start: 6, end: 6 },
           )!,
         ),
       ).toBe("hello\n");
@@ -71,7 +71,7 @@ describe("SpliceRange", () => {
               data: "!",
             }),
             "hello",
-            { start: 5, end: null },
+            { start: 5, end: 5 },
           )!,
         ),
       ).toBe("hello!");
@@ -100,7 +100,7 @@ describe("SpliceRange", () => {
           SpliceRange.fromInputEvent(
             new InputEvent("beforeinput", { inputType: "insertLineBreak" }),
             "hello",
-            { start: 5, end: null },
+            { start: 5, end: 5 },
           )!,
         ),
       ).toBe("hello\n");
@@ -128,7 +128,7 @@ describe("SpliceRange", () => {
               inputType: "deleteContentBackward",
             }),
             "hello",
-            { start: 5, end: null },
+            { start: 5, end: 5 },
           )!,
         ),
       ).toBe("hell");
@@ -143,7 +143,7 @@ describe("SpliceRange", () => {
               inputType: "deleteContentForward",
             }),
             "hello",
-            { start: 0, end: null },
+            { start: 0, end: 0 },
           )!,
         ),
       ).toBe("ello");
@@ -152,7 +152,7 @@ describe("SpliceRange", () => {
 
   describe("SpliceRange.fromSelectionRange & SpliceRange.toSelectionRange", () => {
     it("roundtrips for collapsed selection", () => {
-      const selectionRange = { start: 420, end: null };
+      const selectionRange = { start: 420, end: 420 };
       expect(selectionRange).toEqual(
         SpliceRange.toSelectionRange(
           SpliceRange.fromSelectionRange(selectionRange)!,

@@ -26,13 +26,13 @@ export const useBlockNavigationPlugin: AnyContentEditorPlugin =
 
       switch (e.key) {
         case "ArrowLeft":
-          if (!(prevElement && selection.start === 0 && selection.end === null))
+          if (!(prevElement && selection.start === 0 && selection.end === 0))
             return;
 
           prevElement.focus();
           SelectionRange.apply(prevElement, {
             start: SelectionRange.maxOffset(prevElement),
-            end: null,
+            end: SelectionRange.maxOffset(prevElement),
           });
 
           e.preventDefault();
@@ -45,13 +45,13 @@ export const useBlockNavigationPlugin: AnyContentEditorPlugin =
             !(
               nextElement &&
               selection.start === SelectionRange.maxOffset(e.currentTarget) &&
-              selection.end === null
+              SelectionRange.isCollapsed(selection)
             )
           )
             return;
 
           nextElement.focus();
-          SelectionRange.apply(nextElement, { start: 0, end: null });
+          SelectionRange.apply(nextElement, { start: 0, end: 0 });
 
           e.preventDefault();
           e.stopPropagation();

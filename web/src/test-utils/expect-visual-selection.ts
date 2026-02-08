@@ -7,9 +7,9 @@ export function renderSelectionRange(
   selection: SelectionRange,
 ): string {
   const start = selection.start;
-  const end = selection.end ?? selection.start;
+  const end = selection.end;
 
-  if (selection.end === null) {
+  if (SelectionRange.isCollapsed(selection)) {
     return `${text.slice(0, start)}|${text.slice(start)}`;
   }
 
@@ -25,7 +25,7 @@ export function parseSelectionRange(input: string): {
   if (caret !== -1) {
     return {
       text: input.slice(0, caret) + input.slice(caret + 1),
-      selection: { start: caret, end: null },
+      selection: { start: caret, end: caret },
     };
   }
 

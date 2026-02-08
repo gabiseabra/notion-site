@@ -38,8 +38,8 @@ describe("SelectionRange", () => {
       );
       const p = container.querySelector("p")!;
 
-      SelectionRange.apply(p, { start: 0, end: null });
-      expect(SelectionRange.read(p)).toEqual({ start: 0, end: null });
+      SelectionRange.apply(p, { start: 0, end: 0 });
+      expect(SelectionRange.read(p)).toEqual({ start: 0, end: 0 });
     });
 
     it("sets and gets caret at end", () => {
@@ -50,8 +50,8 @@ describe("SelectionRange", () => {
       );
       const p = container.querySelector("p")!;
 
-      SelectionRange.apply(p, { start: 5, end: null });
-      expect(SelectionRange.read(p)).toEqual({ start: 5, end: null });
+      SelectionRange.apply(p, { start: 5, end: 5 });
+      expect(SelectionRange.read(p)).toEqual({ start: 5, end: 5 });
     });
 
     it("sets and gets caret in middle", () => {
@@ -62,8 +62,8 @@ describe("SelectionRange", () => {
       );
       const p = container.querySelector("p")!;
 
-      SelectionRange.apply(p, { start: 2, end: null });
-      expect(SelectionRange.read(p)).toEqual({ start: 2, end: null });
+      SelectionRange.apply(p, { start: 2, end: 2 });
+      expect(SelectionRange.read(p)).toEqual({ start: 2, end: 2 });
     });
 
     it("sets and gets selection range", () => {
@@ -103,7 +103,7 @@ describe("SelectionRange", () => {
       );
       const [first, second] = Array.from(container.querySelectorAll("p"));
 
-      SelectionRange.apply(second, { start: 0, end: null });
+      SelectionRange.apply(second, { start: 0, end: 0 });
       expect(SelectionRange.read(first)).toBeNull();
     });
 
@@ -116,8 +116,8 @@ describe("SelectionRange", () => {
       const p = container.querySelector("p")!;
 
       // position 8 is inside "world" (after "hello " = 6 chars + 2)
-      SelectionRange.apply(p, { start: 8, end: null });
-      expect(SelectionRange.read(p)).toEqual({ start: 8, end: null });
+      SelectionRange.apply(p, { start: 8, end: 8 });
+      expect(SelectionRange.read(p)).toEqual({ start: 8, end: 8 });
     });
 
     it("handles selection spanning multiple nodes", () => {
@@ -137,8 +137,8 @@ describe("SelectionRange", () => {
       const input = container.querySelector("input")!;
       input.focus();
 
-      SelectionRange.apply(input, { start: 2, end: null });
-      expect(SelectionRange.read(input)).toEqual({ start: 2, end: null });
+      SelectionRange.apply(input, { start: 2, end: 2 });
+      expect(SelectionRange.read(input)).toEqual({ start: 2, end: 2 });
 
       SelectionRange.apply(input, { start: 1, end: 4 });
       expect(SelectionRange.read(input)).toEqual({ start: 1, end: 4 });
@@ -157,32 +157,8 @@ describe("SelectionRange", () => {
       const { container } = render(<p tabIndex={1}></p>);
       const p = container.querySelector("p")!;
       p.onfocus = jest.fn();
-      SelectionRange.apply(p, { start: 0, end: null });
+      SelectionRange.apply(p, { start: 0, end: 0 });
       expect(p.onfocus).toHaveBeenCalled();
-    });
-  });
-
-  describe("SelectionRange.merge", () => {
-    it("merges two collapsed selections", () => {
-      expect(
-        SelectionRange.merge({ start: 5, end: null }, { start: 2, end: null }),
-      ).toEqual({ start: 2, end: null });
-    });
-
-    it("merges collapsed with range", () => {
-      expect(
-        SelectionRange.merge({ start: 5, end: null }, { start: 2, end: 8 }),
-      ).toEqual({ start: 2, end: 8 });
-    });
-
-    it("merges multiple ranges", () => {
-      expect(
-        SelectionRange.merge(
-          { start: 5, end: 7 },
-          { start: 2, end: 4 },
-          { start: 8, end: 10 },
-        ),
-      ).toEqual({ start: 2, end: 10 });
     });
   });
 });

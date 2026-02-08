@@ -20,14 +20,14 @@ describe("useBlockNavigationPlugin", () => {
 
     SelectionRange.apply(first, {
       start: SelectionRange.maxOffset(first),
-      end: null,
+      end: SelectionRange.maxOffset(first),
     });
 
     fireEvent.keyDown(first, { key: "ArrowRight" });
 
     expect(SelectionRange.read(second)).toEqual({
       start: 0,
-      end: null,
+      end: 0,
     });
     expect(SelectionRange.read(first)).toBeNull();
   });
@@ -42,14 +42,14 @@ describe("useBlockNavigationPlugin", () => {
     expect(first).toBeTruthy();
     expect(second).toBeTruthy();
 
-    SelectionRange.apply(second, { start: 0, end: null });
+    SelectionRange.apply(second, { start: 0, end: 0 });
 
     fireEvent.keyDown(second, { key: "ArrowLeft" });
 
     const range = SelectionRange.read(first);
     expect(range).toEqual({
       start: SelectionRange.maxOffset(first),
-      end: null,
+      end: SelectionRange.maxOffset(first),
     });
     expect(SelectionRange.read(second)).toBeNull();
   });
@@ -66,7 +66,7 @@ describe("useBlockNavigationPlugin", () => {
     expect(first).toBeTruthy();
     expect(second).toBeTruthy();
 
-    SelectionRange.apply(first, { start: 2, end: null });
+    SelectionRange.apply(first, { start: 2, end: 2 });
 
     fireEvent.keyDown(first, { key: "ArrowDown" });
 
@@ -84,7 +84,7 @@ describe("useBlockNavigationPlugin", () => {
     expect(first).toBeTruthy();
     expect(second).toBeTruthy();
 
-    SelectionRange.apply(second, { start: 2, end: null });
+    SelectionRange.apply(second, { start: 2, end: 2 });
 
     fireEvent.keyDown(second, { key: "ArrowUp" });
 

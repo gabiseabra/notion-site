@@ -1,16 +1,20 @@
-/** Text offsets within an element; end is null for a collapsed caret. */
-export type SelectionRange = { start: number; end: number | null };
+/** Text offsets within an element; end equals start for a collapsed caret. */
+export type SelectionRange = { start: number; end: number };
 
 type Direction = "up" | "down";
 
 export const SelectionRange = {
+  isCollapsed(selection: SelectionRange) {
+    return isCollapsed(selection);
+  },
+
+  // functions on HTMLElement
   read,
   clear,
   apply,
   applyMaybe,
   maxOffset,
   moveVertically,
-  merge,
 };
 
 /** Get selection offsets within `element`, or null if selection is outside. */
@@ -21,13 +25,9 @@ function read(element: HTMLElement): SelectionRange | null {
     isElementWithTag(element, "textarea")
   ) {
     if (element.selectionStart === null) return null;
-    return {
-      start: element.selectionStart,
-      end:
-        element.selectionEnd === element.selectionStart
-          ? null
-          : element.selectionEnd,
-    };
+    const start = element.selectionStart;
+    const end = element.selectionEnd ?? start;
+    return { start, end };
   }
 
   const doc = element.ownerDocument;
@@ -48,7 +48,7 @@ function read(element: HTMLElement): SelectionRange | null {
     range.startOffset,
   ).length;
   const end = range.collapsed
-    ? null
+    ? start
     : getTextUpToNode(element, range.endContainer, range.endOffset).length;
 
   return { start, end };
@@ -77,10 +77,7 @@ function apply(element: HTMLElement, selection: SelectionRange) {
     isElementWithTag(element, "input") ||
     isElementWithTag(element, "textarea")
   ) {
-    element.setSelectionRange(
-      selection.start,
-      selection.end ?? selection.start,
-    );
+    element.setSelectionRange(selection.start, selection.end);
     return;
   }
 
@@ -97,7 +94,7 @@ function apply(element: HTMLElement, selection: SelectionRange) {
   }
 
   const start = resolveOffset(element, selection.start);
-  const end = resolveOffset(element, selection.end ?? selection.start);
+  const end = resolveOffset(element, selection.end);
 
   if (!start || !end) {
     console.warn("Failed to resolve selection target text node.", element, {
@@ -121,9 +118,7 @@ function applyMaybe(element: HTMLElement, selection: SelectionRange | null) {
 
 /** Max selectable offset (text length) for `element`. */
 function maxOffset(element: HTMLElement): number {
-  const text = element.textContent ?? "";
-  // Empty rich text renders as &nbsp; (char 160)
-  return text === String.fromCharCode(160) ? 0 : text.length;
+  return (element.textContent ?? "").length;
 }
 
 /** Compute the caret range when moving up/down between blocks. */
@@ -189,24 +184,12 @@ function moveVertically(
 
   return {
     start: targetOffset ?? (direction === "up" ? maxOffset(targetElement) : 0),
-    end: null,
+    end: targetOffset ?? (direction === "up" ? maxOffset(targetElement) : 0),
   };
 }
 
-function merge(
-  selection: SelectionRange,
-  ...selections: SelectionRange[]
-): SelectionRange {
-  return selections.reduce(
-    (acc, sel) => ({
-      start: Math.min(acc.start, sel.start),
-      end:
-        acc.end === null && sel.end === null
-          ? null
-          : Math.max(acc.end ?? acc.start, sel.end ?? sel.start),
-    }),
-    selection,
-  );
+function isCollapsed(selection: SelectionRange) {
+  return selection.start === selection.end;
 }
 
 /** Internals */

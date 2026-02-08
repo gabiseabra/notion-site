@@ -19,10 +19,7 @@ export const SpliceRange = {
     return chars.join("");
   },
 
-  fromSelectionRange(selection: SelectionRange): SpliceRange {
-    const start = selection.start;
-    const end = selection.end ?? selection.start;
-
+  fromSelectionRange({ start, end }: SelectionRange): SpliceRange {
     return {
       offset: start,
       deleteCount: Math.max(0, end - start),
@@ -31,13 +28,12 @@ export const SpliceRange = {
   },
 
   toSelectionRange(splice: SpliceRange, direction: "redo" | "undo") {
-    return {
-      start:
-        direction === "redo"
-          ? splice.offset - splice.deleteCount + splice.insert.length
-          : splice.offset + splice.deleteCount - splice.insert.length,
-      end: null,
-    };
+    const start =
+      direction === "redo"
+        ? splice.offset - splice.deleteCount + splice.insert.length
+        : splice.offset + splice.deleteCount - splice.insert.length;
+
+    return { start, end: start };
   },
 
   fromInputEvent(

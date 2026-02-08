@@ -48,12 +48,12 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
       )
         return;
 
-      console.log("history-plugin will restore the selection:", element, {
-        cmd,
-        direction: editor.history.direction,
-        selection,
-        content: element.textContent,
-      });
+      // console.log("history-plugin will restore the selection:", element, {
+      //   cmd,
+      //   direction: editor.history.direction,
+      //   selection,
+      //   content: element.textContent,
+      // });
 
       SelectionRange.apply(element, selection);
     }, []),

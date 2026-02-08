@@ -35,12 +35,12 @@ Don't declare variables you only use once. Inline the call in the assertion.
 ```ts
 // Bad
 const result = getVerticalNavigationRange(current, target, "down");
-expect(result).toEqual({ start: 0, end: null });
+expect(result).toEqual({ start: 0, end: 0 });
 
 // Good
 expect(getVerticalNavigationRange(current, target, "down")).toEqual({
   start: 0,
-  end: null,
+  end: 0,
 });
 ```
 
@@ -122,4 +122,3 @@ contenteditable. I have extended it with this `input` method in attempt to bridg
 Use `setupUserEvent` from [`@notion-site/web/test-utils/user-event.js`](../../web/src/test-utils/user-event.ts) to
 simulate interactions. For contenteditable elements, use`user.input()`.
 For `<input>` or `<textarea>`, it is better to use the standard `user.type()` since it is more stable.
-
