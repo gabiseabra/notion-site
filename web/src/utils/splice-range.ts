@@ -29,8 +29,8 @@ export const SpliceRange = {
   toSelectionRange(splice: SpliceRange, direction: 1 | -1) {
     const start =
       direction === 1
-        ? splice.offset - splice.deleteCount + splice.insert.length
-        : splice.offset + splice.deleteCount - splice.insert.length;
+        ? splice.offset + splice.insert.length
+        : splice.offset + splice.deleteCount;
 
     return { start, end: start };
   },
