@@ -18,6 +18,8 @@ export const CLIENT_DIST = path.resolve(WEB_ROOT, "dist/client");
 
 export const SERVER_DIST = path.resolve(WEB_ROOT, "dist/server");
 
+export const SITE_URL = process.env.CORS_ORIGIN;
+
 export const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 export const CORS_ORIGIN = DEV

@@ -1,6 +1,5 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { match } from "ts-pattern";
-import { rewriteUrl } from "../../utils/url.js";
 import { Span, TextProps } from "../display/Text.js";
 import { Alert } from "../feedback/Banner.js";
 import { MaybeLink } from "../navigation/MaybeLink.js";
@@ -29,9 +28,7 @@ export function RichText({ value, ...props }: RichTextProps) {
               ) : (
                 <MaybeLink
                   key={`${ix}`}
-                  to={
-                    item.text.link ? rewriteUrl(item.text.link.url) : undefined
-                  }
+                  to={item.text.link ? item.text.link.url : undefined}
                 >
                   <Span {...item.annotations} {...props}>
                     {item.text.content}

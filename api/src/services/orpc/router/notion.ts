@@ -163,7 +163,11 @@ async function replaceUrl(url: string) {
     }
   }
 
-  return url;
+  if (env.SITE_URL && url.startsWith(env.SITE_URL)) {
+    return url.slice(env.SITE_URL.length);
+  } else {
+    return url;
+  }
 }
 
 async function mapTextItem(item: Notion.RTF.Item<"text">) {
