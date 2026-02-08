@@ -98,7 +98,7 @@ function apply(element: HTMLElement, selection: SelectionRange) {
   const end = resolveOffset(element, selection.end ?? selection.start);
 
   if (!start || !end) {
-    console.warn("Failed to resolve selection.", element, {
+    console.warn("Failed to resolve selection target text node.", element, {
       resolved: { start, end },
       target: selection,
       textContent: element.textContent,
@@ -138,7 +138,20 @@ function moveVertically(
   if (!sel?.rangeCount) return null;
 
   const range = sel.getRangeAt(0);
-  if (!range.collapsed || !currentElement.contains(range.startContainer)) {
+  if (!range.collapsed) {
+    return null;
+  }
+  if (!currentElement.contains(range.startContainer)) {
+    console.warn(
+      "Caret startContainer is outside current element.",
+      currentElement,
+      "→",
+      targetElement,
+      {
+        direction,
+        startContainer: range.startContainer,
+      },
+    );
     return null;
   }
 
@@ -149,10 +162,15 @@ function moveVertically(
       ? currentLines[0]
       : currentLines[currentLines.length - 1];
 
-  if (
-    !boundaryLine ||
-    Math.round(caretRect.top) !== Math.round(boundaryLine.top)
-  ) {
+  if (Math.round(caretRect.top) !== Math.round(boundaryLine.top)) {
+    return null;
+  }
+  if (!boundaryLine) {
+    console.warn("Failed to resolve boundary line.", currentElement, {
+      direction,
+      lineCount: currentLines.length,
+    });
+
     return null;
   }
 
@@ -237,6 +255,14 @@ function getOffsetFromPoint(
     return getTextUpToNode(element, pos.offsetNode, pos.offset).length;
   }
 
+  console.warn("Failed to resolve caret position from coordinates.", element, {
+    point: { x, y },
+    textContent: element.textContent,
+    supports: {
+      caretRangeFromPoint: typeof doc.caretRangeFromPoint === "function",
+      caretPositionFromPoint: typeof doc.caretPositionFromPoint === "function",
+    },
+  });
   return null;
 }
 
@@ -278,6 +304,11 @@ function resolveOffset(
     remaining -= node.data.length;
   }
 
+  console.warn("Offset could not be mapped to any text node.", element, {
+    offset,
+    textContent: element.textContent,
+    max: maxOffset(element),
+  });
   return null;
 }
 
