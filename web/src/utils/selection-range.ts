@@ -1,7 +1,7 @@
 /** Text offsets within an element; end is null for a collapsed caret. */
-export type Selection = { start: number; end: number | null };
+export type SelectionRange = { start: number; end: number | null };
 
-export const Selection = {
+export const SelectionRange = {
   read,
   clear,
   apply,
@@ -12,7 +12,7 @@ export const Selection = {
 };
 
 /** Get selection offsets within `element`, or null if selection is outside. */
-function read(element: HTMLElement): Selection | null {
+function read(element: HTMLElement): SelectionRange | null {
   // Inputs are pretty straightforward
   if (
     isElementWithTag(element, "input") ||
@@ -66,7 +66,7 @@ function clear(element: HTMLElement) {
 }
 
 /** Set the selection within `element` by text offsets. */
-function apply(element: HTMLElement, selection: Selection) {
+function apply(element: HTMLElement, selection: SelectionRange) {
   const doc = element.ownerDocument;
   const win =
     doc.defaultView || (doc as { parentWindow?: Window }).parentWindow;
@@ -98,7 +98,11 @@ function apply(element: HTMLElement, selection: Selection) {
   const end = resolveOffset(element, selection.end ?? selection.start);
 
   if (!start || !end) {
-    console.warn("Failed to resolve selection:", { start, end }, element);
+    console.warn("Failed to resolve selection.", element, {
+      resolved: { start, end },
+      target: selection,
+      textContent: element.textContent,
+    });
     return;
   }
 
@@ -108,7 +112,7 @@ function apply(element: HTMLElement, selection: Selection) {
   sel.addRange(r);
 }
 
-function applyMaybe(element: HTMLElement, selection: Selection | null) {
+function applyMaybe(element: HTMLElement, selection: SelectionRange | null) {
   if (!selection) clear(element);
   else apply(element, selection);
 }
@@ -125,7 +129,7 @@ function moveVertically(
   currentElement: HTMLElement,
   targetElement: HTMLElement,
   direction: "up" | "down",
-): Selection | null {
+): SelectionRange | null {
   const doc = currentElement.ownerDocument;
   const win =
     doc.defaultView || (doc as { parentWindow?: Window }).parentWindow;
@@ -167,6 +171,22 @@ function moveVertically(
     start: targetOffset ?? (direction === "up" ? maxOffset(targetElement) : 0),
     end: null,
   };
+}
+
+function merge(
+  selection: SelectionRange,
+  ...selections: SelectionRange[]
+): SelectionRange {
+  return selections.reduce(
+    (acc, sel) => ({
+      start: Math.min(acc.start, sel.start),
+      end:
+        acc.end === null && sel.end === null
+          ? null
+          : Math.max(acc.end ?? acc.start, sel.end ?? sel.start),
+    }),
+    selection,
+  );
 }
 
 /** Internals */
@@ -259,19 +279,6 @@ function resolveOffset(
   }
 
   return null;
-}
-
-function merge(selection: Selection, ...selections: Selection[]): Selection {
-  return selections.reduce(
-    (acc, sel) => ({
-      start: Math.min(acc.start, sel.start),
-      end:
-        acc.end === null && sel.end === null
-          ? null
-          : Math.max(acc.end ?? acc.start, sel.end ?? sel.start),
-    }),
-    selection,
-  );
 }
 
 /** Helper guard that works with non-global instances of dom (instanceof doesn't) */

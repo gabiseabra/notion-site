@@ -1,6 +1,6 @@
 import { History } from "@notion-site/common/utils/history.js";
 import { match } from "ts-pattern";
-import type { Selection } from "../../../utils/selection.js";
+import { SelectionRange } from "../../../utils/selection-range.js";
 import { AnyBlock } from "./types.js";
 
 /**
@@ -11,29 +11,29 @@ export type EditorCommandCmd<TBlock extends AnyBlock> =
   | {
       type: "update";
       block: TBlock;
-      selectionBefore?: Selection;
-      selectionAfter?: Selection;
+      selectionBefore?: SelectionRange;
+      selectionAfter?: SelectionRange;
     }
   | {
       type: "remove";
       block: TBlock;
-      selectionBefore?: Selection;
-      selectionAfter?: Selection;
+      selectionBefore?: SelectionRange;
+      selectionAfter?: SelectionRange;
     }
   | {
       type: "split";
       left: TBlock;
       right: TBlock;
-      selectionBefore?: Selection;
-      selectionAfter?: Selection;
+      selectionBefore?: SelectionRange;
+      selectionAfter?: SelectionRange;
     };
 
 export type EditorCommand<TBlock extends AnyBlock> =
   | {
       type: "apply";
       commands: EditorCommandCmd<TBlock>[];
-      selectionBefore?: Selection;
-      selectionAfter?: Selection;
+      selectionBefore?: SelectionRange;
+      selectionAfter?: SelectionRange;
     }
   | EditorCommandCmd<TBlock>;
 

@@ -1,4 +1,4 @@
-import { Selection } from "../../../utils/selection.js";
+import { SelectionRange } from "../../../utils/selection-range.js";
 import { AnyBlock } from "../editor/types.js";
 import { ContentEditorPlugin } from "./types.js";
 
@@ -30,7 +30,7 @@ export const useBlockMutationPlugin =
   (editor) =>
   (block) => ({
     onKeyDown(e) {
-      const selectionBefore = Selection.read(e.target as HTMLElement);
+      const selectionBefore = SelectionRange.read(e.target as HTMLElement);
       if (!selectionBefore) return;
 
       if (
@@ -51,7 +51,7 @@ export const useBlockMutationPlugin =
         const mergedBlock = merge(prevBlock, currentBlock);
         const selectionAfter = {
           id: prevBlock.id,
-          start: Selection.maxOffset(prevElement),
+          start: SelectionRange.maxOffset(prevElement),
           end: null,
         };
 

@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener.js";
-import { getInputEventSpliceParams } from "../../../utils/event.js";
-import { Selection } from "../../../utils/selection.js";
+import { SelectionRange } from "../../../utils/selection-range.js";
+import { SpliceRange } from "../../../utils/splice-range.js";
 import { AnyBlock } from "../editor/types.js";
 import { createEventListenerPlugin } from "./create-event-listener-plugin.js";
 import { ContentEditorPlugin } from "./types.js";
@@ -33,28 +33,31 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
     // before switching to another.
     const pendingRef = useRef<{
       block: TBlock;
-      selectionBefore?: Selection;
-      selectionAfter?: Selection;
+      selectionBefore?: SelectionRange;
+      selectionAfter?: SelectionRange;
     }>(null);
 
-    const update = useCallback((block: TBlock, selectionAfter: Selection) => {
-      // if we switched to another block but there are still pending changes, we
-      // need to save the changes for that block first.
-      if (pendingRef.current && pendingRef.current.block.id !== block.id) {
-        flush();
-      }
+    const update = useCallback(
+      (block: TBlock, selectionAfter: SelectionRange) => {
+        // if we switched to another block but there are still pending changes, we
+        // need to save the changes for that block first.
+        if (pendingRef.current && pendingRef.current.block.id !== block.id) {
+          flush();
+        }
 
-      pendingRef.current ??= {
-        block,
-        selectionBefore:
-          (() => {
-            const element = editor.ref(block.id);
-            return element && Selection.read(element);
-          })() ?? undefined,
-      };
-      pendingRef.current.block = block;
-      pendingRef.current.selectionAfter = selectionAfter;
-    }, []);
+        pendingRef.current ??= {
+          block,
+          selectionBefore:
+            (() => {
+              const element = editor.ref(block.id);
+              return element && SelectionRange.read(element);
+            })() ?? undefined,
+        };
+        pendingRef.current.block = block;
+        pendingRef.current.selectionAfter = selectionAfter;
+      },
+      [],
+    );
 
     const flushTimerRef = useRef<number>(null);
 
@@ -89,16 +92,22 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
     return (block) => (e) => {
       cancelFlush();
       try {
-        const selection = Selection.read(e.target as HTMLElement);
+        if (!(e.target instanceof HTMLElement)) return;
+
+        const selection = SelectionRange.read(e.target);
         if (!selection) return;
 
-        const spliceParams = getInputEventSpliceParams(e, selection);
+        const spliceRange = SpliceRange.fromInputEvent(
+          e,
+          e.target.textContent ?? "",
+          selection,
+        );
 
-        if (spliceParams?.insert === "\n" && !multiline) {
+        if (spliceRange?.insert === "\n" && !multiline) {
           e.preventDefault();
           return;
         }
-        if (!spliceParams) return;
+        if (!spliceRange) return;
 
         const currentBlock =
           pendingRef.current?.block.id === block.id
@@ -110,12 +119,12 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
         update(
           splice(
             currentBlock,
-            spliceParams.offset,
-            spliceParams.deleteCount,
-            spliceParams.insert,
+            spliceRange.offset,
+            spliceRange.deleteCount,
+            spliceRange.insert,
           ),
           {
-            start: spliceParams.offset + spliceParams.insert.length,
+            start: spliceRange.offset + spliceRange.insert.length,
             end: null,
           },
         );

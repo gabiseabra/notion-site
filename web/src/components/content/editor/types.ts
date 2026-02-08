@@ -1,5 +1,5 @@
 import type { RefObject } from "react";
-import type { Selection } from "../../../utils/selection.js";
+import { SelectionRange } from "../../../utils/selection-range.js";
 import type { EditorEventTarget } from "./event.js";
 import type { EditorHistory } from "./history.js";
 
@@ -12,9 +12,9 @@ export type AnyBlock = { id: string };
 export type EditOptions = {
   data?: unknown;
   /** Selection before the change (for undo). */
-  selectionBefore?: Selection;
+  selectionBefore?: SelectionRange;
   /** Selection after the change (for redo). */
-  selectionAfter?: Selection;
+  selectionAfter?: SelectionRange;
 };
 
 /**

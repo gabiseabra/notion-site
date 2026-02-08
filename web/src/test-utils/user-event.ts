@@ -2,8 +2,8 @@ import { never } from "@notion-site/common/utils/error.js";
 import { hash } from "@notion-site/common/utils/hash.js";
 import { userEvent } from "@testing-library/user-event";
 import { JSDOM } from "jsdom";
-import { getInputEventSpliceParams } from "../utils/event.js";
-import { Selection } from "../utils/selection.js";
+import { SelectionRange } from "../utils/selection-range.js";
+import { SpliceRange } from "../utils/splice-range.js";
 
 export function setupUserEvent() {
   const user = userEvent.setup();
@@ -82,9 +82,12 @@ async function forwardInputEvents(
       eventType,
       (e) => {
         // Copy selection from proxy to target before dispatching
-        Selection.applyMaybe(element, Selection.read(proxy));
+        SelectionRange.applyMaybe(element, SelectionRange.read(proxy));
 
-        if (hash(Selection.read(proxy)) !== hash(Selection.read(element))) {
+        if (
+          hash(SelectionRange.read(proxy)) !==
+          hash(SelectionRange.read(element))
+        ) {
           never(
             "failed to copy selection from proxy to target! this shouldn't happen . . .",
           );
@@ -95,9 +98,9 @@ async function forwardInputEvents(
       (e) => {
         // process beforeinput to apply text insertions / deletions to content-editable element
         if (!(e instanceof InputEvent) || e.defaultPrevented) return;
-        const selection = Selection.read(proxy);
+        const selection = SelectionRange.read(proxy);
         const spliceParams =
-          selection && getInputEventSpliceParams(e, proxy.value, selection);
+          selection && SpliceRange.fromInputEvent(e, proxy.value, selection);
         if (spliceParams) {
           element.innerHTML = spliceElementText(
             element,
@@ -113,11 +116,11 @@ async function forwardInputEvents(
   // Copy text content and selection state to the proxy
   proxy.value = element.textContent ?? "";
   proxy.focus();
-  Selection.applyMaybe(proxy, Selection.read(element));
+  SelectionRange.applyMaybe(proxy, SelectionRange.read(element));
 
   await act(proxy, user.proxy);
 
-  Selection.apply(element, {
+  SelectionRange.apply(element, {
     start: proxy.selectionStart ?? 0,
     end:
       proxy.selectionEnd === proxy.selectionStart ? null : proxy.selectionEnd,

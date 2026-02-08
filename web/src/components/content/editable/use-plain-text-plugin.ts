@@ -1,4 +1,5 @@
 import { uuid } from "@notion-site/common/utils/uuid.js";
+import { SpliceRange } from "../../../utils/splice-range.js";
 import { ContentEditor } from "../editor/types.js";
 import { composePlugins } from "./compose-plugins.js";
 import { useAutoCommitPlugin } from "./use-auto-commit-plugin.js";
@@ -22,9 +23,9 @@ export const usePlainTextPlugin = (editor: ContentEditor<PlainTextBlock>) =>
     useAutoCommitPlugin(600),
     useHistoryPlugin,
     useInlineMutationPlugin({
-      splice: ({ id, content }, ...params) => ({
+      splice: ({ id, content }, offset, deleteCount, insert) => ({
         id,
-        content: [...content].splice(...params).join(""),
+        content: SpliceRange.apply(content, { offset, deleteCount, insert }),
       }),
     }),
     useBlockNavigationPlugin,

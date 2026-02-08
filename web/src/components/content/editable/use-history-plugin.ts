@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener.js";
-import { Selection } from "../../../utils/selection.js";
+import { SelectionRange } from "../../../utils/selection-range.js";
 import { EditorCommand } from "../editor/history.js";
 import { AnyContentEditorPlugin } from "./types.js";
 
@@ -28,7 +28,7 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
         redo: cmd.selectionAfter,
       }[editor.history.direction];
       const element = editor.ref(id);
-      const currentSelection = element && Selection.read(element);
+      const currentSelection = element && SelectionRange.read(element);
       if (
         !element ||
         !selection ||
@@ -37,7 +37,7 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
       )
         return;
 
-      Selection.apply(element, selection);
+      SelectionRange.apply(element, selection);
     }, []),
   );
 
