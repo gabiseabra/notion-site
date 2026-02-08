@@ -4,7 +4,7 @@ import { useEventListener } from "../../hooks/use-event-listener.js";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
 import { useNotionPlugin } from "./editable/use-notion-plugin.js";
-import { EditorEvent } from "./editor/event.js";
+import { EditorEvent } from "./editor/editor-event.js";
 import { ContentEditor as TContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
 

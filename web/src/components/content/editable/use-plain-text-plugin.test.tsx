@@ -12,7 +12,7 @@ import {
 } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener.js";
 import { setupUserEvent } from "../../../test-utils/user-event.js";
-import { EditorEvent } from "../editor/event.js";
+import { EditorEvent } from "../editor/editor-event.js";
 import { ContentEditor } from "../editor/types.js";
 import { useContentEditor } from "../editor/use-content-editor.js";
 import { PlainTextBlock, usePlainTextPlugin } from "./use-plain-text-plugin.js";

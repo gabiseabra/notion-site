@@ -1,8 +1,8 @@
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ContentEditorPlugin } from "../editable/types.js";
-import { EditorEvent, EditorEventTarget } from "./event.js";
-import { EditorCommand, EditorHistory } from "./history.js";
+import { EditorEvent, EditorEventTarget } from "./editor-event.js";
+import { EditorCommand, EditorHistory } from "./editor-history.js";
 import { AnyBlock, ContentEditor } from "./types.js";
 
 /**

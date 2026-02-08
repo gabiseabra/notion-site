@@ -1,6 +1,6 @@
 import { EmptyObject } from "@notion-site/common/types/object.js";
 import { TypedEventTarget } from "typescript-event-target";
-import { EditorCommandCmd } from "./history.js";
+import { EditorCommandCmd } from "./editor-history.js";
 import { AnyBlock, ContentEditor } from "./types.js";
 
 type EditorEventMap<TBlock extends AnyBlock> = {

@@ -1,5 +1,5 @@
 import { useEventListener } from "../../../hooks/use-event-listener.js";
-import { EditorEvent } from "../editor/event.js";
+import { EditorEvent } from "../editor/editor-event.js";
 import { AnyBlock } from "../editor/types.js";
 import { ContentEditorPlugin } from "./types.js";
 

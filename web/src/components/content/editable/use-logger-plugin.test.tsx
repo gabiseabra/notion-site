@@ -3,7 +3,7 @@
  */
 import { render } from "@testing-library/react";
 import { act, Ref, RefObject, useImperativeHandle } from "react";
-import { EditorEvent } from "../editor/event.js";
+import { EditorEvent } from "../editor/editor-event.js";
 import { ContentEditor } from "../editor/types.js";
 import { useContentEditor } from "../editor/use-content-editor.js";
 import { composePlugins } from "./compose-plugins.js";

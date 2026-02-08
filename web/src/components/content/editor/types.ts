@@ -1,7 +1,7 @@
 import type { RefObject } from "react";
 import { SelectionRange } from "../../../utils/selection-range.js";
-import type { EditorEventTarget } from "./event.js";
-import type { EditorHistory } from "./history.js";
+import type { EditorEventTarget } from "./editor-event.js";
+import type { EditorHistory } from "./editor-history.js";
 
 export type AnyBlock = { id: string };
 
