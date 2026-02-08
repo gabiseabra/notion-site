@@ -1,6 +1,8 @@
 /** Text offsets within an element; end is null for a collapsed caret. */
 export type SelectionRange = { start: number; end: number | null };
 
+type Direction = "up" | "down";
+
 export const SelectionRange = {
   read,
   clear,
@@ -128,7 +130,7 @@ function maxOffset(element: HTMLElement): number {
 function moveVertically(
   currentElement: HTMLElement,
   targetElement: HTMLElement,
-  direction: "up" | "down",
+  direction: Direction,
 ): SelectionRange | null {
   const doc = currentElement.ownerDocument;
   const win =

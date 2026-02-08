@@ -13,81 +13,85 @@ const WORD_CHAR = /[\p{L}\p{N}_]/u;
 const WHITESPACE = /\s/;
 
 export const SpliceRange = {
-  fromInputEvent,
-  fromSelectionRange,
   apply(text: string, { offset, deleteCount, insert }: SpliceRange) {
     const chars = [...text];
     chars.splice(offset, deleteCount, insert);
     return chars.join("");
   },
+
+  fromSelectionRange(selection: SelectionRange): SpliceRange {
+    const start = selection.start;
+    const end = selection.end ?? selection.start;
+
+    return {
+      offset: start,
+      deleteCount: Math.max(0, end - start),
+      insert: "",
+    };
+  },
+
+  toSelectionRange(splice: SpliceRange, direction: "redo" | "undo") {
+    return {
+      start:
+        direction === "redo"
+          ? splice.offset - splice.deleteCount + splice.insert.length
+          : splice.offset + splice.deleteCount - splice.insert.length,
+      end: null,
+    };
+  },
+
+  fromInputEvent(
+    event: InputEvent,
+    text: string,
+    selection: SelectionRange,
+  ): SpliceRange | null {
+    const selected = SpliceRange.fromSelectionRange(selection);
+
+    switch (event.inputType) {
+      case "insertText":
+      case "insertFromPaste":
+      case "insertFromDrop":
+      case "insertReplacementText":
+        return insertAtSelection(selection, selected, event.data ?? "");
+
+      case "insertLineBreak":
+        return insertAtSelection(selection, selected, "\n");
+
+      case "deleteByCut":
+        return selected;
+
+      case "deleteContentBackward":
+        return deleteFromCaret(text, selection, "backward", "char");
+
+      case "deleteContentForward":
+        return deleteFromCaret(text, selection, "forward", "char");
+
+      case "deleteWordBackward":
+        return deleteFromCaret(text, selection, "backward", "word");
+
+      case "deleteWordForward":
+        return deleteFromCaret(text, selection, "forward", "word");
+
+      case "deleteSoftLineBackward":
+        return deleteFromCaret(text, selection, "backward", "softLine");
+
+      case "deleteSoftLineForward":
+        return deleteFromCaret(text, selection, "forward", "softLine");
+
+      default:
+        return null;
+    }
+  },
 };
-
-/**
- * Get splice range that would result if you applied the InputEvent to the given string at selection.
- */
-function fromInputEvent(
-  event: InputEvent,
-  text: string,
-  selection: SelectionRange,
-): SpliceRange | null {
-  const selected = fromSelectionRange(selection);
-
-  switch (event.inputType) {
-    case "insertText":
-    case "insertFromPaste":
-    case "insertFromDrop":
-    case "insertReplacementText":
-      return insertAtSelection(selection, selected, event.data ?? "");
-
-    case "insertLineBreak":
-      return insertAtSelection(selection, selected, "\n");
-
-    case "deleteByCut":
-      return selected;
-
-    case "deleteContentBackward":
-      return deleteFromCaret(text, selection, "backward", "char");
-
-    case "deleteContentForward":
-      return deleteFromCaret(text, selection, "forward", "char");
-
-    case "deleteWordBackward":
-      return deleteFromCaret(text, selection, "backward", "word");
-
-    case "deleteWordForward":
-      return deleteFromCaret(text, selection, "forward", "word");
-
-    case "deleteSoftLineBackward":
-      return deleteFromCaret(text, selection, "backward", "softLine");
-
-    case "deleteSoftLineForward":
-      return deleteFromCaret(text, selection, "forward", "softLine");
-
-    default:
-      return null;
-  }
-}
-
-/**
- * Get splice range that would result if you hit delete on a non-collapsed selection.
- */
-function fromSelectionRange(selection: SelectionRange): SpliceRange | null {
-  if (selection.end === null) return null;
-
-  const deleteCount = Math.max(0, selection.end - selection.start);
-  if (deleteCount === 0) return null;
-
-  return { offset: selection.start, deleteCount, insert: "" };
-}
 
 function insertAtSelection(
   selection: SelectionRange,
-  selected: SpliceRange | null,
+  selected: SpliceRange,
   insert: string,
 ): SpliceRange {
   return {
     offset: selection.start,
-    deleteCount: selected?.deleteCount ?? 0,
+    deleteCount: selected?.deleteCount,
     insert,
   };
 }
@@ -98,8 +102,8 @@ function deleteFromCaret(
   direction: Direction,
   unit: Unit,
 ): SpliceRange | null {
-  const selected = fromSelectionRange(selection);
-  if (selected) return selected;
+  const selected = SpliceRange.fromSelectionRange(selection);
+  if (selected.deleteCount > 0) return selected;
 
   switch (unit) {
     case "char":

@@ -1,6 +1,7 @@
 import type { MatcherFunction } from "expect";
 import { SelectionRange } from "../utils/selection-range.js";
 
+/** @internal */
 export function renderSelectionRange(
   text: string,
   selection: SelectionRange,
@@ -15,6 +16,7 @@ export function renderSelectionRange(
   return `${text.slice(0, start)}[${text.slice(start, end)}]${text.slice(end)}`;
 }
 
+/** @internal */
 export function parseSelectionRange(input: string): {
   text: string;
   selection: SelectionRange;

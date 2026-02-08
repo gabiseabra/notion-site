@@ -24,7 +24,7 @@ export type InlineMutationPluginOptions<TBlock extends AnyBlock> = {
  */
 export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   multiline,
-  debounceMs = 150,
+  debounceMs = 200,
   splice,
 }: InlineMutationPluginOptions<TBlock>): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
@@ -116,6 +116,13 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
 
         if (!currentBlock) return;
 
+        console.log("inline-mutation-plugin update", {
+          currentBlock,
+          spliceRange,
+          selection,
+          selectionAfter: SpliceRange.toSelectionRange(spliceRange, "redo"),
+        });
+
         update(
           splice(
             currentBlock,
@@ -123,10 +130,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
             spliceRange.deleteCount,
             spliceRange.insert,
           ),
-          {
-            start: spliceRange.offset + spliceRange.insert.length,
-            end: null,
-          },
+          SpliceRange.toSelectionRange(spliceRange, "redo"),
         );
       } finally {
         scheduleFlush();

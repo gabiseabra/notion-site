@@ -19,20 +19,23 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
     editor.bus,
     "postcommit",
     useCallback(({ editor }) => {
+      const direction = editor.history.direction;
       const cmd = editor.history.command;
       if (!cmd) return;
 
-      const id = EditorCommand.id(cmd, editor.history.direction);
+      const id = EditorCommand.id(cmd, direction);
       const selection = {
         undo: cmd.selectionBefore,
         redo: cmd.selectionAfter,
-      }[editor.history.direction];
+      }[direction];
       const element = editor.ref(id);
       const currentSelection = element && SelectionRange.read(element);
 
       if (!element || !selection) {
         console.warn("Failed to restore selection after commit.", element, {
-          history: editor.history,
+          id,
+          cmd,
+          direction,
           revision: editor.revision,
           selection,
           currentSelection,
@@ -44,6 +47,13 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
         selection.end === currentSelection?.end
       )
         return;
+
+      console.log("history-plugin will restore the selection:", element, {
+        cmd,
+        direction: editor.history.direction,
+        selection,
+        content: element.textContent,
+      });
 
       SelectionRange.apply(element, selection);
     }, []),

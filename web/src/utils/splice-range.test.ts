@@ -149,4 +149,22 @@ describe("SpliceRange", () => {
       ).toBe("ello");
     });
   });
+
+  describe("SpliceRange.fromSelectionRange & SpliceRange.toSelectionRange", () => {
+    it("roundtrips for collapsed selection", () => {
+      const selectionRange = { start: 420, end: null };
+      expect(selectionRange).toEqual(
+        SpliceRange.toSelectionRange(
+          SpliceRange.fromSelectionRange(selectionRange)!,
+          "redo",
+        ),
+      );
+      expect(selectionRange).toEqual(
+        SpliceRange.toSelectionRange(
+          SpliceRange.fromSelectionRange(selectionRange)!,
+          "undo",
+        ),
+      );
+    });
+  });
 });
