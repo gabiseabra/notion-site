@@ -15,6 +15,16 @@ export type InlineMutationPluginOptions<TBlock extends AnyBlock> = {
     deleteCount: number,
     insert: string,
   ) => TBlock;
+  /**
+   * It is common to render empty editor blocks as an element containing `&nbsp;`,
+   * as applying/reading a selection range on a trully empty element can cause
+   * problems, but when the placeholder is present, the DOM selection offsets
+   * include that extra character.
+   * If your view renders empty blocks with nbsp, return true here if your block
+   * is empty so the plugin can normalize selectionBefore/After by shifting -1
+   * when applying changes.
+   */
+  nbspFix?: (block: TBlock, element: HTMLElement) => boolean;
 };
 
 /**
@@ -26,6 +36,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   multiline,
   debounceMs = 200,
   splice,
+  nbspFix,
 }: InlineMutationPluginOptions<TBlock>): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
     // while the editor manages a list of blocks, users only edit one block at a time,
@@ -49,7 +60,9 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
         pendingRef.current ??= {
           block,
           selectionBefore: SelectionRange.read(element) ?? undefined,
-          nbspFix: element.textContent === String.fromCharCode(160),
+          nbspFix:
+            !!nbspFix?.(block, element) &&
+            element.textContent === String.fromCharCode(160),
         };
         pendingRef.current.block = block;
         pendingRef.current.selectionAfter = selectionAfter;
