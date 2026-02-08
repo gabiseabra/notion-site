@@ -16,6 +16,7 @@ export const useNotionPlugin = (
     multiline?: boolean;
     logging?: boolean | "verbose";
   } = {
+    multiline: true,
     logging: env.DEV,
   },
 ) =>
