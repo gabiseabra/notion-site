@@ -29,11 +29,19 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
       }[editor.history.direction];
       const element = editor.ref(id);
       const currentSelection = element && SelectionRange.read(element);
+
+      if (!element || !selection) {
+        console.warn("Failed to restore selection after commit.", element, {
+          history: editor.history,
+          revision: editor.revision,
+          selection,
+          currentSelection,
+        });
+        return;
+      }
       if (
-        !element ||
-        !selection ||
-        (selection.start === currentSelection?.start &&
-          selection.end === currentSelection?.end)
+        selection.start === currentSelection?.start &&
+        selection.end === currentSelection?.end
       )
         return;
 
