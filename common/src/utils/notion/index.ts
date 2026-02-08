@@ -1,6 +1,6 @@
 import { zNotion } from "../../dto/notion/schema/index.js";
 import { hasPropertyValue } from "../guards.js";
-import * as _Block from "./blocks.js";
+import * as _Block from "./block.js";
 import * as _RTF from "./rich-text.js";
 import * as _WIP from "./wip.js";
 

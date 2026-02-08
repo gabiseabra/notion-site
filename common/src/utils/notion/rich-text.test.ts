@@ -9,7 +9,7 @@ const getContent = (rich_text: zNotion.rich_text.rich_text_item) =>
     .map((i) => i.text.content)
     .join("");
 
-describe("rich-text utilities", () => {
+describe("Notion.RTF", () => {
   describe("Notion.RTF.getLength", () => {
     it("returns 0 for empty array", () => {
       expect(RTF.getLength([])).toBe(0);

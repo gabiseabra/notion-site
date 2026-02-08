@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import { WithRequired } from "../../types/object.js";
 import { uuid } from "../uuid.js";
-import { Block, BlockType } from "./blocks.js";
+import { Block, BlockType } from "./block.js";
 import { Annotations, empty_text, RichText } from "./rich-text.js";
 
 export function id() {
