@@ -44,7 +44,7 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
       history,
 
       get isDirty() {
-        return history.currentPosition !== snapshot.position;
+        return history.position !== snapshot.position;
       },
 
       get(id) {
