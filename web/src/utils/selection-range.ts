@@ -8,6 +8,13 @@ export const SelectionRange = {
     return isCollapsed(selection);
   },
 
+  shift(range: SelectionRange, delta: number): SelectionRange {
+    return {
+      start: range.start + delta,
+      end: range.end + delta,
+    };
+  },
+
   // functions on HTMLElement
   read,
   clear,

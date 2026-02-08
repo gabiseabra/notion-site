@@ -35,10 +35,11 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
       block: TBlock;
       selectionBefore?: SelectionRange;
       selectionAfter?: SelectionRange;
+      nbspFix: boolean;
     }>(null);
 
     const update = useCallback(
-      (block: TBlock, selectionAfter: SelectionRange) => {
+      (block: TBlock, selectionAfter: SelectionRange, element: HTMLElement) => {
         // if we switched to another block but there are still pending changes, we
         // need to save the changes for that block first.
         if (pendingRef.current && pendingRef.current.block.id !== block.id) {
@@ -47,11 +48,8 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
 
         pendingRef.current ??= {
           block,
-          selectionBefore:
-            (() => {
-              const element = editor.ref(block.id);
-              return element && SelectionRange.read(element);
-            })() ?? undefined,
+          selectionBefore: SelectionRange.read(element) ?? undefined,
+          nbspFix: element.textContent === String.fromCharCode(160),
         };
         pendingRef.current.block = block;
         pendingRef.current.selectionAfter = selectionAfter;
@@ -63,12 +61,19 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
 
     const flush = useCallback(() => {
       if (pendingRef.current) {
+        const { block, selectionAfter, selectionBefore, nbspFix } =
+          pendingRef.current;
+
         if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
 
-        editor.update(pendingRef.current.block, {
+        editor.update(block, {
           data: "inline-mutation-plugin",
-          selectionAfter: pendingRef.current.selectionAfter,
-          selectionBefore: pendingRef.current.selectionBefore,
+          selectionAfter:
+            selectionAfter &&
+            SelectionRange.shift(selectionAfter, nbspFix ? -1 : 0),
+          selectionBefore:
+            selectionBefore &&
+            SelectionRange.shift(selectionBefore, nbspFix ? -1 : 0),
         });
         pendingRef.current = null;
 
@@ -131,6 +136,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
             spliceRange.insert,
           ),
           SpliceRange.toSelectionRange(spliceRange, "redo"),
+          e.target,
         );
       } finally {
         scheduleFlush();
