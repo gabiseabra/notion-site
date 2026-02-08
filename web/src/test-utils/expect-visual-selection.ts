@@ -84,12 +84,14 @@ export const expectSelectionRange = {
   toMatchVisualSelection,
 };
 
-declare module "expect" {
-  interface AsymmetricMatchers {
-    toMatchVisualSelection(expected: string): void;
-  }
+declare global {
+  namespace jest {
+    interface AsymmetricMatchers {
+      toMatchVisualSelection(expected: string): void;
+    }
 
-  interface Matchers<R> {
-    toMatchVisualSelection(expected: string): R;
+    interface Matchers<R> {
+      toMatchVisualSelection(expected: string): R;
+    }
   }
 }

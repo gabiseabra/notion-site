@@ -151,20 +151,52 @@ describe("SpliceRange", () => {
   });
 
   describe("SpliceRange.fromSelectionRange & SpliceRange.toSelectionRange", () => {
-    it("roundtrips for collapsed selection", () => {
-      const selectionRange = { start: 420, end: 420 };
-      expect(selectionRange).toEqual(
-        SpliceRange.toSelectionRange(
-          SpliceRange.fromSelectionRange(selectionRange)!,
+    it("renders the same caret position after roundtrip", () => {
+      expect({
+        text: "hello",
+        selection: SpliceRange.toSelectionRange(
+          SpliceRange.fromSelectionRange({ start: 2, end: 2 }),
           1,
         ),
-      );
-      expect(selectionRange).toEqual(
-        SpliceRange.toSelectionRange(
-          SpliceRange.fromSelectionRange(selectionRange)!,
+      }).toMatchVisualSelection("he|llo");
+      expect({
+        text: "hello",
+        selection: SpliceRange.toSelectionRange(
+          SpliceRange.fromSelectionRange({ start: 2, end: 2 }),
           -1,
         ),
-      );
+      }).toMatchVisualSelection("he|llo");
+    });
+
+    it("places caret after inserted text on redo", () => {
+      expect({
+        text: SpliceRange.apply("hello", {
+          offset: 2,
+          deleteCount: 0,
+          insert: "X",
+        }),
+        selection: SpliceRange.toSelectionRange(
+          {
+            offset: 2,
+            deleteCount: 0,
+            insert: "X",
+          },
+          1,
+        ),
+      }).toMatchVisualSelection("heX|llo");
+    });
+
+    it("places caret at deleted selection start on redo", () => {
+      expect({
+        text: SpliceRange.apply(
+          "hello",
+          SpliceRange.fromSelectionRange({ start: 2, end: 4 }),
+        ),
+        selection: SpliceRange.toSelectionRange(
+          SpliceRange.fromSelectionRange({ start: 2, end: 4 }),
+          1,
+        ),
+      }).toMatchVisualSelection("he|o");
     });
   });
 });
