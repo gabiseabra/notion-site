@@ -42,7 +42,10 @@ export default {
             setupFiles: [
               `${process.cwd()}/${workspace}/src/test-utils/setup.ts`,
             ],
-            setupFilesAfterEnv: ["@testing-library/jest-dom"],
+            setupFilesAfterEnv: [
+              "@testing-library/jest-dom",
+              `${process.cwd()}/${workspace}/src/test-utils/setup-after-env.ts`,
+            ],
           }
         : {}),
     }),
