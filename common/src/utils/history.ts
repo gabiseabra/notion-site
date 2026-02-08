@@ -1,5 +1,5 @@
 export class History<State, Cmd> {
-  private commands: Cmd[] = [];
+  readonly commands: Cmd[] = [];
   private position = 0;
   private snapshots: Map<number, State> = new Map();
   private snapshotInterval = 50;
@@ -26,7 +26,7 @@ export class History<State, Cmd> {
   }
 
   push(cmd: Cmd) {
-    this.commands = this.commands.slice(0, this.position);
+    this.commands.length = this.position; // truncate to current cursor
     this.commands.push(cmd);
     this.position++;
 
