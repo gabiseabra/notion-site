@@ -128,35 +128,48 @@ async function forwardInputEvents(
             dataTransfer: _e.dataTransfer,
             isComposing: _e.isComposing,
             detail: _e.detail,
+            bubbles: _e.bubbles,
+            cancelable: _e.cancelable,
+            composed: _e.composed,
           });
         } else {
           return new EventClass(_e.type, _e);
         }
       },
-      (e, _e) => {
+      (e) => {
         // process beforeinput to apply text insertions / deletions to content-editable element
         if (!isEventType("beforeinput", e) || e.defaultPrevented) return;
         const selection = SelectionRange.read(proxy);
-        const spliceParams =
+        const spliceRange =
           selection && SpliceRange.fromInputEvent(e, proxy.value, selection);
 
-        if (!spliceParams) return;
+        if (!spliceRange) return;
 
         element.innerHTML = spliceElementText(
           element,
-          spliceParams.offset,
-          spliceParams.deleteCount,
-          spliceParams.insert,
+          spliceRange.offset,
+          spliceRange.deleteCount,
+          spliceRange.insert,
         ).innerHTML;
         // testing-library doesn't handle word/line delete, so we need to apply the correct
         // splice to the proxy in this case too
-        if (spliceParams.deleteCount > 1 && isWordOrLineDelete(e.inputType)) {
-          proxy.value = SpliceRange.apply(proxy.value, spliceParams);
+        if (spliceRange.deleteCount > 1 && isWordOrLineDelete(e.inputType)) {
+          proxy.value = SpliceRange.apply(proxy.value, spliceRange);
           SelectionRange.apply(
             proxy,
-            SpliceRange.toSelectionRange(spliceParams, 1),
+            SpliceRange.toSelectionRange(spliceRange, 1),
           );
-          // _e.preventDefault();
+          // testing-library doesn't fire "input" event for this, need to simulate
+          // in the target element.
+          if (e.inputType === "deleteSoftLineForward") {
+            element.dispatchEvent(
+              new Event("input", {
+                bubbles: true,
+                cancelable: true,
+                composed: false,
+              }),
+            );
+          }
         }
       },
     );

@@ -160,7 +160,7 @@ describe("userEvent.input", () => {
       expect(el).toMatchVisualSelection("|");
     });
 
-    it.skip("deleteSoftLineForward: deletes to line end with Ctrl+K", async () => {
+    it("deleteSoftLineForward: deletes to line end with Ctrl+Delete", async () => {
       const user = userEvent.setup();
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
@@ -172,7 +172,7 @@ describe("userEvent.input", () => {
       expect(el).toBeTruthy();
 
       SelectionRange.apply(el, { start: 0, end: 0 });
-      await user.input(el, "{Control>}k{/Control}");
+      await user.input(el, "{Control>}{Delete}{/Control}");
 
       expect(el).toMatchVisualSelection("|");
     });
@@ -393,10 +393,10 @@ describe("userEvent.input", () => {
       expect(beforeinput).toHaveBeenCalledWith(
         expect.objectContaining({ inputType: "deleteSoftLineBackward" }),
       );
-      expect(input).toHaveBeenCalled();
+      expect(input).toHaveBeenCalledTimes(1);
     });
 
-    it.skip("deleteSoftLineForward: forwards all events on Ctrl+K", async () => {
+    it("deleteSoftLineForward: forwards all events on Ctrl+Delete", async () => {
       const user = userEvent.setup();
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
@@ -413,10 +413,10 @@ describe("userEvent.input", () => {
       el.addEventListener("keydown", keydown);
 
       SelectionRange.apply(el, { start: 0, end: 0 });
-      await user.input(el, "{Control>}k{/Control}");
+      await user.input(el, "{Control>}{Delete}{/Control}");
 
       expect(keydown).toHaveBeenCalledWith(
-        expect.objectContaining({ key: "k", ctrlKey: true }),
+        expect.objectContaining({ key: "Delete", ctrlKey: true }),
       );
       expect(beforeinput).toHaveBeenCalledWith(
         expect.objectContaining({ inputType: "deleteSoftLineForward" }),
