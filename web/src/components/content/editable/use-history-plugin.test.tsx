@@ -4,7 +4,7 @@
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { fireEvent, render } from "@testing-library/react";
 import { act } from "react";
-import { setupUserEvent } from "../../../test-utils/user-event.js";
+import { userEvent } from "../../../test-utils/user-event.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { ContentEditor } from "../ContentEditor.js";
 
@@ -19,7 +19,7 @@ describe("useHistoryPlugin", () => {
   });
 
   it("undoes on Cmd+Z", async () => {
-    const user = setupUserEvent({ fakeTimers: true });
+    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -43,7 +43,7 @@ describe("useHistoryPlugin", () => {
   });
 
   it("redoes on Cmd+Shift+Z", async () => {
-    const user = setupUserEvent({ fakeTimers: true });
+    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -67,7 +67,7 @@ describe("useHistoryPlugin", () => {
   });
 
   it("redoes on Cmd+Y", async () => {
-    const user = setupUserEvent({ fakeTimers: true });
+    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -106,7 +106,7 @@ describe("useHistoryPlugin", () => {
   });
 
   it("does nothing without modifier key", async () => {
-    const user = setupUserEvent({ fakeTimers: true });
+    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -127,7 +127,7 @@ describe("useHistoryPlugin", () => {
   });
 
   it("restores selection before on undo", async () => {
-    const user = setupUserEvent({ fakeTimers: true });
+    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -149,7 +149,7 @@ describe("useHistoryPlugin", () => {
   });
 
   it("restores selection after on redo", async () => {
-    const user = setupUserEvent({ fakeTimers: true });
+    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(

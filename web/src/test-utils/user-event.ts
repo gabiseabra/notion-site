@@ -1,58 +1,64 @@
 import { never } from "@notion-site/common/utils/error.js";
 import { hash } from "@notion-site/common/utils/hash.js";
-import { userEvent } from "@testing-library/user-event";
+import { userEvent as _userEvent } from "@testing-library/user-event";
 import { JSDOM } from "jsdom";
 import { SelectionRange } from "../utils/selection-range.js";
 import { SpliceRange } from "../utils/splice-range.js";
 
-export function setupUserEvent(options?: { fakeTimers?: boolean }) {
-  const user = userEvent.setup({
-    ...(options?.fakeTimers ? { advanceTimers: jest.advanceTimersByTime } : {}),
-  });
-  const proxyDom = new JSDOM("<!DOCTYPE html><html><body></body></html>");
-  const proxyDoc = proxyDom.window.document;
-  const proxyUser = userEvent.setup({
-    document: proxyDoc,
-    ...(options?.fakeTimers ? { advanceTimers: jest.advanceTimersByTime } : {}),
-  });
+export const userEvent = {
+  setup(options?: { fakeTimers?: boolean }) {
+    const user = _userEvent.setup({
+      ...(options?.fakeTimers
+        ? { advanceTimers: jest.advanceTimersByTime }
+        : {}),
+    });
+    const proxyDom = new JSDOM("<!DOCTYPE html><html><body></body></html>");
+    const proxyDoc = proxyDom.window.document;
+    const proxyUser = _userEvent.setup({
+      document: proxyDoc,
+      ...(options?.fakeTimers
+        ? { advanceTimers: jest.advanceTimersByTime }
+        : {}),
+    });
 
-  const baseUser: UserEvent = {
-    ...user,
+    const baseUser: UserEvent = {
+      ...user,
 
-    proxy: {
-      ...proxyUser,
+      proxy: {
+        ...proxyUser,
 
-      dom: proxyDom,
-      doc: proxyDoc,
+        dom: proxyDom,
+        doc: proxyDoc,
 
-      get proxy() {
-        return baseUser.proxy;
+        get proxy() {
+          return baseUser.proxy;
+        },
       },
-    },
-  };
+    };
 
-  return {
-    ...baseUser,
+    return {
+      ...baseUser,
 
-    /**
-     * Simulate keyboard input on a contenteditable element.
-     *
-     * Problem: @testing-library/user-event doesn't fire `beforeinput` events
-     * for contenteditable elements - only for `<input>` and `<textarea>`.
-     *
-     * Approach: Create a proxy `<input>` in a separate JSDOM instance,
-     * type into it, and forward the `beforeinput`/`input`/`keydown` events
-     * to the real contenteditable.
-     */
-    async input(element: HTMLElement, keys: string) {
-      await forwardInputEvents(baseUser, element, async (proxy, user) => {
-        await user.keyboard(keys);
-      });
-    },
-  };
-}
+      /**
+       * Simulate keyboard input on a contenteditable element.
+       *
+       * Problem: @testing-library/user-event doesn't fire `beforeinput` events
+       * for contenteditable elements - only for `<input>` and `<textarea>`.
+       *
+       * Approach: Create a proxy `<input>` in a separate JSDOM instance,
+       * type into it, and forward the `beforeinput`/`input`/`keydown` events
+       * to the real contenteditable.
+       */
+      async input(element: HTMLElement, keys: string) {
+        await forwardInputEvents(baseUser, element, async (proxy, user) => {
+          await user.keyboard(keys);
+        });
+      },
+    };
+  },
+};
 
-type UserEvent = ReturnType<typeof userEvent.setup> & {
+type UserEvent = ReturnType<typeof _userEvent.setup> & {
   proxy: UserEvent & {
     dom: JSDOM;
     doc: Document;

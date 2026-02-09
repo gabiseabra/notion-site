@@ -3,7 +3,7 @@
  */
 import { render } from "@testing-library/react";
 import { act, memo, Ref, RefObject, useImperativeHandle } from "react";
-import { setupUserEvent } from "../../../test-utils/user-event.js";
+import { userEvent } from "../../../test-utils/user-event.js";
 import { ContentEditor } from "../editor/types.js";
 import { useContentEditor } from "../editor/use-content-editor.js";
 import { PlainTextBlock, usePlainTextPlugin } from "./use-plain-text-plugin.js";
@@ -57,7 +57,7 @@ describe("usePlainTextPlugin", () => {
   });
 
   it("updates block content on input", async () => {
-    const user = setupUserEvent();
+    const user = userEvent.setup();
     const blocks = [{ id: "a", content: "hey" }] satisfies PlainTextBlock[];
     const editorRef: RefObject<ContentEditor<PlainTextBlock> | null> = {
       current: null,

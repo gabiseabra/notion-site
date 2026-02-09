@@ -6,7 +6,7 @@ import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { render } from "@testing-library/react";
 import { act, RefObject } from "react";
-import { setupUserEvent } from "../../../test-utils/user-event.js";
+import { userEvent } from "../../../test-utils/user-event.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { ContentEditor } from "../ContentEditor.js";
 
@@ -21,7 +21,7 @@ describe("useInlineMutationPlugin", () => {
   });
 
   it("handles typing from the middle", async () => {
-    const user = setupUserEvent({ fakeTimers: true });
+    const user = userEvent.setup({ fakeTimers: true });
 
     const editorRef: RefObject<ContentEditor.Editor | null> = {
       current: null,
@@ -53,7 +53,7 @@ describe("useInlineMutationPlugin", () => {
   });
 
   it("handles typing in empty element", async () => {
-    const user = setupUserEvent({ fakeTimers: true });
+    const user = userEvent.setup({ fakeTimers: true });
 
     const editorRef: RefObject<ContentEditor.Editor | null> = {
       current: null,
@@ -78,7 +78,7 @@ describe("useInlineMutationPlugin", () => {
   });
 
   it("adds newline on Shift+Enter", async () => {
-    const user = setupUserEvent({ fakeTimers: true });
+    const user = userEvent.setup({ fakeTimers: true });
 
     const editorRef: RefObject<ContentEditor.Editor | null> = {
       current: null,
