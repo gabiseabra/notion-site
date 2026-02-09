@@ -156,7 +156,7 @@ async function forwardInputEvents(
             proxy,
             SpliceRange.toSelectionRange(spliceParams, 1),
           );
-          _e.preventDefault();
+          // _e.preventDefault();
         }
       },
     );
@@ -187,8 +187,15 @@ function forwardEvent<TEvent extends keyof HTMLElementEventMap>(
   source.addEventListener(eventType, (_e) => {
     const e = map(_e);
 
+    let defaultPrevented = false;
+
     target.dispatchEvent(
       Object.defineProperties(e, {
+        preventDefault: {
+          value() {
+            defaultPrevented = true;
+          },
+        },
         target: {
           get() {
             return target;
@@ -197,8 +204,12 @@ function forwardEvent<TEvent extends keyof HTMLElementEventMap>(
       }),
     );
 
-    if (e.defaultPrevented) {
+    if (defaultPrevented) {
       _e.preventDefault();
+      Object.defineProperty(e, "defaultPrevented", {
+        configurable: true,
+        value: true,
+      });
     }
 
     post?.(e, _e);

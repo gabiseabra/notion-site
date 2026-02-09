@@ -312,7 +312,7 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    it.skip("deleteWordBackward: forwards all events on Option+Backspace", async () => {
+    it("deleteWordBackward: forwards all events on Option+Backspace", async () => {
       const user = userEvent.setup();
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
@@ -340,7 +340,7 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    it.skip("deleteWordForward: forwards all events on Option+Delete", async () => {
+    it("deleteWordForward: forwards all events on Option+Delete", async () => {
       const user = userEvent.setup();
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
@@ -368,7 +368,7 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    it.skip("deleteSoftLineBackward: forwards all events on Cmd+Backspace", async () => {
+    it("deleteSoftLineBackward: forwards all events on Cmd+Backspace", async () => {
       const user = userEvent.setup();
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
