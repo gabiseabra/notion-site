@@ -106,19 +106,41 @@ it("returns empty props for blocks", () => {
 });
 
 // Good: Testing observable behavior through user interaction
-it("logs edit events when user types in a block", async () => {
+it("logs edit events when user types in a block", () => {
   const log = jest.fn()
   const { container } = render(<TestEditor value={blocks} log={log} />);
 
   const el = container.querySelector("[contenteditable]")!;
-  await user.input(el, "hello");
+  inputEvent.insert(el, "hello");
 
   expect(log).toHaveBeenCalledWith(expect.objectContaining({ eventType: "edit" }));
 });
 ```
 
-🚧Experimental: We use `@testing-library/user-event` for simulating interactions, but it does not support
-contenteditable. I have extended it with this `input` method in attempt to bridge that gap.
-Use `setupUserEvent` from [`@notion-site/web/test-utils/user-event.js`](../../web/src/test-utils/input-event.ts) to
-simulate interactions. For contenteditable elements, use`user.input()`.
-For `<input>` or `<textarea>`, it is better to use the standard `user.type()` since it is more stable.
+## Simulating Input on Contenteditable
+
+`@testing-library/user-event` doesn't support contenteditable elements. Use `inputEvent` from
+[`input-event.ts`](../../web/src/test-utils/input-event.ts) instead.
+
+```ts
+import { inputEvent } from "@notion-site/web/test-utils/input-event.js";
+
+// Insert text (fires keydown, beforeinput, input per character)
+inputEvent.insert(el, "hello");
+
+// Insert line break (Shift+Enter)
+inputEvent.insertLine(el);
+
+// Delete operations (direction: -1 = backward, 1 = forward)
+inputEvent.delete(el);              // Backspace
+inputEvent.delete(el, 1, 1);        // Delete (forward)
+inputEvent.deleteWord(el);          // Option+Backspace
+inputEvent.deleteWord(el, 1, 1);    // Option+Delete
+inputEvent.deleteLine(el);          // Cmd+Backspace
+inputEvent.deleteLine(el, 1, 1);    // Ctrl+Delete
+
+// Command shortcuts (only fires keydown, no text insertion)
+inputEvent.insert(el, "z", { metaKey: true });  // Cmd+Z
+```
+
+For `<input>` or `<textarea>`, use `@testing-library/user-event` directly since it handles those properly.
