@@ -1,4 +1,6 @@
+import { never } from "@notion-site/common/utils/error.js";
 import type { MatcherFunction } from "expect";
+import z from "zod";
 import { SelectionRange } from "../utils/selection-range.js";
 
 /** @internal */
@@ -44,30 +46,37 @@ export function parseSelectionRange(input: string): {
   throw new Error(`Invalid visual selection string: ${input}`);
 }
 
+function parseMatcherInput(actual: unknown) {
+  if (actual instanceof HTMLElement) {
+    return {
+      text: actual.textContent ?? "",
+      selection:
+        SelectionRange.read(actual) ??
+        never("Expected element to have selection"),
+    };
+  }
+
+  const parseResult = z
+    .object({
+      text: z.string(),
+      selection: z.object({ start: z.number(), end: z.number() }),
+    })
+    .safeParse(actual);
+
+  if (parseResult.success) {
+    return parseResult.data;
+  }
+
+  throw new TypeError(
+    "toRenderSelectionAs expects HTMLElement | { text: string; selection: SelectionRange }",
+  );
+}
+
 const toMatchVisualSelection: MatcherFunction<[expected: string]> = function (
   actual,
   expected,
 ) {
-  if (
-    typeof actual !== "object" ||
-    actual === null ||
-    !("text" in actual) ||
-    !("selection" in actual)
-  ) {
-    throw new TypeError(
-      "toRenderSelectionAs expects { text: string; selection: SelectionRange }",
-    );
-  }
-
-  const candidate = actual as {
-    text: string;
-    selection: SelectionRange;
-  };
-
-  if (typeof candidate.text !== "string") {
-    throw new TypeError("toRenderSelectionAs expects text to be a string");
-  }
-
+  const candidate = parseMatcherInput(actual);
   const rendered = renderSelectionRange(candidate.text, candidate.selection);
   const pass = rendered === expected;
 
