@@ -119,6 +119,6 @@ it("logs edit events when user types in a block", async () => {
 
 🚧Experimental: We use `@testing-library/user-event` for simulating interactions, but it does not support
 contenteditable. I have extended it with this `input` method in attempt to bridge that gap.
-Use `setupUserEvent` from [`@notion-site/web/test-utils/user-event.js`](../../web/src/test-utils/user-event.ts) to
+Use `setupUserEvent` from [`@notion-site/web/test-utils/user-event.js`](../../web/src/test-utils/input-event.ts) to
 simulate interactions. For contenteditable elements, use`user.input()`.
 For `<input>` or `<textarea>`, it is better to use the standard `user.type()` since it is more stable.

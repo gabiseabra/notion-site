@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 import { render } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import { act, memo, Ref, RefObject, useImperativeHandle } from "react";
-import { userEvent } from "../../../test-utils/user-event.js";
 import { ContentEditor } from "../editor/types.js";
 import { useContentEditor } from "../editor/use-content-editor.js";
 import { PlainTextBlock, usePlainTextPlugin } from "./use-plain-text-plugin.js";

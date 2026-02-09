@@ -4,7 +4,7 @@
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { fireEvent, render } from "@testing-library/react";
 import { act } from "react";
-import { userEvent } from "../../../test-utils/user-event.js";
+import { inputEvent } from "../../../test-utils/input-event.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { ContentEditor } from "../ContentEditor.js";
 
@@ -19,7 +19,6 @@ describe("useHistoryPlugin", () => {
   });
 
   it("undoes on Cmd+Z", async () => {
-    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -30,7 +29,7 @@ describe("useHistoryPlugin", () => {
     expect(el).toBeTruthy();
 
     SelectionRange.apply(el, { start: 5, end: 5 });
-    await user.input(el, " World");
+    inputEvent.insert(el, " World");
     // @note inline-mutation-plugin does not auto-commit
     // need to wait a little for auto-commit-plugin to fire
     act(() => jest.advanceTimersByTime(1000));
@@ -43,7 +42,6 @@ describe("useHistoryPlugin", () => {
   });
 
   it("redoes on Cmd+Shift+Z", async () => {
-    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -54,7 +52,7 @@ describe("useHistoryPlugin", () => {
     expect(el).toBeTruthy();
 
     SelectionRange.apply(el, { start: 5, end: 5 });
-    await user.input(el, " World");
+    inputEvent.insert(el, " World");
     act(() => jest.advanceTimersByTime(1000));
 
     expect(el.textContent).toBe("Hello World");
@@ -67,7 +65,6 @@ describe("useHistoryPlugin", () => {
   });
 
   it("redoes on Cmd+Y", async () => {
-    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -78,7 +75,7 @@ describe("useHistoryPlugin", () => {
     expect(el).toBeTruthy();
 
     SelectionRange.apply(el, { start: 5, end: 5 });
-    await user.input(el, " World");
+    inputEvent.insert(el, " World");
     act(() => jest.advanceTimersByTime(1000));
 
     expect(el.textContent).toBe("Hello World");
@@ -106,7 +103,6 @@ describe("useHistoryPlugin", () => {
   });
 
   it("does nothing without modifier key", async () => {
-    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -117,7 +113,7 @@ describe("useHistoryPlugin", () => {
     expect(el).toBeTruthy();
 
     SelectionRange.apply(el, { start: 5, end: 5 });
-    await user.input(el, " World");
+    inputEvent.insert(el, " World");
 
     expect(el.textContent).toBe("Hello World");
 
@@ -127,7 +123,6 @@ describe("useHistoryPlugin", () => {
   });
 
   it("restores selection before on undo", async () => {
-    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -138,7 +133,7 @@ describe("useHistoryPlugin", () => {
     expect(el).toBeTruthy();
 
     SelectionRange.apply(el, { start: 2, end: 2 });
-    await user.input(el, "X");
+    inputEvent.insert(el, "X");
     act(() => jest.advanceTimersByTime(1000));
 
     expect(el).toMatchVisualSelection("HeX|llo");
@@ -149,7 +144,6 @@ describe("useHistoryPlugin", () => {
   });
 
   it("restores selection after on redo", async () => {
-    const user = userEvent.setup({ fakeTimers: true });
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -160,7 +154,7 @@ describe("useHistoryPlugin", () => {
     expect(el).toBeTruthy();
 
     SelectionRange.apply(el, { start: 2, end: 2 });
-    await user.input(el, "X");
+    inputEvent.insert(el, "X");
     act(() => jest.advanceTimersByTime(1000));
 
     expect(el).toMatchVisualSelection("HeX|llo");

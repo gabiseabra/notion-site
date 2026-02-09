@@ -3,12 +3,11 @@
  */
 import { render } from "@testing-library/react";
 import { SelectionRange } from "../utils/selection-range.js";
-import { userEvent } from "./user-event.js";
+import { inputEvent } from "./input-event.js";
 
-describe("userEvent.input", () => {
+describe("inputEvent", () => {
   describe("applies content changes", () => {
-    it("insertText: inserts text at end", async () => {
-      const user = userEvent.setup();
+    it("insertText: inserts text at end", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -16,16 +15,13 @@ describe("userEvent.input", () => {
       );
 
       const el = container.querySelector("div")!;
-      expect(el).toBeTruthy();
-
       SelectionRange.apply(el, { start: 5, end: 5 });
-      await user.input(el, " World");
+      inputEvent.insert(el, " World");
 
       expect(el).toMatchVisualSelection("Hello World|");
     });
 
-    it("insertText: inserts text in middle", async () => {
-      const user = userEvent.setup();
+    it("insertText: inserts text in middle", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Helo
@@ -33,16 +29,13 @@ describe("userEvent.input", () => {
       );
 
       const el = container.querySelector("div")!;
-      expect(el).toBeTruthy();
-
       SelectionRange.apply(el, { start: 2, end: 2 });
-      await user.input(el, "l");
+      inputEvent.insert(el, "l");
 
       expect(el).toMatchVisualSelection("Hel|lo");
     });
 
-    it("insertText: replaces selection when typing over selected text", async () => {
-      const user = userEvent.setup();
+    it("insertText: replaces selection when typing over selected text", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -50,16 +43,13 @@ describe("userEvent.input", () => {
       );
 
       const el = container.querySelector("div")!;
-      expect(el).toBeTruthy();
-
       SelectionRange.apply(el, { start: 6, end: 11 });
-      await user.input(el, "Universe");
+      inputEvent.insert(el, "Universe");
 
       expect(el).toMatchVisualSelection("Hello Universe|");
     });
 
-    it("insertLineBreak: inserts newline with Shift+Enter", async () => {
-      const user = userEvent.setup();
+    it("insertLineBreak: inserts newline with Shift+Enter", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           HelloWorld
@@ -67,16 +57,13 @@ describe("userEvent.input", () => {
       );
 
       const el = container.querySelector("div")!;
-      expect(el).toBeTruthy();
-
       SelectionRange.apply(el, { start: 5, end: 5 });
-      await user.input(el, "{Shift>}{Enter}{/Shift}");
+      inputEvent.insertLine(el);
 
       expect(el).toMatchVisualSelection("Hello\n|World");
     });
 
-    it("deleteContentBackward: deletes char with Backspace", async () => {
-      const user = userEvent.setup();
+    it("deleteContentBackward: deletes char with Backspace", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -84,16 +71,13 @@ describe("userEvent.input", () => {
       );
 
       const el = container.querySelector("div")!;
-      expect(el).toBeTruthy();
-
       SelectionRange.apply(el, { start: 5, end: 5 });
-      await user.input(el, "{Backspace}");
+      inputEvent.delete(el);
 
       expect(el).toMatchVisualSelection("Hell|");
     });
 
-    it("deleteContentForward: deletes char with Delete", async () => {
-      const user = userEvent.setup();
+    it("deleteContentForward: deletes char with Delete", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -101,16 +85,13 @@ describe("userEvent.input", () => {
       );
 
       const el = container.querySelector("div")!;
-      expect(el).toBeTruthy();
-
       SelectionRange.apply(el, { start: 0, end: 0 });
-      await user.input(el, "{Delete}");
+      inputEvent.delete(el, 1, 1);
 
       expect(el).toMatchVisualSelection("|ello");
     });
 
-    it("deleteWordBackward: deletes word with Option+Backspace", async () => {
-      const user = userEvent.setup();
+    it("deleteWordBackward: deletes word with Option+Backspace", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -118,16 +99,13 @@ describe("userEvent.input", () => {
       );
 
       const el = container.querySelector("div")!;
-      expect(el).toBeTruthy();
-
       SelectionRange.apply(el, { start: 11, end: 11 });
-      await user.input(el, "{Alt>}{Backspace}{/Alt}");
+      inputEvent.deleteWord(el);
 
       expect(el).toMatchVisualSelection("Hello |");
     });
 
-    it("deleteWordForward: deletes word with Option+Delete", async () => {
-      const user = userEvent.setup();
+    it("deleteWordForward: deletes word with Option+Delete", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -135,16 +113,13 @@ describe("userEvent.input", () => {
       );
 
       const el = container.querySelector("div")!;
-      expect(el).toBeTruthy();
-
       SelectionRange.apply(el, { start: 0, end: 0 });
-      await user.input(el, "{Alt>}{Delete}{/Alt}");
+      inputEvent.deleteWord(el, 1, 1);
 
       expect(el).toMatchVisualSelection("| World");
     });
 
-    it("deleteSoftLineBackward: deletes to line start with Cmd+Backspace", async () => {
-      const user = userEvent.setup();
+    it("deleteSoftLineBackward: deletes to line start with Cmd+Backspace", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -152,16 +127,13 @@ describe("userEvent.input", () => {
       );
 
       const el = container.querySelector("div")!;
-      expect(el).toBeTruthy();
-
       SelectionRange.apply(el, { start: 11, end: 11 });
-      await user.input(el, "{Meta>}{Backspace}{/Meta}");
+      inputEvent.deleteLine(el);
 
       expect(el).toMatchVisualSelection("|");
     });
 
-    it("deleteSoftLineForward: deletes to line end with Ctrl+Delete", async () => {
-      const user = userEvent.setup();
+    it("deleteSoftLineForward: deletes to line end with Ctrl+Delete", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -169,16 +141,13 @@ describe("userEvent.input", () => {
       );
 
       const el = container.querySelector("div")!;
-      expect(el).toBeTruthy();
-
       SelectionRange.apply(el, { start: 0, end: 0 });
-      await user.input(el, "{Control>}{Delete}{/Control}");
+      inputEvent.deleteLine(el, 1, 1);
 
       expect(el).toMatchVisualSelection("|");
     });
 
-    it("respects defaultPrevented on beforeinput", async () => {
-      const user = userEvent.setup();
+    it("respects defaultPrevented on beforeinput", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -186,22 +155,17 @@ describe("userEvent.input", () => {
       );
 
       const el = container.querySelector("div")!;
-      expect(el).toBeTruthy();
-
-      el.addEventListener("beforeinput", (e) => {
-        e.preventDefault();
-      });
+      el.addEventListener("beforeinput", (e) => e.preventDefault());
 
       SelectionRange.apply(el, { start: 5, end: 5 });
-      await user.input(el, " World");
+      inputEvent.insert(el, " World");
 
       expect(el).toMatchVisualSelection("Hello|");
     });
   });
 
   describe("forwards events", () => {
-    it("insertText: forwards all events on typing", async () => {
-      const user = userEvent.setup();
+    it("insertText: forwards all events on typing", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -217,7 +181,7 @@ describe("userEvent.input", () => {
       el.addEventListener("keydown", keydown);
 
       SelectionRange.apply(el, { start: 5, end: 5 });
-      await user.input(el, "X");
+      inputEvent.insert(el, "X");
 
       expect(keydown).toHaveBeenCalledWith(
         expect.objectContaining({ key: "X" }),
@@ -228,8 +192,7 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    it("insertLineBreak: forwards all events on Shift+Enter", async () => {
-      const user = userEvent.setup();
+    it("insertLineBreak: forwards all events on Shift+Enter", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -245,7 +208,7 @@ describe("userEvent.input", () => {
       el.addEventListener("keydown", keydown);
 
       SelectionRange.apply(el, { start: 5, end: 5 });
-      await user.input(el, "{Shift>}{Enter}{/Shift}");
+      inputEvent.insertLine(el);
 
       expect(keydown).toHaveBeenCalledWith(
         expect.objectContaining({ key: "Enter", shiftKey: true }),
@@ -256,8 +219,7 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    it("deleteContentBackward: forwards all events on Backspace", async () => {
-      const user = userEvent.setup();
+    it("deleteContentBackward: forwards all events on Backspace", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -273,7 +235,7 @@ describe("userEvent.input", () => {
       el.addEventListener("keydown", keydown);
 
       SelectionRange.apply(el, { start: 5, end: 5 });
-      await user.input(el, "{Backspace}");
+      inputEvent.delete(el);
 
       expect(keydown).toHaveBeenCalledWith(
         expect.objectContaining({ key: "Backspace" }),
@@ -284,8 +246,7 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    it("deleteContentForward: forwards all events on Delete", async () => {
-      const user = userEvent.setup();
+    it("deleteContentForward: forwards all events on Delete", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -301,7 +262,7 @@ describe("userEvent.input", () => {
       el.addEventListener("keydown", keydown);
 
       SelectionRange.apply(el, { start: 0, end: 0 });
-      await user.input(el, "{Delete}");
+      inputEvent.delete(el, 1, 1);
 
       expect(keydown).toHaveBeenCalledWith(
         expect.objectContaining({ key: "Delete" }),
@@ -312,8 +273,7 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    it("deleteWordBackward: forwards all events on Option+Backspace", async () => {
-      const user = userEvent.setup();
+    it("deleteWordBackward: forwards all events on Option+Backspace", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -329,7 +289,7 @@ describe("userEvent.input", () => {
       el.addEventListener("keydown", keydown);
 
       SelectionRange.apply(el, { start: 11, end: 11 });
-      await user.input(el, "{Alt>}{Backspace}{/Alt}");
+      inputEvent.deleteWord(el);
 
       expect(keydown).toHaveBeenCalledWith(
         expect.objectContaining({ key: "Backspace", altKey: true }),
@@ -340,8 +300,7 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    it("deleteWordForward: forwards all events on Option+Delete", async () => {
-      const user = userEvent.setup();
+    it("deleteWordForward: forwards all events on Option+Delete", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -357,7 +316,7 @@ describe("userEvent.input", () => {
       el.addEventListener("keydown", keydown);
 
       SelectionRange.apply(el, { start: 0, end: 0 });
-      await user.input(el, "{Alt>}{Delete}{/Alt}");
+      inputEvent.deleteWord(el, 1, 1);
 
       expect(keydown).toHaveBeenCalledWith(
         expect.objectContaining({ key: "Delete", altKey: true }),
@@ -368,8 +327,7 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    it("deleteSoftLineBackward: forwards all events on Cmd+Backspace", async () => {
-      const user = userEvent.setup();
+    it("deleteSoftLineBackward: forwards all events on Cmd+Backspace", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -385,7 +343,7 @@ describe("userEvent.input", () => {
       el.addEventListener("keydown", keydown);
 
       SelectionRange.apply(el, { start: 11, end: 11 });
-      await user.input(el, "{Meta>}{Backspace}{/Meta}");
+      inputEvent.deleteLine(el);
 
       expect(keydown).toHaveBeenCalledWith(
         expect.objectContaining({ key: "Backspace", metaKey: true }),
@@ -396,8 +354,7 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalledTimes(1);
     });
 
-    it("deleteSoftLineForward: forwards all events on Ctrl+Delete", async () => {
-      const user = userEvent.setup();
+    it("deleteSoftLineForward: forwards all events on Ctrl+Delete", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -413,7 +370,7 @@ describe("userEvent.input", () => {
       el.addEventListener("keydown", keydown);
 
       SelectionRange.apply(el, { start: 0, end: 0 });
-      await user.input(el, "{Control>}{Delete}{/Control}");
+      inputEvent.deleteLine(el, 1, 1);
 
       expect(keydown).toHaveBeenCalledWith(
         expect.objectContaining({ key: "Delete", ctrlKey: true }),
