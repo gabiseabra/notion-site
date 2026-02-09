@@ -2,6 +2,7 @@ import { Notion } from "@notion-site/common/utils/notion/index.js";
 import * as env from "../../../env.js";
 import { ContentEditor } from "../editor/types.js";
 import { composePlugins } from "./compose-plugins.js";
+import { useAutoCommitPlugin } from "./use-auto-commit-plugin.js";
 import { useBlockMutationPlugin } from "./use-block-mutation-plugin.js";
 import { useBlockNavigationPlugin } from "./use-block-navigation-plugin.js";
 import { useHistoryPlugin } from "./use-history-plugin.js";
@@ -37,7 +38,7 @@ export const useNotionPlugin = (
         console.info(event.eventType, event.detail, event.editor);
     }),
     useSetupPlugin,
-    // useAutoCommitPlugin(600),
+    useAutoCommitPlugin(600),
     useHistoryPlugin,
     useInlineMutationPlugin({
       multiline: options.multiline,
