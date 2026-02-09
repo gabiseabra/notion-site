@@ -6,7 +6,9 @@ import { SelectionRange } from "../utils/selection-range.js";
 import { SpliceRange } from "../utils/splice-range.js";
 
 export function setupUserEvent(options?: { fakeTimers?: boolean }) {
-  const user = userEvent.setup();
+  const user = userEvent.setup({
+    ...(options?.fakeTimers ? { advanceTimers: jest.advanceTimersByTime } : {}),
+  });
   const proxyDom = new JSDOM("<!DOCTYPE html><html><body></body></html>");
   const proxyDoc = proxyDom.window.document;
   const proxyUser = userEvent.setup({
@@ -68,7 +70,7 @@ async function forwardInputEvents(
   element: HTMLElement,
   act: (proxy: HTMLElement, user: UserEvent) => Promise<void>,
 ) {
-  const proxy = user.proxy.doc.createElement("input");
+  const proxy = user.proxy.doc.createElement("textarea");
   user.proxy.doc.body.appendChild(proxy);
 
   // Forward events from proxy to target
