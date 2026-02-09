@@ -1,25 +1,34 @@
-import {
-  parseSelectionRange,
-  renderSelectionRange,
-} from "./expect-visual-selection.js";
-
 describe("expect-visual-selection", () => {
-  it("round-trips visual selection", () => {
-    for (const input of ["he[ll]o", "hell|o", "|hello", "[hello]", "hello|"]) {
-      const parsed = parseSelectionRange(input);
-      const rendered = renderSelectionRange(parsed.text, parsed.selection);
-      expect(rendered).toBe(input);
-    }
+  it("matches collapsed selection at various positions", () => {
+    expect({
+      text: "hello",
+      selection: { start: 0, end: 0 },
+    }).toMatchVisualSelection("|hello");
+    expect({
+      text: "hello",
+      selection: { start: 4, end: 4 },
+    }).toMatchVisualSelection("hell|o");
+    expect({
+      text: "hello",
+      selection: { start: 5, end: 5 },
+    }).toMatchVisualSelection("hello|");
   });
 
-  it("parses bracket selection with exclusive end", () => {
-    expect(parseSelectionRange("he[ll]o")).toEqual({
+  it("matches non-collapsed selection with brackets", () => {
+    expect({
       text: "hello",
       selection: { start: 2, end: 4 },
-    });
+    }).toMatchVisualSelection("he[ll]o");
+    expect({
+      text: "hello",
+      selection: { start: 0, end: 5 },
+    }).toMatchVisualSelection("[hello]");
   });
 
   it("renders exclusive-end selection with brackets", () => {
-    expect(renderSelectionRange("hello", { start: 2, end: 4 })).toBe("he[ll]o");
+    expect({
+      text: "hello",
+      selection: { start: 2, end: 4 },
+    }).toMatchVisualSelection("he[ll]o");
   });
 });

@@ -3,11 +3,42 @@ import type { MatcherFunction } from "expect";
 import z from "zod";
 import { SelectionRange } from "../utils/selection-range.js";
 
-/** @internal */
-export function renderSelectionRange(
-  text: string,
-  selection: SelectionRange,
-): string {
+const toMatchVisualSelection: MatcherFunction<[expected: string]> = function (
+  actual,
+  expected,
+) {
+  const candidate = parseMatcherInput(actual);
+  const rendered = renderSelectionRange(candidate.text, candidate.selection);
+  const pass = rendered === expected;
+
+  return {
+    pass,
+    message: () =>
+      pass
+        ? `expected ${this.utils.printReceived(rendered)} not to equal ${this.utils.printExpected(expected)}`
+        : `expected ${this.utils.printReceived(rendered)} to equal ${this.utils.printExpected(expected)}`,
+  };
+};
+
+export const expectSelectionRange = {
+  toMatchVisualSelection,
+};
+
+declare global {
+  namespace jest {
+    interface AsymmetricMatchers {
+      toMatchVisualSelection(expected: string): void;
+    }
+
+    interface Matchers<R> {
+      toMatchVisualSelection(expected: string): R;
+    }
+  }
+}
+
+/** Internals */
+
+function renderSelectionRange(text: string, selection: SelectionRange): string {
   const start = selection.start;
   const end = selection.end;
 
@@ -18,8 +49,7 @@ export function renderSelectionRange(
   return `${text.slice(0, start)}[${text.slice(start, end)}]${text.slice(end)}`;
 }
 
-/** @internal */
-export function parseSelectionRange(input: string): {
+function parseSelectionRange(input: string): {
   text: string;
   selection: SelectionRange;
 } {
@@ -70,37 +100,4 @@ function parseMatcherInput(actual: unknown) {
   throw new TypeError(
     "toRenderSelectionAs expects HTMLElement | { text: string; selection: SelectionRange }",
   );
-}
-
-const toMatchVisualSelection: MatcherFunction<[expected: string]> = function (
-  actual,
-  expected,
-) {
-  const candidate = parseMatcherInput(actual);
-  const rendered = renderSelectionRange(candidate.text, candidate.selection);
-  const pass = rendered === expected;
-
-  return {
-    pass,
-    message: () =>
-      pass
-        ? `expected ${this.utils.printReceived(rendered)} not to equal ${this.utils.printExpected(expected)}`
-        : `expected ${this.utils.printReceived(rendered)} to equal ${this.utils.printExpected(expected)}`,
-  };
-};
-
-export const expectSelectionRange = {
-  toMatchVisualSelection,
-};
-
-declare global {
-  namespace jest {
-    interface AsymmetricMatchers {
-      toMatchVisualSelection(expected: string): void;
-    }
-
-    interface Matchers<R> {
-      toMatchVisualSelection(expected: string): R;
-    }
-  }
 }
