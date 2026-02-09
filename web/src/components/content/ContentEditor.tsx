@@ -8,19 +8,20 @@ import { EditorEvent } from "./editor/editor-event.js";
 import { ContentEditor as TContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
 
-export type { TContentEditor };
-
-type ContentEditorProps = {
-  ref?: Ref<TContentEditor<Notion.Block> | null>;
-  value: Notion.Block[];
-  onChange: (block: Notion.Block[]) => void;
-};
+export namespace ContentEditor {
+  export type Editor = TContentEditor<Notion.Block>;
+  export type Props = {
+    ref?: Ref<TContentEditor<Notion.Block> | null>;
+    value: Notion.Block[];
+    onChange: (block: Notion.Block[]) => void;
+  };
+}
 
 export const ContentEditor = memo(function ContentEditor({
   ref,
   value: initialValue,
   onChange,
-}: ContentEditorProps) {
+}: ContentEditor.Props) {
   const { editor, editable } = useContentEditor({
     initialValue,
     plugin: useNotionPlugin,

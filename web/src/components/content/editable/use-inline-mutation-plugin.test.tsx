@@ -7,13 +7,13 @@ import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { render } from "@testing-library/react";
 import { act, RefObject } from "react";
 import { setupUserEvent } from "../../../test-utils/user-event.js";
-import { ContentEditor, TContentEditor } from "../ContentEditor.js";
+import { ContentEditor } from "../ContentEditor.js";
 
 describe("useInlineMutationPlugin", () => {
   it("handles typing sequence", async () => {
     const user = setupUserEvent();
 
-    const editorRef: RefObject<TContentEditor<Notion.Block> | null> = {
+    const editorRef: RefObject<ContentEditor.Editor | null> = {
       current: null,
     };
 

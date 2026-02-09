@@ -1,10 +1,7 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { a, p, span } from "@notion-site/common/utils/notion/wip.js";
 import { useLocalStorage } from "usehooks-ts";
-import {
-  ContentEditor,
-  TContentEditor,
-} from "../components/content/ContentEditor.js";
+import { ContentEditor } from "../components/content/ContentEditor.js";
 import { Favicon } from "../components/display/Favicon.js";
 import { Icon } from "../components/display/Icon.js";
 import { Text } from "../components/display/Text.js";
@@ -14,7 +11,7 @@ export const path = "/editor";
 
 declare global {
   interface Window {
-    editor?: TContentEditor<Notion.Block>;
+    editor?: ContentEditor.Editor;
   }
 }
 
