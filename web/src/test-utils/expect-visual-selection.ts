@@ -49,33 +49,6 @@ function renderSelectionRange(text: string, selection: SelectionRange): string {
   return `${text.slice(0, start)}[${text.slice(start, end)}]${text.slice(end)}`;
 }
 
-function parseSelectionRange(input: string): {
-  text: string;
-  selection: SelectionRange;
-} {
-  const caret = input.indexOf("|");
-  if (caret !== -1) {
-    return {
-      text: input.slice(0, caret) + input.slice(caret + 1),
-      selection: { start: caret, end: caret },
-    };
-  }
-
-  const open = input.indexOf("[");
-  const close = input.indexOf("]");
-  if (open !== -1 && close !== -1 && close > open) {
-    return {
-      text:
-        input.slice(0, open) +
-        input.slice(open + 1, close) +
-        input.slice(close + 1),
-      selection: { start: open, end: close - 1 },
-    };
-  }
-
-  throw new Error(`Invalid visual selection string: ${input}`);
-}
-
 function parseMatcherInput(actual: unknown) {
   if (actual instanceof HTMLElement) {
     return {
