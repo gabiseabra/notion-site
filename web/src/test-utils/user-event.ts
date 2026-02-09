@@ -2,6 +2,7 @@ import { never } from "@notion-site/common/utils/error.js";
 import { hash } from "@notion-site/common/utils/hash.js";
 import { userEvent as _userEvent } from "@testing-library/user-event";
 import { JSDOM } from "jsdom";
+import { RefObject } from "react";
 import { SelectionRange } from "../utils/selection-range.js";
 import { SpliceRange } from "../utils/splice-range.js";
 
@@ -79,6 +80,12 @@ async function forwardInputEvents(
   const proxy = user.proxy.doc.createElement("textarea");
   user.proxy.doc.body.appendChild(proxy);
 
+  const keydownModifiers: RefObject<{
+    altKey: boolean;
+    metaKey: boolean;
+    ctrlKey: boolean;
+  } | null> = { current: null };
+
   // Forward events from proxy to target
   for (const [eventType, EventClass] of [
     ["beforeinput", InputEvent],
@@ -89,7 +96,15 @@ async function forwardInputEvents(
       element,
       proxy,
       eventType,
-      (e) => {
+      (_e) => {
+        // Track keydown modifiers for inputType patching
+        if (isEventType("keydown", _e)) {
+          keydownModifiers.current = {
+            altKey: _e.altKey,
+            metaKey: _e.metaKey,
+            ctrlKey: _e.ctrlKey,
+          };
+        }
         // Copy selection from proxy to target before dispatching
         SelectionRange.applyMaybe(element, SelectionRange.read(proxy));
 
@@ -102,21 +117,46 @@ async function forwardInputEvents(
           );
         }
 
-        return new EventClass(e.type, e);
+        // Patch inputType for word/line delete based on modifier keys
+        if (keydownModifiers.current && isEventType("beforeinput", _e)) {
+          return new InputEvent(_e.type, {
+            inputType: getPatchedInputType(
+              _e.inputType,
+              keydownModifiers.current,
+            ),
+            data: _e.data,
+            dataTransfer: _e.dataTransfer,
+            isComposing: _e.isComposing,
+            detail: _e.detail,
+          });
+        } else {
+          return new EventClass(_e.type, _e);
+        }
       },
-      (e) => {
+      (e, _e) => {
         // process beforeinput to apply text insertions / deletions to content-editable element
-        if (!(e instanceof InputEvent) || e.defaultPrevented) return;
+        if (!isEventType("beforeinput", e) || e.defaultPrevented) return;
         const selection = SelectionRange.read(proxy);
         const spliceParams =
           selection && SpliceRange.fromInputEvent(e, proxy.value, selection);
-        if (spliceParams) {
-          element.innerHTML = spliceElementText(
-            element,
-            spliceParams.offset,
-            spliceParams.deleteCount,
-            spliceParams.insert,
-          ).innerHTML;
+
+        if (!spliceParams) return;
+
+        element.innerHTML = spliceElementText(
+          element,
+          spliceParams.offset,
+          spliceParams.deleteCount,
+          spliceParams.insert,
+        ).innerHTML;
+        // testing-library doesn't handle word/line delete, so we need to apply the correct
+        // splice to the proxy in this case too
+        if (spliceParams.deleteCount > 1 && isWordOrLineDelete(e.inputType)) {
+          proxy.value = SpliceRange.apply(proxy.value, spliceParams);
+          SelectionRange.apply(
+            proxy,
+            SpliceRange.toSelectionRange(spliceParams, 1),
+          );
+          _e.preventDefault();
         }
       },
     );
@@ -139,12 +179,15 @@ function forwardEvent<TEvent extends keyof HTMLElementEventMap>(
   source: HTMLElement,
   eventType: TEvent,
   map: (e: HTMLElementEventMap[TEvent]) => HTMLElementEventMap[TEvent],
-  post?: (e: HTMLElementEventMap[TEvent], result: boolean | undefined) => void,
+  post?: (
+    e: HTMLElementEventMap[TEvent],
+    proxy: HTMLElementEventMap[TEvent],
+  ) => void,
 ) {
   source.addEventListener(eventType, (_e) => {
     const e = map(_e);
 
-    const result = target.dispatchEvent(
+    target.dispatchEvent(
       Object.defineProperties(e, {
         target: {
           get() {
@@ -158,8 +201,40 @@ function forwardEvent<TEvent extends keyof HTMLElementEventMap>(
       _e.preventDefault();
     }
 
-    post?.(e, result);
+    post?.(e, _e);
   });
+}
+
+/** Helper guard that works with non-global instances of dom (instanceof doesn't) */
+function isEventType<T extends keyof HTMLElementEventMap>(
+  type: T,
+  event: Event,
+): event is HTMLElementEventMap[T] {
+  return event.type === type;
+}
+
+function getPatchedInputType(
+  inputType: string,
+  modifiers: { altKey: boolean; metaKey: boolean; ctrlKey: boolean },
+): string {
+  if (inputType === "deleteContentBackward") {
+    if (modifiers.metaKey) return "deleteSoftLineBackward";
+    if (modifiers.altKey) return "deleteWordBackward";
+  }
+  if (inputType === "deleteContentForward") {
+    if (modifiers.altKey) return "deleteWordForward";
+    if (modifiers.ctrlKey) return "deleteSoftLineForward";
+  }
+  return inputType;
+}
+
+function isWordOrLineDelete(inputType: string): boolean {
+  return (
+    inputType === "deleteWordBackward" ||
+    inputType === "deleteWordForward" ||
+    inputType === "deleteSoftLineBackward" ||
+    inputType === "deleteSoftLineForward"
+  );
 }
 
 /**

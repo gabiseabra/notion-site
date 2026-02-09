@@ -103,14 +103,7 @@ function apply(element: HTMLElement, selection: SelectionRange) {
   const start = resolveOffset(element, selection.start);
   const end = resolveOffset(element, selection.end);
 
-  if (!start || !end) {
-    console.warn("Failed to resolve selection target text node.", element, {
-      resolved: { start, end },
-      target: selection,
-      textContent: element.textContent,
-    });
-    return;
-  }
+  if (!start || !end) return;
 
   const r = doc.createRange();
   r.setStart(start.node, start.offset);
@@ -299,7 +292,7 @@ function resolveOffset(
     remaining -= node.data.length;
   }
 
-  console.warn("Offset could not be mapped to any text node.", element, {
+  console.warn("Offset could not be mapped to any text node.", {
     offset,
     textContent: element.textContent,
     max: maxOffset(element),

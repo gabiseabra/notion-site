@@ -109,8 +109,7 @@ describe("userEvent.input", () => {
       expect(el).toMatchVisualSelection("|ello");
     });
 
-    // todo: fix deleteWordBackward
-    it.skip("deleteWordBackward: deletes word with Option+Backspace", async () => {
+    it("deleteWordBackward: deletes word with Option+Backspace", async () => {
       const user = userEvent.setup();
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
@@ -127,8 +126,7 @@ describe("userEvent.input", () => {
       expect(el).toMatchVisualSelection("Hello |");
     });
 
-    // todo: fix deleteWordForward
-    it.skip("deleteWordForward: deletes word with Option+Delete", async () => {
+    it("deleteWordForward: deletes word with Option+Delete", async () => {
       const user = userEvent.setup();
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
@@ -145,8 +143,7 @@ describe("userEvent.input", () => {
       expect(el).toMatchVisualSelection("| World");
     });
 
-    // todo: fix deleteSoftLineBackward
-    it.skip("deleteSoftLineBackward: deletes to line start with Cmd+Backspace", async () => {
+    it("deleteSoftLineBackward: deletes to line start with Cmd+Backspace", async () => {
       const user = userEvent.setup();
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
@@ -163,7 +160,6 @@ describe("userEvent.input", () => {
       expect(el).toMatchVisualSelection("|");
     });
 
-    // todo: fix deleteSoftLineForward
     it.skip("deleteSoftLineForward: deletes to line end with Ctrl+K", async () => {
       const user = userEvent.setup();
       const { container } = render(
@@ -316,7 +312,6 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    // todo: fix deleteWordBackward
     it.skip("deleteWordBackward: forwards all events on Option+Backspace", async () => {
       const user = userEvent.setup();
       const { container } = render(
@@ -345,7 +340,6 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    // todo: fix deleteWordForward
     it.skip("deleteWordForward: forwards all events on Option+Delete", async () => {
       const user = userEvent.setup();
       const { container } = render(
@@ -374,7 +368,6 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    // todo: fix deleteSoftLineBackward
     it.skip("deleteSoftLineBackward: forwards all events on Cmd+Backspace", async () => {
       const user = userEvent.setup();
       const { container } = render(
@@ -403,7 +396,6 @@ describe("userEvent.input", () => {
       expect(input).toHaveBeenCalled();
     });
 
-    // todo: fix deleteSoftLineForward
     it.skip("deleteSoftLineForward: forwards all events on Ctrl+K", async () => {
       const user = userEvent.setup();
       const { container } = render(
