@@ -5,12 +5,13 @@ import { JSDOM } from "jsdom";
 import { SelectionRange } from "../utils/selection-range.js";
 import { SpliceRange } from "../utils/splice-range.js";
 
-export function setupUserEvent() {
+export function setupUserEvent(options?: { fakeTimers?: boolean }) {
   const user = userEvent.setup();
   const proxyDom = new JSDOM("<!DOCTYPE html><html><body></body></html>");
   const proxyDoc = proxyDom.window.document;
   const proxyUser = userEvent.setup({
     document: proxyDoc,
+    ...(options?.fakeTimers ? { advanceTimers: jest.advanceTimersByTime } : {}),
   });
 
   const baseUser: UserEvent = {

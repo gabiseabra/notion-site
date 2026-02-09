@@ -1,7 +1,9 @@
 import { useCallback } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
+import { EditorEvent } from "../editor/editor-event.js";
 import { EditorCommand } from "../editor/editor-history.js";
+import { AnyBlock } from "../editor/types.js";
 import { AnyContentEditorPlugin } from "./types.js";
 
 /**
@@ -15,10 +17,8 @@ import { AnyContentEditorPlugin } from "./types.js";
  * | `Ctrl+Y` | `Cmd+Y`: Redo (alternative)
  */
 export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
-  useEventListener(
-    editor.bus,
-    "postcommit",
-    useCallback(({ editor }) => {
+  const restoreSelection = useCallback(
+    <TBlock extends AnyBlock>({ editor }: EditorEvent<TBlock>) => {
       const direction = editor.history.direction;
       const cmd = editor.history.command;
       if (!cmd) return;
@@ -47,8 +47,12 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
         return;
 
       SelectionRange.apply(element, selection);
-    }, []),
+    },
+    [],
   );
+
+  useEventListener(editor.bus, "postcommit", restoreSelection);
+  useEventListener(editor.bus, "reset", restoreSelection);
 
   return () => ({
     onKeyDown(e) {

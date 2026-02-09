@@ -1,8 +1,5 @@
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
-import {
-  EditorHistory,
-  type EditorCommandCmd,
-} from "./editor-history.js";
+import { EditorHistory, type EditorCommandCmd } from "./editor-history.js";
 
 type Block = { id: string; text: string };
 
