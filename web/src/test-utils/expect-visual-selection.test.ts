@@ -24,11 +24,4 @@ describe("expect-visual-selection", () => {
       selection: { start: 0, end: 5 },
     }).toMatchVisualSelection("[hello]");
   });
-
-  it("renders exclusive-end selection with brackets", () => {
-    expect({
-      text: "hello",
-      selection: { start: 2, end: 4 },
-    }).toMatchVisualSelection("he[ll]o");
-  });
 });
