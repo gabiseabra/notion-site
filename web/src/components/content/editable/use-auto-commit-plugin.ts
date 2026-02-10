@@ -19,7 +19,7 @@ export const useAutoCommitPlugin =
     };
 
     return () => ({
-      onKeyDown() {
+      onInput() {
         scheduleCommit();
       },
     });
