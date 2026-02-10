@@ -4,6 +4,56 @@
 import { SpliceRange } from "./splice-range.js";
 
 describe("SpliceRange", () => {
+  describe("SpliceRange.fromSelectionRange & SpliceRange.toSelectionRange", () => {
+    it("renders the same caret position after roundtrip", () => {
+      expect({
+        text: "hello",
+        selection: SpliceRange.toSelectionRange(
+          SpliceRange.fromSelectionRange({ start: 2, end: 2 }),
+          1,
+        ),
+      }).toMatchVisualSelection("he|llo");
+      expect({
+        text: "hello",
+        selection: SpliceRange.toSelectionRange(
+          SpliceRange.fromSelectionRange({ start: 2, end: 2 }),
+          -1,
+        ),
+      }).toMatchVisualSelection("he|llo");
+    });
+
+    it("places caret after inserted text on redo", () => {
+      expect({
+        text: SpliceRange.apply("hello", {
+          offset: 2,
+          deleteCount: 0,
+          insert: "X",
+        }),
+        selection: SpliceRange.toSelectionRange(
+          {
+            offset: 2,
+            deleteCount: 0,
+            insert: "X",
+          },
+          1,
+        ),
+      }).toMatchVisualSelection("heX|llo");
+    });
+
+    it("places caret at deleted selection start on redo", () => {
+      expect({
+        text: SpliceRange.apply(
+          "hello",
+          SpliceRange.fromSelectionRange({ start: 2, end: 4 }),
+        ),
+        selection: SpliceRange.toSelectionRange(
+          SpliceRange.fromSelectionRange({ start: 2, end: 4 }),
+          1,
+        ),
+      }).toMatchVisualSelection("he|o");
+    });
+  });
+
   describe("SpliceRange.fromInputEvent", () => {
     it("deletes word backward from caret", () => {
       expect(
@@ -150,53 +200,131 @@ describe("SpliceRange", () => {
     });
   });
 
-  describe("SpliceRange.fromSelectionRange & SpliceRange.toSelectionRange", () => {
-    it("renders the same caret position after roundtrip", () => {
-      expect({
-        text: "hello",
-        selection: SpliceRange.toSelectionRange(
-          SpliceRange.fromSelectionRange({ start: 2, end: 2 }),
-          1,
-        ),
-      }).toMatchVisualSelection("he|llo");
-      expect({
-        text: "hello",
-        selection: SpliceRange.toSelectionRange(
-          SpliceRange.fromSelectionRange({ start: 2, end: 2 }),
-          -1,
-        ),
-      }).toMatchVisualSelection("he|llo");
+  describe("SpliceRange.applyToElement", () => {
+    it("inserts text at offset in plain text", () => {
+      const el = document.createElement("div");
+      el.textContent = "hello world";
+      SpliceRange.applyToElement(el, {
+        offset: 5,
+        deleteCount: 0,
+        insert: "!",
+      });
+      expect(el.textContent).toBe("hello! world");
     });
 
-    it("places caret after inserted text on redo", () => {
-      expect({
-        text: SpliceRange.apply("hello", {
-          offset: 2,
-          deleteCount: 0,
-          insert: "X",
-        }),
-        selection: SpliceRange.toSelectionRange(
-          {
-            offset: 2,
-            deleteCount: 0,
-            insert: "X",
-          },
-          1,
-        ),
-      }).toMatchVisualSelection("heX|llo");
+    it("deletes text at offset", () => {
+      const el = document.createElement("div");
+      el.textContent = "hello world";
+      SpliceRange.applyToElement(el, { offset: 5, deleteCount: 6, insert: "" });
+      expect(el.textContent).toBe("hello");
     });
 
-    it("places caret at deleted selection start on redo", () => {
-      expect({
-        text: SpliceRange.apply(
-          "hello",
-          SpliceRange.fromSelectionRange({ start: 2, end: 4 }),
-        ),
-        selection: SpliceRange.toSelectionRange(
-          SpliceRange.fromSelectionRange({ start: 2, end: 4 }),
-          1,
-        ),
-      }).toMatchVisualSelection("he|o");
+    it("replaces text at offset", () => {
+      const el = document.createElement("div");
+      el.textContent = "hello world";
+      SpliceRange.applyToElement(el, {
+        offset: 6,
+        deleteCount: 5,
+        insert: "there",
+      });
+      expect(el.textContent).toBe("hello there");
+    });
+
+    it("inserts inside inline element at text boundary", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "hello <b>world</b>";
+      SpliceRange.applyToElement(el, {
+        offset: 6,
+        deleteCount: 0,
+        insert: "X",
+      });
+      expect(el.innerHTML).toBe("hello <b>Xworld</b>");
+    });
+
+    it("inserts inside inline element at end boundary", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<b>hello</b> world";
+      SpliceRange.applyToElement(el, {
+        offset: 5,
+        deleteCount: 0,
+        insert: "X",
+      });
+      expect(el.innerHTML).toBe("<b>helloX</b> world");
+    });
+
+    it("inserts into right element with prefer=right", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<b>hello</b><i>world</i>";
+      SpliceRange.applyToElement(
+        el,
+        { offset: 5, deleteCount: 0, insert: " " },
+        "right",
+      );
+      expect(el.innerHTML).toBe("<b>hello</b><i> world</i>");
+    });
+
+    it("inserts into left element with prefer=left", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<b>hello</b><i>world</i>";
+      SpliceRange.applyToElement(
+        el,
+        { offset: 5, deleteCount: 0, insert: " " },
+        "left",
+      );
+      expect(el.innerHTML).toBe("<b>hello </b><i>world</i>");
+    });
+
+    it("deletes across inline element boundary", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "hello <b>world</b>!";
+      SpliceRange.applyToElement(el, { offset: 4, deleteCount: 6, insert: "" });
+      expect(el.textContent).toBe("helld!");
+    });
+  });
+
+  describe("SpliceRange.getElementBoundary", () => {
+    it("returns null inside text", () => {
+      const el = document.createElement("div");
+      el.textContent = "hello";
+      expect(SpliceRange.getElementBoundary(el, 2)).toBe(null);
+    });
+
+    it("returns null inside inline element", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<b>hello</b>";
+      expect(SpliceRange.getElementBoundary(el, 2)).toBe(null);
+    });
+
+    it("returns start at beginning of inline element", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "hello <b>world</b>";
+      const b = el.querySelector("b");
+      expect(SpliceRange.getElementBoundary(el, 6)).toEqual({
+        type: "start",
+        left: null,
+        right: b,
+      });
+    });
+
+    it("returns end at end of inline element", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<b>hello</b> world";
+      const b = el.querySelector("b");
+      expect(SpliceRange.getElementBoundary(el, 5)).toEqual({
+        type: "end",
+        left: b,
+        right: null,
+      });
+    });
+
+    it("returns between when between two inline elements", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<b>hello</b><i>world</i>";
+      expect(SpliceRange.getElementBoundary(el, 5)).toEqual({
+        type: "between",
+        left: el.querySelector("b"),
+        right: el.querySelector("i"),
+      });
     });
   });
 });

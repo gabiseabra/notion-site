@@ -12,6 +12,9 @@ const WORD_CHAR = /[\p{L}\p{N}_]/u;
 const WHITESPACE = /\s/;
 
 export const SpliceRange = {
+  applyToElement,
+  getElementBoundary,
+
   apply(text: string, { offset, deleteCount, insert }: SpliceRange) {
     const chars = [...text];
     chars.splice(offset, deleteCount, insert);
@@ -238,4 +241,108 @@ function isWordChar(ch: string): boolean {
 
 function isWhitespace(ch: string): boolean {
   return WHITESPACE.test(ch);
+}
+
+type DOMPosition = { node: Node; offset: number };
+
+export type ElementBoundary =
+  | { type: "start"; left: null; right: Element }
+  | { type: "end"; left: Element; right: null }
+  | { type: "between"; left: Element; right: Element };
+
+export function applyToElement(
+  element: HTMLElement,
+  { offset, deleteCount, insert }: SpliceRange,
+  prefer: "left" | "right" = "right",
+) {
+  const start = findPosition(element, offset, prefer);
+  const end =
+    deleteCount > 0
+      ? findPosition(element, offset + deleteCount, prefer)
+      : start;
+
+  const range = document.createRange();
+  range.setStart(start.node, start.offset);
+  range.setEnd(end.node, end.offset);
+  range.deleteContents();
+
+  if (insert) {
+    range.insertNode(document.createTextNode(insert));
+    range.commonAncestorContainer.normalize();
+  }
+}
+
+export function getElementBoundary(
+  element: HTMLElement,
+  offset: number,
+): ElementBoundary | null {
+  const texts = collectTextNodes(element);
+  let pos = 0;
+
+  for (let i = 0; i < texts.length; i++) {
+    const len = texts[i].textContent?.length ?? 0;
+    if (pos + len > offset) return null;
+    if (pos + len < offset) {
+      pos += len;
+      continue;
+    }
+
+    const left =
+      texts[i]?.parentElement !== element
+        ? (texts[i]?.parentElement ?? null)
+        : null;
+    const right =
+      texts[i + 1]?.parentElement !== element
+        ? (texts[i + 1]?.parentElement ?? null)
+        : null;
+
+    if (left && right) return { type: "between", left, right };
+    if (left) return { type: "end", left, right: null };
+    if (right) return { type: "start", left: null, right };
+    return null;
+  }
+
+  return null;
+}
+
+function findPosition(
+  element: HTMLElement,
+  offset: number,
+  prefer: "left" | "right",
+): DOMPosition {
+  const texts = collectTextNodes(element);
+  let pos = 0;
+
+  for (let i = 0; i < texts.length; i++) {
+    const node = texts[i];
+    const len = node.textContent?.length ?? 0;
+    const next = texts[i + 1];
+
+    if (pos + len > offset) {
+      return { node, offset: offset - pos };
+    }
+
+    if (pos + len === offset && next) {
+      const useNext =
+        prefer === "right"
+          ? next.parentNode !== element || node.parentNode === element
+          : next.parentNode !== element && node.parentNode === element;
+
+      return useNext ? { node: next, offset: 0 } : { node, offset: len };
+    }
+
+    pos += len;
+  }
+
+  const last = texts[texts.length - 1];
+  return last
+    ? { node: last, offset: last.textContent?.length ?? 0 }
+    : { node: element, offset: 0 };
+}
+
+function collectTextNodes(element: HTMLElement): Text[] {
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+  const nodes: Text[] = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+  return nodes;
 }
