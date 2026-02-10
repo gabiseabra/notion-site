@@ -4,7 +4,7 @@
 import { ElementBoundary } from "./element-boundary.js";
 
 describe("ElementBoundary", () => {
-  describe("ElementBoundary.get", () => {
+  describe("ElementBoundary.read", () => {
     it("returns null inside text", () => {
       const el = document.createElement("div");
       el.textContent = "hello";
