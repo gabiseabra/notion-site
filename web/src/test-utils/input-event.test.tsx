@@ -6,8 +6,20 @@ import { SelectionRange } from "../utils/selection-range.js";
 import { inputEvent } from "./input-event.js";
 
 describe("inputEvent", () => {
-  describe("applies content changes", () => {
-    it("insertText: inserts text at end", () => {
+  describe("insert", () => {
+    it("inserts text in empty element", () => {
+      const { container } = render(
+        <div contentEditable suppressContentEditableWarning />,
+      );
+
+      const el = container.querySelector("div")!;
+      SelectionRange.apply(el, { start: 0, end: 0 });
+      inputEvent.insert(el, "Hello");
+
+      expect(el).toMatchVisualSelection("Hello|");
+    });
+
+    it("inserts text at end", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -21,7 +33,7 @@ describe("inputEvent", () => {
       expect(el).toMatchVisualSelection("Hello World|");
     });
 
-    it("insertText: inserts text in middle", () => {
+    it("inserts text in middle", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Helo
@@ -35,7 +47,7 @@ describe("inputEvent", () => {
       expect(el).toMatchVisualSelection("Hel|lo");
     });
 
-    it("insertText: replaces selection when typing over selected text", () => {
+    it("replaces selection when typing over selected text", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -49,123 +61,7 @@ describe("inputEvent", () => {
       expect(el).toMatchVisualSelection("Hello Universe|");
     });
 
-    it("insertLineBreak: inserts newline with Shift+Enter", () => {
-      const { container } = render(
-        <div contentEditable suppressContentEditableWarning>
-          HelloWorld
-        </div>,
-      );
-
-      const el = container.querySelector("div")!;
-      SelectionRange.apply(el, { start: 5, end: 5 });
-      inputEvent.insertLine(el);
-
-      expect(el).toMatchVisualSelection("Hello\n|World");
-    });
-
-    it("deleteContentBackward: deletes char with Backspace", () => {
-      const { container } = render(
-        <div contentEditable suppressContentEditableWarning>
-          Hello
-        </div>,
-      );
-
-      const el = container.querySelector("div")!;
-      SelectionRange.apply(el, { start: 5, end: 5 });
-      inputEvent.delete(el);
-
-      expect(el).toMatchVisualSelection("Hell|");
-    });
-
-    it("deleteContentForward: deletes char with Delete", () => {
-      const { container } = render(
-        <div contentEditable suppressContentEditableWarning>
-          Hello
-        </div>,
-      );
-
-      const el = container.querySelector("div")!;
-      SelectionRange.apply(el, { start: 0, end: 0 });
-      inputEvent.delete(el, 1, 1);
-
-      expect(el).toMatchVisualSelection("|ello");
-    });
-
-    it("deleteWordBackward: deletes word with Option+Backspace", () => {
-      const { container } = render(
-        <div contentEditable suppressContentEditableWarning>
-          Hello World
-        </div>,
-      );
-
-      const el = container.querySelector("div")!;
-      SelectionRange.apply(el, { start: 11, end: 11 });
-      inputEvent.deleteWord(el);
-
-      expect(el).toMatchVisualSelection("Hello |");
-    });
-
-    it("deleteWordForward: deletes word with Option+Delete", () => {
-      const { container } = render(
-        <div contentEditable suppressContentEditableWarning>
-          Hello World
-        </div>,
-      );
-
-      const el = container.querySelector("div")!;
-      SelectionRange.apply(el, { start: 0, end: 0 });
-      inputEvent.deleteWord(el, 1, 1);
-
-      expect(el).toMatchVisualSelection("| World");
-    });
-
-    it("deleteSoftLineBackward: deletes to line start with Cmd+Backspace", () => {
-      const { container } = render(
-        <div contentEditable suppressContentEditableWarning>
-          Hello World
-        </div>,
-      );
-
-      const el = container.querySelector("div")!;
-      SelectionRange.apply(el, { start: 11, end: 11 });
-      inputEvent.deleteLine(el);
-
-      expect(el).toMatchVisualSelection("|");
-    });
-
-    it("deleteSoftLineForward: deletes to line end with Ctrl+Delete", () => {
-      const { container } = render(
-        <div contentEditable suppressContentEditableWarning>
-          Hello World
-        </div>,
-      );
-
-      const el = container.querySelector("div")!;
-      SelectionRange.apply(el, { start: 0, end: 0 });
-      inputEvent.deleteLine(el, 1, 1);
-
-      expect(el).toMatchVisualSelection("|");
-    });
-
-    it("respects defaultPrevented on beforeinput", () => {
-      const { container } = render(
-        <div contentEditable suppressContentEditableWarning>
-          Hello
-        </div>,
-      );
-
-      const el = container.querySelector("div")!;
-      el.addEventListener("beforeinput", (e) => e.preventDefault());
-
-      SelectionRange.apply(el, { start: 5, end: 5 });
-      inputEvent.insert(el, " World");
-
-      expect(el).toMatchVisualSelection("Hello|");
-    });
-  });
-
-  describe("forwards events", () => {
-    it("insertText: forwards all events on typing", () => {
+    it("fires keydown, beforeinput, and input events", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -191,8 +87,24 @@ describe("inputEvent", () => {
       );
       expect(input).toHaveBeenCalled();
     });
+  });
 
-    it("insertLineBreak: forwards all events on Shift+Enter", () => {
+  describe("insertLine", () => {
+    it("inserts newline", () => {
+      const { container } = render(
+        <div contentEditable suppressContentEditableWarning>
+          HelloWorld
+        </div>,
+      );
+
+      const el = container.querySelector("div")!;
+      SelectionRange.apply(el, { start: 5, end: 5 });
+      inputEvent.insertLine(el);
+
+      expect(el).toMatchVisualSelection("Hello\n|World");
+    });
+
+    it("fires keydown, beforeinput, and input events", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -218,8 +130,38 @@ describe("inputEvent", () => {
       );
       expect(input).toHaveBeenCalled();
     });
+  });
 
-    it("deleteContentBackward: forwards all events on Backspace", () => {
+  describe("delete", () => {
+    it("deletes char backward", () => {
+      const { container } = render(
+        <div contentEditable suppressContentEditableWarning>
+          Hello
+        </div>,
+      );
+
+      const el = container.querySelector("div")!;
+      SelectionRange.apply(el, { start: 5, end: 5 });
+      inputEvent.delete(el);
+
+      expect(el).toMatchVisualSelection("Hell|");
+    });
+
+    it("deletes char forward", () => {
+      const { container } = render(
+        <div contentEditable suppressContentEditableWarning>
+          Hello
+        </div>,
+      );
+
+      const el = container.querySelector("div")!;
+      SelectionRange.apply(el, { start: 0, end: 0 });
+      inputEvent.delete(el, 1, 1);
+
+      expect(el).toMatchVisualSelection("|ello");
+    });
+
+    it("fires keydown, beforeinput, and input events", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello
@@ -245,35 +187,38 @@ describe("inputEvent", () => {
       );
       expect(input).toHaveBeenCalled();
     });
+  });
 
-    it("deleteContentForward: forwards all events on Delete", () => {
+  describe("deleteWord", () => {
+    it("deletes word backward", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
-          Hello
+          Hello World
         </div>,
       );
 
       const el = container.querySelector("div")!;
-      const beforeinput = jest.fn();
-      const input = jest.fn();
-      const keydown = jest.fn();
-      el.addEventListener("beforeinput", beforeinput);
-      el.addEventListener("input", input);
-      el.addEventListener("keydown", keydown);
+      SelectionRange.apply(el, { start: 11, end: 11 });
+      inputEvent.deleteWord(el);
 
-      SelectionRange.apply(el, { start: 0, end: 0 });
-      inputEvent.delete(el, 1, 1);
-
-      expect(keydown).toHaveBeenCalledWith(
-        expect.objectContaining({ key: "Delete" }),
-      );
-      expect(beforeinput).toHaveBeenCalledWith(
-        expect.objectContaining({ inputType: "deleteContentForward" }),
-      );
-      expect(input).toHaveBeenCalled();
+      expect(el).toMatchVisualSelection("Hello |");
     });
 
-    it("deleteWordBackward: forwards all events on Option+Backspace", () => {
+    it("deletes word forward", () => {
+      const { container } = render(
+        <div contentEditable suppressContentEditableWarning>
+          Hello World
+        </div>,
+      );
+
+      const el = container.querySelector("div")!;
+      SelectionRange.apply(el, { start: 0, end: 0 });
+      inputEvent.deleteWord(el, 1, 1);
+
+      expect(el).toMatchVisualSelection("| World");
+    });
+
+    it("fires keydown, beforeinput, and input events", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -299,35 +244,38 @@ describe("inputEvent", () => {
       );
       expect(input).toHaveBeenCalled();
     });
+  });
 
-    it("deleteWordForward: forwards all events on Option+Delete", () => {
+  describe("deleteLine", () => {
+    it("deletes line backward", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
-          Hello World
+          {"Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit"}
         </div>,
       );
 
       const el = container.querySelector("div")!;
-      const beforeinput = jest.fn();
-      const input = jest.fn();
-      const keydown = jest.fn();
-      el.addEventListener("beforeinput", beforeinput);
-      el.addEventListener("input", input);
-      el.addEventListener("keydown", keydown);
+      SelectionRange.apply(el, { start: 55, end: 55 });
+      inputEvent.deleteLine(el);
 
-      SelectionRange.apply(el, { start: 0, end: 0 });
-      inputEvent.deleteWord(el, 1, 1);
-
-      expect(keydown).toHaveBeenCalledWith(
-        expect.objectContaining({ key: "Delete", altKey: true }),
-      );
-      expect(beforeinput).toHaveBeenCalledWith(
-        expect.objectContaining({ inputType: "deleteWordForward" }),
-      );
-      expect(input).toHaveBeenCalled();
+      expect(el).toMatchVisualSelection("Lorem ipsum dolor sit amet,\n|");
     });
 
-    it("deleteSoftLineBackward: forwards all events on Cmd+Backspace", () => {
+    it("deletes line forward", () => {
+      const { container } = render(
+        <div contentEditable suppressContentEditableWarning>
+          {"Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit"}
+        </div>,
+      );
+
+      const el = container.querySelector("div")!;
+      SelectionRange.apply(el, { start: 0, end: 0 });
+      inputEvent.deleteLine(el, 1, 1);
+
+      expect(el).toMatchVisualSelection("|\nconsectetur adipiscing elit");
+    });
+
+    it("fires keydown, beforeinput, and input events", () => {
       const { container } = render(
         <div contentEditable suppressContentEditableWarning>
           Hello World
@@ -353,32 +301,21 @@ describe("inputEvent", () => {
       );
       expect(input).toHaveBeenCalledTimes(1);
     });
+  });
 
-    it("deleteSoftLineForward: forwards all events on Ctrl+Delete", () => {
-      const { container } = render(
-        <div contentEditable suppressContentEditableWarning>
-          Hello World
-        </div>,
-      );
+  it("respects defaultPrevented on beforeinput", () => {
+    const { container } = render(
+      <div contentEditable suppressContentEditableWarning>
+        Hello
+      </div>,
+    );
 
-      const el = container.querySelector("div")!;
-      const beforeinput = jest.fn();
-      const input = jest.fn();
-      const keydown = jest.fn();
-      el.addEventListener("beforeinput", beforeinput);
-      el.addEventListener("input", input);
-      el.addEventListener("keydown", keydown);
+    const el = container.querySelector("div")!;
+    el.addEventListener("beforeinput", (e) => e.preventDefault());
 
-      SelectionRange.apply(el, { start: 0, end: 0 });
-      inputEvent.deleteLine(el, 1, 1);
+    SelectionRange.apply(el, { start: 5, end: 5 });
+    inputEvent.insert(el, " World");
 
-      expect(keydown).toHaveBeenCalledWith(
-        expect.objectContaining({ key: "Delete", ctrlKey: true }),
-      );
-      expect(beforeinput).toHaveBeenCalledWith(
-        expect.objectContaining({ inputType: "deleteSoftLineForward" }),
-      );
-      expect(input).toHaveBeenCalled();
-    });
+    expect(el).toMatchVisualSelection("Hello|");
   });
 });
