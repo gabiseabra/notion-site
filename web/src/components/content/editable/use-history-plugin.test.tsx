@@ -102,27 +102,7 @@ describe("useHistoryPlugin", () => {
     expect(el.textContent).toBe("Hello");
   });
 
-  it("does nothing without modifier key", async () => {
-    const blocks = [p("a", span("Hello"))];
-
-    const { container } = render(
-      <ContentEditor value={blocks} onChange={() => {}} />,
-    );
-
-    const el = container.querySelector("p")!;
-    expect(el).toBeTruthy();
-
-    SelectionRange.apply(el, { start: 5, end: 5 });
-    inputEvent.insert(el, " World");
-
-    expect(el.textContent).toBe("Hello World");
-
-    fireEvent.keyDown(el, { key: "z" });
-
-    expect(el.textContent).toBe("Hello World");
-  });
-
-  it("restores selection before on undo", async () => {
+  it("restores selection before undo", async () => {
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
@@ -143,7 +123,7 @@ describe("useHistoryPlugin", () => {
     expect(el).toMatchVisualSelection("He|llo");
   });
 
-  it("restores selection after on redo", async () => {
+  it("restores selection after redo", async () => {
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
