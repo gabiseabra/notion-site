@@ -105,11 +105,12 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
           selection,
         );
 
-        if (spliceRange?.insert === "\n" && !multiline) {
+        if (!spliceRange) return;
+        // skip newline if multiline is disabled
+        if (spliceRange.insert === "\n" && !multiline) {
           e.preventDefault();
           return;
         }
-        if (!spliceRange) return;
 
         const currentBlock =
           pendingRef.current?.block.id === block.id
@@ -133,3 +134,5 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
       }
     };
   });
+
+function shouldCommit(element: HTMLElement, spliceRange: SpliceRange) {}

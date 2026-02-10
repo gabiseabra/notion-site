@@ -13,7 +13,6 @@ const WHITESPACE = /\s/;
 
 export const SpliceRange = {
   applyToElement,
-  getElementBoundary,
 
   apply(text: string, { offset, deleteCount, insert }: SpliceRange) {
     const chars = [...text];
@@ -245,11 +244,11 @@ function isWhitespace(ch: string): boolean {
 
 type DOMPosition = { node: Node; offset: number };
 
-export type ElementBoundary =
-  | { type: "start"; left: null; right: Element }
-  | { type: "end"; left: Element; right: null }
-  | { type: "between"; left: Element; right: Element };
-
+/**
+ * Applies a splice range to an element's DOM, preserving inline element structure.
+ * At a text/element boundary, inserts inside the element.
+ * At a boundary between two elements, `prefer` determines which element to insert into.
+ */
 export function applyToElement(
   element: HTMLElement,
   { offset, deleteCount, insert }: SpliceRange,
@@ -270,39 +269,6 @@ export function applyToElement(
     range.insertNode(document.createTextNode(insert));
     range.commonAncestorContainer.normalize();
   }
-}
-
-export function getElementBoundary(
-  element: HTMLElement,
-  offset: number,
-): ElementBoundary | null {
-  const texts = collectTextNodes(element);
-  let pos = 0;
-
-  for (let i = 0; i < texts.length; i++) {
-    const len = texts[i].textContent?.length ?? 0;
-    if (pos + len > offset) return null;
-    if (pos + len < offset) {
-      pos += len;
-      continue;
-    }
-
-    const left =
-      texts[i]?.parentElement !== element
-        ? (texts[i]?.parentElement ?? null)
-        : null;
-    const right =
-      texts[i + 1]?.parentElement !== element
-        ? (texts[i + 1]?.parentElement ?? null)
-        : null;
-
-    if (left && right) return { type: "between", left, right };
-    if (left) return { type: "end", left, right: null };
-    if (right) return { type: "start", left: null, right };
-    return null;
-  }
-
-  return null;
 }
 
 function findPosition(
