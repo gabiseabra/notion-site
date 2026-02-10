@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { isEventFromMatchingDescendant } from "../../../utils/event.js";
+import { Event } from "../../../utils/event.js";
 import styles from "./ResourceList.module.scss";
 
 export function ResourceList<T>({
@@ -31,7 +31,7 @@ export function ResourceList<T>({
           onClick={
             onClick &&
             ((e) => {
-              if (!isEventFromMatchingDescendant(e, "a")) {
+              if (!Event.isFromMatchingDescendant(e, "a")) {
                 onClick(item);
               }
             })

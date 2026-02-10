@@ -1,3 +1,5 @@
+import { Element } from "./element.js";
+
 /** Text offsets within an element; end equals start for a collapsed caret. */
 export type SelectionRange = { start: number; end: number };
 
@@ -5,7 +7,7 @@ type Direction = "up" | "down";
 
 export const SelectionRange = {
   isCollapsed(selection: SelectionRange) {
-    return isCollapsed(selection);
+    return selection.start === selection.end;
   },
 
   shift(range: SelectionRange, delta: number): SelectionRange {
@@ -28,8 +30,8 @@ export const SelectionRange = {
 function read(element: HTMLElement): SelectionRange | null {
   // Inputs are pretty straightforward
   if (
-    isElementWithTag(element, "input") ||
-    isElementWithTag(element, "textarea")
+    Element.isElementWithTag(element, "input") ||
+    Element.isElementWithTag(element, "textarea")
   ) {
     if (element.selectionStart === null) return null;
     const start = element.selectionStart;
@@ -81,8 +83,8 @@ function apply(element: HTMLElement, selection: SelectionRange) {
     doc.defaultView || (doc as { parentWindow?: Window }).parentWindow;
 
   if (
-    isElementWithTag(element, "input") ||
-    isElementWithTag(element, "textarea")
+    Element.isElementWithTag(element, "input") ||
+    Element.isElementWithTag(element, "textarea")
   ) {
     element.setSelectionRange(selection.start, selection.end);
     return;
@@ -100,8 +102,8 @@ function apply(element: HTMLElement, selection: SelectionRange) {
     return;
   }
 
-  const start = resolveOffset(element, selection.start);
-  const end = resolveOffset(element, selection.end);
+  const start = Element.findNodeAt(element, selection.start);
+  const end = Element.findNodeAt(element, selection.end);
 
   if (!start || !end) return;
 
@@ -191,10 +193,6 @@ function moveVertically(
   };
 }
 
-function isCollapsed(selection: SelectionRange) {
-  return selection.start === selection.end;
-}
-
 /** Internals */
 
 /** Line rectangles for the element's text layout. */
@@ -269,41 +267,4 @@ function getTextUpToNode(
   pre.selectNodeContents(element);
   pre.setEnd(node, offset);
   return pre.toString();
-}
-
-/** Resolve a text offset to a concrete text node and node offset. */
-function resolveOffset(
-  element: HTMLElement,
-  offset: number,
-): { node: Text; offset: number } | null {
-  const doc = element.ownerDocument;
-
-  const walker = doc.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-  let remaining = offset;
-
-  while (walker.nextNode()) {
-    const node = walker.currentNode;
-    if (!(node instanceof Text)) continue;
-
-    if (remaining <= node.data.length) {
-      return { node, offset: remaining };
-    }
-
-    remaining -= node.data.length;
-  }
-
-  console.warn("Offset could not be mapped to any text node.", {
-    offset,
-    textContent: element.textContent,
-    max: maxOffset(element),
-  });
-  return null;
-}
-
-/** Helper guard that works with non-global instances of dom (instanceof doesn't) */
-function isElementWithTag<T extends keyof HTMLElementTagNameMap>(
-  element: HTMLElement,
-  tag: T,
-): element is HTMLElementTagNameMap[T] {
-  return element.tagName === tag.toUpperCase();
 }

@@ -1,3 +1,5 @@
+import { Element } from "./element.js";
+
 /**
  * Describes a text offset position at the edge of an inline element.
  * - `start`: entering an element (element is on the right)
@@ -18,7 +20,7 @@ export const ElementBoundary = {
  * @returns `null` if the offset is inside text (not at an element edge)
  */
 function read(element: HTMLElement, offset: number): ElementBoundary | null {
-  const texts = collectTextNodes(element);
+  const texts = Element.getTextNodes(element);
   let pos = 0;
 
   for (let i = 0; i < texts.length; i++) {
@@ -45,11 +47,4 @@ function read(element: HTMLElement, offset: number): ElementBoundary | null {
   }
 
   return null;
-}
-
-function collectTextNodes(element: HTMLElement): Text[] {
-  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-  const nodes: Text[] = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode as Text);
-  return nodes;
 }

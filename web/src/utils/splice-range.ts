@@ -1,3 +1,4 @@
+import { Element } from "./element.js";
 import { SelectionRange } from "./selection-range.js";
 
 export type SpliceRange = {
@@ -5,11 +6,6 @@ export type SpliceRange = {
   deleteCount: number;
   insert: string;
 };
-
-type Unit = "char" | "word" | "softLine";
-
-const WORD_CHAR = /[\p{L}\p{N}_]/u;
-const WHITESPACE = /\s/;
 
 export const SpliceRange = {
   applyToElement,
@@ -80,6 +76,11 @@ export const SpliceRange = {
     }
   },
 };
+
+type Unit = "char" | "word" | "softLine";
+
+const WORD_CHAR = /[\p{L}\p{N}_]/u;
+const WHITESPACE = /\s/;
 
 function insertAtSelection(
   selection: SelectionRange,
@@ -242,8 +243,6 @@ function isWhitespace(ch: string): boolean {
   return WHITESPACE.test(ch);
 }
 
-type DOMPosition = { node: Node; offset: number };
-
 /**
  * Applies a splice range to an element's DOM, preserving inline element structure.
  * At a text/element boundary, inserts inside the element.
@@ -254,10 +253,10 @@ export function applyToElement(
   { offset, deleteCount, insert }: SpliceRange,
   prefer: "left" | "right" = "right",
 ) {
-  const start = findPosition(element, offset, prefer);
+  const start = Element.findNodeAt(element, offset, prefer);
   const end =
     deleteCount > 0
-      ? findPosition(element, offset + deleteCount, prefer)
+      ? Element.findNodeAt(element, offset + deleteCount, prefer)
       : start;
 
   const range = document.createRange();
@@ -273,46 +272,4 @@ export function applyToElement(
   for (const child of Array.from(element.querySelectorAll("*"))) {
     if (!child.textContent) child.remove();
   }
-}
-
-function findPosition(
-  element: HTMLElement,
-  offset: number,
-  prefer: "left" | "right",
-): DOMPosition {
-  const texts = collectTextNodes(element);
-  let pos = 0;
-
-  for (let i = 0; i < texts.length; i++) {
-    const node = texts[i];
-    const len = node.textContent?.length ?? 0;
-    const next = texts[i + 1];
-
-    if (pos + len > offset) {
-      return { node, offset: offset - pos };
-    }
-
-    if (pos + len === offset && next) {
-      const useNext =
-        prefer === "right"
-          ? next.parentNode !== element || node.parentNode === element
-          : next.parentNode !== element && node.parentNode === element;
-
-      return useNext ? { node: next, offset: 0 } : { node, offset: len };
-    }
-
-    pos += len;
-  }
-
-  const last = texts[texts.length - 1];
-  return last
-    ? { node: last, offset: last.textContent?.length ?? 0 }
-    : { node: element, offset: 0 };
-}
-
-function collectTextNodes(element: HTMLElement): Text[] {
-  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-  const nodes: Text[] = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode as Text);
-  return nodes;
 }
