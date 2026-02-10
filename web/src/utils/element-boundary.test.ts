@@ -20,21 +20,19 @@ describe("ElementBoundary", () => {
     it("returns start at beginning of inline element", () => {
       const el = document.createElement("div");
       el.innerHTML = "hello <b>world</b>";
-      const b = el.querySelector("b");
       expect(ElementBoundary.read(el, 6)).toEqual({
         type: "start",
         left: null,
-        right: b,
+        right: el.querySelector("b"),
       });
     });
 
     it("returns end at end of inline element", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b> world";
-      const b = el.querySelector("b");
       expect(ElementBoundary.read(el, 5)).toEqual({
         type: "end",
-        left: b,
+        left: el.querySelector("b"),
         right: null,
       });
     });
