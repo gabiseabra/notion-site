@@ -6,9 +6,7 @@ import { act, Ref, RefObject, useImperativeHandle } from "react";
 import { EditorEvent } from "../editor/editor-event.js";
 import { ContentEditor } from "../editor/types.js";
 import { useContentEditor } from "../editor/use-content-editor.js";
-import { composePlugins } from "./compose-plugins.js";
 import { useLoggerPlugin } from "./use-logger-plugin.js";
-import { useSetupPlugin } from "./use-setup-plugin.js";
 
 type TestBlock = { id: string; content: string };
 
@@ -23,7 +21,7 @@ function TestEditor({
 }) {
   const { editor, editable } = useContentEditor({
     initialValue,
-    plugin: composePlugins<TestBlock>(useSetupPlugin, useLoggerPlugin(log)),
+    plugin: useLoggerPlugin(log),
   });
 
   useImperativeHandle(ref, () => editor, [editor]);

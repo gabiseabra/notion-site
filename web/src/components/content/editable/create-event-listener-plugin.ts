@@ -17,9 +17,9 @@ export function createEventListenerPlugin<
     const editable = plugin(editor);
 
     useEffect(() => {
-      const blocks = Array.from(editor.blocksRef.current.entries())
-        .map(([id, element]) => {
-          const block = editor.blocks.find((b) => b.id === id);
+      const blocks = editor.blocks
+        .map((block) => {
+          const element = editor.ref(block.id);
           return element && block ? { element, block } : null;
         })
         .filter(isNonNullable);

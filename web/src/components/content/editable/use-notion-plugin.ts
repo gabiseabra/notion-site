@@ -7,7 +7,6 @@ import { useBlockNavigationPlugin } from "./use-block-navigation-plugin.js";
 import { useHistoryPlugin } from "./use-history-plugin.js";
 import { useInlineMutationPlugin } from "./use-inline-mutation-plugin.js";
 import { useLoggerPlugin } from "./use-logger-plugin.js";
-import { useSetupPlugin } from "./use-setup-plugin.js";
 
 export const useNotionPlugin = (
   options: {
@@ -35,7 +34,6 @@ export const useNotionPlugin = (
       else if (event.eventType !== "flush")
         console.info(event.eventType, event.detail, event.editor);
     }),
-    useSetupPlugin,
     useAutoCommitPlugin(600),
     useHistoryPlugin,
     useInlineMutationPlugin({

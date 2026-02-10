@@ -1,7 +1,6 @@
-import type { RefObject } from "react";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import type { EditorEventTarget } from "./editor-event.js";
-import type { EditorHistory } from "./editor-history.js";
+import { EditorHistory } from "./editor-history.js";
 
 export type AnyBlock = { id: string };
 
@@ -21,40 +20,74 @@ export type EditOptions = {
  * Shared state passed to plugins in their editor setup phase.
  */
 export type ContentEditor<TBlock extends AnyBlock> = {
-  /** Current snapshot of the state */
+  /**
+   * Last committed state. Updated after `commit()`.
+   * May be stale if edits were made since last commit — check `isDirty`.
+   */
   blocks: TBlock[];
-  /** Changes every time that the snapshot is updated (so react is going to update) */
+  /**
+   * History position at the time of last commit.
+   * Increases with each edit, decreases on undo.
+   */
   revision: number;
-  /** Block ID → DOM element. Populated by plugins via the `ref` prop. */
-  blocksRef: RefObject<Map<string, HTMLElement | null>>;
-  /** Event target for editor commands. */
-  bus: EditorEventTarget<TBlock>;
-  /** Command history for undo/redo. */
+  /**
+   * True when history has moved past the last committed snapshot.
+   * When dirty, `blocks` is stale — use `peek()` to read fresh state.
+   */
+  readonly isDirty: boolean;
+  /**
+   * Manages state of uncommitted changes.
+   * Manipulating history directly e.g. by calling `editor.history.undo` / `redo` ,
+   * does not flush pending changes, so if you have any, they will be overwritten.
+   * Make sure to flush by calling `peek` before doing it.
+   */
   history: EditorHistory<TBlock>;
   /**
-   * True if the current snapshot is stale.
-   * Need to flush before making changes if you're reading from blocks.
+   * Emits lifecycle events.
+   * Plugins subscribe here to intercept or react to editor changes.
    */
-  isDirty: boolean;
+  bus: EditorEventTarget<TBlock>;
 
-  // Methods to read blocks from state
+  // Methods to read from state
 
-  /** Returns block data from the current snapshot by id. */
+  /**
+   * Read block by id from the last committed snapshot.
+   */
   get(id: string): TBlock | null;
-  /** Flushes pending changes if needed, then returns block data from the latest revision. */
+
+  /**
+   * Read block by id from the latest history state after flushing pending changes.
+   * More expensive than `get()`, but guarantees fresh data.
+   */
   peek(id: string): TBlock | null;
-  /** Returns block's registered DOM element by id. */
+
+  /**
+   * Get the DOM element registered for a block. Returns `null` if the block
+   * hasn't mounted yet or was removed.
+   */
   ref(id: string): HTMLElement | null;
 
   // Methods to update the state
 
-  /** Replace a block by ID. Pushes to history. */
+  /**
+   * Replace a block's data. Dispatches an `edit` event (can be cancelled).
+   */
   update(block: TBlock, options?: EditOptions): void;
-  /** Remove a block by ID. Pushes to history. */
+
+  /**
+   * Remove a block from state. Dispatches an `edit` event (can be cancelled).
+   */
   remove(block: TBlock, options?: EditOptions): void;
-  /** Replace block `left` with `[left, right]`. Pushes to history. */
+
+  /**
+   * Update the block on the left and insert the block on the right next to it.
+   * Dispatches an `edit` event (can be cancelled).
+   */
   split(left: TBlock, right: TBlock, options?: EditOptions): void;
-  /** Batch multiple operations as a single history entry. */
+
+  /**
+   * Group multiple edits into one undo/redo step.
+   */
   transaction(
     fn: () => void,
     options?: {
@@ -62,6 +95,9 @@ export type ContentEditor<TBlock extends AnyBlock> = {
       selectionAfter?: SelectionRange & { id: string };
     },
   ): void;
-  /** Commit the current state of history to DOM. Callback runs after render is done. */
+
+  /**
+   * Sync React state with history.
+   */
   commit(data?: unknown): void;
 };

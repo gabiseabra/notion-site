@@ -39,9 +39,8 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
     () => ({
       blocks: snapshot.state,
       revision: snapshot.position,
-      blocksRef,
-      bus,
       history,
+      bus,
 
       get isDirty() {
         return history.position !== snapshot.position;
@@ -169,7 +168,7 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   // notify event listeners
   useEffect(() => {
     const event =
-      editor.history.position === 0
+      history.position === 0
         ? !isReadyRef.current
           ? new EditorEvent("ready", editor, {})
           : new EditorEvent("reset", editor, {})
@@ -177,7 +176,15 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
 
     editor.bus.dispatchTypedEvent(event.eventType, event);
     isReadyRef.current = true;
-  }, [editor]);
+  }, [history, editor]);
 
-  return { editable, editor };
+  return {
+    editor,
+    editable: (block: TBlock) => ({
+      ...editable(block),
+      ref(element: HTMLElement | null) {
+        blocksRef.current.set(block.id, element);
+      },
+    }),
+  };
 }

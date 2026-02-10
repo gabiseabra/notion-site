@@ -1,9 +1,9 @@
-import { useCallback } from "react";
+import { KeyboardEvent, useCallback } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { EditorEvent } from "../editor/editor-event.js";
 import { EditorCommand } from "../editor/editor-history.js";
-import { AnyBlock } from "../editor/types.js";
+import { AnyBlock, ContentEditor } from "../editor/types.js";
 import { AnyContentEditorPlugin } from "./types.js";
 
 /**
@@ -54,27 +54,43 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
   useEventListener(editor.bus, "postcommit", restoreSelection);
   useEventListener(editor.bus, "reset", restoreSelection);
 
-  return () => ({
+  return (block) => ({
     onKeyDown(e) {
-      const cmd = editor.history.command;
       const isMod = e.ctrlKey || e.metaKey;
 
-      if (!cmd || !isMod) return;
+      if (!isMod) return;
 
-      if (e.key === "z" && !e.shiftKey) {
-        if (!editor.history.undo()) return;
+      if (isUndo(e) && isUndoable(block.id, editor)) {
+        editor.history.undo();
         editor.commit("history-plugin: undo");
         e.preventDefault();
         return;
       }
 
-      if ((e.key === "z" && e.shiftKey) || e.key === "y") {
-        if (!editor.history.redo()) return;
-
+      if (isRedo(e) && isRedoable(block.id, editor)) {
+        editor.history.redo();
         editor.commit("history-plugin: redo");
         e.preventDefault();
         return;
       }
     },
   });
+};
+
+const isUndo = (e: KeyboardEvent) => e.key === "z" && !e.shiftKey;
+const isUndoable = <TBlock extends AnyBlock>(
+  id: string,
+  editor: ContentEditor<TBlock>,
+) => {
+  editor.peek(id);
+  return editor.history.position !== 0;
+};
+const isRedo = (e: KeyboardEvent) =>
+  (e.key === "z" && e.shiftKey) || e.key === "y";
+const isRedoable = <TBlock extends AnyBlock>(
+  id: string,
+  editor: ContentEditor<TBlock>,
+) => {
+  editor.peek(id);
+  return editor.history.commands.length > editor.history.position;
 };

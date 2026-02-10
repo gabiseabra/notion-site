@@ -42,8 +42,7 @@ export const useBlockMutationPlugin =
       ) {
         const index = editor.blocks.findIndex((b) => b.id === block.id);
         const prevBlock = editor.blocks[index - 1];
-        const prevElement =
-          prevBlock && editor.blocksRef.current.get(prevBlock.id);
+        const prevElement = prevBlock && editor.ref(prevBlock.id);
         const currentBlock = editor.peek(block.id);
 
         if (!prevBlock || !prevElement || !currentBlock) return;

@@ -7,7 +7,6 @@ import { useBlockMutationPlugin } from "./use-block-mutation-plugin.js";
 import { useBlockNavigationPlugin } from "./use-block-navigation-plugin.js";
 import { useHistoryPlugin } from "./use-history-plugin.js";
 import { useInlineMutationPlugin } from "./use-inline-mutation-plugin.js";
-import { useSetupPlugin } from "./use-setup-plugin.js";
 
 export type PlainTextBlock = {
   id: string;
@@ -19,7 +18,6 @@ export type PlainTextBlock = {
  */
 export const usePlainTextPlugin = (editor: ContentEditor<PlainTextBlock>) =>
   composePlugins<PlainTextBlock>(
-    useSetupPlugin,
     useAutoCommitPlugin(600),
     useHistoryPlugin,
     useInlineMutationPlugin({
