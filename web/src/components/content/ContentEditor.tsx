@@ -24,7 +24,7 @@ export const ContentEditor = memo(function ContentEditor({
 }: ContentEditor.Props) {
   const { editor, editable } = useContentEditor({
     initialValue,
-    plugin: useNotionPlugin,
+    plugin: useNotionPlugin(),
   });
 
   useImperativeHandle(ref, () => editor, [editor]);

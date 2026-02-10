@@ -1,6 +1,5 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import * as env from "../../../env.js";
-import { ContentEditor } from "../editor/types.js";
 import { composePlugins } from "./compose-plugins.js";
 import { useAutoCommitPlugin } from "./use-auto-commit-plugin.js";
 import { useBlockMutationPlugin } from "./use-block-mutation-plugin.js";
@@ -11,7 +10,6 @@ import { useLoggerPlugin } from "./use-logger-plugin.js";
 import { useSetupPlugin } from "./use-setup-plugin.js";
 
 export const useNotionPlugin = (
-  editor: ContentEditor<Notion.Block>,
   options: {
     disabled?: boolean;
     multiline?: boolean;
@@ -70,4 +68,4 @@ export const useNotionPlugin = (
         return Notion.Block.split(block, offset, deleteRange);
       },
     }),
-  )(editor);
+  );
