@@ -274,11 +274,46 @@ describe("SpliceRange", () => {
       expect(el.innerHTML).toBe("<b>hello </b><i>world</i>");
     });
 
-    it("deletes across inline element boundary", () => {
+    it("deletes from plain text into inline element", () => {
       const el = document.createElement("div");
       el.innerHTML = "hello <b>world</b>!";
-      SpliceRange.applyToElement(el, { offset: 4, deleteCount: 6, insert: "" });
-      expect(el.textContent).toBe("helld!");
+      SpliceRange.applyToElement(el, { offset: 4, deleteCount: 5, insert: "" });
+      expect(el.innerHTML).toBe("hell<b>ld</b>!");
+    });
+
+    it("deletes from inline element into plain text", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "!<b>hello</b> world";
+      SpliceRange.applyToElement(el, { offset: 3, deleteCount: 5, insert: "" });
+      expect(el.innerHTML).toBe("!<b>he</b>orld");
+    });
+
+    it("deletes from one inline element into another", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<b>hello</b><i>world</i>";
+      SpliceRange.applyToElement(el, { offset: 3, deleteCount: 4, insert: "" });
+      expect(el.innerHTML).toBe("<b>hel</b><i>rld</i>");
+    });
+
+    it("deletes across inline element with plain text between", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<b>aaa</b> bbb <i>ccc</i>";
+      SpliceRange.applyToElement(el, { offset: 2, deleteCount: 9, insert: "" });
+      expect(el.innerHTML).toBe("<b>aa</b>");
+    });
+
+    it("deletes entire inline element from surrounding text", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "aa<b>bbb</b>cc";
+      SpliceRange.applyToElement(el, { offset: 1, deleteCount: 5, insert: "" });
+      expect(el.innerHTML).toBe("ac");
+    });
+
+    it("deletes nested inline elements", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "a<b>b<i>c</i>d</b>e";
+      SpliceRange.applyToElement(el, { offset: 1, deleteCount: 3, insert: "" });
+      expect(el.innerHTML).toBe("ae");
     });
   });
 });

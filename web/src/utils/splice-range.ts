@@ -267,7 +267,11 @@ export function applyToElement(
 
   if (insert) {
     range.insertNode(document.createTextNode(insert));
-    range.commonAncestorContainer.normalize();
+  }
+
+  element.normalize();
+  for (const child of Array.from(element.querySelectorAll("*"))) {
+    if (!child.textContent) child.remove();
   }
 }
 
