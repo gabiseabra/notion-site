@@ -1,4 +1,5 @@
 import { fireEvent } from "@testing-library/react";
+import { act } from "react";
 import { SelectionRange } from "../utils/selection-range.js";
 import { SpliceRange } from "../utils/splice-range.js";
 
@@ -101,7 +102,7 @@ function simulate(
     bubbles: true,
     cancelable: true,
   });
-  element.dispatchEvent(beforeInput);
+  act(() => element.dispatchEvent(beforeInput));
   if (beforeInput.defaultPrevented) return;
 
   // apply change
@@ -112,7 +113,7 @@ function simulate(
   }
 
   // input
-  element.dispatchEvent(new Event("input", { bubbles: true }));
+  act(() => element.dispatchEvent(new Event("input", { bubbles: true })));
 }
 
 function deleteN(
