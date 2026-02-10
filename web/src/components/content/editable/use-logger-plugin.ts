@@ -15,7 +15,6 @@ export const useLoggerPlugin =
     useEventListener(editor.bus, "commit", log);
     useEventListener(editor.bus, "postcommit", log);
     useEventListener(editor.bus, "flush", log);
-    useEventListener(editor.bus, "reset", log);
     useEventListener(editor.bus, "ready", log);
 
     return () => ({});

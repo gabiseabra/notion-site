@@ -85,7 +85,7 @@ describe("useLoggerPlugin", () => {
     );
   });
 
-  it("logs reset event when reaching end of history", () => {
+  it("logs postcommit event when reaching start of history", () => {
     const log = jest.fn();
     const blocks = [{ id: "a", content: "Hello" }] satisfies TestBlock[];
     const editorRef: RefObject<ContentEditor<TestBlock> | null> = {
@@ -107,7 +107,7 @@ describe("useLoggerPlugin", () => {
     });
 
     expect(log).toHaveBeenCalledWith(
-      expect.objectContaining({ eventType: "reset" }),
+      expect.objectContaining({ eventType: "postcommit" }),
     );
   });
 });

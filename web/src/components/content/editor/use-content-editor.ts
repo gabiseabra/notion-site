@@ -168,10 +168,8 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   // notify event listeners
   useEffect(() => {
     const event =
-      history.position === 0
-        ? !isReadyRef.current
-          ? new EditorEvent("ready", editor, {})
-          : new EditorEvent("reset", editor, {})
+      !isReadyRef.current
+        ? new EditorEvent("ready", editor, {})
         : new EditorEvent("postcommit", editor, {});
 
     editor.bus.dispatchTypedEvent(event.eventType, event);

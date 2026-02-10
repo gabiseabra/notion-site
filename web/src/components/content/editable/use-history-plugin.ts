@@ -52,7 +52,6 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
   );
 
   useEventListener(editor.bus, "postcommit", restoreSelection);
-  useEventListener(editor.bus, "reset", restoreSelection);
 
   return (block) => ({
     onKeyDown(e) {

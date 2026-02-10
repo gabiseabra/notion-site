@@ -33,10 +33,6 @@ type EditorEventMap<TBlock extends AnyBlock> = {
    */
   flush: EmptyObject;
   /**
-   * You have reached the end of history.
-   */
-  reset: EmptyObject;
-  /**
    * Runs once after editor setup is done.
    */
   ready: EmptyObject;
