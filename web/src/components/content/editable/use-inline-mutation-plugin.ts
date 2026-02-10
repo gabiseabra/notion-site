@@ -1,5 +1,6 @@
 import { useCallback, useRef } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener.js";
+import { ElementBoundary } from "../../../utils/element-boundary.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { SpliceRange } from "../../../utils/splice-range.js";
 import { AnyBlock } from "../editor/types.js";
@@ -129,10 +130,23 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
           SpliceRange.toSelectionRange(spliceRange, 1),
           e.target,
         );
+
+        if (shouldCommit(e.target, spliceRange)) {
+          e.preventDefault();
+          editor.commit("inline-mutation-plugin");
+        }
       } finally {
         scheduleFlush();
       }
     };
   });
 
-function shouldCommit(element: HTMLElement, spliceRange: SpliceRange) {}
+function shouldCommit(element: HTMLElement, spliceRange: SpliceRange) {
+  const boundary = ElementBoundary.read(element, spliceRange.offset);
+  if (boundary) {
+    // At element boundaries, browsers may insert text outside adjacent inline
+    // elements rather than inside them. Commit manually to control placement.
+    return true;
+  }
+  return false;
+}
