@@ -1,7 +1,7 @@
 import "./css/global.scss";
 
 import React from "react";
-import { hydrateRoot } from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import * as env from "./env.js";
 import { RootPovider } from "./providers/RootProvider.js";
@@ -14,8 +14,7 @@ if (!root) {
   throw new Error("Root element not found");
 }
 
-hydrateRoot(
-  root,
+createRoot(root).render(
   <React.StrictMode>
     <RootPovider url={env.API_URL}>
       <RouterProvider router={router} />
