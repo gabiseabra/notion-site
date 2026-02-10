@@ -144,6 +144,8 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
         if (!editorRef.current) return;
 
         flush();
+        if (!this.isDirty) return;
+
         const snapshot = history.snapshot();
 
         const event = new EditorEvent("commit", editorRef.current, {
