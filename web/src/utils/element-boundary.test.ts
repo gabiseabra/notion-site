@@ -48,5 +48,16 @@ describe("ElementBoundary", () => {
         right: el.querySelector("i"),
       });
     });
+
+    it("returns start for an empty span element", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<span></span>";
+      const span = el.querySelector("span");
+      expect(ElementBoundary.read(el, 0)).toEqual({
+        type: "start",
+        left: null,
+        right: span,
+      });
+    });
   });
 });

@@ -21,6 +21,14 @@ export const ElementBoundary = {
  */
 function read(element: HTMLElement, offset: number): ElementBoundary | null {
   const texts = Element.getTextNodes(element);
+  if (texts.length === 0) {
+    const right = element.firstElementChild;
+    if (!right) return null;
+    if (offset <= 0) return { type: "start", left: null, right };
+
+    const left = element.lastElementChild;
+    return left ? { type: "end", left, right: null } : null;
+  }
   let pos = 0;
 
   for (let i = 0; i < texts.length; i++) {
