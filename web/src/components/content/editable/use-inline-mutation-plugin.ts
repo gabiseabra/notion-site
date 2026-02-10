@@ -143,7 +143,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
 
 function shouldCommit(element: HTMLElement, spliceRange: SpliceRange) {
   const boundary = ElementBoundary.read(element, spliceRange.offset);
-  if (boundary) {
+  if (boundary && boundary.right) {
     // At element boundaries, browsers may insert text outside adjacent inline
     // elements rather than inside them. Commit manually to control placement.
     return true;

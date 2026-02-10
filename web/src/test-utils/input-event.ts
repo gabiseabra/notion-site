@@ -113,7 +113,7 @@ function simulate(
   }
 
   // input
-  act(() => element.dispatchEvent(new Event("input", { bubbles: true })));
+  fireEvent.input(element);
 }
 
 function deleteN(
