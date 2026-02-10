@@ -63,7 +63,7 @@ export const useBlockNavigationPlugin: AnyContentEditorPlugin =
           const range = SelectionRange.moveVertically(
             e.currentTarget,
             prevElement,
-            "up",
+            1,
           );
           if (!range) return;
 
@@ -81,7 +81,7 @@ export const useBlockNavigationPlugin: AnyContentEditorPlugin =
           const range = SelectionRange.moveVertically(
             e.currentTarget,
             nextElement,
-            "down",
+            -1,
           );
           if (!range) return;
 

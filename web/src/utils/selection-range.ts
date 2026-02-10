@@ -1,9 +1,8 @@
+import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { Element } from "./element.js";
 
 /** Text offsets within an element; end equals start for a collapsed caret. */
 export type SelectionRange = { start: number; end: number };
-
-type Direction = "up" | "down";
 
 export const SelectionRange = {
   isCollapsed(selection: SelectionRange) {
@@ -39,17 +38,9 @@ function read(element: HTMLElement): SelectionRange | null {
     return { start, end };
   }
 
-  const doc = element.ownerDocument;
-  const win =
-    doc.defaultView || (doc as { parentWindow?: Window }).parentWindow;
+  const range = getRange();
 
-  const sel = win?.getSelection();
-
-  if (!sel?.rangeCount) return null;
-
-  const range = sel.getRangeAt(0);
-
-  if (!element.contains(range.startContainer)) return null;
+  if (!range || !element.contains(range.startContainer)) return null;
 
   const start = getTextUpToNode(
     element,
@@ -65,23 +56,12 @@ function read(element: HTMLElement): SelectionRange | null {
 
 /** Unselects all elements. Handles the appropriate DOM instance for the given element. */
 function clear(element: HTMLElement) {
-  const doc = element.ownerDocument;
-  const win =
-    doc.defaultView || (doc as { parentWindow?: Window }).parentWindow;
-
-  const sel = win?.getSelection();
-  if (!sel) return;
-
-  sel.removeAllRanges();
+  window.getSelection()?.removeAllRanges();
   element.blur();
 }
 
 /** Set the selection within `element` by text offsets. */
 function apply(element: HTMLElement, selection: SelectionRange) {
-  const doc = element.ownerDocument;
-  const win =
-    doc.defaultView || (doc as { parentWindow?: Window }).parentWindow;
-
   if (
     Element.isElementWithTag(element, "input") ||
     Element.isElementWithTag(element, "textarea")
@@ -92,11 +72,6 @@ function apply(element: HTMLElement, selection: SelectionRange) {
 
   clear(element);
 
-  const sel = win?.getSelection();
-  if (!sel) return;
-
-  sel.removeAllRanges();
-
   if (element.textContent === "" && selection.start === 0) {
     element.focus();
     return;
@@ -105,12 +80,19 @@ function apply(element: HTMLElement, selection: SelectionRange) {
   const start = Element.findNodeAt(element, selection.start);
   const end = Element.findNodeAt(element, selection.end);
 
-  if (!start || !end) return;
+  if (!start || !end) {
+    console.warn("Invalid selection range", {
+      element,
+      selection,
+    });
+    return;
+  }
 
-  const r = doc.createRange();
+  const r = document.createRange();
   r.setStart(start.node, start.offset);
   r.setEnd(end.node, end.offset);
-  sel.addRange(r);
+
+  window.getSelection()?.addRange(r);
 }
 
 function applyMaybe(element: HTMLElement, selection: SelectionRange | null) {
@@ -123,62 +105,73 @@ function maxOffset(element: HTMLElement): number {
   return (element.textContent ?? "").length;
 }
 
-/** Compute the caret range when moving up/down between blocks. */
+/**
+ * Compute the caret range when moving up/down between blocks.
+ * @note noop for non-collapsed ranges.
+ */
 function moveVertically(
   currentElement: HTMLElement,
   targetElement: HTMLElement,
-  direction: Direction,
+  direction: 1 | -1,
 ): SelectionRange | null {
-  const doc = currentElement.ownerDocument;
-  const win =
-    doc.defaultView || (doc as { parentWindow?: Window }).parentWindow;
-
-  const sel = win?.getSelection();
-  if (!sel?.rangeCount) return null;
-
-  const range = sel.getRangeAt(0);
-  if (!range.collapsed) {
-    return null;
-  }
+  const range = window.getSelection()?.getRangeAt(0);
+  if (!range || !range.collapsed) return null;
   if (!currentElement.contains(range.startContainer)) {
-    console.warn(
-      "Caret startContainer is outside current element.",
+    console.warn("Caret startContainer is outside current element.", {
       currentElement,
-      "→",
       targetElement,
-      {
-        direction,
-        startContainer: range.startContainer,
-      },
-    );
-    return null;
-  }
-
-  const caretRect = range.getClientRects()[0] ?? range.getBoundingClientRect();
-  const currentLines = getLineRects(currentElement);
-  const boundaryLine =
-    direction === "up"
-      ? currentLines[0]
-      : currentLines[currentLines.length - 1];
-
-  // When the element is empty, caretRect will be all 0, even though the element
-  // has a caret. We'll just assume that the move is valid and starts at the
-  // beginning of the line (since this line is empty).
-  if (caretRect.top === 0 && caretRect.height === 0)
-    return { start: 0, end: 0 };
-  if (Math.round(caretRect.top) !== Math.round(boundaryLine.top)) return null;
-  if (!boundaryLine) {
-    console.warn("Failed to resolve boundary line.", currentElement, {
       direction,
-      lineCount: currentLines.length,
+      range,
     });
-
     return null;
   }
 
+  const caretRect = getCaretRect(range);
+  if (!caretRect)
+    return moveVerticallyByOffset(
+      currentElement,
+      targetElement,
+      direction,
+      range,
+    );
+  else
+    return moveVerticallyByGeometry(
+      currentElement,
+      targetElement,
+      direction,
+      caretRect,
+    );
+}
+
+/** Internals */
+
+function getRange(): Range | null {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return null;
+  return sel.getRangeAt(0);
+}
+
+/**
+ * Move vertically between blocks using layout geometry.
+ */
+function moveVerticallyByGeometry(
+  currentElement: HTMLElement,
+  targetElement: HTMLElement,
+  direction: 1 | -1,
+  caretRect: DOMRect,
+): SelectionRange | null {
+  // Read the line rectangles from the current selection.
+  const lineRects = getLineRects(currentElement);
+  const boundaryLine =
+    direction === 1 ? lineRects[0] : lineRects[lineRects.length - 1];
+
+  // Ensure the caret is on the boundary line (first line for up, last for down).
+  if (!isSameLine(caretRect, boundaryLine)) return null;
+
+  // Project the x-position into the target element and resolve a text offset.
   const targetLines = getLineRects(targetElement);
   const targetLine =
-    direction === "up" ? targetLines[targetLines.length - 1] : targetLines[0];
+    direction === 1 ? targetLines[targetLines.length - 1] : targetLines[0];
   const targetOffset =
     targetLine &&
     getOffsetFromPoint(
@@ -188,38 +181,93 @@ function moveVertically(
     );
 
   return {
-    start: targetOffset ?? (direction === "up" ? maxOffset(targetElement) : 0),
-    end: targetOffset ?? (direction === "up" ? maxOffset(targetElement) : 0),
+    start: targetOffset ?? (direction === 1 ? maxOffset(targetElement) : 0),
+    end: targetOffset ?? (direction === 1 ? maxOffset(targetElement) : 0),
   };
 }
 
-/** Internals */
+/**
+ * Move vertically when the current element is whitespace-only.
+ * The caret rect can be zero for whitespace-only text, so geometry is
+ * unreliable.
+ */
+function moveVerticallyByOffset(
+  currentElement: HTMLElement,
+  targetElement: HTMLElement,
+  direction: 1 | -1,
+  range: Range,
+): SelectionRange | null {
+  // Derive the caret text offset from the selection range.
+  const text = currentElement.textContent ?? "";
+  const caretOffset = getTextUpToNode(
+    currentElement,
+    range.startContainer,
+    range.startOffset,
+  ).length;
+
+  // Compute the caret line index by counting `\n` before that offset.
+  const lines = text.replace(/\n$/, "").split("\n");
+  const lineIndex = text.slice(0, caretOffset).split("\n").length - 1;
+  const lastLineIndex = Math.max(0, lines.length - 1);
+  const isBoundaryLine =
+    direction === 1 ? lineIndex === 0 : lineIndex === lastLineIndex;
+
+  // Allow movement only if the caret is on the boundary line; otherwise null.
+  if (!isBoundaryLine) return null;
+
+  // When navigating down from an empty block, selection always starts at 0, 0
+  if (direction === -1) return { start: 0, end: 0 };
+
+  // Moving up from an empty/whitespace-only block: start of target's last
+  // visual line, or fallback to max offset.
+  const targetLine = getLineRects(targetElement).pop();
+  const lineStartOffset = targetLine
+    ? getOffsetFromPoint(
+        targetElement,
+        targetLine.left + 1,
+        targetLine.top + targetLine.height / 2,
+      )
+    : null;
+
+  const start = lineStartOffset ?? maxOffset(targetElement);
+  return { start, end: start };
+}
 
 /** Line rectangles for the element's text layout. */
-function getLineRects(element: HTMLElement): DOMRect[] {
-  const doc = element.ownerDocument;
-
-  const range = doc.createRange();
+function getLineRects(element: HTMLElement): NonEmpty<DOMRect> {
+  const range = document.createRange();
   range.selectNodeContents(element);
 
-  const rects = Array.from(range.getClientRects());
+  const lines: DOMRect[] = Array.from(range.getClientRects()).reduce<DOMRect[]>(
+    (lines, rect) => {
+      const last = lines[lines.length - 1];
+      if (!last || Math.round(rect.top) !== Math.round(last.top)) {
+        lines.push(rect);
+      }
+      return lines;
+    },
+    [],
+  );
 
-  if (rects.length === 0) {
+  if (!NonEmpty.isNonEmpty(lines)) {
     return [element.getBoundingClientRect()];
   }
 
-  const lines: DOMRect[] = [];
-  let lastTop = Number.NaN;
-
-  for (const rect of rects) {
-    const top = Math.round(rect.top);
-    if (top !== lastTop) {
-      lines.push(rect);
-      lastTop = top;
-    }
-  }
-
   return lines;
+}
+
+function getCaretRect(range: Range) {
+  const rect = range.getClientRects()[0] ?? range.getBoundingClientRect();
+  return isZeroRect(rect) ? null : rect;
+}
+
+function isZeroRect(rect: DOMRect) {
+  return (
+    rect.top === 0 && rect.bottom === 0 && rect.left === 0 && rect.right === 0
+  );
+}
+function isSameLine(a: DOMRect, b: DOMRect) {
+  return Math.abs(a.top + a.height / 2 - (b.top + b.height / 2)) <= 2;
 }
 
 /** Resolve a text offset from viewport coords inside `element`. */
@@ -228,15 +276,13 @@ function getOffsetFromPoint(
   x: number,
   y: number,
 ): number | null {
-  const doc = element.ownerDocument;
-
-  const range = doc.caretRangeFromPoint?.(x, y);
+  const range = document.caretRangeFromPoint?.(x, y);
   if (range && element.contains(range.startContainer)) {
     return getTextUpToNode(element, range.startContainer, range.startOffset)
       .length;
   }
 
-  const pos = doc.caretPositionFromPoint?.(x, y);
+  const pos = document.caretPositionFromPoint?.(x, y);
   if (pos && element.contains(pos.offsetNode)) {
     return getTextUpToNode(element, pos.offsetNode, pos.offset).length;
   }
@@ -245,8 +291,9 @@ function getOffsetFromPoint(
     point: { x, y },
     textContent: element.textContent,
     supports: {
-      caretRangeFromPoint: typeof doc.caretRangeFromPoint === "function",
-      caretPositionFromPoint: typeof doc.caretPositionFromPoint === "function",
+      caretRangeFromPoint: typeof document.caretRangeFromPoint === "function",
+      caretPositionFromPoint:
+        typeof document.caretPositionFromPoint === "function",
     },
   });
   return null;
@@ -261,9 +308,7 @@ function getTextUpToNode(
   node: Node,
   offset: number,
 ): string {
-  const doc = element.ownerDocument;
-
-  const pre = doc.createRange();
+  const pre = document.createRange();
   pre.selectNodeContents(element);
   pre.setEnd(node, offset);
   return pre.toString();
