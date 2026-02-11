@@ -15,10 +15,12 @@
     "dev": "concurrently \"npm run dev -w api\" \"npm run dev -w web\"",
     "lint": "eslint \"{api,web,common}/src/**/*.{ts,tsx}\"",
     "tsc": "tsc -b",
+    "cy:open": "cypress open",
     "test": "NODE_OPTIONS=--experimental-vm-modules node --loader ts-node/esm ./node_modules/jest/bin/jest.js -c jest.config.ts --",
     "test:common": "NODE_OPTIONS=--experimental-vm-modules node --loader ts-node/esm ./node_modules/jest/bin/jest.js -c jest.config.ts --selectProjects common --",
     "test:api": "NODE_OPTIONS=--experimental-vm-modules node --loader ts-node/esm ./node_modules/jest/bin/jest.js -c jest.config.ts --selectProjects api --",
-    "test:web": "NODE_OPTIONS=--experimental-vm-modules node --loader ts-node/esm ./node_modules/jest/bin/jest.js -c jest.config.ts --selectProjects web --"
+    "test:web": "NODE_OPTIONS=--experimental-vm-modules node --loader ts-node/esm ./node_modules/jest/bin/jest.js -c jest.config.ts --selectProjects web --",
+    "test:cy": "cypress run --component --"
   },
   "engines": {
     "node": ">=22",
@@ -34,6 +36,7 @@
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
     "concurrently": "^9.2.1",
+    "cypress": "^15.10.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",

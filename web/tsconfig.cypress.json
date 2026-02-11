@@ -1,0 +1,25 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "..",
+    "jsx": "react-jsx",
+    "types": [
+      "vite/client",
+      "cypress",
+    ],
+    "outDir": "./dist/cy",
+    "tsBuildInfoFile": "dist/cy/.tsbuildinfo"
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.cy.ts",
+    "src/**/*.cy.tsx",
+    "../cypress/**/*.ts",
+  ],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/test-utils/**/*",
+  ]
+}

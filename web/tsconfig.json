@@ -14,9 +14,16 @@
     "src/**/*",
     "vite.config.ts"
   ],
+  "exclude": [
+    "src/**/*.cy.ts",
+    "src/**/*.cy.tsx"
+  ],
   "references": [
     {
       "path": "../common"
+    },
+    {
+      "path": "./tsconfig.cypress.json"
     }
   ]
 }
