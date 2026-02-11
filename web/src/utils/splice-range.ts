@@ -250,13 +250,26 @@ function isWhitespace(ch: string): boolean {
  */
 export function applyToElement(
   element: HTMLElement,
-  { offset, deleteCount, insert }: SpliceRange,
+  spliceRange: SpliceRange,
   prefer: -1 | 1 = -1,
 ) {
-  const start = CaretTarget.resolve(element, offset, prefer);
-  const end = CaretTarget.resolve(element, offset + deleteCount, prefer);
+  const { offset, deleteCount, insert } = spliceRange;
 
-  if (!(start && end)) return;
+  const start = CaretTarget.resolve(element, offset, prefer);
+  const end = deleteCount
+    ? CaretTarget.resolve(element, offset + deleteCount, prefer)
+    : start;
+
+  if (!start || !end) {
+    if (!element.textContent && offset == 0 && deleteCount === 0)
+      element.appendChild(document.createTextNode(spliceRange.insert));
+    else
+      console.warn("Failed to resolve CaretTarget", {
+        element,
+        spliceRange,
+      });
+    return;
+  }
 
   const range = document.createRange();
   range.setStart(CaretTarget.allocateText(start), start.offset);

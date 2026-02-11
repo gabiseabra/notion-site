@@ -39,8 +39,6 @@ describe("useBlockNavigationPlugin", () => {
     );
 
     const [first, second] = Array.from(container.querySelectorAll("p"));
-    expect(first).toBeTruthy();
-    expect(second).toBeTruthy();
 
     SelectionRange.apply(second, { start: 0, end: 0 });
 
@@ -63,8 +61,6 @@ describe("useBlockNavigationPlugin", () => {
     );
 
     const [first, second] = Array.from(container.querySelectorAll("p"));
-    expect(first).toBeTruthy();
-    expect(second).toBeTruthy();
 
     SelectionRange.apply(first, { start: 2, end: 2 });
 
@@ -81,8 +77,6 @@ describe("useBlockNavigationPlugin", () => {
     );
 
     const [first, second] = Array.from(container.querySelectorAll("p"));
-    expect(first).toBeTruthy();
-    expect(second).toBeTruthy();
 
     SelectionRange.apply(second, { start: 2, end: 2 });
 

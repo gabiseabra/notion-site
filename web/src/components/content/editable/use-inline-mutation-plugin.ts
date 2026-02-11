@@ -136,7 +136,6 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
         const caret = CaretTarget.getAnchor(e.target, spliceRange.offset);
         if (caret?.type === "boundary") {
           SpliceRange.applyToElement(e.target, spliceRange);
-          console.log(caret, e.target.innerHTML);
           e.preventDefault();
         }
       } finally {

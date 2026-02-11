@@ -27,22 +27,32 @@ describe("CaretTarget", () => {
       expect(CaretTarget.getAnchor(el, 6)).toBe(null);
     });
 
+    it("returns text when offset is in root", () => {
+      const el = document.createElement("div");
+      el.textContent = "hello";
+
+      expect(CaretTarget.getAnchor(el, 5)).toEqual({
+        type: "inside",
+        node: textAnchor(el.firstChild),
+        offset: 5,
+      });
+    });
+
+    it("returns element when offset is 0 in empty element", () => {
+      const el = document.createElement("div");
+
+      expect(CaretTarget.getAnchor(el, 0)).toEqual({
+        type: "inside",
+        node: elementAnchor(el),
+        offset: 0,
+      });
+    });
+
     it("returns null when offset is out of bounds in mixed content", () => {
       const el = document.createElement("div");
       el.innerHTML = "a<b>bc</b>d";
 
       expect(CaretTarget.getAnchor(el, 5)).toBe(null);
-    });
-
-    it("returns outside inside plain text", () => {
-      const el = document.createElement("div");
-      el.textContent = "hello";
-
-      expect(CaretTarget.getAnchor(el, 2)).toEqual({
-        type: "outside",
-        node: el.firstChild,
-        offset: 2,
-      });
     });
 
     it("returns boundary start at beginning of inline element", () => {
@@ -55,6 +65,18 @@ describe("CaretTarget", () => {
           type: "start",
           left: el.firstChild,
           right: textAnchor(el.querySelector("b")!.firstChild),
+        },
+      });
+    });
+
+    it("returns boundary start at offset 0 when element starts with inline text", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<span>Second</span>";
+
+      expect(CaretTarget.getAnchor(el, 0)).toMatchObject({
+        type: "boundary",
+        boundary: {
+          type: "start",
         },
       });
     });
@@ -134,15 +156,57 @@ describe("CaretTarget", () => {
       });
     });
 
-    it("returns boundary end at boundary after inline in mixed content", () => {
+    it("returns boundary start when root text precedes inline", () => {
       const el = document.createElement("div");
-      el.innerHTML = "a<b>bc</b>d";
+      el.innerHTML = "x<span>y</span>";
 
-      expect(CaretTarget.getAnchor(el, 3)).toEqual({
+      expect(CaretTarget.getAnchor(el, 1)).toEqual({
+        type: "boundary",
+        boundary: {
+          type: "start",
+          left: el.firstChild,
+          right: textAnchor(el.querySelector("span")!.firstChild),
+        },
+      });
+    });
+
+    it("returns boundary end when inline is followed by root text", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<span>hi</span>x";
+
+      expect(CaretTarget.getAnchor(el, 2)).toEqual({
         type: "boundary",
         boundary: {
           type: "end",
-          left: textAnchor(el.querySelector("b")!.firstChild),
+          left: textAnchor(el.querySelector("span")!.firstChild),
+          right: el.lastChild,
+        },
+      });
+    });
+
+    it("returns boundary start at empty inline between root text", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "a<span></span>b";
+
+      expect(CaretTarget.getAnchor(el, 1)).toEqual({
+        type: "boundary",
+        boundary: {
+          type: "start",
+          left: el.firstChild,
+          right: elementAnchor(el.querySelector("span")),
+        },
+      });
+    });
+
+    it("returns boundary end at empty inline between root text", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "a<span></span>b";
+
+      expect(CaretTarget.getAnchor(el, 2)).toEqual({
+        type: "boundary",
+        boundary: {
+          type: "end",
+          left: elementAnchor(el.querySelector("span")),
           right: el.lastChild,
         },
       });
@@ -158,6 +222,20 @@ describe("CaretTarget", () => {
           type: "between",
           left: elementAnchor(el.querySelector("b")),
           right: elementAnchor(el.querySelector("i")),
+        },
+      });
+    });
+
+    it("returns boundary start when root text ends with empty inline", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "x<span></span>";
+
+      expect(CaretTarget.getAnchor(el, 1)).toEqual({
+        type: "boundary",
+        boundary: {
+          type: "start",
+          left: el.firstChild,
+          right: elementAnchor(el.querySelector("span")),
         },
       });
     });
@@ -215,12 +293,12 @@ describe("CaretTarget", () => {
 
       expect(
         CaretTarget.fromAnchor({
-          type: "outside",
-          node: el.firstChild as Text,
+          type: "inside",
+          node: textAnchor(el.firstChild),
           offset: 3,
         }),
       ).toEqual({
-        type: "root",
+        type: "text",
         node: el.firstChild,
         offset: 3,
       });
@@ -333,13 +411,13 @@ describe("CaretTarget", () => {
     });
   });
 
-  describe.only("CaretTarget.resolve", () => {
+  describe("CaretTarget.resolve", () => {
     it("resolves plain text offset", () => {
       const el = document.createElement("div");
       el.textContent = "hello";
 
       expect(CaretTarget.resolve(el, 2)).toEqual({
-        type: "root",
+        type: "text",
         node: el.firstChild,
         offset: 2,
       });

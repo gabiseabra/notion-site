@@ -73,22 +73,26 @@ function apply(element: HTMLElement, selection: SelectionRange) {
 
   clear(element);
 
+  if (!element.textContent && selection.start === 0 && selection.end === 0) {
+    element.focus();
+    return;
+  }
+
   const start = CaretTarget.resolve(element, selection.start);
   const end = !SelectionRange.isCollapsed(selection)
     ? CaretTarget.resolve(element, selection.end)
     : start;
 
-  console.log({ start, end, selection });
-  if (!start || !end) {
+  if (
+    !start ||
+    !end ||
+    !CaretTarget.isAnchored(start) ||
+    !CaretTarget.isAnchored(end)
+  ) {
     console.warn("Invalid selection range", {
       element,
       selection,
     });
-    return;
-  }
-
-  if (!CaretTarget.isAnchored(start) || !CaretTarget.isAnchored(end)) {
-    element.focus();
     return;
   }
 
