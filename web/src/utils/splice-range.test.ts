@@ -252,26 +252,59 @@ describe("SpliceRange", () => {
       expect(el.innerHTML).toBe("<b>helloX</b> world");
     });
 
-    it("inserts into right element with prefer=right", () => {
+    it("inserts into right element with prefer=1", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b><i>world</i>";
       SpliceRange.applyToElement(
         el,
         { offset: 5, deleteCount: 0, insert: " " },
-        "right",
+        1,
       );
       expect(el.innerHTML).toBe("<b>hello</b><i> world</i>");
     });
 
-    it("inserts into left element with prefer=left", () => {
+    it("inserts into left element with prefer=-1", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b><i>world</i>";
       SpliceRange.applyToElement(
         el,
         { offset: 5, deleteCount: 0, insert: " " },
-        "left",
+        -1,
       );
       expect(el.innerHTML).toBe("<b>hello </b><i>world</i>");
+    });
+
+    it("inserts into empty span element in empty div", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<span></span>";
+      SpliceRange.applyToElement(el, {
+        offset: 0,
+        deleteCount: 0,
+        insert: "X",
+      });
+      expect(el.innerHTML).toBe("<span>X</span>");
+    });
+
+    it("inserts into empty span element in div with text on the left", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "x<span></span>";
+      SpliceRange.applyToElement(el, {
+        offset: 1,
+        deleteCount: 0,
+        insert: "X",
+      });
+      expect(el.innerHTML).toBe("x<span>X</span>");
+    });
+
+    it("inserts into empty span element in div with text on the right", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<span></span>x";
+      SpliceRange.applyToElement(el, {
+        offset: 0,
+        deleteCount: 0,
+        insert: "X",
+      });
+      expect(el.innerHTML).toBe("<span>X</span>x");
     });
 
     it("deletes from plain text into inline element", () => {

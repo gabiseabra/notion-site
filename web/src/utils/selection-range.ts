@@ -1,4 +1,5 @@
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
+import { CaretTarget } from "./caret-target.js";
 import { Element } from "./element.js";
 
 /** Text offsets within an element; end equals start for a collapsed caret. */
@@ -72,14 +73,12 @@ function apply(element: HTMLElement, selection: SelectionRange) {
 
   clear(element);
 
-  if (element.textContent === "" && selection.start === 0) {
-    element.focus();
-    return;
-  }
+  const start = CaretTarget.resolve(element, selection.start);
+  const end = !SelectionRange.isCollapsed(selection)
+    ? CaretTarget.resolve(element, selection.end)
+    : start;
 
-  const start = Element.findNodeAt(element, selection.start);
-  const end = Element.findNodeAt(element, selection.end);
-
+  console.log({ start, end, selection });
   if (!start || !end) {
     console.warn("Invalid selection range", {
       element,
@@ -88,9 +87,14 @@ function apply(element: HTMLElement, selection: SelectionRange) {
     return;
   }
 
+  if (!CaretTarget.isAnchored(start) || !CaretTarget.isAnchored(end)) {
+    element.focus();
+    return;
+  }
+
   const r = document.createRange();
-  r.setStart(start.node, start.offset);
-  r.setEnd(end.node, end.offset);
+  r.setStart(CaretTarget.getText(start), start.offset);
+  r.setEnd(CaretTarget.getText(end), end.offset);
 
   window.getSelection()?.addRange(r);
 }

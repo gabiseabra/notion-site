@@ -1,4 +1,4 @@
-import { Element } from "./element.js";
+import { CaretTarget } from "./caret-target.js";
 import { SelectionRange } from "./selection-range.js";
 
 export type SpliceRange = {
@@ -251,22 +251,19 @@ function isWhitespace(ch: string): boolean {
 export function applyToElement(
   element: HTMLElement,
   { offset, deleteCount, insert }: SpliceRange,
-  prefer: "left" | "right" = "right",
+  prefer: -1 | 1 = -1,
 ) {
-  const start = Element.findNodeAt(element, offset, prefer);
-  const end =
-    deleteCount > 0
-      ? Element.findNodeAt(element, offset + deleteCount, prefer)
-      : start;
+  const start = CaretTarget.resolve(element, offset, prefer);
+  const end = CaretTarget.resolve(element, offset + deleteCount, prefer);
+
+  if (!(start && end)) return;
 
   const range = document.createRange();
-  range.setStart(start.node, start.offset);
-  range.setEnd(end.node, end.offset);
-  range.deleteContents();
+  range.setStart(CaretTarget.allocateText(start), start.offset);
+  range.setEnd(CaretTarget.allocateText(end), end.offset);
 
-  if (insert) {
-    range.insertNode(document.createTextNode(insert));
-  }
+  if (deleteCount) range.deleteContents();
+  if (insert) range.insertNode(document.createTextNode(insert));
 
   element.normalize();
   for (const child of Array.from(element.querySelectorAll("*"))) {

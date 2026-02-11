@@ -2,15 +2,43 @@
  * @jest-environment jsdom
  */
 
-import { CaretOffset } from "./caret-offset.js";
+import { Anchor, CaretTarget } from "./caret-target.js";
 
-describe("CaretOffset", () => {
-  describe("CaretOffset.read", () => {
+const elementAnchor = (element: HTMLElement | null): Anchor => {
+  if (!(element instanceof HTMLElement)) {
+    throw new Error("impossible");
+  }
+  return { type: "element", element };
+};
+
+const textAnchor = (node: ChildNode | null): Anchor => {
+  if (!(node instanceof Text) || !node.parentElement) {
+    throw new Error("impossible");
+  }
+  return { type: "text", node };
+};
+
+describe("CaretTarget", () => {
+  describe("CaretTarget.getAnchor", () => {
+    it("returns null when offset is out of bounds", () => {
+      const el = document.createElement("div");
+      el.textContent = "hello";
+
+      expect(CaretTarget.getAnchor(el, 6)).toBe(null);
+    });
+
+    it("returns null when offset is out of bounds in mixed content", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "a<b>bc</b>d";
+
+      expect(CaretTarget.getAnchor(el, 5)).toBe(null);
+    });
+
     it("returns outside inside plain text", () => {
       const el = document.createElement("div");
       el.textContent = "hello";
 
-      expect(CaretOffset.read(el, 2)).toEqual({
+      expect(CaretTarget.getAnchor(el, 2)).toEqual({
         type: "outside",
         node: el.firstChild,
         offset: 2,
@@ -21,12 +49,12 @@ describe("CaretOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "hello <b>world</b>";
 
-      expect(CaretOffset.read(el, 6)).toEqual({
+      expect(CaretTarget.getAnchor(el, 6)).toEqual({
         type: "boundary",
         boundary: {
           type: "start",
           left: el.firstChild,
-          right: el.querySelector("b"),
+          right: textAnchor(el.querySelector("b")!.firstChild),
         },
       });
     });
@@ -35,11 +63,11 @@ describe("CaretOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b> world";
 
-      expect(CaretOffset.read(el, 5)).toEqual({
+      expect(CaretTarget.getAnchor(el, 5)).toEqual({
         type: "boundary",
         boundary: {
           type: "end",
-          left: el.querySelector("b"),
+          left: textAnchor(el.querySelector("b")!.firstChild),
           right: el.lastChild,
         },
       });
@@ -49,12 +77,12 @@ describe("CaretOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b><i>world</i>";
 
-      expect(CaretOffset.read(el, 5)).toEqual({
+      expect(CaretTarget.getAnchor(el, 5)).toEqual({
         type: "boundary",
         boundary: {
           type: "between",
-          left: el.querySelector("b"),
-          right: el.querySelector("i"),
+          left: textAnchor(el.querySelector("b")!.firstChild),
+          right: textAnchor(el.querySelector("i")!.firstChild),
         },
       });
     });
@@ -63,9 +91,9 @@ describe("CaretOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<span></span>";
 
-      expect(CaretOffset.read(el, 0)).toEqual({
+      expect(CaretTarget.getAnchor(el, 0)).toEqual({
         type: "inside",
-        node: el.querySelector("span"),
+        node: elementAnchor(el.querySelector("span")),
         offset: 0,
       });
     });
@@ -74,9 +102,9 @@ describe("CaretOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b>";
 
-      expect(CaretOffset.read(el, 2)).toEqual({
+      expect(CaretTarget.getAnchor(el, 2)).toEqual({
         type: "inside",
-        node: el.querySelector("b"),
+        node: textAnchor(el.querySelector("b")!.firstChild),
         offset: 2,
       });
     });
@@ -85,9 +113,9 @@ describe("CaretOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "a<b>bc</b>d";
 
-      expect(CaretOffset.read(el, 2)).toEqual({
+      expect(CaretTarget.getAnchor(el, 2)).toEqual({
         type: "inside",
-        node: el.querySelector("b"),
+        node: textAnchor(el.querySelector("b")!.firstChild),
         offset: 1,
       });
     });
@@ -96,12 +124,12 @@ describe("CaretOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "a<b>bc</b>d";
 
-      expect(CaretOffset.read(el, 1)).toEqual({
+      expect(CaretTarget.getAnchor(el, 1)).toEqual({
         type: "boundary",
         boundary: {
           type: "start",
           left: el.firstChild,
-          right: el.querySelector("b"),
+          right: textAnchor(el.querySelector("b")!.firstChild),
         },
       });
     });
@@ -110,11 +138,11 @@ describe("CaretOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "a<b>bc</b>d";
 
-      expect(CaretOffset.read(el, 3)).toEqual({
+      expect(CaretTarget.getAnchor(el, 3)).toEqual({
         type: "boundary",
         boundary: {
           type: "end",
-          left: el.querySelector("b"),
+          left: textAnchor(el.querySelector("b")!.firstChild),
           right: el.lastChild,
         },
       });
@@ -124,30 +152,59 @@ describe("CaretOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b></b><i></i>";
 
-      expect(CaretOffset.read(el, 0)).toEqual({
+      expect(CaretTarget.getAnchor(el, 0)).toEqual({
         type: "boundary",
         boundary: {
           type: "between",
-          left: el.querySelector("b"),
-          right: el.querySelector("i"),
+          left: elementAnchor(el.querySelector("b")),
+          right: elementAnchor(el.querySelector("i")),
+        },
+      });
+    });
+
+    it("returns boundary start in empty element with mixed content", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "hello <i></i>";
+
+      expect(CaretTarget.getAnchor(el, 6)).toEqual({
+        type: "boundary",
+        boundary: {
+          type: "start",
+          left: el.firstChild,
+          right: elementAnchor(el.querySelector("i")),
+        },
+      });
+    });
+
+    it("returns boundary end in empty element with mixed content", () => {
+      const el = document.createElement("div");
+      el.innerHTML = "<i></i> hello";
+
+      expect(CaretTarget.getAnchor(el, 0)).toEqual({
+        type: "boundary",
+        boundary: {
+          type: "end",
+          left: elementAnchor(el.querySelector("i")),
+          right: el.lastChild,
         },
       });
     });
   });
 
-  describe("CaretOffset.toDOMPosition", () => {
+  describe("CaretTarget.fromAnchor", () => {
     it("returns inside as-is", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b>";
 
       expect(
-        CaretOffset.toDOMPosition({
+        CaretTarget.fromAnchor({
           type: "inside",
-          node: el.querySelector("b")!,
+          node: textAnchor(el.querySelector("b")!.firstChild),
           offset: 2,
         }),
       ).toEqual({
-        node: el.querySelector("b"),
+        type: "text",
+        node: el.querySelector("b")!.firstChild,
         offset: 2,
       });
     });
@@ -157,12 +214,13 @@ describe("CaretOffset", () => {
       el.textContent = "hello";
 
       expect(
-        CaretOffset.toDOMPosition({
+        CaretTarget.fromAnchor({
           type: "outside",
           node: el.firstChild as Text,
           offset: 3,
         }),
       ).toEqual({
+        type: "root",
         node: el.firstChild,
         offset: 3,
       });
@@ -173,16 +231,17 @@ describe("CaretOffset", () => {
       el.innerHTML = "x<b>yy</b>";
 
       expect(
-        CaretOffset.toDOMPosition({
+        CaretTarget.fromAnchor({
           type: "boundary",
           boundary: {
             type: "start",
             left: el.firstChild as Text,
-            right: el.querySelector("b")!,
+            right: textAnchor(el.querySelector("b")!.firstChild!),
           },
         }),
       ).toEqual({
-        node: el.querySelector("b"),
+        type: "text",
+        node: el.querySelector("b")!.firstChild,
         offset: 0,
       });
     });
@@ -192,16 +251,17 @@ describe("CaretOffset", () => {
       el.innerHTML = "<b>hello</b>x";
 
       expect(
-        CaretOffset.toDOMPosition({
+        CaretTarget.fromAnchor({
           type: "boundary",
           boundary: {
             type: "end",
-            left: el.querySelector("b")!,
+            left: textAnchor(el.querySelector("b")!.firstChild),
             right: el.lastChild as Text,
           },
         }),
       ).toEqual({
-        node: el.querySelector("b"),
+        type: "text",
+        node: el.querySelector("b")!.firstChild,
         offset: 5,
       });
     });
@@ -211,19 +271,20 @@ describe("CaretOffset", () => {
       el.innerHTML = "<b>ab</b><i>cd</i>";
 
       expect(
-        CaretOffset.toDOMPosition(
+        CaretTarget.fromAnchor(
           {
             type: "boundary",
             boundary: {
               type: "between",
-              left: el.querySelector("b")!,
-              right: el.querySelector("i")!,
+              left: textAnchor(el.querySelector("b")!.firstChild),
+              right: textAnchor(el.querySelector("i")!.firstChild),
             },
           },
           -1,
         ),
       ).toEqual({
-        node: el.querySelector("b"),
+        type: "text",
+        node: el.querySelector("b")!.firstChild,
         offset: 2,
       });
     });
@@ -233,19 +294,20 @@ describe("CaretOffset", () => {
       el.innerHTML = "<b>ab</b><i>cd</i>";
 
       expect(
-        CaretOffset.toDOMPosition(
+        CaretTarget.fromAnchor(
           {
             type: "boundary",
             boundary: {
               type: "between",
-              left: el.querySelector("b")!,
-              right: el.querySelector("i")!,
+              left: textAnchor(el.querySelector("b")!.firstChild),
+              right: textAnchor(el.querySelector("i")!.firstChild),
             },
           },
           1,
         ),
       ).toEqual({
-        node: el.querySelector("i"),
+        type: "text",
+        node: el.querySelector("i")!.firstChild,
         offset: 0,
       });
     });
@@ -255,103 +317,113 @@ describe("CaretOffset", () => {
       el.innerHTML = "<b></b>x";
 
       expect(
-        CaretOffset.toDOMPosition({
+        CaretTarget.fromAnchor({
           type: "boundary",
           boundary: {
             type: "end",
-            left: el.querySelector("b")!,
+            left: elementAnchor(el.querySelector("b")),
             right: el.lastChild as Text,
           },
         }),
       ).toEqual({
-        node: el.querySelector("b"),
+        type: "element",
+        element: el.querySelector("b"),
         offset: 0,
       });
     });
   });
 
-  describe("CaretOffset.read + CaretOffset.toDOMPosition", () => {
-    it("round-trips plain text offset", () => {
+  describe.only("CaretTarget.resolve", () => {
+    it("resolves plain text offset", () => {
       const el = document.createElement("div");
       el.textContent = "hello";
 
-      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 2)!)).toEqual({
+      expect(CaretTarget.resolve(el, 2)).toEqual({
+        type: "root",
         node: el.firstChild,
         offset: 2,
       });
     });
 
-    it("round-trips inside inline text", () => {
+    it("resolves inside inline text", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b>";
 
-      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 2)!)).toEqual({
-        node: el.querySelector("b"),
+      expect(CaretTarget.resolve(el, 2)).toEqual({
+        type: "text",
+        node: el.querySelector("b")!.firstChild,
         offset: 2,
       });
     });
 
-    it("round-trips boundary start to inline start", () => {
+    it("resolves boundary start to inline start", () => {
       const el = document.createElement("div");
       el.innerHTML = "hello <b>world</b>";
 
-      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 6)!)).toEqual({
-        node: el.querySelector("b"),
+      expect(CaretTarget.resolve(el, 6)).toEqual({
+        type: "text",
+        node: el.querySelector("b")!.firstChild,
         offset: 0,
       });
     });
 
-    it("round-trips boundary end to inline end", () => {
+    it("resolves boundary end to inline end", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b> world";
 
-      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 5)!)).toEqual({
-        node: el.querySelector("b"),
+      expect(CaretTarget.resolve(el, 5)).toEqual({
+        type: "text",
+        node: el.querySelector("b")!.firstChild,
         offset: 5,
       });
     });
 
-    it("round-trips boundary between to left end  when prefer = -1", () => {
+    it("resolves boundary between to left end  when prefer = -1", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b><i>world</i>";
 
-      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 5)!, -1)).toEqual({
-        node: el.querySelector("b"),
+      expect(CaretTarget.resolve(el, 5, -1)).toEqual({
+        type: "text",
+        node: el.querySelector("b")!.firstChild,
         offset: 5,
       });
     });
 
-    it("round-trips boundary between to right start when prefer = 1", () => {
+    it("resolves boundary between to right start when prefer = 1", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b><i>world</i>";
 
-      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 5)!, 1)).toEqual({
-        node: el.querySelector("i"),
+      expect(CaretTarget.resolve(el, 5, 1)).toEqual({
+        type: "text",
+        node: el.querySelector("i")!.firstChild,
         offset: 0,
       });
     });
 
-    it("round-trips empty inline element", () => {
+    it("resolves empty inline element", () => {
       const el = document.createElement("div");
       el.innerHTML = "<span></span>";
 
-      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 0)!)).toEqual({
-        node: el.querySelector("span"),
+      expect(CaretTarget.resolve(el, 0)).toEqual({
+        type: "element",
+        element: el.querySelector("span"),
         offset: 0,
       });
     });
 
-    it("round-trips empty container with two inline elements", () => {
+    it("resolves empty container with two inline elements", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b></b><i></i>";
 
-      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 0)!, -1)).toEqual({
-        node: el.querySelector("b"),
+      expect(CaretTarget.resolve(el, 0, -1)).toEqual({
+        type: "element",
+        element: el.querySelector("b"),
         offset: 0,
       });
 
-      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 0)!, 1)).toEqual({
-        node: el.querySelector("i"),
+      expect(CaretTarget.resolve(el, 0, 1)).toEqual({
+        type: "element",
+        element: el.querySelector("i"),
         offset: 0,
       });
     });

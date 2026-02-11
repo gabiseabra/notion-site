@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener.js";
-import { ElementBoundary } from "../../../utils/element-boundary.js";
+import { CaretTarget } from "../../../utils/caret-target.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { SpliceRange } from "../../../utils/splice-range.js";
 import { AnyBlock } from "../editor/types.js";
@@ -131,22 +131,16 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
           e.target,
         );
 
-        if (shouldCommit(e.target, spliceRange)) {
+        // At element boundaries, browsers may insert text outside adjacent inline
+        // elements rather than inside them. Re-write HTMl manually to control placement.
+        const caret = CaretTarget.getAnchor(e.target, spliceRange.offset);
+        if (caret?.type === "boundary") {
+          SpliceRange.applyToElement(e.target, spliceRange);
+          console.log(caret, e.target.innerHTML);
           e.preventDefault();
-          editor.commit("inline-mutation-plugin");
         }
       } finally {
         scheduleFlush();
       }
     };
   });
-
-function shouldCommit(element: HTMLElement, spliceRange: SpliceRange) {
-  const boundary = ElementBoundary.read(element, spliceRange.offset);
-  if (boundary && boundary.right) {
-    // At element boundaries, browsers may insert text outside adjacent inline
-    // elements rather than inside them. Commit manually to control placement.
-    return true;
-  }
-  return false;
-}
