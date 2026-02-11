@@ -1,6 +1,6 @@
 import { WithRequired } from "@notion-site/common/types/object.js";
 import { liftMaybe } from "@notion-site/common/utils/fp.js";
-import { Element } from "./element.js";
+import { getTextNodes } from "./element.js";
 
 /**
  * Inline anchor candidate.
@@ -83,7 +83,7 @@ export const CaretTarget = {
  * @returns `null` when the offset is out of bounds.
  */
 function getAnchor(element: HTMLElement, offset: number): CaretAnchor | null {
-  const texts = Element.getTextNodes(element);
+  const texts = getTextNodes(element);
 
   // Walk text nodes in order, tracking the running text offset.
   for (let i = 0, pos = 0; i < texts.length; i++) {

@@ -1,6 +1,6 @@
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { CaretTarget } from "./caret-target.js";
-import { Element } from "./element.js";
+import { isElementWithTag } from "./element.js";
 
 /** Text offsets within an element; end equals start for a collapsed caret. */
 export type SelectionRange = { start: number; end: number };
@@ -30,8 +30,8 @@ export const SelectionRange = {
 function read(element: HTMLElement): SelectionRange | null {
   // Inputs are pretty straightforward
   if (
-    Element.isElementWithTag(element, "input") ||
-    Element.isElementWithTag(element, "textarea")
+    isElementWithTag(element, "input") ||
+    isElementWithTag(element, "textarea")
   ) {
     if (element.selectionStart === null) return null;
     const start = element.selectionStart;
@@ -64,8 +64,8 @@ function clear(element: HTMLElement) {
 /** Set the selection within `element` by text offsets. */
 function apply(element: HTMLElement, selection: SelectionRange) {
   if (
-    Element.isElementWithTag(element, "input") ||
-    Element.isElementWithTag(element, "textarea")
+    isElementWithTag(element, "input") ||
+    isElementWithTag(element, "textarea")
   ) {
     element.setSelectionRange(selection.start, selection.end);
     return;

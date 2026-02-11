@@ -13,7 +13,7 @@ import { useDocumentEventListener } from "../../hooks/use-document-event-listene
 import { useRafThrottledCallback } from "../../hooks/use-raf-throttled-callback.js";
 import { useResizeObserver } from "../../hooks/use-resize-observer.js";
 import { useWindowEventListener } from "../../hooks/use-window-event-listener.js";
-import { Event } from "../../utils/event.js";
+import { isEventFromElement } from "../../utils/event.js";
 import styles from "./Popover.module.scss";
 
 export type PopoverPlacement =
@@ -147,7 +147,7 @@ export function Popover({
   useDocumentEventListener(
     "pointerdown",
     useCallback((e) => {
-      if (triggerRef.current && !Event.isFromElement(e, triggerRef.current)) {
+      if (triggerRef.current && !isEventFromElement(e, triggerRef.current)) {
         onClickOutsideRef.current();
       }
     }, []),
