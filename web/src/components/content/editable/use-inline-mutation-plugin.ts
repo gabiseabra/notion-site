@@ -1,6 +1,5 @@
 import { useCallback, useRef } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener.js";
-import { CaretTarget } from "../../../utils/caret-target.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { SpliceRange } from "../../../utils/splice-range.js";
 import { AnyBlock } from "../editor/types.js";
@@ -130,14 +129,6 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
           SpliceRange.toSelectionRange(spliceRange, 1),
           e.target,
         );
-
-        // At element boundaries, browsers may insert text outside adjacent inline
-        // elements rather than inside them. Re-write HTMl manually to control placement.
-        const caret = CaretTarget.getAnchor(e.target, spliceRange.offset);
-        if (caret?.type === "boundary") {
-          SpliceRange.applyToElement(e.target, spliceRange);
-          e.preventDefault();
-        }
       } finally {
         scheduleFlush();
       }
