@@ -1,15 +1,16 @@
 /**
  * @jest-environment jsdom
  */
-import { ElementOffset } from "./element-offset.js";
 
-describe("ElementOffset", () => {
-  describe("ElementOffset.read", () => {
+import { CaretOffset } from "./caret-offset.js";
+
+describe("CaretOffset", () => {
+  describe("CaretOffset.read", () => {
     it("returns outside inside plain text", () => {
       const el = document.createElement("div");
       el.textContent = "hello";
 
-      expect(ElementOffset.read(el, 2)).toEqual({
+      expect(CaretOffset.read(el, 2)).toEqual({
         type: "outside",
         node: el.firstChild,
         offset: 2,
@@ -20,7 +21,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "hello <b>world</b>";
 
-      expect(ElementOffset.read(el, 6)).toEqual({
+      expect(CaretOffset.read(el, 6)).toEqual({
         type: "boundary",
         boundary: {
           type: "start",
@@ -34,7 +35,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b> world";
 
-      expect(ElementOffset.read(el, 5)).toEqual({
+      expect(CaretOffset.read(el, 5)).toEqual({
         type: "boundary",
         boundary: {
           type: "end",
@@ -48,7 +49,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b><i>world</i>";
 
-      expect(ElementOffset.read(el, 5)).toEqual({
+      expect(CaretOffset.read(el, 5)).toEqual({
         type: "boundary",
         boundary: {
           type: "between",
@@ -62,7 +63,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<span></span>";
 
-      expect(ElementOffset.read(el, 0)).toEqual({
+      expect(CaretOffset.read(el, 0)).toEqual({
         type: "inside",
         node: el.querySelector("span"),
         offset: 0,
@@ -73,7 +74,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b>";
 
-      expect(ElementOffset.read(el, 2)).toEqual({
+      expect(CaretOffset.read(el, 2)).toEqual({
         type: "inside",
         node: el.querySelector("b"),
         offset: 2,
@@ -84,7 +85,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "a<b>bc</b>d";
 
-      expect(ElementOffset.read(el, 2)).toEqual({
+      expect(CaretOffset.read(el, 2)).toEqual({
         type: "inside",
         node: el.querySelector("b"),
         offset: 1,
@@ -95,7 +96,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "a<b>bc</b>d";
 
-      expect(ElementOffset.read(el, 1)).toEqual({
+      expect(CaretOffset.read(el, 1)).toEqual({
         type: "boundary",
         boundary: {
           type: "start",
@@ -109,7 +110,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "a<b>bc</b>d";
 
-      expect(ElementOffset.read(el, 3)).toEqual({
+      expect(CaretOffset.read(el, 3)).toEqual({
         type: "boundary",
         boundary: {
           type: "end",
@@ -123,7 +124,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b></b><i></i>";
 
-      expect(ElementOffset.read(el, 0)).toEqual({
+      expect(CaretOffset.read(el, 0)).toEqual({
         type: "boundary",
         boundary: {
           type: "between",
@@ -134,13 +135,13 @@ describe("ElementOffset", () => {
     });
   });
 
-  describe("ElementOffset.extract", () => {
+  describe("CaretOffset.toDOMPosition", () => {
     it("returns inside as-is", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b>";
 
       expect(
-        ElementOffset.extract({
+        CaretOffset.toDOMPosition({
           type: "inside",
           node: el.querySelector("b")!,
           offset: 2,
@@ -156,7 +157,7 @@ describe("ElementOffset", () => {
       el.textContent = "hello";
 
       expect(
-        ElementOffset.extract({
+        CaretOffset.toDOMPosition({
           type: "outside",
           node: el.firstChild as Text,
           offset: 3,
@@ -172,7 +173,7 @@ describe("ElementOffset", () => {
       el.innerHTML = "x<b>yy</b>";
 
       expect(
-        ElementOffset.extract({
+        CaretOffset.toDOMPosition({
           type: "boundary",
           boundary: {
             type: "start",
@@ -191,7 +192,7 @@ describe("ElementOffset", () => {
       el.innerHTML = "<b>hello</b>x";
 
       expect(
-        ElementOffset.extract({
+        CaretOffset.toDOMPosition({
           type: "boundary",
           boundary: {
             type: "end",
@@ -210,7 +211,7 @@ describe("ElementOffset", () => {
       el.innerHTML = "<b>ab</b><i>cd</i>";
 
       expect(
-        ElementOffset.extract(
+        CaretOffset.toDOMPosition(
           {
             type: "boundary",
             boundary: {
@@ -232,7 +233,7 @@ describe("ElementOffset", () => {
       el.innerHTML = "<b>ab</b><i>cd</i>";
 
       expect(
-        ElementOffset.extract(
+        CaretOffset.toDOMPosition(
           {
             type: "boundary",
             boundary: {
@@ -254,7 +255,7 @@ describe("ElementOffset", () => {
       el.innerHTML = "<b></b>x";
 
       expect(
-        ElementOffset.extract({
+        CaretOffset.toDOMPosition({
           type: "boundary",
           boundary: {
             type: "end",
@@ -269,12 +270,12 @@ describe("ElementOffset", () => {
     });
   });
 
-  describe("ElementOffset.read + ElementOffset.extract", () => {
+  describe("CaretOffset.read + CaretOffset.toDOMPosition", () => {
     it("round-trips plain text offset", () => {
       const el = document.createElement("div");
       el.textContent = "hello";
 
-      expect(ElementOffset.extract(ElementOffset.read(el, 2)!)).toEqual({
+      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 2)!)).toEqual({
         node: el.firstChild,
         offset: 2,
       });
@@ -284,7 +285,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b>";
 
-      expect(ElementOffset.extract(ElementOffset.read(el, 2)!)).toEqual({
+      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 2)!)).toEqual({
         node: el.querySelector("b"),
         offset: 2,
       });
@@ -294,7 +295,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "hello <b>world</b>";
 
-      expect(ElementOffset.extract(ElementOffset.read(el, 6)!)).toEqual({
+      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 6)!)).toEqual({
         node: el.querySelector("b"),
         offset: 0,
       });
@@ -304,7 +305,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b> world";
 
-      expect(ElementOffset.extract(ElementOffset.read(el, 5)!)).toEqual({
+      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 5)!)).toEqual({
         node: el.querySelector("b"),
         offset: 5,
       });
@@ -314,7 +315,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b><i>world</i>";
 
-      expect(ElementOffset.extract(ElementOffset.read(el, 5)!, -1)).toEqual({
+      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 5)!, -1)).toEqual({
         node: el.querySelector("b"),
         offset: 5,
       });
@@ -324,7 +325,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b>hello</b><i>world</i>";
 
-      expect(ElementOffset.extract(ElementOffset.read(el, 5)!, 1)).toEqual({
+      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 5)!, 1)).toEqual({
         node: el.querySelector("i"),
         offset: 0,
       });
@@ -334,7 +335,7 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<span></span>";
 
-      expect(ElementOffset.extract(ElementOffset.read(el, 0)!)).toEqual({
+      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 0)!)).toEqual({
         node: el.querySelector("span"),
         offset: 0,
       });
@@ -344,12 +345,12 @@ describe("ElementOffset", () => {
       const el = document.createElement("div");
       el.innerHTML = "<b></b><i></i>";
 
-      expect(ElementOffset.extract(ElementOffset.read(el, 0)!, -1)).toEqual({
+      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 0)!, -1)).toEqual({
         node: el.querySelector("b"),
         offset: 0,
       });
 
-      expect(ElementOffset.extract(ElementOffset.read(el, 0)!, 1)).toEqual({
+      expect(CaretOffset.toDOMPosition(CaretOffset.read(el, 0)!, 1)).toEqual({
         node: el.querySelector("i"),
         offset: 0,
       });
