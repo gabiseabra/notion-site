@@ -34,7 +34,7 @@ describe("useBlockNavigationPlugin", () => {
     cy.get("@first").should("have.focus");
   });
 
-  it("moves caret to previous block on ArrowDown", () => {
+  it("moves caret to next block on ArrowDown (", () => {
     cy.mount(
       <ContentEditor
         value={[p("a", span("First")), p("b", span("Second"))]}
