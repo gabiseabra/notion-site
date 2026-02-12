@@ -1,4 +1,5 @@
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
+import { SelectionRange } from "../../../utils/selection-range.js";
 import { ContentEditor } from "../ContentEditor.js";
 
 const options = {
@@ -63,5 +64,40 @@ describe("useHistoryPlugin", () => {
       .eq(1)
       .should("have.focus")
       .should("contain.text", "Just adding a newline");
+  });
+
+  it.only("restores cursor position on undo / redo", () => {
+    cy.mount(
+      <ContentEditor
+        value={[p("a", span("Hello World"))]}
+        onChange={() => {}}
+        options={options}
+      />,
+    );
+
+    cy.get("p").type("{moveToEnd}").type("{ctrl}{backspace}");
+    cy.wait(options.autoCommit);
+
+    cy.get("p")
+      .then(([p]) => {
+        expect(SelectionRange.read(p)).to.deep.equal({
+          start: 6,
+          end: 6,
+        });
+      })
+      .type("{ctrl}z")
+      .then(([p]) => {
+        expect(SelectionRange.read(p)).to.deep.equal({
+          start: 11,
+          end: 11,
+        });
+      })
+      .type("{ctrl}y")
+      .then(([p]) => {
+        expect(SelectionRange.read(p)).to.deep.equal({
+          start: 6,
+          end: 6,
+        });
+      });
   });
 });
