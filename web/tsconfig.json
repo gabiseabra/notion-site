@@ -1,26 +1,11 @@
 {
-  "extends": "../tsconfig.base.json",
+  "files": [],
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "types": [
-      "vite/client",
-      "jest",
-      "@testing-library/jest-dom"
-    ],
-    "outDir": "./dist/ts",
-    "tsBuildInfoFile": "dist/ts/.tsbuildinfo"
+    "composite": true
   },
-  "include": [
-    "src/**/*",
-    "vite.config.ts"
-  ],
-  "exclude": [
-    "src/**/*.cy.ts",
-    "src/**/*.cy.tsx"
-  ],
   "references": [
     {
-      "path": "../common"
+      "path": "./tsconfig.build.json"
     },
     {
       "path": "./tsconfig.cypress.json"
