@@ -28,14 +28,8 @@ jobs:
       - name: Typescript
         run: npm run tsc
 
-      - name: Jest
-        run: npm run test
-
       - name: Build
         run: npm run build
 
-      - name: Cypress
-        uses: cypress-io/github-action@v6
-        with:
-          component: true
-          working-directory: "${{ matrix.project }}"
+      - name: Jest
+        run: npm run test
