@@ -5,7 +5,16 @@ import { isElementWithTag } from "./element.js";
 /** Text offsets within an element; end equals start for a collapsed caret. */
 export type SelectionRange = { start: number; end: number };
 
+/**
+ * Utilities for reading and applying text selections within DOM elements.
+ * Works with both contenteditable elements and input/textarea elements.
+ */
 export const SelectionRange = {
+  read,
+  clear,
+  apply,
+  moveVertically,
+
   isCollapsed(selection: SelectionRange) {
     return selection.start === selection.end;
   },
@@ -17,16 +26,14 @@ export const SelectionRange = {
     };
   },
 
-  // functions on HTMLElement
-  read,
-  clear,
-  apply,
-  applyMaybe,
-  maxOffset,
-  moveVertically,
+  maxOffset(element: HTMLElement): number {
+    return (element.textContent ?? "").length;
+  },
 };
 
-/** Get selection offsets within `element`, or null if selection is outside. */
+/**
+ * Get selection offsets within `element`, or null if selection is outside.
+ */
 function read(element: HTMLElement): SelectionRange | null {
   // Inputs are pretty straightforward
   if (
@@ -55,7 +62,14 @@ function read(element: HTMLElement): SelectionRange | null {
   return { start, end };
 }
 
-/** Unselects all elements. Handles the appropriate DOM instance for the given element. */
+/** @internal */
+function getRange(): Range | null {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return null;
+  return sel.getRangeAt(0);
+}
+
+/** Unselects all elements. */
 function clear(element: HTMLElement) {
   window.getSelection()?.removeAllRanges();
   element.blur();
@@ -103,16 +117,6 @@ function apply(element: HTMLElement, selection: SelectionRange) {
   window.getSelection()?.addRange(r);
 }
 
-function applyMaybe(element: HTMLElement, selection: SelectionRange | null) {
-  if (!selection) clear(element);
-  else apply(element, selection);
-}
-
-/** Max selectable offset (text length) for `element`. */
-function maxOffset(element: HTMLElement): number {
-  return (element.textContent ?? "").length;
-}
-
 /**
  * Compute the caret range when moving up/down between blocks.
  * @note noop for non-collapsed ranges.
@@ -151,16 +155,9 @@ function moveVertically(
     );
 }
 
-/** Internals */
-
-function getRange(): Range | null {
-  const sel = window.getSelection();
-  if (!sel || !sel.rangeCount) return null;
-  return sel.getRangeAt(0);
-}
-
 /**
  * Move vertically between blocks using layout geometry.
+ * @internal
  */
 function moveVerticallyByGeometry(
   currentElement: HTMLElement,
@@ -189,15 +186,19 @@ function moveVerticallyByGeometry(
     );
 
   return {
-    start: targetOffset ?? (direction === 1 ? maxOffset(targetElement) : 0),
-    end: targetOffset ?? (direction === 1 ? maxOffset(targetElement) : 0),
+    start:
+      targetOffset ??
+      (direction === 1 ? SelectionRange.maxOffset(targetElement) : 0),
+    end:
+      targetOffset ??
+      (direction === 1 ? SelectionRange.maxOffset(targetElement) : 0),
   };
 }
 
 /**
  * Move vertically when the current element is whitespace-only.
- * The caret rect can be zero for whitespace-only text, so geometry is
- * unreliable.
+ * The caret rect can be zero for whitespace-only text, so geometry is unreliable.
+ * @internal
  */
 function moveVerticallyByOffset(
   currentElement: HTMLElement,
@@ -237,11 +238,14 @@ function moveVerticallyByOffset(
       )
     : null;
 
-  const start = lineStartOffset ?? maxOffset(targetElement);
+  const start = lineStartOffset ?? SelectionRange.maxOffset(targetElement);
   return { start, end: start };
 }
 
-/** Line rectangles for the element's text layout. */
+/**
+ * Line rectangles for the element's text layout.
+ * @internal
+ */
 function getLineRects(element: HTMLElement): NonEmpty<DOMRect> {
   const range = document.createRange();
   range.selectNodeContents(element);
@@ -264,21 +268,28 @@ function getLineRects(element: HTMLElement): NonEmpty<DOMRect> {
   return lines;
 }
 
+/** @internal */
 function getCaretRect(range: Range) {
   const rect = range.getClientRects()[0] ?? range.getBoundingClientRect();
   return isZeroRect(rect) ? null : rect;
 }
 
+/** @internal */
 function isZeroRect(rect: DOMRect) {
   return (
     rect.top === 0 && rect.bottom === 0 && rect.left === 0 && rect.right === 0
   );
 }
+
+/** @internal */
 function isSameLine(a: DOMRect, b: DOMRect) {
   return Math.abs(a.top + a.height / 2 - (b.top + b.height / 2)) <= 2;
 }
 
-/** Resolve a text offset from viewport coords inside `element`. */
+/**
+ * Resolve a text offset from viewport coords inside `element`.
+ * @internal
+ */
 function getOffsetFromPoint(
   element: HTMLElement,
   x: number,
@@ -310,6 +321,7 @@ function getOffsetFromPoint(
 /**
  * Get the text content from the start of `element` up to a specific DOM node + offset.
  * Traverses the DOM and returns the plain text represented by that range.
+ * @internal
  */
 function getTextUpToNode(
   element: HTMLElement,

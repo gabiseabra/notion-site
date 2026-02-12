@@ -139,14 +139,17 @@ const caretLeft = getCaretLeft(element, direction);
 When writing utility modules, add a short jsdoc explaining what the function is doing if it isn't trivial.
 If the function is being exported, be more descriptive and add **`@note`** s about behaviour and edge cases.
 
-- **You don't need to use `@internal`**: Internal helpers are not exported. Just write a one line explanation, it's
-  fine!
 - **You don't need to use `@params`**: Params should already be clear by the type annotations.
 - **You can use `@return`** to explain how to interpret the return type.
+- **You should use `@internal`**: for internal helpers. Mark non-exported functions with `/** @internal */`. A one-line
+  JSDoc is fine for trivial internals.
 
 ```ts
 // Internal helper - one line
-/** Get caret's x position, or null if not on the boundary line for the given direction. */
+/**
+ * Get caret's x position, or null if not on the boundary line for the given direction.
+ * @internal
+ */
 function getCaretLeft(element: HTMLElement, direction: "up" | "down"): number | null {
 }
 
@@ -236,22 +239,57 @@ you see `X`, you immediately know where `X.parse`, `X.is`, `X.options`, or other
 #### Basic Structure
 
 ```ts
-// history.ts
-export type EditorCommand =
-  | { type: "update"; blockId: string }
-  | { type: "remove"; blockId: string }
-  | { type: "apply"; commands: EditorCommand[] };
+// caret-target.ts
 
-export const EditorCommand = {
-  /** Get the target block id for selection restoration. */
-  id: (cmd: EditorCommand): string =>
-    cmd.type === "apply" ? EditorCommand.id(cmd.commands[0]) : cmd.blockId,
+/**
+ * Inline anchor candidate.
+ * - `text`: text node inside an inline child element.
+ * - `element`: empty inline child element (no text content yet).
+ */
+export type CaretTarget =
+  | { type: "text"; node: Text; offset: number }
+  | { type: "element"; element: HTMLElement; offset: number };
 
-  /** Flatten nested apply commands into a flat list. */
-  flat: (cmds: EditorCommand[]) =>
-    cmds.flatMap((cmd) => (cmd.type === "apply" ? cmd.commands : [cmd])),
+/**
+ * Caret target that can receive a selection directly.
+ */
+export type AnchoredCaretTarget = Extract<CaretTarget, { type: "text" }>
+
+/**
+ * Utilities to map between a plain text offset in a root editable element and a
+ * concrete DOM caret target.
+ */
+export const CaretTarget = {
+  getAnchor,
+  fromAnchor,
+
+  // Trivial methods can be defined inline.
+  isAnchored(target: CaretTarget): target is AnchoredCaretTarget {
+    return target.type !== "element";
+  },
 };
+
+/**
+ * Try to find where the caret could land inside of the element at the given offset.
+ * @returns `null` when the offset is out of bounds.
+ */
+function getAnchor(element: HTMLElement, offset: number): CaretAnchor | null {
+  // ...
+}
+
+/** @internal */
+function textAnchor(node: Text | null, root: HTMLElement): Anchor | null {
+  // ...
+}
 ```
+
+Organize exports in this order:
+
+1. **Type exports at top** — each with JSDoc explaining variants/cases.
+2. **Namespace object** — with JSDoc describing what the module does. Define methods inline if they are trivial, or
+   below the export otherwise.
+3. **Internal functions** — marked with `@internal`. If the helper is only used by one public method, keep it below that
+   method. If it is used across the whole module, keep it at the bottom of the module.
 
 #### Use Cases
 

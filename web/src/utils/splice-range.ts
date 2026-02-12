@@ -1,13 +1,19 @@
 import { CaretTarget } from "./caret-target.js";
 import { SelectionRange } from "./selection-range.js";
 
+/** A text mutation. */
 export type SpliceRange = {
   offset: number;
   deleteCount: number;
   insert: string;
 };
 
+/**
+ * Utilities for computing and applying text splice operations.
+ * Bridges input events to text mutations and applies them to DOM elements.
+ */
 export const SpliceRange = {
+  fromInputEvent,
   applyToElement,
 
   apply(text: string, { offset, deleteCount, insert }: SpliceRange) {
@@ -32,56 +38,56 @@ export const SpliceRange = {
 
     return { start, end: start };
   },
-
-  fromInputEvent(
-    event: InputEvent,
-    text: string,
-    selection: SelectionRange,
-  ): SpliceRange | null {
-    const selected = SpliceRange.fromSelectionRange(selection);
-
-    switch (event.inputType) {
-      case "insertText":
-      case "insertFromPaste":
-      case "insertFromDrop":
-      case "insertReplacementText":
-        return insertAtSelection(selection, selected, event.data ?? "");
-
-      case "insertLineBreak":
-        return insertAtSelection(selection, selected, "\n");
-
-      case "deleteByCut":
-        return selected;
-
-      case "deleteContentBackward":
-        return deleteFromCaret(text, selection, -1, "char");
-
-      case "deleteContentForward":
-        return deleteFromCaret(text, selection, 1, "char");
-
-      case "deleteWordBackward":
-        return deleteFromCaret(text, selection, -1, "word");
-
-      case "deleteWordForward":
-        return deleteFromCaret(text, selection, 1, "word");
-
-      case "deleteSoftLineBackward":
-        return deleteFromCaret(text, selection, -1, "softLine");
-
-      case "deleteSoftLineForward":
-        return deleteFromCaret(text, selection, 1, "softLine");
-
-      default:
-        return null;
-    }
-  },
 };
 
-type Unit = "char" | "word" | "softLine";
+/**
+ * Convert an InputEvent into a SpliceRange based on input type.
+ * @returns `null` for unsupported input types.
+ */
+function fromInputEvent(
+  event: InputEvent,
+  text: string,
+  selection: SelectionRange,
+): SpliceRange | null {
+  const selected = SpliceRange.fromSelectionRange(selection);
 
-const WORD_CHAR = /[\p{L}\p{N}_]/u;
-const WHITESPACE = /\s/;
+  switch (event.inputType) {
+    case "insertText":
+    case "insertFromPaste":
+    case "insertFromDrop":
+    case "insertReplacementText":
+      return insertAtSelection(selection, selected, event.data ?? "");
 
+    case "insertLineBreak":
+      return insertAtSelection(selection, selected, "\n");
+
+    case "deleteByCut":
+      return selected;
+
+    case "deleteContentBackward":
+      return deleteFromCaret(text, selection, -1, "char");
+
+    case "deleteContentForward":
+      return deleteFromCaret(text, selection, 1, "char");
+
+    case "deleteWordBackward":
+      return deleteFromCaret(text, selection, -1, "word");
+
+    case "deleteWordForward":
+      return deleteFromCaret(text, selection, 1, "word");
+
+    case "deleteSoftLineBackward":
+      return deleteFromCaret(text, selection, -1, "softLine");
+
+    case "deleteSoftLineForward":
+      return deleteFromCaret(text, selection, 1, "softLine");
+
+    default:
+      return null;
+  }
+}
+
+/** @internal */
 function insertAtSelection(
   selection: SelectionRange,
   selected: SpliceRange,
@@ -94,6 +100,10 @@ function insertAtSelection(
   };
 }
 
+/** @internal */
+type Unit = "char" | "word" | "softLine";
+
+/** @internal */
 function deleteFromCaret(
   text: string,
   selection: SelectionRange,
@@ -113,6 +123,7 @@ function deleteFromCaret(
   }
 }
 
+/** @internal */
 function getCharDeleteSpan(
   text: string,
   caret: number,
@@ -127,6 +138,7 @@ function getCharDeleteSpan(
     : null;
 }
 
+/** @internal */
 function getWordDeleteSpan(
   text: string,
   caret: number,
@@ -139,6 +151,7 @@ function getWordDeleteSpan(
   return getWordDeleteSpanForward(text, caret);
 }
 
+/** @internal */
 function getWordDeleteSpanBackward(
   text: string,
   caret: number,
@@ -158,6 +171,7 @@ function getWordDeleteSpanBackward(
   return { offset: left, deleteCount: caret - left, insert: "" };
 }
 
+/** @internal */
 function getWordDeleteSpanForward(
   text: string,
   caret: number,
@@ -179,6 +193,7 @@ function getWordDeleteSpanForward(
   return { offset: caret, deleteCount: right - caret, insert: "" };
 }
 
+/** @internal */
 function getSoftLineDeleteSpan(
   text: string,
   caret: number,
@@ -191,6 +206,7 @@ function getSoftLineDeleteSpan(
   return getSoftLineDeleteSpanForward(text, caret);
 }
 
+/** @internal */
 function getSoftLineDeleteSpanBackward(
   text: string,
   caret: number,
@@ -203,6 +219,7 @@ function getSoftLineDeleteSpanBackward(
   return { offset: lineStart, deleteCount: caret - lineStart, insert: "" };
 }
 
+/** @internal */
 function getSoftLineDeleteSpanForward(
   text: string,
   caret: number,
@@ -215,6 +232,13 @@ function getSoftLineDeleteSpanForward(
   return { offset: caret, deleteCount: lineEnd - caret, insert: "" };
 }
 
+/** @internal */
+const WORD_CHAR = /[\p{L}\p{N}_]/u;
+
+/** @internal */
+const WHITESPACE = /\s/;
+
+/** @internal */
 function skipBackwardWhile(
   text: string,
   from: number,
@@ -225,6 +249,7 @@ function skipBackwardWhile(
   return i;
 }
 
+/** @internal */
 function skipForwardWhile(
   text: string,
   from: number,
@@ -235,10 +260,12 @@ function skipForwardWhile(
   return i;
 }
 
+/** @internal */
 function isWordChar(ch: string): boolean {
   return WORD_CHAR.test(ch);
 }
 
+/** @internal */
 function isWhitespace(ch: string): boolean {
   return WHITESPACE.test(ch);
 }
@@ -248,7 +275,7 @@ function isWhitespace(ch: string): boolean {
  * At a text/element boundary, inserts inside the element.
  * At a boundary between two elements, `prefer` determines which element to insert into.
  */
-export function applyToElement(
+function applyToElement(
   element: HTMLElement,
   spliceRange: SpliceRange,
   prefer: -1 | 1 = -1,
