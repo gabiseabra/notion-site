@@ -19,7 +19,7 @@
   },
   "scripts": {
     "dev": "dotenvx run -f ../.env -- vite",
-    "clean": "rm -rf ./dist",
+    "clean": "tsc -b --clean && rm -rf dist",
     "build": "npm run build:ts && npm run build:client && npm run build:server",
     "build:ts": "tsc -b",
     "build:client": "dotenvx run -f ../.env -- vite build",
