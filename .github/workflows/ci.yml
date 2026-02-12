@@ -25,11 +25,17 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Type-check
+      - name: Typescript
         run: npm run tsc
 
-      - name: Test
+      - name: Jest
         run: npm run test
 
       - name: Build
         run: npm run build
+
+      - name: Cypress
+        uses: cypress-io/github-action@v6
+        with:
+          component: true
+          working-directory: "${{ matrix.project }}"
