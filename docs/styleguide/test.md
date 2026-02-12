@@ -148,6 +148,6 @@ For `<input>` or `<textarea>`, use `@testing-library/user-event` directly since 
 ## Cypress Component Tests
 
 - Do not import test helpers in Cypress specs.
-- Avoid direct DOM manipulation (for example, setting selection ranges by hand).
+- Do not use DOM methods to manipulate state (for example, setting selection ranges by hand). If you must read from the DOM, prefer existing utilities (e.g., selection range helpers) over ad-hoc code.
 - Use Cypress commands to simulate interactions whenever possible (`cy.get(...).type(...)`, `click`, `trigger`, etc.).
 - Prefer `cy.get(...).should(...)` assertions; avoid `expect(...)` and `.then(...)` in Cypress specs.
