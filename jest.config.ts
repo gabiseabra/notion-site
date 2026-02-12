@@ -29,7 +29,7 @@ export default {
             tsconfig: `${process.cwd()}/${workspace}/${workspace === "web" ? `tsconfig.build` : "tsconfig"}.json`,
             diagnostics: false,
           },
-        ] as const,
+        ],
       },
       moduleNameMapper: {
         "^.+/env(\\.js)?$": `${process.cwd()}/${workspace}/src/test-utils/env.ts`,

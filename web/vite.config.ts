@@ -1,6 +1,6 @@
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
-import { defineConfig } from "vite";
+import { defineConfig, searchForWorkspaceRoot } from "vite";
 
 const VITE_PORT = parseInt(process.env.VITE_PORT || "3030", 10);
 const PORT = parseInt(process.env.PORT || "3000", 10);
@@ -15,6 +15,9 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   server: {
     port: VITE_PORT,
+    fs: {
+      allow: [searchForWorkspaceRoot(__dirname)],
+    },
     proxy: {
       "/feed": `http://localhost:${PORT}`,
       "/api": {
