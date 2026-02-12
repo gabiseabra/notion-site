@@ -144,3 +144,10 @@ inputEvent.insert(el, "z", { metaKey: true });  // Cmd+Z
 ```
 
 For `<input>` or `<textarea>`, use `@testing-library/user-event` directly since it handles those properly.
+
+## Cypress Component Tests
+
+- Do not import test helpers in Cypress specs.
+- Avoid direct DOM manipulation (for example, setting selection ranges by hand).
+- Use Cypress commands to simulate interactions whenever possible (`cy.get(...).type(...)`, `click`, `trigger`, etc.).
+- Prefer `cy.get(...).should(...)` assertions; avoid `expect(...)` and `.then(...)` in Cypress specs.
