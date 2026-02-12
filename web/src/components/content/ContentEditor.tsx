@@ -3,7 +3,10 @@ import { memo, Ref, useCallback, useImperativeHandle } from "react";
 import { useEventListener } from "../../hooks/use-event-listener.js";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
-import { useNotionPlugin } from "./editable/use-notion-plugin.js";
+import {
+  NotionPluginOptions,
+  useNotionPlugin,
+} from "./editable/use-notion-plugin.js";
 import { EditorEvent } from "./editor/editor-event.js";
 import { ContentEditor as TContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
@@ -14,6 +17,7 @@ export namespace ContentEditor {
     ref?: Ref<TContentEditor<Notion.Block> | null>;
     value: Notion.Block[];
     onChange: (block: Notion.Block[]) => void;
+    options: NotionPluginOptions;
   };
 }
 
@@ -21,10 +25,11 @@ export const ContentEditor = memo(function ContentEditor({
   ref,
   value: initialValue,
   onChange,
+  options,
 }: ContentEditor.Props) {
   const { editor, editable } = useContentEditor({
     initialValue,
-    plugin: useNotionPlugin(),
+    plugin: useNotionPlugin(options),
   });
 
   useImperativeHandle(ref, () => editor, [editor]);

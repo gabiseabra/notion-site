@@ -8,12 +8,15 @@ import { useHistoryPlugin } from "./use-history-plugin.js";
 import { useInlineMutationPlugin } from "./use-inline-mutation-plugin.js";
 import { useLoggerPlugin } from "./use-logger-plugin.js";
 
+export type NotionPluginOptions = {
+  disabled?: boolean;
+  multiline?: boolean;
+  logging?: boolean | "verbose";
+  autoCommit?: number;
+};
+
 export const useNotionPlugin = (
-  options: {
-    disabled?: boolean;
-    multiline?: boolean;
-    logging?: boolean | "verbose";
-  } = {
+  options: NotionPluginOptions = {
     multiline: true,
     logging: env.DEV,
   },
@@ -34,7 +37,7 @@ export const useNotionPlugin = (
       else if (event.eventType !== "flush")
         console.info(event.eventType, event.detail, event.editor);
     }),
-    useAutoCommitPlugin(600),
+    useAutoCommitPlugin(options.autoCommit ?? 600),
     useHistoryPlugin,
     useInlineMutationPlugin({
       multiline: options.multiline,
