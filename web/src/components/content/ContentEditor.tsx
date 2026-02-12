@@ -17,7 +17,7 @@ export namespace ContentEditor {
     ref?: Ref<TContentEditor<Notion.Block> | null>;
     value: Notion.Block[];
     onChange: (block: Notion.Block[]) => void;
-    options: NotionPluginOptions;
+    options?: NotionPluginOptions;
   };
 }
 
