@@ -66,7 +66,7 @@ describe("useHistoryPlugin", () => {
       .should("contain.text", "Just adding a newline");
   });
 
-  it.only("restores cursor position on undo / redo", () => {
+  it("restores cursor position on undo / redo", () => {
     cy.mount(
       <ContentEditor
         value={[p("a", span("Hello World"))]}
