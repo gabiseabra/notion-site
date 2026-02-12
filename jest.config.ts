@@ -22,14 +22,14 @@ export default {
             ],
       extensionsToTreatAsEsm: workspace === "web" ? [".ts", ".tsx"] : [".ts"],
       transform: {
-        [workspace === "web" ? "^.+\\.(ts|tsx)$" : "^.+\\.ts$"]: [
+        "^.+\\.tsx?$": [
           "ts-jest",
           {
             useESM: true,
-            tsconfig: `${process.cwd()}/${workspace}/tsconfig.json`,
+            tsconfig: `${process.cwd()}/${workspace}/${workspace === "web" ? `tsconfig.build` : "tsconfig"}.json`,
             diagnostics: false,
           },
-        ] as [string, Record<string, unknown>],
+        ] as const,
       },
       moduleNameMapper: {
         "^.+/env(\\.js)?$": `${process.cwd()}/${workspace}/src/test-utils/env.ts`,
