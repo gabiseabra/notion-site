@@ -2,7 +2,7 @@ import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { ContentEditor } from "../ContentEditor.js";
 
 const options = {
-  autoCommit: 100,
+  autoCommit: 200,
 };
 
 describe("useHistoryPlugin", () => {
