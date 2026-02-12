@@ -77,11 +77,11 @@ describe("useBlockNavigationPlugin", () => {
     cy.get("p").eq(0).as("first");
     cy.get("p").eq(1).as("second");
 
-    cy.get("@first").click().type("{downArrow}{downArrow}");
-
-    cy.get("@first").should("have.focus");
-
-    cy.get("@first").click().type("{downArrow}");
+    cy.get("@first")
+      .click()
+      .type("{moveToStart}{downArrow}{downArrow}")
+      .should("have.focus")
+      .type("{downArrow}");
 
     cy.get("@second").should("have.focus");
   });
@@ -97,11 +97,11 @@ describe("useBlockNavigationPlugin", () => {
     cy.get("p").eq(0).as("first");
     cy.get("p").eq(1).as("second");
 
-    cy.get("@second").click().type("{upArrow}{upArrow}");
-
-    cy.get("@second").should("have.focus");
-
-    cy.get("@second").click().type("{upArrow}");
+    cy.get("@second")
+      .click()
+      .type("{moveToEnd}{upArrow}{upArrow}")
+      .should("have.focus")
+      .type("{upArrow}");
 
     cy.get("@first").should("have.focus");
   });
