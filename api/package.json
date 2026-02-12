@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -b",
-    "clean": "tsc -b --clean",
+    "clean": "rm -rf dist",
     "start": "dotenvx run -f ../.env -- node dist/server.js",
     "dev": "nodemon --watch 'src/**' --watch '../common/src/**' --ext ts,tsx,js,json --exec 'npm run build && dotenvx run -f ../.env -- npm run start'"
   },

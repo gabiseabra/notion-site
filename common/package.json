@@ -13,7 +13,7 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "clean": "tsc -b --clean"
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "zod": "^3.22.4"
