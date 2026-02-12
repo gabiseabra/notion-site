@@ -1,11 +1,16 @@
 import { defineConfig } from "cypress";
+import viteConfig from "./web/vite.config.js";
 
 export default defineConfig({
   component: {
     devServer: {
       framework: "react",
       bundler: "vite",
-      viteConfig: () => import("./web/vite.config.ts"),
+      viteConfig: () =>
+        viteConfig({
+          command: "build",
+          mode: "test",
+        }),
     },
     excludeSpecPattern: ["**/dist/**/*"],
   },
