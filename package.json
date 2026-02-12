@@ -15,7 +15,7 @@
     "dev": "concurrently \"npm run dev -w api\" \"npm run dev -w web\"",
     "lint": "eslint \"{api,web,common}/src/**/*.{ts,tsx}\"",
     "tsc": "tsc -b",
-    "cy:open": "cypress open",
+    "cy:open": "cypress open --component --browser chrome",
     "test": "NODE_OPTIONS=--experimental-vm-modules node --loader ts-node/esm ./node_modules/jest/bin/jest.js -c jest.config.ts --",
     "test:common": "NODE_OPTIONS=--experimental-vm-modules node --loader ts-node/esm ./node_modules/jest/bin/jest.js -c jest.config.ts --selectProjects common --",
     "test:api": "NODE_OPTIONS=--experimental-vm-modules node --loader ts-node/esm ./node_modules/jest/bin/jest.js -c jest.config.ts --selectProjects api --",
