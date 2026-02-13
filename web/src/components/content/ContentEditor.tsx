@@ -40,7 +40,7 @@ export const ContentEditor = memo(function ContentEditor({
     (e: EditorEvent<Notion.Block>) => onChange(e.editor.blocks),
     [onChange],
   );
-  useEventListener(editor.bus, "commit", onCommit);
+  useEventListener(editor.bus, "postcommit", onCommit);
 
   return (
     <RootBlock
