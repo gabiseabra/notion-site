@@ -37,10 +37,10 @@ export const ContentEditor = memo(function ContentEditor({
   useImperativeHandle(ref, () => editor, [editor]);
 
   const onCommit = useCallback(
-    (e: EditorEvent<Notion.Block>) => onChange(e.editor.blocks),
+    (e: EditorEvent<Notion.Block, "commit">) => onChange(e.detail.blocks),
     [onChange],
   );
-  useEventListener(editor.bus, "postcommit", onCommit);
+  useEventListener(editor.bus, "commit", onCommit);
 
   return (
     <RootBlock
