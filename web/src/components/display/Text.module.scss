@@ -32,11 +32,8 @@
   line-break: anywhere;
 }
 
-.span:empty {
-  &::after {
-    display: inline-block;
-    content: "\00a0";
-  }
+.text[contenteditable] * {
+  display: inline;
 }
 
 // Theme palette classes

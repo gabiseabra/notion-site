@@ -43,6 +43,7 @@ export function Text({
   return (
     <Tag
       className={[
+        styles.text,
         indent && styles[`indent-${{ 1: 1, 2: 2, 3: 3, 4: 4 }[indent] ?? 0}`],
         size && styles[`size-${size}`],
         color && styles[`color-${color}`],
