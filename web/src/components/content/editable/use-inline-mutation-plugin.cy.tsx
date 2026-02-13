@@ -3,6 +3,7 @@ import { ContentEditor } from "../ContentEditor.js";
 
 const options = {
   autoCommit: 200,
+  multiline: true,
 };
 
 describe("useInlineMutationPlugin", () => {

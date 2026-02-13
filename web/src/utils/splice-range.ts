@@ -58,6 +58,7 @@ function fromInputEvent(
     case "insertReplacementText":
       return insertAtSelection(selection, selected, event.data ?? "");
 
+    case "insertParagraph":
     case "insertLineBreak":
       return insertAtSelection(selection, selected, "\n");
 
