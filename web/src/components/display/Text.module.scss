@@ -32,8 +32,14 @@
   line-break: anywhere;
 }
 
-.text[contenteditable] * {
-  display: inline;
+.text[contenteditable] {
+  * {
+    display: inline-block;
+  }
+  // .span::after {
+  //   display: inline-block;
+  //   content: " ";
+  // }
 }
 
 // Theme palette classes
