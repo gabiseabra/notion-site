@@ -1,5 +1,7 @@
+import { unique } from "@notion-site/common/utils/array.js";
+import { keys } from "@notion-site/common/utils/object.js";
 import { AnyBlock } from "../editor/types.js";
-import { ContentEditorPlugin } from "./types.js";
+import { ContentEditableProps, ContentEditorPlugin } from "./types.js";
 
 /**
  * Composes multiple plugins into a single plugin.
@@ -22,54 +24,18 @@ export function composePlugins<TBlock extends AnyBlock>(
     return (block) => {
       const handlers = appliedPlugins.map((p) => p(block));
 
-      return {
-        contentEditable: handlers.find((handler) => handler.contentEditable)
-          ?.contentEditable,
-        suppressContentEditableWarning: handlers.find(
-          (handler) => handler.suppressContentEditableWarning,
-        )?.suppressContentEditableWarning,
-        tabIndex: handlers.reduce<number | undefined>(
-          (acc, handler) => acc ?? handler.tabIndex,
-          undefined,
-        ),
+      const events = unique(handlers.flatMap((props) => keys(props)));
 
-        ref(e) {
-          for (const { ref } of handlers) {
-            ref?.(e);
-          }
-        },
-
-        onKeyDown(e) {
-          for (const { onKeyDown } of handlers) {
-            onKeyDown?.(e);
+      return events.reduce<ContentEditableProps>((props, key) => {
+        props[key] = (e) => {
+          for (const _props of handlers) {
+            // ugh....
+            (_props[key] as ((event: typeof e) => void) | undefined)?.(e);
             if (e.isPropagationStopped()) return;
           }
-        },
-        onInput(e) {
-          for (const { onInput } of handlers) {
-            onInput?.(e);
-            if (e.isPropagationStopped()) return;
-          }
-        },
-        onBeforeInput(e) {
-          for (const { onBeforeInput } of handlers) {
-            onBeforeInput?.(e);
-            if (e.isPropagationStopped()) return;
-          }
-        },
-        onFocus(e) {
-          for (const { onFocus } of handlers) {
-            onFocus?.(e);
-            if (e.isPropagationStopped()) return;
-          }
-        },
-        onBlur(e) {
-          for (const { onBlur } of handlers) {
-            onBlur?.(e);
-            if (e.isPropagationStopped()) return;
-          }
-        },
-      };
+        };
+        return props;
+      }, {});
     };
   };
 }

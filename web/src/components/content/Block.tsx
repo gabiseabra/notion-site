@@ -8,8 +8,9 @@ import { RichText, RichTextProps } from "./RichText.js";
 import { ContentEditableProps } from "./editable/types.js";
 
 type BlockProps = {
-  indent?: number;
   value: Notion.Block;
+  indent?: number;
+  editable?: boolean;
   inline?: Partial<RichTextProps>;
 } & ContentEditableProps;
 
@@ -19,17 +20,25 @@ type BlockProps = {
  */
 export function Block({
   value,
+  indent,
+  editable,
   inline: inlineProps,
-  ...blockProps
+  ...editableProps
 }: BlockProps) {
   const contentProps = (rich_text: Notion.RichText) =>
-    blockProps.contentEditable
+    editable
       ? {
+          indent,
+          tabIndex: 1,
+          contentEditable: "plaintext-only" as const,
+          suppressContentEditableWarning: true,
           dangerouslySetInnerHTML: {
             __html: richTextToHTML(rich_text),
           },
+          ...editableProps,
         }
       : {
+          indent,
           children: <RichText value={rich_text} {...inlineProps} />,
         };
 
@@ -41,7 +50,7 @@ export function Block({
             as="p"
             color={block.paragraph.color}
             {...contentProps(block.paragraph.rich_text)}
-            {...blockProps}
+            {...editableProps}
           />
         ))
         .with({ type: "bulleted_list_item" }, (block) => (
@@ -49,7 +58,7 @@ export function Block({
             as="p"
             color={block.bulleted_list_item.color}
             {...contentProps(block.bulleted_list_item.rich_text)}
-            {...blockProps}
+            {...editableProps}
           />
         ))
         .with({ type: "numbered_list_item" }, (block) => (
@@ -57,7 +66,7 @@ export function Block({
             as="p"
             color={block.numbered_list_item.color}
             {...contentProps(block.numbered_list_item.rich_text)}
-            {...blockProps}
+            {...editableProps}
           />
         ))
         .with({ type: "heading_1" }, (block) => (
@@ -65,7 +74,7 @@ export function Block({
             as="h2"
             color={block.heading_1.color}
             {...contentProps(block.heading_1.rich_text)}
-            {...blockProps}
+            {...editableProps}
           />
         ))
         .with({ type: "heading_2" }, (block) => (
@@ -73,7 +82,7 @@ export function Block({
             as="h3"
             color={block.heading_2.color}
             {...contentProps(block.heading_2.rich_text)}
-            {...blockProps}
+            {...editableProps}
           />
         ))
         .with({ type: "heading_3" }, (block) => (
@@ -81,7 +90,7 @@ export function Block({
             as="h4"
             color={block.heading_3.color}
             {...contentProps(block.heading_3.rich_text)}
-            {...blockProps}
+            {...editableProps}
           />
         ))
         .with({ type: "quote" }, (block) => (
@@ -89,10 +98,10 @@ export function Block({
             as="blockquote"
             color={block.quote.color}
             {...contentProps(block.quote.rich_text)}
-            {...blockProps}
+            {...editableProps}
           />
         ))
-        .with({ type: "divider" }, () => <hr {...blockProps} />)
+        .with({ type: "divider" }, () => <hr {...editableProps} />)
         .with({ type: "link_to_page" }, (data) => (
           <LinkToPage id={data.link_to_page.page_id} />
         ))

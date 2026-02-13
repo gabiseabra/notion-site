@@ -9,7 +9,6 @@ import { useInlineMutationPlugin } from "./use-inline-mutation-plugin.js";
 import { useLoggerPlugin } from "./use-logger-plugin.js";
 
 export type NotionPluginOptions = {
-  disabled?: boolean;
   multiline?: boolean;
   logging?: boolean | "verbose";
   autoCommit?: number;
@@ -22,14 +21,6 @@ export const useNotionPlugin = (
   },
 ) =>
   composePlugins<Notion.Block>(
-    () => () =>
-      options.disabled
-        ? {}
-        : {
-            contentEditable: "plaintext-only",
-            suppressContentEditableWarning: true,
-            tabIndex: 0,
-          },
     useLoggerPlugin((event) => {
       if (!options.logging) return;
       else if (options.logging == "verbose")

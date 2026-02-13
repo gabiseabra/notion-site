@@ -18,6 +18,7 @@ export namespace ContentEditor {
     value: Notion.Block[];
     onChange: (block: Notion.Block[]) => void;
     options?: NotionPluginOptions;
+    disabled?: boolean;
   };
 }
 
@@ -26,6 +27,7 @@ export const ContentEditor = memo(function ContentEditor({
   value: initialValue,
   onChange,
   options,
+  disabled,
 }: ContentEditor.Props) {
   const { editor, editable } = useContentEditor({
     initialValue,
@@ -44,7 +46,12 @@ export const ContentEditor = memo(function ContentEditor({
     <RootBlock
       value={editor.blocks}
       render={(block, path) => (
-        <Block indent={path.indent} value={block} {...editable(block)} />
+        <Block
+          indent={path.indent}
+          value={block}
+          editable={!disabled}
+          {...editable(block)}
+        />
       )}
     />
   );

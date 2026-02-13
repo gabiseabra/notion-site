@@ -1,45 +1,16 @@
-import { FocusEvent, FormEvent, InputEvent, KeyboardEvent } from "react";
+import { HTMLAttributes } from "react";
 import { AnyBlock, ContentEditor } from "../editor/types.js";
+
+type ReactEventHandlers<T> = {
+  [K in keyof T as K extends `on${string}` ? K : never]: T[K];
+};
 
 /**
  * These props are spread onto the block's DOM element to enable editing.
  */
-export type ContentEditableProps = {
-  /**
-   * Callback ref to register the block's DOM element.
-   */
-  ref?: (element: HTMLElement | null) => void;
-
-  /**
-   * The contentEditable mode for the element.
-   * - `"plaintext-only"` prevents automatic rich text formatting.
-   * - `undefined` for disabled.
-   */
-  contentEditable?: "plaintext-only" | undefined;
-  suppressContentEditableWarning?: boolean;
-  tabIndex?: number;
-
-  /**
-   * Keyboard event handler for navigation, shortcuts, etc.
-   * Called on keydown before the browser processes the key.
-   */
-  onKeyDown?: (e: KeyboardEvent<HTMLElement>) => void;
-
-  /**
-   * Input event handler for content changes.
-   * Called after the DOM has been updated with new content.
-   */
-  onInput?: (e: FormEvent<HTMLElement>) => void;
-
-  /**
-   * Before-input event handler for intercepting input.
-   * Called before the DOM is updated, allows preventing input.
-   */
-  onBeforeInput?: (e: InputEvent<HTMLElement>) => void;
-
-  onFocus?: (e: FocusEvent<HTMLElement>) => void;
-  onBlur?: (e: FocusEvent<HTMLElement>) => void;
-};
+export type ContentEditableProps = ReactEventHandlers<
+  HTMLAttributes<HTMLElement>
+>;
 
 /**
  * A plugin that extends the content editor's behavior.
