@@ -48,10 +48,10 @@ export const useNotionPlugin = (
 
         return Notion.Block.map(left, (node) => ({
           ...node,
-          rich_text: [
+          rich_text: Notion.RTF.normalize([
             ...node.rich_text,
             ...Notion.Block.extract(right).rich_text,
-          ],
+          ]),
         }));
       },
       split(block, offset, deleteRange) {
