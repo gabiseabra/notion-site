@@ -1,4 +1,3 @@
-import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { CaretTarget } from "./caret-target.js";
 import { isElementWithTag } from "./element.js";
 
@@ -155,6 +154,9 @@ function moveVertically(
     );
 }
 
+/** Small inset in px to probe inside element bounds and avoid boundary precision issues. */
+const PROBE_INSET_PX = 2;
+
 /**
  * Move vertically between blocks using layout geometry.
  * @internal
@@ -165,25 +167,22 @@ function moveVerticallyByGeometry(
   direction: 1 | -1,
   caretRect: DOMRect,
 ): SelectionRange | null {
-  // Read the line rectangles from the current selection.
-  const lineRects = getLineRects(currentElement);
-  const boundaryLine =
-    direction === 1 ? lineRects[0] : lineRects[lineRects.length - 1];
+  const currentRect = currentElement.getBoundingClientRect();
+  const pos = direction === 1 ? "top" : "bottom";
+  const distance = Math.floor(Math.abs(caretRect[pos] - currentRect[pos]));
 
-  // Ensure the caret is on the boundary line (first line for up, last for down).
-  if (!isSameLine(caretRect, boundaryLine)) return null;
+  // Ensure the caret is close enough to the boundary line.
+  if (distance > PROBE_INSET_PX) return null;
 
   // Project the x-position into the target element and resolve a text offset.
-  const targetLines = getLineRects(targetElement);
-  const targetLine =
-    direction === 1 ? targetLines[targetLines.length - 1] : targetLines[0];
-  const targetOffset =
-    targetLine &&
-    getOffsetFromPoint(
-      targetElement,
-      caretRect.left,
-      targetLine.top + targetLine.height / 2,
-    );
+  const targetRect = targetElement.getBoundingClientRect();
+  const targetOffset = getOffsetFromPoint(
+    targetElement,
+    caretRect.x,
+    direction === 1
+      ? targetRect.bottom - caretRect.height / 2
+      : targetRect.top + caretRect.height / 2,
+  );
 
   return {
     start:
@@ -229,43 +228,15 @@ function moveVerticallyByOffset(
 
   // Moving up from an empty/whitespace-only block: start of target's last
   // visual line, or fallback to max offset.
-  const targetLine = getLineRects(targetElement).pop();
-  const lineStartOffset = targetLine
-    ? getOffsetFromPoint(
-        targetElement,
-        targetLine.left + 1,
-        targetLine.top + targetLine.height / 2,
-      )
-    : null;
+  const targetRect = targetElement.getBoundingClientRect();
+  const lineStartOffset = getOffsetFromPoint(
+    targetElement,
+    targetRect.left + PROBE_INSET_PX,
+    targetRect.bottom - PROBE_INSET_PX,
+  );
 
   const start = lineStartOffset ?? SelectionRange.maxOffset(targetElement);
   return { start, end: start };
-}
-
-/**
- * Line rectangles for the element's text layout.
- * @internal
- */
-function getLineRects(element: HTMLElement): NonEmpty<DOMRect> {
-  const range = document.createRange();
-  range.selectNodeContents(element);
-
-  const lines: DOMRect[] = Array.from(range.getClientRects()).reduce<DOMRect[]>(
-    (lines, rect) => {
-      const last = lines[lines.length - 1];
-      if (!last || Math.round(rect.top) !== Math.round(last.top)) {
-        lines.push(rect);
-      }
-      return lines;
-    },
-    [],
-  );
-
-  if (!NonEmpty.isNonEmpty(lines)) {
-    return [element.getBoundingClientRect()];
-  }
-
-  return lines;
 }
 
 /** @internal */
@@ -279,11 +250,6 @@ function isZeroRect(rect: DOMRect) {
   return (
     rect.top === 0 && rect.bottom === 0 && rect.left === 0 && rect.right === 0
   );
-}
-
-/** @internal */
-function isSameLine(a: DOMRect, b: DOMRect) {
-  return Math.abs(a.top + a.height / 2 - (b.top + b.height / 2)) <= 2;
 }
 
 /**
