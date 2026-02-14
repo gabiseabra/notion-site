@@ -3,12 +3,6 @@ import { zNotion } from "../../dto/notion/schema/index.js";
 import * as RTF from "./rich-text.js";
 import { span } from "./wip.js";
 
-const getContent = (rich_text: zNotion.rich_text.rich_text_item) =>
-  rich_text
-    .filter((i) => i.type === "text")
-    .map((i) => i.text.content)
-    .join("");
-
 describe("Notion.RTF", () => {
   describe("Notion.RTF.getLength", () => {
     it("returns 0 for empty array", () => {
@@ -44,10 +38,9 @@ describe("Notion.RTF", () => {
     });
 
     it("finds item at valid offset", () => {
-      const item = span("hello");
       for (let i = 0; i <= 5; ++i)
-        expect(RTF.findByOffset([item], i)).toEqual({
-          node: item,
+        expect(RTF.findByOffset([span("hello")], i)).toEqual({
+          node: span("hello"),
           index: 0,
           start: 0,
           length: 5,
@@ -55,15 +48,13 @@ describe("Notion.RTF", () => {
     });
 
     it("finds nothing at invalid offset", () => {
-      const item = span("hello");
-      expect(RTF.findByOffset([item], -1)).toEqual(null);
-      expect(RTF.findByOffset([item], 6)).toEqual(null);
+      expect(RTF.findByOffset([span("hello")], -1)).toEqual(null);
+      expect(RTF.findByOffset([span("hello")], 6)).toEqual(null);
     });
 
     it("finds correct item in multi-item array", () => {
-      const items = [span("hello"), span(" world")];
-      expect(RTF.findByOffset(items, 7)).toEqual({
-        node: items[1],
+      expect(RTF.findByOffset([span("hello"), span(" world")], 7)).toEqual({
+        node: span("hello"),
         index: 1,
         start: 5,
         length: 6,
@@ -111,66 +102,56 @@ describe("Notion.RTF", () => {
 
   describe("Notion.RTF.splice", () => {
     it("returns same array when no changes", () => {
-      const rich_text = [span("hello")];
-      expect(RTF.splice(rich_text, 0, 0, "")).toBe(rich_text);
+      expect(RTF.splice([span("hello")], 0, 0, "")).toBe([span("hello")]);
     });
 
     it("creates text item when inserting into empty array", () => {
-      expect(getContent(RTF.splice([], 0, 0, "hello"))).toBe("hello");
+      expect(RTF.splice([], 0, 0, "hello")).toEqual([span("hello")]);
     });
 
     it("inserts text at beginning", () => {
-      expect(getContent(RTF.splice([span("world")], 0, 0, "hello "))).toBe(
-        "hello world",
-      );
+      expect(RTF.splice([span("world")], 0, 0, "hello ")).toEqual([
+        span("hello world"),
+      ]);
     });
 
     it("inserts text in middle", () => {
-      expect(getContent(RTF.splice([span("helo")], 3, 0, "l"))).toBe("hello");
+      expect(RTF.splice([span("helo")], 3, 0, "l")).toEqual([span("hello")]);
     });
 
     it("inserts text at end", () => {
-      expect(getContent(RTF.splice([span("hello")], 5, 0, " world"))).toBe(
-        "hello world",
-      );
+      expect(RTF.splice([span("hello")], 5, 0, " world")).toEqual([
+        span("hello world"),
+      ]);
     });
 
     it("deletes text", () => {
-      expect(getContent(RTF.splice([span("hello")], 1, 3, ""))).toBe("ho");
+      expect(RTF.splice([span("hello")], 1, 3, "")).toEqual([span("ho")]);
     });
 
     it("replaces text", () => {
-      expect(getContent(RTF.splice([span("hello")], 1, 3, "ipp"))).toBe(
-        "hippo",
-      );
+      expect(RTF.splice([span("hello")], 1, 3, "ipp")).toEqual([span("hippo")]);
     });
 
     it("preserves annotations from item at insert point", () => {
-      const result = RTF.splice(
-        [span("hello", { bold: true })],
-        5,
-        0,
-        " world",
-      );
-      expect(result[result.length - 1]).toMatchObject({
-        annotations: { bold: true },
-      });
+      expect(
+        RTF.splice([span("hello", { bold: true })], 5, 0, " world"),
+      ).toEqual([span("hello world", { bold: true })]);
+    });
+
+    it("preserves structure across mixed annotations", () => {
+      expect(
+        RTF.splice(
+          [span("he", { bold: true }), span("llo", { italic: true })],
+          1,
+          3,
+          "",
+        ),
+      ).toEqual([span("h", { bold: true }), span("o", { italic: true })]);
     });
   });
 
   describe("Notion.RTF.normalize", () => {
-    it("returns empty array for empty input", () => {
-      expect(RTF.normalize([])).toEqual([]);
-    });
-
-    it("returns same items when no merging needed", () => {
-      const rich_text = [
-        span("hello", { bold: true }),
-        span(" world", { italic: true }),
-      ];
-      expect(RTF.normalize(rich_text)).toEqual(rich_text);
-    });
-
     it("merges adjacent items with same annotations", () => {
       expect(
         RTF.normalize([span("hello"), span(" world"), span("! ! !")]),

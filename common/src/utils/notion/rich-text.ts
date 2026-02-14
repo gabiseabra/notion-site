@@ -67,29 +67,33 @@ export function slice(
 
   if (!startItem) return [];
 
-  return [
-    replaceTextContent(startItem.node, (content) =>
-      content.slice(
-        start - startItem.start,
-        end && endItem && endItem.index === startItem.index
-          ? Math.min(startItem.length, end - startItem.start)
-          : undefined,
+  return normalize(
+    [
+      replaceTextContent(startItem.node, (content) =>
+        content.slice(
+          start - startItem.start,
+          end && endItem && endItem.index === startItem.index
+            ? Math.min(startItem.length, end - startItem.start)
+            : undefined,
+        ),
       ),
+      ...(endItem && endItem.index === startItem.index
+        ? []
+        : rich_text.slice(
+            startItem.index + 1,
+            endItem ? endItem.index : undefined,
+          )),
+      ...(!endItem || endItem.index === startItem.index
+        ? []
+        : [
+            replaceTextContent(endItem.node, (content) =>
+              content.slice(0, (end ?? 0) - endItem.start),
+            ),
+          ]),
+    ].filter(
+      (item) => !(item.type === "text" && item.text.content.length === 0),
     ),
-    ...(endItem && endItem.index === startItem.index
-      ? []
-      : rich_text.slice(
-          startItem.index + 1,
-          endItem ? endItem.index : undefined,
-        )),
-    ...(!endItem || endItem.index === startItem.index
-      ? []
-      : [
-          replaceTextContent(endItem.node, (content) =>
-            content.slice(0, (end ?? 0) - endItem.start),
-          ),
-        ]),
-  ].filter((item) => !(item.type === "text" && item.text.content.length === 0));
+  );
 }
 
 /**
