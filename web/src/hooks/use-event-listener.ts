@@ -1,5 +1,5 @@
 import { hash } from "@notion-site/common/utils/hash.js";
-import { RefObject, useEffect } from "react";
+import { RefObject, useEffect, useRef } from "react";
 import { TypedEventTarget } from "typescript-event-target";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,13 +26,18 @@ export function useEventListener<
       ? elementOrRef.current
       : elementOrRef;
 
+  const listenerRef = useRef(listener);
+  listenerRef.current = listener;
+
   useEffect(() => {
     if (!element) return;
+    const f: typeof listener = (e) => listenerRef.current(e);
     if (element instanceof HTMLElement) {
-      element.addEventListener(type, listener, options);
-      return () => element.removeEventListener(type, listener, options);
+      element.addEventListener(type, f, options);
+      return () => element.removeEventListener(type, f, options);
+    } else {
+      element.addEventListener(type, f, options);
+      return () => element.removeEventListener(type, f, options);
     }
-    element.addEventListener(type, listener, options);
-    return () => element.removeEventListener(type, listener, options);
-  }, [element, type, listener, hash(options)]);
+  }, [element, type, hash(options)]);
 }

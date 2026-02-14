@@ -1,7 +1,6 @@
-import { KeyboardEvent, useCallback } from "react";
+import { KeyboardEvent } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { EditorEvent } from "../editor/editor-event.js";
 import { EditorCommand } from "../editor/editor-history.js";
 import { AnyBlock, ContentEditor } from "../editor/types.js";
 import { AnyContentEditorPlugin } from "./types.js";
@@ -17,41 +16,36 @@ import { AnyContentEditorPlugin } from "./types.js";
  * | `Ctrl+Y` | `Cmd+Y`: Redo (alternative)
  */
 export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
-  const restoreSelection = useCallback(
-    <TBlock extends AnyBlock>({ editor }: EditorEvent<TBlock>) => {
-      const direction = editor.history.direction;
-      const cmd = editor.history.command;
-      if (!cmd) return;
+  useEventListener(editor.bus, "postcommit", ({ editor }) => {
+    const direction = editor.history.direction;
+    const cmd = editor.history.command;
+    if (!cmd) return;
 
-      const id = EditorCommand.id(cmd, direction);
-      const selection =
-        direction === -1 ? cmd.selectionBefore : cmd.selectionAfter;
-      const element = editor.ref(id);
-      const currentSelection = element && SelectionRange.read(element);
+    const id = EditorCommand.id(cmd, direction);
+    const selection =
+      direction === -1 ? cmd.selectionBefore : cmd.selectionAfter;
+    const element = editor.ref(id);
+    const currentSelection = element && SelectionRange.read(element);
 
-      if (!element || !selection) {
-        console.warn("Failed to restore selection after commit.", element, {
-          id,
-          cmd,
-          direction,
-          revision: editor.revision,
-          selection,
-          currentSelection,
-        });
-        return;
-      }
-      if (
-        selection.start === currentSelection?.start &&
-        selection.end === currentSelection?.end
-      )
-        return;
+    if (!element || !selection) {
+      console.warn("Failed to restore selection after commit.", element, {
+        id,
+        cmd,
+        direction,
+        revision: editor.revision,
+        selection,
+        currentSelection,
+      });
+      return;
+    }
+    if (
+      selection.start === currentSelection?.start &&
+      selection.end === currentSelection?.end
+    )
+      return;
 
-      SelectionRange.apply(element, selection);
-    },
-    [],
-  );
-
-  useEventListener(editor.bus, "postcommit", restoreSelection);
+    SelectionRange.apply(element, selection);
+  });
 
   return (block) => ({
     onKeyDown(e) {

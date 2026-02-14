@@ -1,5 +1,5 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
-import { memo, Ref, useCallback, useImperativeHandle } from "react";
+import { memo, Ref, useImperativeHandle } from "react";
 import { useEventListener } from "../../hooks/use-event-listener.js";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
@@ -7,7 +7,6 @@ import {
   NotionPluginOptions,
   useNotionPlugin,
 } from "./editable/use-notion-plugin.js";
-import { EditorEvent } from "./editor/editor-event.js";
 import { ContentEditor as TContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
 
@@ -36,11 +35,7 @@ export const ContentEditor = memo(function ContentEditor({
 
   useImperativeHandle(ref, () => editor, [editor]);
 
-  const onCommit = useCallback(
-    (e: EditorEvent<Notion.Block, "commit">) => onChange(e.detail.blocks),
-    [onChange],
-  );
-  useEventListener(editor.bus, "commit", onCommit);
+  useEventListener(editor.bus, "commit", (e) => onChange(e.detail.blocks));
 
   return (
     <RootBlock
