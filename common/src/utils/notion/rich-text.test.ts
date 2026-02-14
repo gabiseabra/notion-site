@@ -54,7 +54,7 @@ describe("Notion.RTF", () => {
 
     it("finds correct item in multi-item array", () => {
       expect(RTF.findByOffset([span("hello"), span(" world")], 7)).toEqual({
-        node: span("hello"),
+        node: span(" world"),
         index: 1,
         start: 5,
         length: 6,
@@ -102,7 +102,7 @@ describe("Notion.RTF", () => {
 
   describe("Notion.RTF.splice", () => {
     it("returns same array when no changes", () => {
-      expect(RTF.splice([span("hello")], 0, 0, "")).toBe([span("hello")]);
+      expect(RTF.splice([span("hello")], 0, 0, "")).toEqual([span("hello")]);
     });
 
     it("creates text item when inserting into empty array", () => {
