@@ -6,7 +6,8 @@ type ReactEventHandlers<T> = {
 };
 
 /**
- * These props are spread onto the block's DOM element to enable editing.
+ * Any React event handler prop that a plugin can attach to a block’s editable
+ * DOM element. These props are composed and spread onto that element.
  */
 export type ContentEditableProps = ReactEventHandlers<
   HTMLAttributes<HTMLElement>
