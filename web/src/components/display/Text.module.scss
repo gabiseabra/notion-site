@@ -36,10 +36,10 @@
   * {
     display: inline-block;
   }
-  // .span::after {
-  //   display: inline-block;
-  //   content: " ";
-  // }
+  .span:empty::after {
+    display: inline;
+    content: "\200B";
+  }
 }
 
 // Theme palette classes

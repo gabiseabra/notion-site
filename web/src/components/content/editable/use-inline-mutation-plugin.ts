@@ -96,8 +96,16 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
       try {
         if (!(e.target instanceof HTMLElement)) return;
 
-        const selection = SelectionRange.read(e.target);
-        if (!selection) return;
+        const currentBlock =
+          pendingRef.current?.block.id === block.id
+            ? pendingRef.current.block
+            : editor.peek(block.id);
+        const selection =
+          pendingRef.current?.block.id === block.id
+            ? pendingRef.current.selectionAfter
+            : SelectionRange.read(e.target);
+
+        if (!currentBlock || !selection) return;
 
         const spliceRange = SpliceRange.fromInputEvent(
           e,
@@ -111,13 +119,6 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
           e.preventDefault();
           return;
         }
-
-        const currentBlock =
-          pendingRef.current?.block.id === block.id
-            ? pendingRef.current.block
-            : editor.peek(block.id);
-
-        if (!currentBlock) return;
 
         update(
           splice(
