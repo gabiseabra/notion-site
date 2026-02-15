@@ -178,7 +178,7 @@ async function mapTextItem(item: Notion.RTF.Item<"text">) {
         ? { url: await replaceUrl(item.text.link.url) }
         : null,
       content:
-        Notion.RTF.isRedacted(item) && !env.DEV
+        Notion.RTF.isItemRedacted(item) && !env.DEV
           ? "█".repeat(item.text.content.length)
           : item.text.content,
     },

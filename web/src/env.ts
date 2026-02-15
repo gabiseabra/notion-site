@@ -10,3 +10,5 @@ export const API_URL =
 export const SITE_TITLE: string =
   import.meta.env.VITE_SITE_TITLE ?? "Site Title";
 export const SITE_URL: string | undefined = import.meta.env.VITE_SITE_URL;
+
+export const IS_MAC = navigator.userAgent.match(/OS X 10/);

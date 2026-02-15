@@ -1,5 +1,6 @@
 import { zNotion } from "../../dto/notion/schema/index.js";
-import { hasPropertyValue } from "../guards.js";
+import { hasPropertyValue, isNonNullable } from "../guards.js";
+import { keys } from "../object.js";
 
 export type RichText = zNotion.rich_text.rich_text_item;
 
@@ -197,8 +198,76 @@ export function annotationsEquals(a: Annotations, b: Annotations) {
   );
 }
 
-export function isRedacted({ text: { link } }: Item<"text">) {
+export function isItemRedacted({ text: { link } }: Item<"text">) {
   return link?.url === "REDACTED";
+}
+
+export function isItemAnnotated(item: Item<"text">, a: Partial<Annotations>) {
+  return (
+    (typeof a.bold !== "undefined" && a.bold === item.annotations.bold) ||
+    (typeof a.code !== "undefined" && a.code === item.annotations.code) ||
+    (typeof a.italic !== "undefined" && a.italic === item.annotations.italic) ||
+    (typeof a.color !== "undefined" && a.color === item.annotations.color) ||
+    (typeof a.underline !== "undefined" &&
+      a.underline === item.annotations.underline) ||
+    (typeof a.strikethrough !== "undefined" &&
+      a.strikethrough === item.annotations.strikethrough)
+  );
+}
+
+/** @returns true if any of the items in the range has the given annotation */
+export function isAnnotated(
+  rich_text: RichText,
+  a: Partial<Annotations>,
+  start: number,
+  end: number,
+) {
+  return (
+    start === end
+      ? [findByOffset(rich_text, start)?.node].filter(isNonNullable)
+      : slice(rich_text, start, end)
+  ).some((item) => item.type === "text" && isItemAnnotated(item, a));
+}
+
+export function setAnnotations(
+  rich_text: RichText,
+  a: Partial<Annotations>,
+  start: number,
+  end: number,
+): RichText {
+  const before = slice(rich_text, 0, start);
+  const middle = slice(rich_text, start, end).map((item) =>
+    item.type === "text"
+      ? {
+          ...item,
+          annotations: {
+            ...item.annotations,
+            ...a,
+          },
+        }
+      : item,
+  );
+  const after = slice(rich_text, end);
+
+  return normalize([...before, ...middle, ...after]);
+}
+
+export function toggleAnnotations(
+  rich_text: RichText,
+  a: Partial<Annotations>,
+  start: number,
+  end: number,
+): RichText {
+  return setAnnotations(
+    rich_text,
+    !isAnnotated(rich_text, a, start, end)
+      ? a
+      : (Object.fromEntries(
+          keys(a).map((a) => [a, empty_text.annotations[a]] as const),
+        ) satisfies Partial<Annotations>),
+    start,
+    end,
+  );
 }
 
 export const empty_text: Item<"text"> = {

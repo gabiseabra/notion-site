@@ -21,7 +21,7 @@ export function RichText({ value, ...props }: RichTextProps) {
         value.map((item, ix) =>
           match(item)
             .with({ type: "text" }, (item) =>
-              Notion.RTF.isRedacted(item) ? (
+              Notion.RTF.isItemRedacted(item) ? (
                 <Span key={ix} redacted {...props}>
                   {item.text.content}
                 </Span>
