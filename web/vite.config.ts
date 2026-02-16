@@ -1,13 +1,20 @@
 import react from "@vitejs/plugin-react";
+import { resolve } from "path";
 import { defineConfig, searchForWorkspaceRoot } from "vite";
 
 const VITE_PORT = parseInt(process.env.VITE_PORT || "3030", 10);
 const PORT = parseInt(process.env.PORT || "3000", 10);
 
-export default defineConfig(({ isSsrBuild }) => ({
+export default defineConfig(({ isSsrBuild, mode }) => ({
   plugins: [react()],
   resolve: {
     preserveSymlinks: true,
+    alias:
+      mode !== "test"
+        ? {
+            "@notion-site/common": resolve("../common/src/"),
+          }
+        : undefined,
   },
   server: {
     port: VITE_PORT,
