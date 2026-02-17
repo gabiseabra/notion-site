@@ -1,0 +1,57 @@
+@use "../../css/mixins/shadow" as shadow;
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+  padding: 0;
+  cursor: pointer;
+
+  background: transparent;
+  border: none;
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
+}
+
+.tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%);
+  pointer-events: none;
+  white-space: nowrap;
+
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: var(--space);
+  border-radius: var(--radius);
+  background: var(--bg-from);
+  color: var(--color-text);
+
+  @include shadow.shadow(1);
+
+  animation: copy-toast 800ms linear forwards;
+}
+
+@keyframes copy-toast {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px);
+  }
+  25% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  75% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+}

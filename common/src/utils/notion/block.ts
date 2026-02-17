@@ -13,6 +13,7 @@ export const RichTextType = [
   "quote",
   "bulleted_list_item",
   "numbered_list_item",
+  "code",
 ] as const;
 
 /** Block restricted to a union type */
@@ -75,6 +76,8 @@ export function extract(block: Block): Node {
       return block.child_page;
     case "image":
       return block.image;
+    case "code":
+      return block.code;
   }
 }
 
@@ -105,6 +108,8 @@ export function map<T extends BlockType>(
       return { ...block, child_page: f(extract(block)) };
     case "image":
       return { ...block, image: f(extract(block)) };
+    case "code":
+      return { ...block, code: f(extract(block)) };
   }
 }
 
@@ -127,7 +132,7 @@ export function split(
   left: Block;
   right: Block;
 } {
-  if (!narrow(block, ...RichTextType)) {
+  if (!isRichText(block)) {
     return {
       left: block,
       right: create({ type: "paragraph" }),
@@ -137,14 +142,14 @@ export function split(
   const node = extract(block);
 
   return {
-    left: map(block, () => ({
+    left: map(block, (node) => ({
       ...node,
       rich_text: RTF.slice(node.rich_text, 0, offset),
     })),
     right: create({
       type: "paragraph",
       paragraph: {
-        ...node,
+        color: "default",
         rich_text: RTF.slice(node.rich_text, offset + deleteRange),
       },
     }),

@@ -1,6 +1,7 @@
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { match } from "ts-pattern";
+import { Code } from "../display/Code.js";
 import { Image } from "../display/Image.js";
 import { Span, Text } from "../display/Text.js";
 import { LinkToPage } from "../navigation/LinkToPage.js";
@@ -118,6 +119,17 @@ export function Block({
               .with({ type: "external" }, ({ external }) => external.url)
               .with({ type: "file" }, ({ file }) => file.url)
               .exhaustive()}
+          />
+        ))
+        .with({ type: "code" }, (block) => (
+          <Code
+            code={Notion.RTF.getContent(block.code.rich_text)}
+            language={block.code.language}
+            after={
+              block.code.caption.length > 0 && (
+                <RichText size="caption" value={block.code.caption} />
+              )
+            }
           />
         ))
         .exhaustive()}

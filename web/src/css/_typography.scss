@@ -3,14 +3,19 @@
  **********************************************************************************************************************/
 @use "mixins/text" as text;
 
+@forward "highlight.js/scss/shades-of-purple.scss";
+// @forward "highlight.js/scss/rose-pine-moon.scss";
+// @forward "highlight.js/scss/nnfx-light.scss";
+// @forward "highlight.js/scss/github.scss";
+
 /** Outfit */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 /** EB Garamond */
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap");
 /** Source Sans Pro */
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap");
 /** Lovers Quarrel */
-@import url('https://fonts.googleapis.com/css2?family=Lovers+Quarrel&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Lovers+Quarrel&display=swap");
 
 :root {
   /* global text size & spacing variables */
@@ -22,12 +27,14 @@
   --paragraph-margin: 0.75em;
   --indentation: 1em;
 
-  --font-body: 'Outfit', 'Arial', sans-serif;
-  --font-heading: "EB Garamond", 'Times New Roman', Times, serif;
+  --font-body: "Outfit", "Arial", sans-serif;
+  --font-heading: "EB Garamond", "Times New Roman", Times, serif;
   // A thiner serif header althernative
   // --font-heading: "Cormorant Garamond", 'Times New Roman', Times, serif;
   --font-monospace: "Source Code Pro", Courier, monospace;
-  --font-cursive: "Lovers Quarrel", "Brush Script MT", "Apple Chancery", "Lucida Handwriting", cursive;
+  --font-cursive:
+    "Lovers Quarrel", "Brush Script MT", "Apple Chancery", "Lucida Handwriting",
+    cursive;
 
   /* more heading options */
 
@@ -63,7 +70,8 @@ p {
   white-space: pre-wrap;
 }
 
-ul, ol {
+ul,
+ol {
   margin: var(--paragraph-margin) 0;
   padding: 0 var(--indentation);
 }
@@ -89,7 +97,7 @@ blockquote {
   &::after {
     position: absolute;
     display: block;
-    content: ' ';
+    content: " ";
     left: 0;
     top: 0;
     height: 100%;
@@ -103,7 +111,10 @@ a {
   color: var(--color-link);
   text-decoration: underline;
 
-  &:has(h1), &:has(h2), &:has(h3), &:has(h4) {
+  &:has(h1),
+  &:has(h2),
+  &:has(h3),
+  &:has(h4) {
     text-decoration: none;
   }
 }

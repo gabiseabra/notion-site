@@ -29,6 +29,7 @@
   "dependencies": {
     "@notion-site/common": "*",
     "@orpc/client": "^1.13.4",
+    "highlight.js": "^11.11.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-icons": "^5.5.0",

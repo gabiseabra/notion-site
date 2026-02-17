@@ -23,9 +23,10 @@
 
 .code {
   padding: 0 var(--space);
-  color: var(--color-primary) !important;
-  background: var(--bg-from);
+  color: var(--color-highlight) !important;
+  background: var(--bg-gray);
   font-family: var(--font-monospace);
+  font-size: 0.95em;
 }
 
 .redacted {

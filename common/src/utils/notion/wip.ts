@@ -41,6 +41,7 @@ export function create(_base: WithRequired<Partial<Block>, "type">): Block {
     .with({ type: "link_to_page" }, (base) => ({ ...link_to_page, ...base }))
     .with({ type: "child_page" }, (base) => ({ ...child_page, ...base }))
     .with({ type: "image" }, (base) => ({ ...image, ...base }))
+    .with({ type: "code" }, (base) => ({ ...code, ...base }))
     .exhaustive();
 }
 
@@ -156,6 +157,14 @@ const image = {
   image: {
     type: "file" as const,
     file: { url: "" },
+    caption: [],
+  },
+};
+
+const code = {
+  code: {
+    language: "typescript" as const,
+    rich_text: [],
     caption: [],
   },
 };
