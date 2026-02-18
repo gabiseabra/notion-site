@@ -15,7 +15,7 @@ type CodeProps = {
 
 export function Code({ code, language, before, after }: CodeProps) {
   const html = useMemo(() => {
-    return hljs.highlight(code, { language }).value;
+    return hljs.highlight(code, { language: mapLanguage(language) }).value;
   }, [code, language]);
 
   return (
@@ -39,4 +39,15 @@ export function Code({ code, language, before, after }: CodeProps) {
       {after}
     </div>
   );
+}
+
+function mapLanguage(language: zNotion.blocks.language) {
+  switch (language) {
+    case "plain text":
+      return "txt";
+    case "typescript":
+      return "tsx";
+    default:
+      return language;
+  }
 }

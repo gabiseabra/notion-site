@@ -1,9 +1,11 @@
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { match } from "ts-pattern";
+import { Callout } from "../display/Callout.js";
 import { Code } from "../display/Code.js";
 import { Image } from "../display/Image.js";
 import { Span, Text } from "../display/Text.js";
+import { Checkbox } from "../inputs/Checkbox.js";
 import { LinkToPage } from "../navigation/LinkToPage.js";
 import { RichText, RichTextProps } from "./RichText.js";
 import { ContentEditableProps } from "./editable/types.js";
@@ -70,6 +72,13 @@ export function Block({
             {...editableProps}
           />
         ))
+        .with({ type: "to_do" }, (block) => (
+          <Checkbox
+            checked={block.to_do.checked}
+            {...contentProps(block.to_do.rich_text)}
+            {...editableProps}
+          />
+        ))
         .with({ type: "heading_1" }, (block) => (
           <Text
             as="h2"
@@ -131,6 +140,11 @@ export function Block({
               )
             }
           />
+        ))
+        .with({ type: "callout" }, (block) => (
+          <Callout icon={block.callout.icon} background={block.callout.color}>
+            <RichText value={block.callout.rich_text} />
+          </Callout>
         ))
         .exhaustive()}
     </>

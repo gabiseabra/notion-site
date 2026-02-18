@@ -1,0 +1,19 @@
+@use "../../css/mixins/color" as color;
+
+.callout {
+  padding: calc(var(--space) * 4) calc(var(--space) * 3);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: calc(var(--space) * 2);
+  margin: var(--paragraph-margin) 0;
+}
+
+@each $name, $_ in color.$colors-codes {
+  @if $name != "default" {
+    .#{"bg-" + $name + "_background"} {
+      background: var(#{"--bg-" + $name});
+    }
+  }
+}

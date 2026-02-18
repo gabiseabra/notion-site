@@ -1,0 +1,39 @@
+@use "../../css/mixins/shadow" as shadow;
+
+.label {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: calc(var(--space) * 1.5);
+  margin: var(--paragraph-margin) 0;
+}
+
+/* Visually hidden but still interactive */
+.input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+/* The custom UI */
+.box {
+  display: block;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  background: var(--bg-gray);
+  border-radius: calc(var(--radius) / 2);
+  transform: translateY(4px);
+  @include shadow.shadow(0.5, $inset: true);
+
+  svg {
+    transform: scale(1.2) translateY(-1px);
+  }
+}
+
+.input:checked + .box {
+  background: var(--color-text);
+  color: var(--bg-from);
+}

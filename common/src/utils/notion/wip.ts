@@ -38,10 +38,12 @@ export function create(_base: WithRequired<Partial<Block>, "type">): Block {
       ...numbered_list_item,
       ...base,
     }))
+    .with({ type: "to_do" }, (base) => ({ ...to_do, ...base }))
     .with({ type: "link_to_page" }, (base) => ({ ...link_to_page, ...base }))
     .with({ type: "child_page" }, (base) => ({ ...child_page, ...base }))
     .with({ type: "image" }, (base) => ({ ...image, ...base }))
     .with({ type: "code" }, (base) => ({ ...code, ...base }))
+    .with({ type: "callout" }, (base) => ({ ...callout, ...base }))
     .exhaustive();
 }
 
@@ -103,42 +105,41 @@ const empty_content: Block<"paragraph">["paragraph"] = {
 };
 
 const heading_1 = {
-  type: "heading_1",
   heading_1: empty_content,
 } as const;
 
 const heading_2 = {
-  type: "heading_2",
   heading_2: empty_content,
 } as const;
 
 const heading_3 = {
-  type: "heading_3",
   heading_3: empty_content,
 } as const;
 
 const divider = {
-  type: "divider",
   divider: {},
 } as const;
 
 const paragraph = {
-  type: "paragraph",
   paragraph: empty_content,
 } as const;
 
 const bulleted_list_item = {
-  type: "bulleted_list_item",
   bulleted_list_item: empty_content,
 } as const;
 
 const numbered_list_item = {
-  type: "numbered_list_item",
   numbered_list_item: empty_content,
 } as const;
 
+const to_do = {
+  to_do: {
+    rich_text: [],
+    checked: false,
+  },
+};
+
 const quote = {
-  type: "quote",
   quote: empty_content,
 } as const;
 
@@ -166,5 +167,13 @@ const code = {
     language: "typescript" as const,
     rich_text: [],
     caption: [],
+  },
+};
+
+const callout = {
+  callout: {
+    icon: { type: "emoji" as const, emoji: "🤖" },
+    rich_text: [],
+    color: "gray_background" as const,
   },
 };

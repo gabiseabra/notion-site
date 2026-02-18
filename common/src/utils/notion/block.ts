@@ -66,6 +66,8 @@ export function extract(block: Block): Node {
       return block.bulleted_list_item;
     case "numbered_list_item":
       return block.numbered_list_item;
+    case "to_do":
+      return block.to_do;
     case "quote":
       return block.quote;
     case "divider":
@@ -78,6 +80,8 @@ export function extract(block: Block): Node {
       return block.image;
     case "code":
       return block.code;
+    case "callout":
+      return block.callout;
   }
 }
 
@@ -102,6 +106,8 @@ export function map<T extends BlockType>(
       return { ...block, bulleted_list_item: f(extract(block)) };
     case "numbered_list_item":
       return { ...block, numbered_list_item: f(extract(block)) };
+    case "to_do":
+      return { ...block, to_do: f(extract(block)) };
     case "link_to_page":
       return { ...block, link_to_page: f(extract(block)) };
     case "child_page":
@@ -110,6 +116,8 @@ export function map<T extends BlockType>(
       return { ...block, image: f(extract(block)) };
     case "code":
       return { ...block, code: f(extract(block)) };
+    case "callout":
+      return { ...block, callout: f(extract(block)) };
   }
 }
 

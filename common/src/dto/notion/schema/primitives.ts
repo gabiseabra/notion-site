@@ -14,7 +14,7 @@ export const color = z.enum([
 ]);
 export type color = z.infer<typeof color>;
 
-const background_color = z.enum([
+export const background_color = z.enum([
   "default_background",
   "gray_background",
   "brown_background",

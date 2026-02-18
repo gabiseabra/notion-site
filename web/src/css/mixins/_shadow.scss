@@ -1,11 +1,19 @@
 @use "sass:list" as list;
 
-@mixin shadow($distance: 1, $intensity: 1) {
-  $one: var(--color-shadow) 0 calc(1px * #{$distance}) calc(3px * #{$distance});
+@mixin shadow($distance: 1, $intensity: 1, $inset: false) {
+  $insetKeyword: null;
+  @if $inset {
+    $insetKeyword: inset;
+  }
+
+  $one: #{$insetKeyword} var(--color-shadow) 0 calc(1px * #{$distance})
+    calc(3px * #{$distance});
+
   $shadows: ();
   @for $i from 1 through $intensity {
     $shadows: list.append($shadows, $one, comma);
   }
+
   box-shadow: $shadows;
 }
 

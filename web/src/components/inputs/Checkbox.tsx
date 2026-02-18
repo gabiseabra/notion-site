@@ -1,0 +1,36 @@
+import { HTMLAttributes } from "react";
+import { BsCheck } from "react-icons/bs";
+import styles from "./Checkbox.module.scss";
+
+type CheckboxProps = {
+  checked?: boolean;
+  onToggleChecked?: (checked: boolean) => void;
+  disabled?: boolean;
+  name?: string;
+} & Omit<HTMLAttributes<HTMLElement>, "checked">;
+
+export function Checkbox({
+  checked,
+  onToggleChecked,
+  disabled,
+  name,
+  ...props
+}: CheckboxProps) {
+  return (
+    <label className={styles.label}>
+      <input
+        className={styles.input}
+        type="checkbox"
+        name={name}
+        disabled={disabled}
+        checked={checked}
+        onChange={(e) => onToggleChecked?.(e.currentTarget.checked)}
+      />
+      <div className={styles.box} aria-hidden="true">
+        {checked && <BsCheck />}
+      </div>
+
+      <div className={styles.content} {...props} />
+    </label>
+  );
+}

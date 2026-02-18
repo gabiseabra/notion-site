@@ -192,8 +192,8 @@ export class BlockPath extends Array<Notion.Block> {
   get indent() {
     return this.filter(
       (block) =>
-        block.type === "bulleted_list_item" ||
-        block.type === "numbered_list_item",
+        block.type !== "bulleted_list_item" &&
+        block.type !== "numbered_list_item",
     ).length;
   }
 

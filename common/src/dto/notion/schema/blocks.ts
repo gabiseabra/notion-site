@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { external, file } from "./media.js";
-import { api_color } from "./primitives.js";
+import { external, file, icon } from "./media.js";
+import { api_color, background_color } from "./primitives.js";
 import { block_id, page_id } from "./references.js";
 import { rich_text_item } from "./rich_text.js";
 
@@ -60,6 +60,15 @@ export const numbered_list_item = z.object({
   }),
 });
 export type numbered_list_item = z.infer<typeof numbered_list_item>;
+
+export const to_do = z.object({
+  type: z.literal("to_do"),
+  to_do: z.object({
+    rich_text: rich_text_item,
+    checked: z.boolean(),
+  }),
+});
+export type to_do = z.infer<typeof to_do>;
 
 export const quote = z.object({
   type: z.literal("quote"),
@@ -201,6 +210,16 @@ export const code = z.object({
 });
 export type code = z.infer<typeof code>;
 
+export const callout = z.object({
+  type: z.literal("callout"),
+  callout: z.object({
+    icon: icon,
+    rich_text: rich_text_item,
+    color: background_color,
+  }),
+});
+export type callout = z.infer<typeof callout>;
+
 export const base_block_shape = {
   id: z.string(),
   parent: z.union([page_id, block_id]),
@@ -215,12 +234,14 @@ export const block = z.discriminatedUnion("type", [
   heading_3.extend(base_block_shape),
   bulleted_list_item.extend(base_block_shape),
   numbered_list_item.extend(base_block_shape),
+  to_do.extend(base_block_shape),
   divider.extend(base_block_shape),
   quote.extend(base_block_shape),
   link_to_page.extend(base_block_shape),
   child_page.extend(base_block_shape),
   image.extend(base_block_shape),
   code.extend(base_block_shape),
+  callout.extend(base_block_shape),
 ]);
 export type block = z.infer<typeof block>;
 
