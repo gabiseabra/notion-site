@@ -1,5 +1,10 @@
 import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
-import hljs from "highlight.js";
+import Prism from "prismjs";
+import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-jsx";
+import "prismjs/components/prism-markup";
+import "prismjs/components/prism-tsx";
+import "prismjs/components/prism-typescript";
 import { ReactNode, useMemo } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import { CopyButton } from "../inputs/CopyButton.js";
@@ -14,15 +19,17 @@ type CodeProps = {
 };
 
 export function Code({ code, language, before, after }: CodeProps) {
+  const prismLang = mapLanguage(language);
+
   const html = useMemo(() => {
-    return hljs.highlight(code, { language: mapLanguage(language) }).value;
-  }, [code, language]);
+    const grammar = Prism.languages[prismLang] ?? Prism.languages.markup;
+    return Prism.highlight(code, grammar, prismLang);
+  }, [code, prismLang]);
 
   return (
     <div className={styles.wrapper}>
       <span className={styles.language}>
         {language}
-
         <CopyButton as="button" copyText={code}>
           <IconControl as="span" size="xs" color="currentColor">
             <FaRegCopy />
@@ -32,8 +39,13 @@ export function Code({ code, language, before, after }: CodeProps) {
 
       {before}
 
-      <pre className={["hljs", styles.code].join(" ")}>
-        <code dangerouslySetInnerHTML={{ __html: html }} />
+      <pre
+        className={[styles.code, "prism", `language-${prismLang}`].join(" ")}
+      >
+        <code
+          className={`language-${prismLang}`}
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
       </pre>
 
       {after}
@@ -44,7 +56,7 @@ export function Code({ code, language, before, after }: CodeProps) {
 function mapLanguage(language: zNotion.blocks.language) {
   switch (language) {
     case "plain text":
-      return "txt";
+      return "none";
     case "typescript":
       return "tsx";
     default:

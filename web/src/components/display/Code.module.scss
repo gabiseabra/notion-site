@@ -1,3 +1,5 @@
+@use "../../css/mixins/shadow" as shadow;
+
 .wrapper {
   position: relative;
   max-width: 100%;
@@ -14,6 +16,10 @@
 }
 
 .language {
+  --lang-bg: var(--bg-gray);
+  --lang-color: var(--color-text);
+
+  z-index: 1;
   position: absolute;
   display: flex;
   flex-direction: row;
@@ -21,14 +27,16 @@
   gap: var(--space);
   top: 0;
   right: 0;
-  background: var(--color-text);
-  color: var(--bg-to);
+  background: var(--lang-bg);
+  color: var(--lang-color);
   font-size: 0.75em;
   padding: calc(var(--space) * 0.25) var(--space);
   border-top-right-radius: var(--radius);
   border-bottom-left-radius: var(--radius);
 
+  @include shadow.shadow(0.5);
+
   button {
-    color: var(--bg-to);
+    color: var(--lang-color);
   }
 }

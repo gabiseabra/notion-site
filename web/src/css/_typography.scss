@@ -3,10 +3,14 @@
  **********************************************************************************************************************/
 @use "mixins/text" as text;
 
-@forward "highlight.js/scss/shades-of-purple.scss";
-// @forward "highlight.js/scss/rose-pine-moon.scss";
-// @forward "highlight.js/scss/nnfx-light.scss";
-// @forward "highlight.js/scss/github.scss";
+// @import "prism-themes/themes/prism-material-light.css";
+// @import "prism-themes/themes/prism-dracula.css";
+@import "prism-themes/themes/prism-vs.css";
+
+code[class*="language-"],
+pre[class*="language-"] {
+  font-size: 0.85em;
+}
 
 /** Outfit */
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
