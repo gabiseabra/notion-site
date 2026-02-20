@@ -8,6 +8,7 @@
   align-items: baseline;
   gap: calc(var(--space) * 2);
   margin: var(--paragraph-margin) 0;
+  white-space: pre-wrap;
 }
 
 @each $name, $_ in color.$colors-codes {

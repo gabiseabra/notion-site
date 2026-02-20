@@ -36,7 +36,10 @@
 
 .text[contenteditable] {
   * {
-    display: inline-block;
+    display: inline;
+    &:only-child {
+      display: inline-block;
+    }
   }
   .span:empty::after {
     display: inline;
