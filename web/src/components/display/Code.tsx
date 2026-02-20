@@ -24,7 +24,15 @@ export function Code({ code, language, before, after }: CodeProps) {
 
   const html = useMemo(() => {
     const grammar = Prism.languages[prismLang] ?? Prism.languages.markup;
-    return Prism.highlight(code, grammar, prismLang);
+    return Prism.highlight(
+      // fix tabs
+      code
+        .split("\n")
+        .map((line) => line.replace(/^\t+/, (m) => "  ".repeat(m.length)))
+        .join("\n"),
+      grammar,
+      prismLang,
+    );
   }, [code, prismLang]);
 
   return (
