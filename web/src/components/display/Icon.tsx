@@ -32,7 +32,7 @@ export function Icon({ icon, size }: IconProps) {
 }
 
 export type IconControlProps = {
-  as: "span" | "a" | "button";
+  as: "div" | "span" | "a" | "button";
 
   size: "xs" | "s" | "m" | "l";
   color: zNotion.primitives.color | "primary" | "secondary" | "currentColor";

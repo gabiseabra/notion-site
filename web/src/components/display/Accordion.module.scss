@@ -1,0 +1,48 @@
+.accordion {
+  white-space: pre-wrap;
+  margin: var(--paragraph-margin) 0;
+
+  & > summary {
+    display: flex;
+    align-items: start;
+  }
+  & > summary::marker {
+    display: none;
+    content: "";
+  }
+  & > summary > * {
+    margin-block: 0;
+  }
+  &[open] .toggle > * {
+    transform: rotate(180deg);
+  }
+
+  &::details-content > *:first-child {
+    margin-top: 0;
+  }
+  &::details-content > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Animation
+.accordion {
+  &::details-content {
+    overflow: clip;
+    block-size: 0;
+    opacity: 0;
+    transform: translateY(-6px);
+
+    transition-property: block-size, opacity, transform;
+    transition-duration: 300ms, 100ms, 300ms;
+    transition-timing-function:
+      cubic-bezier(0.175, 0.885, 0.32, 1.275), ease,
+      cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  &[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

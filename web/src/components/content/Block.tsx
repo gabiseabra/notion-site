@@ -140,6 +140,14 @@ export function Block({
             <RichText value={block.callout.rich_text} />
           </Callout>
         ))
+        .with({ type: "toggle" }, (block) => (
+          <Text
+            as="p"
+            color={block.toggle.color}
+            {...contentProps(block.toggle.rich_text)}
+            {...editableProps}
+          />
+        ))
         .exhaustive()}
     </>
   );

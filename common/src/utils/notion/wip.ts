@@ -44,6 +44,7 @@ export function create(_base: WithRequired<Partial<Block>, "type">): Block {
     .with({ type: "image" }, (base) => ({ ...image, ...base }))
     .with({ type: "code" }, (base) => ({ ...code, ...base }))
     .with({ type: "callout" }, (base) => ({ ...callout, ...base }))
+    .with({ type: "toggle" }, (base) => ({ ...toggle, ...base }))
     .exhaustive();
 }
 
@@ -175,5 +176,12 @@ const callout = {
     icon: { type: "emoji" as const, emoji: "🤖" },
     rich_text: [],
     color: "gray_background" as const,
+  },
+};
+
+const toggle = {
+  toggle: {
+    rich_text: [],
+    color: "default" as const,
   },
 };

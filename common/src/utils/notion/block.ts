@@ -14,6 +14,8 @@ export const RichTextType = [
   "bulleted_list_item",
   "numbered_list_item",
   "code",
+  "callout",
+  "toggle",
 ] as const;
 
 /** Block restricted to a union type */
@@ -82,6 +84,8 @@ export function extract(block: Block): Node {
       return block.code;
     case "callout":
       return block.callout;
+    case "toggle":
+      return block.toggle;
   }
 }
 
@@ -123,6 +127,8 @@ export function map<T extends BlockType>(
       return { ...block, code: f(extract(block)) };
     case "callout":
       return { ...block, callout: f(extract(block)) };
+    case "toggle":
+      return { ...block, toggle: f(extract(block)) };
   }
 }
 

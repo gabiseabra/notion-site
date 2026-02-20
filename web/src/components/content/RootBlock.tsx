@@ -7,6 +7,7 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { Fragment, ReactNode } from "react";
 import { match } from "ts-pattern";
+import { Accordion } from "../display/Accordion.js";
 import { Block } from "./Block.js";
 
 type RootBlockProps = {
@@ -75,6 +76,15 @@ export function RootBlock({
               ))}
             </ol>
           ))
+          .with({ type: "toggle" }, ({ id, toggle, children }) => (
+            <Accordion key={id} summary={render(toggle, path)}>
+              <RootBlock
+                value={children}
+                render={render}
+                path={path.concat(toggle)}
+              />
+            </Accordion>
+          ))
           .exhaustive(),
       )}
     </>
@@ -104,6 +114,12 @@ export type RootBlock =
       id: string;
       type: "numbered_list";
       children: Extract<NestedBlock, { type: "numbered_list_item" }>[];
+    }
+  | {
+      id: string;
+      type: "toggle";
+      toggle: Notion.Block.Block<"toggle">;
+      children: Notion.Block[];
     };
 
 /**
@@ -158,28 +174,49 @@ const mapNestedBlock =
 function rootBlockReducer(acc: RootBlock[], block: NestedBlock): RootBlock[] {
   const previous = acc[acc.length - 1];
 
-  if (block.type === "bulleted_list_item") {
-    if (previous && previous.type === "bulleted_list") {
-      previous.children.push(block);
-      return acc;
-    } else {
+  switch (block.type) {
+    case "bulleted_list_item":
+      if (previous && previous.type === "bulleted_list") {
+        previous.children.push(block);
+        return acc;
+      } else {
+        return [
+          ...acc,
+          { id: block.id, type: "bulleted_list", children: [block] },
+        ];
+      }
+
+    case "numbered_list_item":
+      if (previous && previous.type === "numbered_list") {
+        previous.children.push(block);
+        return acc;
+      } else {
+        return [
+          ...acc,
+          { id: block.id, type: "numbered_list", children: [block] },
+        ];
+      }
+
+    case "toggle":
       return [
         ...acc,
-        { id: block.id, type: "bulleted_list", children: [block] },
+        {
+          id: block.id,
+          type: "toggle",
+          toggle: block,
+          children: block.children,
+        },
       ];
-    }
   }
 
-  if (block.type === "numbered_list_item") {
-    if (previous && previous.type === "numbered_list") {
-      previous.children.push(block);
-      return acc;
-    } else {
-      return [
-        ...acc,
-        { id: block.id, type: "numbered_list", children: [block] },
-      ];
-    }
+  if (
+    previous &&
+    previous.type === "toggle" &&
+    block.parent.type === "block_id" &&
+    block.parent.block_id === previous.id
+  ) {
+    previous.children.push(block);
+    return acc;
   }
 
   return [...acc, { id: block.id, type: "paragraph", block }];

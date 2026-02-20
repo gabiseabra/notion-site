@@ -220,6 +220,15 @@ export const callout = z.object({
 });
 export type callout = z.infer<typeof callout>;
 
+export const toggle = z.object({
+  type: z.literal("toggle"),
+  toggle: z.object({
+    rich_text: rich_text_item,
+    color: api_color,
+  }),
+});
+export type toggle = z.infer<typeof toggle>;
+
 export const base_block_shape = {
   id: z.string(),
   parent: z.union([page_id, block_id]),
@@ -242,6 +251,7 @@ export const block = z.discriminatedUnion("type", [
   image.extend(base_block_shape),
   code.extend(base_block_shape),
   callout.extend(base_block_shape),
+  toggle.extend(base_block_shape),
 ]);
 export type block = z.infer<typeof block>;
 
