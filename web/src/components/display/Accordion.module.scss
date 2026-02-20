@@ -46,3 +46,11 @@
     transform: translateY(0);
   }
 }
+
+.animating::details-content {
+  overflow: clip;
+}
+
+.accordion[open]::details-content {
+  overflow: visible;
+}
