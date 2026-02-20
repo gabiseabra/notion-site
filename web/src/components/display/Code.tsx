@@ -8,6 +8,7 @@ import "prismjs/components/prism-tsx";
 import "prismjs/components/prism-typescript";
 import { ReactNode, useMemo } from "react";
 import { FaRegCopy } from "react-icons/fa";
+import * as css from "../../css/index.js";
 import { CopyButton } from "../inputs/CopyButton.js";
 import styles from "./Code.module.scss";
 import { IconControl } from "./Icon.js";
@@ -17,9 +18,10 @@ type CodeProps = {
   language: zNotion.blocks.language;
   before?: ReactNode;
   after?: ReactNode;
+  indent?: number;
 };
 
-export function Code({ code, language, before, after }: CodeProps) {
+export function Code({ code, language, before, after, indent = 0 }: CodeProps) {
   const prismLang = mapLanguage(language);
 
   const html = useMemo(() => {
@@ -36,7 +38,10 @@ export function Code({ code, language, before, after }: CodeProps) {
   }, [code, prismLang]);
 
   return (
-    <div className={styles.wrapper}>
+    <div
+      className={styles.wrapper}
+      style={{ paddingLeft: css.indent(indent) }}
+    >
       <span className={styles.language}>
         {language}
         <CopyButton as="button" copyText={code}>

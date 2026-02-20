@@ -1,6 +1,7 @@
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { match } from "ts-pattern";
+import * as css from "../../css/index.js";
 import { Callout } from "../display/Callout.js";
 import { Image } from "../display/Image.js";
 import { Span, Text } from "../display/Text.js";
@@ -24,7 +25,7 @@ type BlockProps = {
  */
 export function Block({
   value,
-  indent,
+  indent = 0,
   editable,
   onEditorChange,
   inline: inlineProps,
@@ -113,14 +114,21 @@ export function Block({
             {...editableProps}
           />
         ))
-        .with({ type: "divider" }, () => <hr {...editableProps} />)
-        .with({ type: "link_to_page" }, (data) => (
-          <LinkToPage id={data.link_to_page.page_id} />
+        .with({ type: "divider" }, () => (
+            <div style={{ paddingLeft: css.indent(indent) }}>
+            <hr {...editableProps} />
+          </div>
         ))
-        .with({ type: "child_page" }, (data) => <LinkToPage id={data.id} />)
+        .with({ type: "link_to_page" }, (data) => (
+          <LinkToPage id={data.link_to_page.page_id} indent={indent} />
+        ))
+        .with({ type: "child_page" }, (data) => (
+          <LinkToPage id={data.id} indent={indent} />
+        ))
         .with({ type: "image" }, (data) => (
           <Image
             title={Notion.RTF.getContent(data.image.caption) || undefined}
+            indent={indent}
             caption={
               data.image.caption.length > 0 && (
                 <RichText size="caption" value={data.image.caption} />
@@ -133,10 +141,18 @@ export function Block({
           />
         ))
         .with({ type: "code" }, (block) => (
-          <CodeBlock block={block} onEditorChange={onEditorChange} />
+          <CodeBlock
+            block={block}
+            indent={indent}
+            onEditorChange={onEditorChange}
+          />
         ))
         .with({ type: "callout" }, (block) => (
-          <Callout icon={block.callout.icon} background={block.callout.color}>
+          <Callout
+            icon={block.callout.icon}
+            background={block.callout.color}
+            indent={indent}
+          >
             <RichText value={block.callout.rich_text} />
           </Callout>
         ))

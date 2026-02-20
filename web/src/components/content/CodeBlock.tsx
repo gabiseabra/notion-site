@@ -5,10 +5,12 @@ import { InlineContentEditor } from "./InlineContentEditor.js";
 
 export function CodeBlock({
   block,
+  indent = 0,
   editable,
   onEditorChange,
 }: {
   block: NotionBlock<"code">;
+  indent?: number;
   editable?: boolean;
   onEditorChange?: (block: NotionBlock<"code">) => void;
 }) {
@@ -16,6 +18,7 @@ export function CodeBlock({
     <Code
       code={Notion.RTF.getContent(block.code.rich_text)}
       language={block.code.language}
+      indent={indent}
       // @todo handle changing language and code content
       after={
         block.code.caption.length > 0 && (

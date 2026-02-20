@@ -10,6 +10,8 @@ export const _space = "var(--space)";
 
 export const space = (n: number) => `calc(${_space} * ${n})`;
 
+export const indent = (n: number) => `calc(var(--indentation) * ${n})`;
+
 export const breakpoint = (size: "s" | "m") => `var(--breakpoint-${size})`;
 
 export function computeProperty(variableOrProperty: string, element?: Element) {

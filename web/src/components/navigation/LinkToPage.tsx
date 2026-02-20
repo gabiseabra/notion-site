@@ -1,6 +1,7 @@
 import { extractErrorMessage } from "@notion-site/common/utils/error.js";
 import { Link, LinkProps } from "react-router";
 import { suspend } from "suspend-react";
+import * as css from "../../css/index.js";
 import { useOrpc } from "../../providers/OrpcProvider.js";
 import { RichText } from "../content/RichText.js";
 import { Icon } from "../display/Icon.js";
@@ -16,10 +17,14 @@ import styles from "./LinkToPage.module.scss";
  */
 export function LinkToPage({
   id,
+  indent = 0,
   ...props
-}: { id: string } & Omit<LinkProps, "to">) {
+}: { id: string; indent?: number } & Omit<LinkProps, "to">) {
   return (
-    <p className={styles["link-to-page"]}>
+    <p
+      className={styles["link-to-page"]}
+      style={{ paddingLeft: css.indent(indent) }}
+    >
       <SuspenseBoundary
         loading={<Spinner size="s" />}
         error={(error) => (

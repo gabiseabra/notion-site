@@ -1,16 +1,23 @@
 import { ComponentPropsWithoutRef, ReactNode, useState } from "react";
+import * as css from "../../css/index.js";
 import { Col } from "../layout/FlexBox.js";
 import { Lightbox } from "../overlays/Lightbox.js";
 
 type ImageProps = {
   caption?: ReactNode;
+  indent?: number;
 } & ComponentPropsWithoutRef<"img">;
 
-export function Image({ caption, style = {}, ...props }: ImageProps) {
+export function Image({
+  caption,
+  indent = 0,
+  style = {},
+  ...props
+}: ImageProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Col>
+    <Col style={{ paddingLeft: css.indent(indent) }}>
       <img
         style={{
           maxWidth: "100%",

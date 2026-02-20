@@ -1,5 +1,6 @@
 import { HTMLAttributes } from "react";
 import { BsCheck } from "react-icons/bs";
+import * as css from "../../css/index.js";
 import styles from "./Checkbox.module.scss";
 
 type CheckboxProps = {
@@ -7,6 +8,7 @@ type CheckboxProps = {
   onToggleChecked?: (checked: boolean) => void;
   disabled?: boolean;
   name?: string;
+  indent?: number;
 } & Omit<HTMLAttributes<HTMLElement>, "checked">;
 
 export function Checkbox({
@@ -14,10 +16,14 @@ export function Checkbox({
   onToggleChecked,
   disabled,
   name,
+  indent = 0,
   ...props
 }: CheckboxProps) {
   return (
-    <label className={styles.label}>
+    <label
+      className={styles.label}
+      style={{ paddingLeft: css.indent(indent) }}
+    >
       <input
         className={styles.input}
         type="checkbox"
