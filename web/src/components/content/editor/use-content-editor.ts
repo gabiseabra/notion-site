@@ -14,9 +14,11 @@ import { AnyBlock, ContentEditor } from "./types.js";
 export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   initialValue,
   plugin,
+  onChange,
 }: {
   initialValue: TBlock[];
   plugin: ContentEditorPlugin<TBlock, TDetail>;
+  onChange?: (blocks: TBlock[]) => void;
 }) {
   const isReadyRef = useRef(false);
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
@@ -170,6 +172,10 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
     const event = !isReadyRef.current
       ? new EditorEvent("ready", editor, {})
       : new EditorEvent("postcommit", editor, {});
+
+    if (isReadyRef.current) {
+      onChange?.(editor.blocks);
+    }
 
     editor.bus.dispatchTypedEvent(event.eventType, event);
     isReadyRef.current = true;

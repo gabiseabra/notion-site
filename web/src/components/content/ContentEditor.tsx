@@ -1,6 +1,5 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { memo, Ref, useImperativeHandle } from "react";
-import { useEventListener } from "../../hooks/use-event-listener.js";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
 import {
@@ -31,11 +30,10 @@ export const ContentEditor = memo(function ContentEditor({
   const { editor, editable } = useContentEditor({
     initialValue,
     plugin: useNotionPlugin(options),
+    onChange,
   });
 
   useImperativeHandle(ref, () => editor, [editor]);
-
-  useEventListener(editor.bus, "commit", (e) => onChange(e.detail.blocks));
 
   return (
     <RootBlock
@@ -45,6 +43,7 @@ export const ContentEditor = memo(function ContentEditor({
           indent={path.indent}
           value={block}
           editable={!disabled}
+          onEditorChange={editor.update}
           {...editable(block)}
         />
       )}

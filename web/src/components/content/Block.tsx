@@ -2,11 +2,11 @@ import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { match } from "ts-pattern";
 import { Callout } from "../display/Callout.js";
-import { Code } from "../display/Code.js";
 import { Image } from "../display/Image.js";
 import { Span, Text } from "../display/Text.js";
 import { Checkbox } from "../inputs/Checkbox.js";
 import { LinkToPage } from "../navigation/LinkToPage.js";
+import { CodeBlock } from "./CodeBlock.js";
 import { RichText, RichTextProps } from "./RichText.js";
 import { ContentEditableProps } from "./editable/types.js";
 
@@ -14,6 +14,7 @@ type BlockProps = {
   value: Notion.Block;
   indent?: number;
   editable?: boolean;
+  onEditorChange?: (block: Notion.Block) => void;
   inline?: Partial<RichTextProps>;
 } & ContentEditableProps;
 
@@ -25,6 +26,7 @@ export function Block({
   value,
   indent,
   editable,
+  onEditorChange,
   inline: inlineProps,
   ...editableProps
 }: BlockProps) {
@@ -131,15 +133,7 @@ export function Block({
           />
         ))
         .with({ type: "code" }, (block) => (
-          <Code
-            code={Notion.RTF.getContent(block.code.rich_text)}
-            language={block.code.language}
-            after={
-              block.code.caption.length > 0 && (
-                <RichText size="caption" value={block.code.caption} />
-              )
-            }
-          />
+          <CodeBlock block={block} onEditorChange={onEditorChange} />
         ))
         .with({ type: "callout" }, (block) => (
           <Callout icon={block.callout.icon} background={block.callout.color}>
@@ -151,7 +145,7 @@ export function Block({
   );
 }
 
-function richTextToHTML(rich_text: Notion.RichText) {
+export function richTextToHTML(rich_text: Notion.RichText) {
   if (rich_text.length === 0) return `<span class="${Span.className({})}" />`;
   return rich_text
     .filter(hasPropertyValue("type", "text"))

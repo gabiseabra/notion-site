@@ -43,7 +43,11 @@ export const useNotionPlugin = (
     useBlockNavigationPlugin,
     useBlockMutationPlugin({
       merge(left, right) {
-        if (!Notion.Block.isRichText(left) || !Notion.Block.isRichText(right))
+        if (
+          !options.multiline ||
+          !Notion.Block.isRichText(left) ||
+          !Notion.Block.isRichText(right)
+        )
           return null;
 
         return Notion.Block.map(left, (node) => ({
@@ -55,7 +59,7 @@ export const useNotionPlugin = (
         }));
       },
       split(block, offset, deleteRange) {
-        if (!Notion.Block.isRichText(block)) return null;
+        if (!options.multiline || !Notion.Block.isRichText(block)) return null;
 
         return Notion.Block.split(block, offset, deleteRange);
       },

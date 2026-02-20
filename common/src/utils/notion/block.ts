@@ -85,6 +85,11 @@ export function extract(block: Block): Node {
   }
 }
 
+export function extractRichText(block: Block) {
+  if (!isRichText(block)) return [];
+  return extract(block).rich_text;
+}
+
 export function map<T extends BlockType>(
   block: Block<T>,
   f: (node: UniqueNode<T>) => UniqueNode<T>,
