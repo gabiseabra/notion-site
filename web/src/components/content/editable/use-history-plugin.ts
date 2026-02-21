@@ -1,5 +1,4 @@
-import { KeyboardEvent } from "react";
-import { useEventListener } from "../../../hooks/use-event-listener.js";
+import { KeyboardEvent, useEffect } from "react";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { EditorCommand } from "../editor/editor-history.js";
 import { AnyBlock, ContentEditor } from "../editor/types.js";
@@ -16,7 +15,7 @@ import { AnyContentEditorPlugin } from "./types.js";
  * | `Ctrl+Y` | `Cmd+Y`: Redo (alternative)
  */
 export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
-  useEventListener(editor.bus, "postcommit", ({ editor }) => {
+  useEffect(() => {
     const direction = editor.history.direction;
     const cmd = editor.history.command;
     if (!cmd) return;
@@ -38,6 +37,7 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
       });
       return;
     }
+
     if (
       selection.start === currentSelection?.start &&
       selection.end === currentSelection?.end
