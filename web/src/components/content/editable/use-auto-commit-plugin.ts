@@ -2,7 +2,10 @@ import { useRef } from "react";
 import { AnyContentEditorPlugin } from "./types.js";
 
 /**
- * Auto commits changes onKeyPress after so many ms.
+ * Auto commits changes after input, debounced by `debounceMs`.
+ *
+ * Schedules a commit on each input event and only commits if the editor
+ * is still dirty when the debounce timer fires.
  */
 export const useAutoCommitPlugin =
   (debounceMs: number): AnyContentEditorPlugin =>
