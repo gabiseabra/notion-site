@@ -1,8 +1,8 @@
 /**
- * Notion returns blocks as a flat list with parent references. This module derives a
- * hierarchy by resolving each block’s descendants from the same response set, then
- * produces a top-level render stream where consecutive list items are grouped into
- * list containers (bulleted/numbered).
+ * Notion returns blocks as a flat list with parent references. This module:
+ * 1. Derives descendants for each block from the same response set.
+ * 2. Builds a top-level render stream that groups adjacent list items.
+ * 3. Renders recursively with stable keys and indentation.
  */
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { Fragment, ReactNode } from "react";
@@ -12,14 +12,16 @@ import { Block } from "./Block.js";
 
 type RootBlockProps = {
   value: Notion.Block[];
+  /**
+   * Custom render hook for a single block. Receives the block and its path.
+   * Use `path.indent` to align with list/toggle nesting.
+   */
   render?: (block: Notion.Block, path: BlockPath) => ReactNode;
+  /** Path of ancestors for the current render subtree. */
   path?: BlockPath;
 };
 
-/**
- * Accepts a flat block array and renders it recursively.
- * @direction block
- */
+/** Accepts a flat block array and renders it recursively. */
 export function RootBlock({
   value,
   render = (block, { indent }) => <Block value={block} indent={indent} />,
@@ -27,9 +29,9 @@ export function RootBlock({
 }: RootBlockProps) {
   return (
     <>
-      {getRootBlocks(value).map((block) =>
-        match(block)
-          .with({ type: "paragraph" }, ({ block }) => (
+      {getRootBlocks(value).map((rootBlock) =>
+        match(rootBlock)
+          .with({ type: "block" }, ({ block }) => (
             <Fragment key={block.id}>
               {render(block, path)}
 
@@ -43,7 +45,7 @@ export function RootBlock({
             </Fragment>
           ))
           .with({ type: "bulleted_list" }, ({ children }) => (
-            <ul key={block.id}>
+            <ul key={rootBlock.id}>
               {children.map((block) => (
                 <li key={block.id}>
                   {render(block, path)}
@@ -60,7 +62,7 @@ export function RootBlock({
             </ul>
           ))
           .with({ type: "numbered_list" }, ({ children }) => (
-            <ol key={block.id}>
+            <ol key={rootBlock.id}>
               {children.map((block) => (
                 <li key={block.id}>
                   {render(block, path)}
@@ -93,16 +95,11 @@ export function RootBlock({
 
 /** Utilities */
 
-/**
- * Normalised top-level render nodes.
- *
- * Paragraph-like blocks render as standalone nodes, while adjacent list item blocks
- * are grouped into a single list container.
- */
+/** Normalised render nodes used by `RootBlock`. */
 export type RootBlock =
   | {
       id: string;
-      type: "paragraph";
+      type: "block";
       block: NestedBlock;
     }
   | {
@@ -123,7 +120,8 @@ export type RootBlock =
     };
 
 /**
- * A Notion block augmented with the descendant blocks present in the same response set.
+ * A Notion block augmented with descendants present in the same response set.
+ * `children` includes direct and deep descendants in flat order.
  */
 export type NestedBlock = Notion.Block & {
   children: Notion.Block[];
@@ -131,47 +129,71 @@ export type NestedBlock = Notion.Block & {
 
 /**
  * Builds the top-level render stream from a flat Notion block array.
+ *
+ * If all items are nested (`parent.type === "block_id"`), we treat blocks whose
+ * parent is not in the current set as the local roots for this subtree.
  */
 function getRootBlocks(blocks: Notion.Block[]) {
-  const isNested = blocks.every((block) => block.parent.type === "block_id");
-
-  return blocks
-    .filter(({ parent }) =>
-      // only include root blocks
-      isNested
-        ? parent.type === "block_id" &&
-          !blocks.some((_block) => _block.id === parent.block_id)
-        : parent.type === "page_id",
-    )
-    .map(mapNestedBlock(blocks))
-    .reduce(rootBlockReducer, []);
+  return getLocalRoots(blocks)
+    .map(attachDescendants(blocks))
+    .reduce(foldRootBlocks, []);
 }
 
-const mapNestedBlock =
+/**
+ * Returns the root blocks for the current render pass.
+ * - If all blocks are nested (`parent.type === "block_id"`), roots are those
+ *   whose parent is not present in the current set.
+ * - Otherwise, roots are the page-level blocks (`parent.type === "page_id"`).
+ */
+function getLocalRoots(blocks: Notion.Block[]) {
+  const isNested = blocks.every((block) => block.parent.type === "block_id");
+
+  return blocks.filter(({ parent }) =>
+    isNested
+      ? parent.type === "block_id" &&
+        !blocks.some((block) => block.id === parent.block_id)
+      : parent.type === "page_id",
+  );
+}
+
+/**
+ * Attaches a flat list of descendants to each block by following parent links.
+ * The result is a preorder-like list that preserves the original response order.
+ */
+const attachDescendants =
   (blocks: Notion.Block[]) =>
   (block: Notion.Block): NestedBlock => ({
     ...block,
-    // includes all of the deeply nested blocks of children
     children: blocks
       .reduce(
-        (acc, block) => {
-          const { parent } = block;
+        (acc, childBlock) => {
+          // Step 1: Track the ids already collected in this chain.
+          const { parent } = childBlock;
           const childBlockIds = acc.map((block) => block.id);
+          // Step 2: If the current block's parent is in the chain,
+          // it's a descendant and should be appended.
           if (
             parent.type === "block_id" &&
             childBlockIds.includes(parent.block_id)
           ) {
-            return [...acc, block];
+            return [...acc, childBlock];
           } else {
             return acc;
           }
         },
+        // Seed with the root block so descendants can match it.
         [block],
       )
+      // Drop the seed so `children` only contains descendants.
       .slice(1),
   });
 
-function rootBlockReducer(acc: RootBlock[], block: NestedBlock): RootBlock[] {
+/**
+ * Folds a flat stream of `NestedBlock` into the `RootBlock[]` shape.
+ * Order is preserved. The accumulator is mutated only when appending to an
+ * existing list group.
+ */
+function foldRootBlocks(acc: RootBlock[], block: NestedBlock): RootBlock[] {
   const previous = acc[acc.length - 1];
 
   switch (block.type) {
@@ -209,17 +231,8 @@ function rootBlockReducer(acc: RootBlock[], block: NestedBlock): RootBlock[] {
       ];
   }
 
-  if (
-    previous &&
-    previous.type === "toggle" &&
-    block.parent.type === "block_id" &&
-    block.parent.block_id === previous.id
-  ) {
-    previous.children.push(block);
-    return acc;
-  }
-
-  return [...acc, { id: block.id, type: "paragraph", block }];
+  // Step 2: Default case for paragraph-like nodes.
+  return [...acc, { id: block.id, type: "block", block }];
 }
 
 export class BlockPath extends Array<Notion.Block> {
