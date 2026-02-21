@@ -12,10 +12,25 @@ export const inputEvent = {
     deleteN(el, "line", count, dir),
   insert: (el: HTMLElement, text: string, mods: Modifiers = {}) =>
     [...text].forEach((ch) => simulate(el, "insertText", ch, ch, mods)),
-  insertLine: (el: HTMLElement, count = 1, mods: Modifiers = {}) => {
+  insertLine: (
+    el: HTMLElement,
+    count = 1,
+    mods: Omit<Modifiers, "shiftKey"> = {},
+  ) => {
     for (let i = 0; i < count; i++)
       simulate(el, "insertLineBreak", "Enter", null, {
         shiftKey: true,
+        ...mods,
+      });
+  },
+  insertParagraph: (
+    el: HTMLElement,
+    count = 1,
+    mods: Omit<Modifiers, "shiftKey"> = {},
+  ) => {
+    for (let i = 0; i < count; i++)
+      simulate(el, "insertParagraph", "Enter", null, {
+        shiftKey: false,
         ...mods,
       });
   },
