@@ -89,7 +89,7 @@ describe("useInlineMutationPlugin", () => {
     expect(el).toBeTruthy();
 
     SelectionRange.apply(el, { start: 5, end: 5 });
-    inputEvent.insertLine(el, 1, { shiftKey: true });
+    inputEvent.insertLine(el, 1);
     inputEvent.insert(el, "World");
     act(() => jest.advanceTimersByTime(1000));
 
