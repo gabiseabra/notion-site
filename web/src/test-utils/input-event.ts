@@ -100,10 +100,11 @@ function simulate(
   const text = element.textContent ?? "";
 
   // keydown
-  fireEvent.keyDown(element, {
+  const shouldContinue = fireEvent.keyDown(element, {
     key,
     ...modifiers,
   });
+  if (!shouldContinue) return;
 
   // Command shortcuts (meta/ctrl + key) don't fire beforeinput for text insertion
   if (inputType === "insertText" && (modifiers.metaKey || modifiers.ctrlKey)) {
