@@ -23,7 +23,7 @@ export function LinkToPage({
   return (
     <p
       className={styles["link-to-page"]}
-      style={{ paddingLeft: css.indent(indent) }}
+      style={{ marginLeft: css.indent(indent) }}
     >
       <SuspenseBoundary
         loading={<Spinner size="s" />}

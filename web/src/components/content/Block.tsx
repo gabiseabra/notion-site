@@ -115,7 +115,7 @@ export function Block({
           />
         ))
         .with({ type: "divider" }, () => (
-            <div style={{ paddingLeft: css.indent(indent) }}>
+          <div style={{ marginLeft: css.indent(indent) }}>
             <hr {...editableProps} />
           </div>
         ))

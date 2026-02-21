@@ -38,10 +38,7 @@ export function Code({ code, language, before, after, indent = 0 }: CodeProps) {
   }, [code, prismLang]);
 
   return (
-    <div
-      className={styles.wrapper}
-      style={{ paddingLeft: css.indent(indent) }}
-    >
+    <div className={styles.wrapper} style={{ marginLeft: css.indent(indent) }}>
       <span className={styles.language}>
         {language}
         <CopyButton as="button" copyText={code}>

@@ -20,10 +20,7 @@ export function Checkbox({
   ...props
 }: CheckboxProps) {
   return (
-    <label
-      className={styles.label}
-      style={{ paddingLeft: css.indent(indent) }}
-    >
+    <label className={styles.label} style={{ marginLeft: css.indent(indent) }}>
       <input
         className={styles.input}
         type="checkbox"

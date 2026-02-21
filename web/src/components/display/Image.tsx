@@ -17,7 +17,7 @@ export function Image({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Col style={{ paddingLeft: css.indent(indent) }}>
+    <Col style={{ marginLeft: css.indent(indent) }}>
       <img
         style={{
           maxWidth: "100%",

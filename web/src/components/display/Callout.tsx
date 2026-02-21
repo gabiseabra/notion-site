@@ -20,7 +20,7 @@ export function Callout({
   return (
     <section
       className={[styles.callout, styles[`bg-${background}`]].join(" ")}
-      style={{ paddingLeft: css.indent(indent) }}
+      style={{ marginLeft: css.indent(indent) }}
     >
       <Icon size="m" icon={icon} />
 
