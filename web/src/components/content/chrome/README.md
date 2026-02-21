@@ -1,0 +1,2 @@
+> Definition: Chrome is the visual design elements that give users information about or commands to operate on the screen's content (as opposed to being part of that content). These design elements are provided by the underlying system — whether it be an operating system, a website, or an application — and surround the user's data.
+— (Jakob Nilsen from NNGroup)[https://www.nngroup.com/articles/browser-and-gui-chrome]
