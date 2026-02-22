@@ -173,7 +173,7 @@
     &.#{"color-" + $name + "_background"} {
       background-color: var(#{"--bg-" + $name});
       &.active {
-        outline: 1px solid var(#{"--color-" + $name});
+        outline: 1.5px solid var(#{"--color-" + $name});
       }
     }
   }
