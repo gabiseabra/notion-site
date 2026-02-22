@@ -32,7 +32,15 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
     const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
     const selectionRect = range?.getBoundingClientRect();
 
-    if (selectionRect && selectionRect.height && selectionRect.width) {
+    if (
+      range &&
+      selectionRect &&
+      selectionRect.height &&
+      selectionRect.width &&
+      editor.blocks.some((block) =>
+        editor.ref(block.id)?.contains(range.startContainer),
+      )
+    ) {
       setSelectionRect(selectionRect);
     } else {
       setSelectionRect(null);
@@ -60,9 +68,17 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
   );
 }
 
-export function Toolbar({ editor }: { editor: Editor }) {
+export function Toolbar({
+  editor,
+  disabled,
+}: {
+  editor: Editor;
+  disabled?: boolean;
+}) {
   const selection = useEditorSelectionRange(editor);
   const selectedBlock = selection && editor.get(selection.id);
+
+  disabled ??= !selection;
 
   const selectedColor =
     selectedBlock &&
