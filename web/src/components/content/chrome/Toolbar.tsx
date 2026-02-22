@@ -49,7 +49,7 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
       <div
         style={{
           width: selectionRect?.width ?? 0,
-          height: 10,
+          height: "1em",
           position: "fixed",
           top: selectionRect?.top ?? -1,
           left: selectionRect?.left ?? -1,
