@@ -2,6 +2,7 @@ import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { memo, Ref, useImperativeHandle } from "react";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
+import { DocumentToolbar, FloatingToolbar } from "./chrome/Toolbar.js";
 import {
   NotionPluginOptions,
   useNotionPlugin,
@@ -35,17 +36,23 @@ export const Editor = memo(function ContentEditor({
   useImperativeHandle(ref, () => editor, [editor]);
 
   return (
-    <RootBlock
-      value={editor.blocks}
-      render={(block, path) => (
-        <Block
-          indent={path.indent}
-          value={block}
-          editable={!disabled}
-          onEditorChange={editor.update}
-          {...editable(block)}
-        />
-      )}
-    />
+    <div>
+      <DocumentToolbar editor={editor} />
+
+      <FloatingToolbar editor={editor} />
+
+      <RootBlock
+        value={editor.blocks}
+        render={(block, path) => (
+          <Block
+            indent={path.indent}
+            value={block}
+            editable={!disabled}
+            onEditorChange={editor.update}
+            {...editable(block)}
+          />
+        )}
+      />
+    </div>
   );
 });

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useWindowEventListener } from "../../../hooks/use-window-event-listener.js";
+import { useDocumentEventListener } from "../../../hooks/use-document-event-listener.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { AnyBlock, ContentEditor } from "./types.js";
 
@@ -14,7 +14,7 @@ export function useEditorSelectionRange<TBlock extends AnyBlock>(
   const [selectionRange, setSelectionRange] =
     useState<EditorSelectionRange | null>(null);
 
-  useWindowEventListener("selectionchange", () => {
+  useDocumentEventListener("selectionchange", () => {
     const sel = window.getSelection();
     const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
 

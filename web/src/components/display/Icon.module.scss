@@ -7,27 +7,29 @@
   justify-content: center;
   align-items: center;
 
+  line-height: 0;
   font-size: var(--icon-size);
   padding: 0;
 
   background: transparent;
   border: none;
 
-  &:focus, &:active {
+  &:focus,
+  &:active {
     outline: none;
   }
 
   & > * {
+    display: block;
     width: var(--icon-size);
     height: var(--icon-size);
   }
 }
 
-
 .badge {
   position: absolute;
-  bottom: calc(var(--badge-size) * -.5);
-  right: calc(var(--badge-size) * -.5);
+  bottom: calc(var(--badge-size) * -0.5);
+  right: calc(var(--badge-size) * -0.5);
 
   height: var(--badge-size);
   min-width: var(--badge-size);

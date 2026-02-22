@@ -110,12 +110,13 @@ export function Popover({
     const tipEl = tipRef.current;
     if (!triggerEl || !tipEl) return;
 
+    const triggerRect = getTriggerRect(triggerEl);
     const coords = getBestCoords(
       css.toPx(css.computeProperty(css._space)) * offset,
       css.toPx(css.computeProperty(css._space)) * 2,
       css.toPx(css.computeProperty(css._space)) * 2,
       placements,
-      triggerEl.getBoundingClientRect(),
+      triggerRect,
       tipEl.getBoundingClientRect(),
     );
 
@@ -181,6 +182,14 @@ export function Popover({
       )}
     </span>
   );
+}
+
+function getTriggerRect(triggerEl: HTMLElement): DOMRect {
+  const rect = triggerEl.getBoundingClientRect();
+  if (rect.width || rect.height) return rect;
+
+  const child = triggerEl.firstElementChild;
+  return child instanceof HTMLElement ? child.getBoundingClientRect() : rect;
 }
 
 const clamp = (v: number, min: number, max: number) =>

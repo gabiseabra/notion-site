@@ -38,6 +38,7 @@ export function Block({
           tabIndex: 1,
           contentEditable: "plaintext-only" as const,
           suppressContentEditableWarning: true,
+          translate: "no" as const,
           dangerouslySetInnerHTML: {
             __html: richTextToHTML(rich_text),
           },

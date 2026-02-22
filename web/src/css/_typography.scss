@@ -162,3 +162,11 @@ h4 {
   color: var(--color-highlight);
   text-shadow: none;
 }
+
+.goog-tooltip,
+.goog-tooltip.skiptranslate,
+#gtx-trans,
+#goog-gt-tt {
+  display: none !important;
+  top: 0px !important;
+}

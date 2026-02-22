@@ -132,6 +132,17 @@ export function map<T extends BlockType>(
   }
 }
 
+export function mapRichText(
+  block: Block,
+  f: (rich_text: RTF.RichText) => RTF.RichText,
+) {
+  if (!isRichText(block)) return block;
+  return map(block, (node) => ({
+    ...node,
+    rich_text: f(extract(block).rich_text),
+  }));
+}
+
 export function traverse<T extends BlockType>(
   block: Block<T>,
   f: (node: UniqueNode<T>) => Promise<UniqueNode<T>>,

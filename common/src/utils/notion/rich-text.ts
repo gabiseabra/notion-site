@@ -1,6 +1,5 @@
 import { zNotion } from "../../dto/notion/schema/index.js";
 import { hasPropertyValue, isNonNullable } from "../guards.js";
-import { keys } from "../object.js";
 
 export type RichText = zNotion.rich_text.rich_text_item;
 
@@ -34,6 +33,12 @@ export function findByOffset(rich_text: RichText, offset: number) {
   }
 
   return null;
+}
+
+export function findByRange(rich_text: RichText, start: number, end: number) {
+  return start === end
+    ? [findByOffset(rich_text, start)?.node].filter(isNonNullable)
+    : slice(rich_text, start, end);
 }
 
 export function getContent(rich_text: RichText) {
@@ -215,20 +220,6 @@ export function isItemAnnotated(item: Item<"text">, a: Partial<Annotations>) {
   );
 }
 
-/** @returns true if any of the items in the range has the given annotation */
-export function isAnnotated(
-  rich_text: RichText,
-  a: Partial<Annotations>,
-  start: number,
-  end: number,
-) {
-  return (
-    start === end
-      ? [findByOffset(rich_text, start)?.node].filter(isNonNullable)
-      : slice(rich_text, start, end)
-  ).some((item) => item.type === "text" && isItemAnnotated(item, a));
-}
-
 export function setAnnotations(
   rich_text: RichText,
   a: Partial<Annotations>,
@@ -250,24 +241,6 @@ export function setAnnotations(
   const after = slice(rich_text, end);
 
   return normalize([...before, ...middle, ...after]);
-}
-
-export function toggleAnnotations(
-  rich_text: RichText,
-  a: Partial<Annotations>,
-  start: number,
-  end: number,
-): RichText {
-  return setAnnotations(
-    rich_text,
-    !isAnnotated(rich_text, a, start, end)
-      ? a
-      : (Object.fromEntries(
-          keys(a).map((a) => [a, empty_text.annotations[a]] as const),
-        ) satisfies Partial<Annotations>),
-    start,
-    end,
-  );
 }
 
 export const empty_text: Item<"text"> = {
