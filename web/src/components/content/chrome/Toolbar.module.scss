@@ -63,6 +63,7 @@
 }
 
 .toolbar-menu-item {
+  position: relative;
   display: flex;
   flex-direction: row;
   gap: var(--space);
@@ -82,9 +83,40 @@
   }
 
   &.active {
-    // font-style: italic;
     text-decoration: underline;
-    background: color-mix(in oklch, var(--bg-blue), var(--bg-default) 90%);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.15em;
+
+    &::before {
+      position: absolute;
+      display: block;
+      content: " ";
+      border-radius: 4px;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      box-shadow: inset 0 0 1px 2px currentColor;
+      z-index: 1;
+    }
+
+    &:first-child::before {
+      border-top-left-radius: var(--radius);
+      border-top-right-radius: var(--radius);
+    }
+
+    &:last-child::before {
+      border-bottom-left-radius: var(--radius);
+      border-bottom-right-radius: var(--radius);
+    }
+
+    // Default color
+    &:first-child {
+      // remove active outline
+      &::before {
+        display: none;
+      }
+    }
   }
 
   @each $name, $_ in color.$colors-codes {
@@ -125,7 +157,7 @@
   &:last-child {
     margin-bottom: 0;
 
-    &::before {
+    &::after {
       display: none;
     }
   }
