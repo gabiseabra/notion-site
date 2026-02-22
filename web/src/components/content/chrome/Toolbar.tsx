@@ -45,6 +45,7 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
       offset={2}
       placements={["top", "right", "left", "bottom"]}
       content={<Toolbar editor={editor} />}
+      style={{ wrap: { position: "absolute" } }}
     >
       <div
         style={{
@@ -124,7 +125,7 @@ export function Toolbar({ editor }: { editor: Editor }) {
           return (
             <ToolbarMenu.Item
               key={color}
-              active={isColorActive}
+              active={isColorActive || isBackgroundActive}
               color={color}
               onClick={() => execCommand(toggleAnnotations({ color }))}
             >

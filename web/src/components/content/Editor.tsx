@@ -37,9 +37,9 @@ export const Editor = memo(function ContentEditor({
 
   return (
     <div>
-      <DocumentToolbar editor={editor} />
-
       <FloatingToolbar editor={editor} />
+
+      <DocumentToolbar editor={editor} />
 
       <RootBlock
         value={editor.blocks}

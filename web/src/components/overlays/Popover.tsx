@@ -40,7 +40,10 @@ export type PopoverProps = {
   offset?: number; // space unit
 
   className?: string;
-  style?: CSSProperties;
+  style?: {
+    wrap?: CSSProperties;
+    container?: CSSProperties;
+  };
 
   onClickOutside?: () => void;
   onOffScreen?: () => void;
@@ -159,6 +162,7 @@ export function Popover({
       ref={triggerRef}
       className={styles.wrap}
       aria-describedby={open ? tooltipId : undefined}
+      style={style?.wrap}
     >
       {children}
 
@@ -173,7 +177,7 @@ export function Popover({
             top: coords?.top ?? 0,
             left: coords?.left ?? 0,
             opacity: coords ? 1 : 0,
-            ...style,
+            ...style?.container,
           }}
         >
           <div className={styles.content}>{content}</div>

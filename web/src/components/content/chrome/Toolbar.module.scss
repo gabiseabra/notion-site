@@ -81,6 +81,12 @@
     outline: none;
   }
 
+  &.active {
+    // font-style: italic;
+    text-decoration: underline;
+    background: color-mix(in oklch, var(--bg-blue), var(--bg-default) 90%);
+  }
+
   @each $name, $_ in color.$colors-codes {
     &.#{"color-" + $name} {
       @if ($name == "default") {
@@ -105,7 +111,7 @@
     position: absolute;
     display: block;
     content: " ";
-    bottom: 0;
+    bottom: -1px;
     left: 0;
     right: 0;
 
