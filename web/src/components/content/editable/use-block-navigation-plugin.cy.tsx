@@ -1,10 +1,10 @@
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
-import { ContentEditor } from "../ContentEditor.js";
+import { Editor } from "../Editor.js";
 
 describe("useBlockNavigationPlugin", () => {
   it("moves caret to next block on ArrowRight at end", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,
@@ -17,7 +17,7 @@ describe("useBlockNavigationPlugin", () => {
 
   it("moves caret to previous block on ArrowLeft at start", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,
@@ -29,9 +29,7 @@ describe("useBlockNavigationPlugin", () => {
   });
 
   it("moves caret to next block on ArrowDown from empty block", () => {
-    cy.mount(
-      <ContentEditor value={[p("a"), p("b"), p("c")]} onChange={() => {}} />,
-    );
+    cy.mount(<Editor value={[p("a"), p("b"), p("c")]} onChange={() => {}} />);
 
     cy.get("p").eq(0).click().type("{downArrow}");
     cy.get("p").eq(1).should("have.focus").type("{downArrow}");
@@ -39,9 +37,7 @@ describe("useBlockNavigationPlugin", () => {
   });
 
   it("moves caret to previous block on ArrowUp from empty block", () => {
-    cy.mount(
-      <ContentEditor value={[p("a"), p("b"), p("c")]} onChange={() => {}} />,
-    );
+    cy.mount(<Editor value={[p("a"), p("b"), p("c")]} onChange={() => {}} />);
 
     cy.get("p").eq(2).click().type("{upArrow}");
     cy.get("p").eq(1).should("have.focus").type("{upArrow}");
@@ -50,7 +46,7 @@ describe("useBlockNavigationPlugin", () => {
 
   it("moves caret to next block on ArrowDown from simple block", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,
@@ -62,7 +58,7 @@ describe("useBlockNavigationPlugin", () => {
 
   it("moves caret to previous block on ArrowUp from simple block", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,
@@ -74,7 +70,7 @@ describe("useBlockNavigationPlugin", () => {
 
   it("moves caret to next block on ArrowDown from multi-line block", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("Multi\nLine\nString")), p("b", span("Second"))]}
         onChange={() => {}}
       />,
@@ -92,7 +88,7 @@ describe("useBlockNavigationPlugin", () => {
 
   it("moves caret to previous block on ArrowUp from multi-line block", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("First")), p("b", span("Multi\nLine\nString"))]}
         onChange={() => {}}
       />,

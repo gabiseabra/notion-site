@@ -6,7 +6,7 @@ import { render } from "@testing-library/react";
 import { act } from "react";
 import { inputEvent } from "../../../test-utils/input-event.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { ContentEditor } from "../ContentEditor.js";
+import { Editor } from "../Editor.js";
 
 describe("useAutoCommitPlugin", () => {
   beforeEach(() => {
@@ -23,7 +23,7 @@ describe("useAutoCommitPlugin", () => {
     const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
-      <ContentEditor
+      <Editor
         value={blocks}
         onChange={onChange}
         options={{ autoCommit: 200 }}

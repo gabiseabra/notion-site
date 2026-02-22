@@ -4,15 +4,13 @@
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { fireEvent, render } from "@testing-library/react";
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { ContentEditor } from "../ContentEditor.js";
+import { Editor } from "../Editor.js";
 
 describe("useBlockNavigationPlugin", () => {
   it("moves caret to next block on ArrowRight at end", () => {
     const blocks = [p("a", span("First")), p("b", span("Second"))];
 
-    const { container } = render(
-      <ContentEditor value={blocks} onChange={() => {}} />,
-    );
+    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
 
     const [first, second] = Array.from(container.querySelectorAll("p"));
     expect(first).toBeTruthy();
@@ -34,9 +32,7 @@ describe("useBlockNavigationPlugin", () => {
 
   it("moves caret to previous block on ArrowLeft at start", () => {
     const blocks = [p("a", span("First")), p("b", span("Second"))];
-    const { container } = render(
-      <ContentEditor value={blocks} onChange={() => {}} />,
-    );
+    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
 
     const [first, second] = Array.from(container.querySelectorAll("p"));
 

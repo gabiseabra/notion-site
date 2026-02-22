@@ -1,7 +1,7 @@
 import type { Block as NotionBlock } from "@notion-site/common/utils/notion/block.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { Code } from "../display/Code.js";
-import { InlineContentEditor } from "./InlineContentEditor.js";
+import { InlineEditor } from "./InlineEditor.js";
 
 export function CodeBlock({
   block,
@@ -22,7 +22,7 @@ export function CodeBlock({
       // @todo handle changing language and code content
       after={
         block.code.caption.length > 0 && (
-          <InlineContentEditor
+          <InlineEditor
             id="caption"
             value={block.code.caption}
             disabled={!editable}

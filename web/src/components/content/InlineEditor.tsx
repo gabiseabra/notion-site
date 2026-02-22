@@ -7,29 +7,27 @@ import { RichText } from "./RichText.js";
 import {
   NotionPluginOptions,
   useNotionPlugin,
-} from "./editable/use-notion-plugin.js";
+} from "./editable/notion/use-notion-plugin.js";
 import { ContentEditor as TContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
 
-export namespace InlineContentEditor {
-  export type Props = {
-    id: string;
-    ref?: Ref<TContentEditor<Notion.Block> | null>;
-    value: Notion.RichText;
-    onChange: (block: Notion.RichText) => void;
-    options?: Omit<NotionPluginOptions, "multiline">;
-    disabled?: boolean;
-  };
-}
+export type InlineEditorProps = {
+  id: string;
+  ref?: Ref<TContentEditor<Notion.Block> | null>;
+  value: Notion.RichText;
+  onChange: (block: Notion.RichText) => void;
+  options?: Omit<NotionPluginOptions, "multiline">;
+  disabled?: boolean;
+};
 
-export const InlineContentEditor = memo(function InlineContentEditor({
+export const InlineEditor = memo(function InlineEditor({
   id,
   ref,
   value: initialValue,
   onChange,
   options,
   disabled,
-}: InlineContentEditor.Props) {
+}: InlineEditorProps) {
   const { editor, editable } = useContentEditor({
     initialValue: [p(id, ...initialValue)],
     plugin: useNotionPlugin(options),

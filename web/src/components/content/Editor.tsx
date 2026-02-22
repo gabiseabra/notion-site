@@ -5,28 +5,27 @@ import { RootBlock } from "./RootBlock.js";
 import {
   NotionPluginOptions,
   useNotionPlugin,
-} from "./editable/use-notion-plugin.js";
-import { ContentEditor as TContentEditor } from "./editor/types.js";
+} from "./editable/notion/use-notion-plugin.js";
+import { ContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
 
-export namespace ContentEditor {
-  export type Editor = TContentEditor<Notion.Block>;
-  export type Props = {
-    ref?: Ref<TContentEditor<Notion.Block> | null>;
-    value: Notion.Block[];
-    onChange: (block: Notion.Block[]) => void;
-    options?: NotionPluginOptions;
-    disabled?: boolean;
-  };
-}
+export type Editor = ContentEditor<Notion.Block>;
 
-export const ContentEditor = memo(function ContentEditor({
+export type EditorProps = {
+  ref?: Ref<ContentEditor<Notion.Block> | null>;
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+  options?: NotionPluginOptions;
+  disabled?: boolean;
+};
+
+export const Editor = memo(function ContentEditor({
   ref,
   value: initialValue,
   onChange,
   options,
   disabled,
-}: ContentEditor.Props) {
+}: EditorProps) {
   const { editor, editable } = useContentEditor({
     initialValue,
     plugin: useNotionPlugin(options),

@@ -1,6 +1,6 @@
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { ContentEditor } from "../ContentEditor.js";
+import { Editor } from "../Editor.js";
 
 const options = {
   autoCommit: 200,
@@ -9,7 +9,7 @@ const options = {
 describe("useHistoryPlugin", () => {
   it("undoes and redoes typed edits across blocks", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("Initial state 123"))]}
         onChange={() => {}}
         options={options}
@@ -68,7 +68,7 @@ describe("useHistoryPlugin", () => {
 
   it("restores cursor position on undo / redo", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("Hello World"))]}
         onChange={() => {}}
         options={options}

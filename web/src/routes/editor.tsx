@@ -1,7 +1,7 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { a, p, span } from "@notion-site/common/utils/notion/wip.js";
 import { useLocalStorage } from "usehooks-ts";
-import { ContentEditor } from "../components/content/ContentEditor.js";
+import { Editor } from "../components/content/Editor.js";
 import { Favicon } from "../components/display/Favicon.js";
 import { Icon } from "../components/display/Icon.js";
 import { Text } from "../components/display/Text.js";
@@ -11,7 +11,7 @@ export const path = "/editor";
 
 declare global {
   interface Window {
-    editor?: ContentEditor.Editor;
+    editor?: Editor;
   }
 }
 
@@ -59,7 +59,7 @@ export function Component() {
         &nbsp; Content Editor Demo
       </Text>
 
-      <ContentEditor
+      <Editor
         ref={(editor) => {
           window.editor = editor ?? undefined;
         }}

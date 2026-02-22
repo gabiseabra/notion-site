@@ -8,7 +8,7 @@ import { render } from "@testing-library/react";
 import { act, RefObject } from "react";
 import { inputEvent } from "../../../test-utils/input-event.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { ContentEditor } from "../ContentEditor.js";
+import { Editor } from "../Editor.js";
 
 describe("useInlineMutationPlugin", () => {
   beforeEach(() => {
@@ -21,12 +21,12 @@ describe("useInlineMutationPlugin", () => {
   });
 
   it("handles typing from the middle", async () => {
-    const editorRef: RefObject<ContentEditor.Editor | null> = {
+    const editorRef: RefObject<Editor | null> = {
       current: null,
     };
 
     const { container } = render(
-      <ContentEditor
+      <Editor
         ref={editorRef}
         value={[p("420", span("hey"))]}
         onChange={() => {}}
@@ -50,12 +50,12 @@ describe("useInlineMutationPlugin", () => {
   });
 
   it("handles typing in empty element", async () => {
-    const editorRef: RefObject<ContentEditor.Editor | null> = {
+    const editorRef: RefObject<Editor | null> = {
       current: null,
     };
 
     const { container } = render(
-      <ContentEditor ref={editorRef} value={[p("a")]} onChange={() => {}} />,
+      <Editor ref={editorRef} value={[p("a")]} onChange={() => {}} />,
     );
 
     const el = container.querySelector("p")!;
@@ -73,12 +73,12 @@ describe("useInlineMutationPlugin", () => {
   });
 
   it("adds newline on Shift+Enter", async () => {
-    const editorRef: RefObject<ContentEditor.Editor | null> = {
+    const editorRef: RefObject<Editor | null> = {
       current: null,
     };
 
     const { container } = render(
-      <ContentEditor
+      <Editor
         ref={editorRef}
         value={[p("a", span("Hello"))]}
         onChange={() => {}}

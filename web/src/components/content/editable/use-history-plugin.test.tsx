@@ -6,7 +6,7 @@ import { fireEvent, render } from "@testing-library/react";
 import { act } from "react";
 import { inputEvent } from "../../../test-utils/input-event.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { ContentEditor } from "../ContentEditor.js";
+import { Editor } from "../Editor.js";
 
 describe("useHistoryPlugin", () => {
   beforeEach(() => {
@@ -21,9 +21,7 @@ describe("useHistoryPlugin", () => {
   it("undoes on Cmd+Z", async () => {
     const blocks = [p("a", span("Hello"))];
 
-    const { container } = render(
-      <ContentEditor value={blocks} onChange={() => {}} />,
-    );
+    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();
@@ -44,9 +42,7 @@ describe("useHistoryPlugin", () => {
   it("redoes on Cmd+Shift+Z", async () => {
     const blocks = [p("a", span("Hello"))];
 
-    const { container } = render(
-      <ContentEditor value={blocks} onChange={() => {}} />,
-    );
+    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();
@@ -67,9 +63,7 @@ describe("useHistoryPlugin", () => {
   it("redoes on Cmd+Y", async () => {
     const blocks = [p("a", span("Hello"))];
 
-    const { container } = render(
-      <ContentEditor value={blocks} onChange={() => {}} />,
-    );
+    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();
@@ -90,9 +84,7 @@ describe("useHistoryPlugin", () => {
   it("does nothing when no command in history", () => {
     const blocks = [p("a", span("Hello"))];
 
-    const { container } = render(
-      <ContentEditor value={blocks} onChange={() => {}} />,
-    );
+    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();
@@ -105,9 +97,7 @@ describe("useHistoryPlugin", () => {
   it("restores selection before undo", async () => {
     const blocks = [p("a", span("Hello"))];
 
-    const { container } = render(
-      <ContentEditor value={blocks} onChange={() => {}} />,
-    );
+    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();
@@ -126,9 +116,7 @@ describe("useHistoryPlugin", () => {
   it("restores selection after redo", async () => {
     const blocks = [p("a", span("Hello"))];
 
-    const { container } = render(
-      <ContentEditor value={blocks} onChange={() => {}} />,
-    );
+    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();

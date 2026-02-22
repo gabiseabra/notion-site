@@ -1,5 +1,5 @@
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
-import { ContentEditor } from "../ContentEditor.js";
+import { Editor } from "../Editor.js";
 
 const options = {
   autoCommit: 200,
@@ -8,9 +8,7 @@ const options = {
 
 describe("useInlineMutationPlugin", () => {
   it("inserts newline into the palceholder span", () => {
-    cy.mount(
-      <ContentEditor value={[p("a")]} onChange={() => {}} options={options} />,
-    );
+    cy.mount(<Editor value={[p("a")]} onChange={() => {}} options={options} />);
 
     cy.get("p")
       .click()
@@ -22,7 +20,7 @@ describe("useInlineMutationPlugin", () => {
 
   it("inserts newline at the end of a rich-text span", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("Hello"))]}
         onChange={() => {}}
         options={options}
@@ -37,7 +35,7 @@ describe("useInlineMutationPlugin", () => {
 
   it("prevents Shift+Enter newline when multiline is disabled", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("Hello"))]}
         onChange={() => {}}
         options={{ ...options, multiline: false }}
@@ -51,9 +49,7 @@ describe("useInlineMutationPlugin", () => {
   });
 
   it("handles type characters then backspace some", () => {
-    cy.mount(
-      <ContentEditor value={[p("a")]} onChange={() => {}} options={options} />,
-    );
+    cy.mount(<Editor value={[p("a")]} onChange={() => {}} options={options} />);
 
     cy.get("p").click().type("Hello World").should("have.text", "Hello World");
 
@@ -66,7 +62,7 @@ describe("useInlineMutationPlugin", () => {
 
   it("selects text then types to replace it", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("Hello World"))]}
         onChange={() => {}}
         options={options}
@@ -81,7 +77,7 @@ describe("useInlineMutationPlugin", () => {
 
   it("selects text then deletes it", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("Hello World"))]}
         onChange={() => {}}
         options={options}
@@ -93,7 +89,7 @@ describe("useInlineMutationPlugin", () => {
 
   it("inserts text via execCommand (simulates paste)", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("Before "))]}
         onChange={() => {}}
         options={options}
@@ -111,7 +107,7 @@ describe("useInlineMutationPlugin", () => {
 
   it("flushes pending changes before block split", () => {
     cy.mount(
-      <ContentEditor
+      <Editor
         value={[p("a", span("Initial"))]}
         onChange={() => {}}
         options={options}
