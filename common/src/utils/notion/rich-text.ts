@@ -1,5 +1,6 @@
 import { zNotion } from "../../dto/notion/schema/index.js";
 import { hasPropertyValue, isNonNullable } from "../guards.js";
+import { keys, omitUndefined } from "../object.js";
 
 export type RichText = zNotion.rich_text.rich_text_item;
 
@@ -120,23 +121,35 @@ export function splice(
 
   const length = getLength(rich_text);
 
-  // Clamp offset to valid range
-  const safeOffset = Math.max(0, Math.min(offset, length));
-  const safeEnd = Math.min(safeOffset + deleteCount, length);
+  const start = Math.max(0, Math.min(offset, length));
+  const end = Math.min(start + deleteCount, length);
 
   // Get the slices before and after the affected range
-  const before = safeOffset > 0 ? slice(rich_text, 0, safeOffset) : [];
-  const after = safeEnd < length ? slice(rich_text, safeEnd, length) : [];
+  const before = start > 0 ? slice(rich_text, 0, start) : [];
+  const after = end < length ? slice(rich_text, end, length) : [];
 
-  // If inserting, inherit annotations from the item at the insert point
-  let insertItems: RichText = [];
-  if (insert !== "") {
-    const itemAtOffset = findByOffset(rich_text, safeOffset);
+  // If inserting, inherit annotations from the selected range
+  const insertItems: RichText = (() => {
+    if (insert === "") return [];
 
-    insertItems = [
-      replaceTextContent(itemAtOffset?.node ?? empty_text, () => insert),
+    const currentText = findByOffset(rich_text, start)?.node;
+    const defaultAnnotations =
+      currentText?.annotations ?? empty_text.annotations;
+
+    return [
+      {
+        type: "text",
+        text: {
+          content: insert,
+          link: currentText?.text.link ?? null,
+        },
+        annotations: {
+          ...defaultAnnotations,
+          ...getAnnotations(rich_text, start, end),
+        },
+      },
     ];
-  }
+  })();
 
   return normalize([...before, ...insertItems, ...after]);
 }
@@ -241,6 +254,32 @@ export function setAnnotations(
   const after = slice(rich_text, end);
 
   return normalize([...before, ...middle, ...after]);
+}
+
+export function getAnnotations(
+  rich_text: RichText,
+  start: number,
+  end: number,
+): Partial<Annotations> {
+  const textItems = slice(rich_text, start, end).filter(
+    hasPropertyValue("type", "text"),
+  );
+  const first = textItems[0]?.annotations;
+  if (!first) return {};
+
+  return omitUndefined(
+    Object.fromEntries(
+      keys(first).map(
+        (key) =>
+          [
+            key,
+            textItems.every((item) => item.annotations[key] === first[key])
+              ? first[key]
+              : undefined,
+          ] as const,
+      ),
+    ),
+  );
 }
 
 export const empty_text: Item<"text"> = {
