@@ -33,11 +33,11 @@
 
   .text-color--bg {
     position: absolute;
-    border-radius: calc(var(--radius) / 4);
+    border-radius: calc(var(--radius) / 2);
+    top: -2px;
     left: -2px;
     right: -2px;
     bottom: -2px;
-    height: 50%;
     z-index: 0;
   }
 
