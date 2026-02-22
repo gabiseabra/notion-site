@@ -10,7 +10,7 @@ import { Popover } from "../../overlays/Popover.js";
 import {
   isAnnotated,
   NotionAnnotations,
-  toggleAnnotation,
+  toggleAnnotations,
 } from "../editable/notion/annotations.js";
 import { Editor } from "../Editor.js";
 import { useEditorSelectionRange } from "../editor/use-editor-selection-range.js";
@@ -124,7 +124,7 @@ export function Toolbar({ editor }: { editor: Editor }) {
               key={color}
               active={isColorActive}
               color={color}
-              onClick={() => execCommand(toggleAnnotation({ color }))}
+              onClick={() => execCommand(toggleAnnotations({ color }))}
             >
               {color == "default" ? (
                 <div className={styles["bg-color-button"]} />
@@ -138,7 +138,7 @@ export function Toolbar({ editor }: { editor: Editor }) {
                   ].join(" ")}
                   onClick={(e) => {
                     execCommand(
-                      toggleAnnotation({ color: `${color}_background` }),
+                      toggleAnnotations({ color: `${color}_background` }),
                     );
                     e.stopPropagation();
                   }}

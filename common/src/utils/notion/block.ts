@@ -1,5 +1,6 @@
 import { zNotion } from "../../dto/notion/schema/index.js";
 import { UnionToTuple } from "../../types/union.js";
+import { keys } from "../object.js";
 import * as RTF from "./rich-text.js";
 import { create } from "./wip.js";
 
@@ -184,4 +185,45 @@ export function split(
       },
     }),
   };
+}
+
+export function isAnnotated(
+  block: Block,
+  annotations: Partial<RTF.Annotations>,
+  start: number,
+  end: number,
+) {
+  if (!isRichText(block)) return false;
+  const selectedText = RTF.findByRange(extract(block).rich_text, start, end);
+
+  return (
+    selectedText.length > 0 &&
+    selectedText.every(
+      (item) => item.type === "text" && RTF.isItemAnnotated(item, annotations),
+    )
+  );
+}
+
+export function toggleAnnotations(
+  block: Block,
+  annotations: Partial<RTF.Annotations>,
+  start: number,
+  end: number,
+) {
+  if (!isRichText(block) || start === end) return block;
+
+  return mapRichText(block, (rich_text) =>
+    RTF.setAnnotations(
+      rich_text,
+      !isAnnotated(block, annotations, start, end)
+        ? annotations
+        : (Object.fromEntries(
+            keys(annotations).map(
+              (a) => [a, RTF.empty_text.annotations[a]] as const,
+            ),
+          ) satisfies Partial<RTF.Annotations>),
+      start,
+      end,
+    ),
+  );
 }

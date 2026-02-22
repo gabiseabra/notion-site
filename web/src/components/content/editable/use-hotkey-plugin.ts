@@ -1,7 +1,7 @@
 import { MaybeReadonly } from "@notion-site/common/types/readonly.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { AnyBlock } from "../editor/types.js";
-import { ContentEditorPlugin } from "./types.js";
+import { ContentEditorPlugin, EditorCommand } from "./types.js";
 
 type Mod = "Ctrl" | "Alt" | "Shift" | "Meta";
 type Key =
@@ -46,7 +46,7 @@ export type Hotkey = `${Mod}+${Key}` | `${Mod}+${Mod}+${Key}` | Key;
 
 export type HotkeyPluginOptions<TBlock> = MaybeReadonly<{
   key: Hotkey | Hotkey[];
-  apply: (block: TBlock, selection: SelectionRange) => TBlock | null;
+  command: EditorCommand<TBlock>;
 }>;
 
 export const useHotkeyPlugin =
@@ -68,7 +68,7 @@ export const useHotkeyPlugin =
         return;
 
       const currentBlock = editor.peek(block.id) ?? block;
-      const nextBlock = hotkey.apply(currentBlock, selection);
+      const nextBlock = hotkey.command(currentBlock, selection);
 
       if (nextBlock) {
         editor.update(nextBlock, {

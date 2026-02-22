@@ -69,7 +69,7 @@ export const useNotionPlugin = (
     ...Object.values(NotionAnnotations).map((annotation) =>
       useHotkeyPlugin({
         key: annotation.key,
-        apply: annotation.apply,
+        command: annotation.apply,
       }),
     ),
   );

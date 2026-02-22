@@ -1,4 +1,5 @@
 import { HTMLAttributes } from "react";
+import { SelectionRange } from "../../../utils/selection-range.js";
 import { AnyBlock, ContentEditor } from "../editor/types.js";
 
 type ReactEventHandlers<T> = {
@@ -31,3 +32,8 @@ export type AnyContentEditorPlugin<TDetail = ContentEditableProps> = <
 >(
   editor: ContentEditor<TBlock>,
 ) => (block: TBlock) => TDetail;
+
+export type EditorCommand<TBlock> = (
+  block: TBlock,
+  selection: SelectionRange,
+) => TBlock | null;
