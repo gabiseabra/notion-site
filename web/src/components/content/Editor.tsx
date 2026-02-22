@@ -2,7 +2,8 @@ import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { memo, Ref, useImperativeHandle } from "react";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
-import { DocumentToolbar, FloatingToolbar } from "./chrome/Toolbar.js";
+import { DocumentToolbar } from "./chrome/DocumentToolbar.js";
+import { FloatingToolbar } from "./chrome/FloatingToolbar.js";
 import {
   NotionPluginOptions,
   useNotionPlugin,

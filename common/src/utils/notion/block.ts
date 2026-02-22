@@ -227,3 +227,11 @@ export function toggleAnnotations(
     ),
   );
 }
+
+export function getAnnotations(
+  block: Block,
+  start: number,
+  end: number,
+): Partial<RTF.Annotations> {
+  return RTF.getAnnotations(extractRichText(block), start, end);
+}
