@@ -9,9 +9,9 @@ import { Col, Row } from "../../layout/FlexBox.js";
 import { Popover } from "../../overlays/Popover.js";
 import {
   isAnnotated,
-  NotionAnnotations,
+  NotionCommand,
   toggleAnnotations,
-} from "../editable/notion/annotations.js";
+} from "../editable/notion/command.js";
 import { Editor } from "../Editor.js";
 import { useEditorSelectionRange } from "../editor/use-editor-selection-range.js";
 import styles from "./Toolbar.module.scss";
@@ -88,20 +88,22 @@ export function Toolbar({ editor }: { editor: Editor }) {
 
   return (
     <Row gap={0} alignX="start">
-      {Object.entries(NotionAnnotations).map(
-        ([key, { key: hotkey, icon, apply, isActive }]) => (
+      {(["bold", "italic", "underline", "striketrough"] as const)
+        .map((cmd) => [cmd, NotionCommand[cmd]] as const)
+        .map(([key, cmd]) => (
           <ToolbarButton
             key={key}
             active={
-              !!selectedBlock && selection && isActive(selectedBlock, selection)
+              !!selectedBlock &&
+              selection &&
+              cmd.isActive(selectedBlock, selection)
             }
-            title={hotkey}
-            onClick={() => execCommand(apply)}
+            title={cmd.key}
+            onClick={() => execCommand(cmd.command)}
           >
-            {icon}
+            {cmd.icon}
           </ToolbarButton>
-        ),
-      )}
+        ))}
 
       <Divider />
 

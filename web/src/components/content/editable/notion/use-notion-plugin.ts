@@ -8,7 +8,7 @@ import { useHistoryPlugin } from "../use-history-plugin.js";
 import { useHotkeyPlugin } from "../use-hotkey-plugin.js";
 import { useInlineMutationPlugin } from "../use-inline-mutation-plugin.js";
 import { useLoggerPlugin } from "../use-logger-plugin.js";
-import { NotionAnnotations } from "./annotations.js";
+import { NotionCommand } from "./command.js";
 
 export type NotionPluginOptions = {
   multiline?: boolean;
@@ -66,10 +66,8 @@ export const useNotionPlugin = (
         return Notion.Block.split(block, offset, deleteRange);
       },
     }),
-    ...Object.values(NotionAnnotations).map((annotation) =>
-      useHotkeyPlugin({
-        key: annotation.key,
-        command: annotation.apply,
-      }),
-    ),
+    useHotkeyPlugin(NotionCommand.bold),
+    useHotkeyPlugin(NotionCommand.italic),
+    useHotkeyPlugin(NotionCommand.underline),
+    useHotkeyPlugin(NotionCommand.striketrough),
   );

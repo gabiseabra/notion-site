@@ -26,28 +26,28 @@ export const toggleAnnotations =
 
 const Mod = env.IS_MAC ? "Meta" : "Ctrl";
 
-export const NotionAnnotations = {
+export const NotionCommand = {
   bold: {
     key: `${Mod}+b`,
-    apply: toggleAnnotations({ bold: true }),
+    command: toggleAnnotations({ bold: true }),
     isActive: isAnnotated({ bold: true }),
     icon: <FaBold />,
   },
   underline: {
     key: `${Mod}+u`,
-    apply: toggleAnnotations({ underline: true }),
+    command: toggleAnnotations({ underline: true }),
     isActive: isAnnotated({ underline: true }),
     icon: <FaUnderline />,
   },
   italic: {
     key: `${Mod}+i`,
-    apply: toggleAnnotations({ italic: true }),
+    command: toggleAnnotations({ italic: true }),
     isActive: isAnnotated({ italic: true }),
     icon: <FaItalic />,
   },
   striketrough: {
     key: `${Mod}+Shift+s`,
-    apply: toggleAnnotations({ strikethrough: true }),
+    command: toggleAnnotations({ strikethrough: true }),
     isActive: isAnnotated({ strikethrough: true }),
     icon: <FaStrikethrough />,
   },
