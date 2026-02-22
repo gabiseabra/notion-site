@@ -1,7 +1,14 @@
 import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { titleCase } from "@notion-site/common/utils/case.js";
+import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
-import { Fragment, isValidElement, ReactNode, useState } from "react";
+import {
+  Fragment,
+  isValidElement,
+  ReactNode,
+  useEffect,
+  useState,
+} from "react";
 import { useDocumentEventListener } from "../../../hooks/use-document-event-listener.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { IconControl } from "../../display/Icon.js";
@@ -79,6 +86,8 @@ export function Toolbar({
   const selectedBlock = selection && editor.get(selection.id);
 
   disabled ??= !selection;
+  const disabledAction =
+    (!selection || SelectionRange.isCollapsed(selection)) && "action";
 
   const selectedColor =
     selectedBlock &&
@@ -110,6 +119,7 @@ export function Toolbar({
         .map(([key, cmd]) => (
           <ToolbarButton
             key={key}
+            disabled={disabled || disabledAction}
             active={
               !!selectedBlock &&
               selection &&
@@ -125,6 +135,7 @@ export function Toolbar({
       <Divider />
 
       <ToolbarMenu
+        disabled={!!disabledAction}
         options={colors.map((color) => {
           const isColorActive =
             !!selectedBlock &&
@@ -141,6 +152,7 @@ export function Toolbar({
           return (
             <ToolbarMenu.Item
               key={color}
+              disabled={disabled || disabledAction}
               active={isColorActive || isBackgroundActive}
               color={color}
               onClick={() => execCommand(toggleAnnotations({ color }))}
@@ -169,7 +181,7 @@ export function Toolbar({
           );
         })}
       >
-        <ToolbarButton>
+        <ToolbarButton disabled={disabled || disabledAction}>
           <TextColorIcon color={selectedColor} />
         </ToolbarButton>
       </ToolbarMenu>
@@ -189,7 +201,7 @@ function ToolbarButton({
   children: ReactNode;
   title?: string;
   active?: boolean;
-  disabled?: boolean;
+  disabled?: boolean | "action" | "feedback";
   onClick?: () => void;
 }) {
   return (
@@ -197,9 +209,25 @@ function ToolbarButton({
       as="button"
       size="s"
       p={1}
-      color={active ? "blue" : disabled ? "gray" : "default"}
+      color={
+        active
+          ? "blue"
+          : disabled === true || disabled == "feedback"
+            ? "gray"
+            : "default"
+      }
       title={title}
-      onClick={!disabled ? onClick : undefined}
+      onClick={
+        disabled === false || disabled !== "action" ? onClick : undefined
+      }
+      style={{
+        cursor:
+          disabled === "action"
+            ? "not-allowed"
+            : disabled === false
+              ? "pointer"
+              : "default",
+      }}
     >
       {children}
     </IconControl>
@@ -209,11 +237,17 @@ function ToolbarButton({
 function ToolbarPopover({
   children,
   content,
+  disabled,
 }: {
   children: ReactNode;
   content: ReactNode;
+  disabled?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (disabled) setIsOpen(false);
+  }, [!!disabled]);
 
   return (
     <Popover
@@ -224,7 +258,9 @@ function ToolbarPopover({
       onClickOutside={() => setIsOpen(false)}
       onOffScreen={() => setIsOpen(false)}
     >
-      <span onClick={() => setIsOpen((open) => !open)}>{children}</span>
+      <span onClick={() => setIsOpen((open) => !disabled && !open)}>
+        {children}
+      </span>
     </Popover>
   );
 }
@@ -235,6 +271,7 @@ function ToolbarMenu({
 }: {
   children: ReactNode;
   options: ReactNode[];
+  disabled?: boolean;
 }) {
   return (
     <ToolbarPopover
@@ -256,21 +293,29 @@ ToolbarMenu.Item = function ToolbarMenuItem({
   children,
   color,
   active,
+  disabled,
   onClick,
 }: {
   children: ReactNode;
   color?: zNotion.primitives.color;
   active?: boolean;
+  disabled?: boolean | "feedback" | "action";
   onClick?: () => void;
 }) {
   return (
     <button
       className={[
         styles["toolbar-menu-item"],
-        color ? styles[`color-${color}`] : "",
-        active ? styles["active"] : "",
-      ].join(" ")}
-      onClick={onClick}
+        color && styles[`color-${color}`],
+        active && styles["active"],
+        (disabled === true || disabled === "feedback") && styles["disabled"],
+        disabled !== "action" && styles["clickable"],
+      ]
+        .filter(isTruthy)
+        .join(" ")}
+      onClick={
+        disabled === false || disabled !== "action" ? onClick : undefined
+      }
     >
       {children}
     </button>
