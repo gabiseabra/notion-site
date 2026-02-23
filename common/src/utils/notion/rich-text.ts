@@ -17,47 +17,12 @@ export function traverseText(
   );
 }
 
-export function findByOffset(rich_text: RichText, offset: number) {
-  let index = 0,
-    start = 0;
-
-  if (offset < 0) return null;
-
-  for (const node of rich_text) {
-    if (node.type !== "text") continue;
-
-    const length = node.text.content.length;
-
-    if (start + length >= offset) return { node, index, start, length };
-
-    index++;
-    start += length;
-  }
-
-  return null;
-}
-
-export function findByRange(rich_text: RichText, start: number, end: number) {
-  return start === end
-    ? [findByOffset(rich_text, start)?.node].filter(isNonNullable)
-    : slice(rich_text, start, end);
-}
-
 export function getContent(rich_text: RichText) {
-  return rich_text
-    .filter(hasPropertyValue("type", "text"))
-    .map(({ text }) => text.content)
-    .join("");
-}
-
-/**
- * @deprecated use `Notion.RTF.getContent(rich_text).length` instead
- */
-export function getLength(rich_text: RichText) {
-  return rich_text.reduce((acc, item) => {
-    if (item.type !== "text") return acc;
-    return acc + item.text.content.length;
-  }, 0);
+  return foldText(
+    rich_text,
+    (content, item) => content + item.text.content,
+    "",
+  );
 }
 
 /**
@@ -70,8 +35,8 @@ export function slice(
 ): RichText {
   if (end === start) return [];
 
-  const startItem = findByOffset(rich_text, start);
-  const endItem = end ? findByOffset(rich_text, end) : undefined;
+  const startItem = _findByOffset(rich_text, start);
+  const endItem = end ? _findByOffset(rich_text, end) : undefined;
 
   if (!startItem) return [];
 
@@ -115,12 +80,12 @@ export function splice(
 ): RichText {
   if (deleteCount === 0 && insert === "") return rich_text;
 
-  if (getLength(rich_text) === 0) {
+  const length = getContent(rich_text).length;
+
+  if (length === 0) {
     if (insert === "") return [];
     return [replaceTextContent(empty_text, () => insert)];
   }
-
-  const length = getLength(rich_text);
 
   const start = Math.max(0, Math.min(offset, length));
   const end = Math.min(start + deleteCount, length);
@@ -133,7 +98,7 @@ export function splice(
   const insertItems: RichText = (() => {
     if (insert === "") return [];
 
-    const currentText = findByOffset(rich_text, start)?.node;
+    const currentText = _findByOffset(rich_text, start)?.node;
     const defaultAnnotations =
       currentText?.annotations ?? empty_text.annotations;
 
@@ -188,18 +153,9 @@ export type Item<T extends ItemType = ItemType> = Extract<
 export function itemEquals(a: Item, b: Item) {
   return a.type === "text" && b.type === "text"
     ? a.text.content === b.text.content &&
-        annotationsEquals(a.annotations, b.annotations)
+        annotationsEquals(a.annotations, b.annotations) &&
+        (a.text.link?.url ?? null) === (b.text.link?.url ?? null)
     : a.type === b.type;
-}
-
-function replaceTextContent(
-  item: Item<"text">,
-  f: (content: string) => string,
-): Item<"text"> {
-  return {
-    ...item,
-    text: { ...item.text, content: f(item.text.content) },
-  };
 }
 
 export function foldText<T>(
@@ -211,12 +167,22 @@ export function foldText<T>(
     (acc, item, index) => {
       if (item.type !== "text") return acc;
       return {
-        value: f(acc.value, item, index, acc.offset),
+        value: f(acc.value, item, acc.offset, index),
         offset: acc.offset + item.text.content.length,
       };
     },
     { value: initialValue, offset: 0 },
   ).value;
+}
+
+function replaceTextContent(
+  item: Item<"text">,
+  f: (content: string) => string,
+): Item<"text"> {
+  return {
+    ...item,
+    text: { ...item.text, content: f(item.text.content) },
+  };
 }
 
 /** Annotations stuff */
@@ -279,6 +245,10 @@ export function getAnnotations(
   start: number,
   end: number,
 ): Partial<Annotations> {
+  if (start === end) {
+    return _findByOffset(rich_text, start)?.node.annotations ?? {};
+  }
+
   const textItems = slice(rich_text, start, end).filter(
     hasPropertyValue("type", "text"),
   );
@@ -345,36 +315,66 @@ export function getLink(
   return isSameLink ? first : undefined;
 }
 
-/**
- * Find closest range that matches the given link.
- */
-export function findLinkFocusRange(
-  rich_text: RichText,
-  link: Link,
-  offset: number = 0,
-): { start: number; end: number } | null {
-  return foldText<{ start: number; end: number } | null>(
+/** Methods to find chunks of text */
+
+function _findByOffset(rich_text: RichText, offset: number) {
+  if (offset < 0) return null;
+
+  return foldText<{
+    node: Item<"text">;
+    index: number;
+    start: number;
+    length: number;
+  } | null>(
     rich_text,
-    (acc, item, itemStart) => {
-      const itemEnd = itemStart + item.text.content.length;
-
-      if (
-        // skip if item is out of range
-        itemEnd < offset ||
-        // skip if item url doesn't match
-        item.text.link?.url !== link?.url ||
-        // skip if already found closing tag
-        (acc && acc.end !== itemStart)
-      )
-        return acc;
-
-      return {
-        start: acc?.start ?? itemStart,
-        end: itemEnd,
-      };
+    (acc, node, start, index) => {
+      const length = node.text.content.length;
+      return !acc && start + length >= offset
+        ? { node, index, start, length }
+        : acc;
     },
     null,
   );
+}
+
+export function findByRange(rich_text: RichText, start: number, end: number) {
+  return start === end
+    ? [_findByOffset(rich_text, start)?.node].filter(isNonNullable)
+    : slice(rich_text, start, end);
+}
+
+/**
+ * Find the range that includes all items maching same the link in the given offset.
+ */
+export function findLinkRange(
+  rich_text: RichText,
+  offset: number = 0,
+): { start: number; end: number } | null {
+  const target = _findByOffset(rich_text, offset);
+  const link = target?.node.text.link;
+
+  if (!target || !link) return null;
+
+  const range = {
+    start: target.start,
+    end: target.start + target.node.text.content.length,
+  };
+
+  for (let i = target.index; i > 0; --i) {
+    const text = rich_text[i];
+    if (!(text && text.type === "text" && text.text.link?.url === link.url))
+      break;
+    range.start -= text.text.content.length;
+  }
+
+  for (let i = target.index; i < rich_text.length; ++i) {
+    const text = rich_text[i];
+    if (!(text && text.type === "text" && text.text.link?.url === link.url))
+      break;
+    range.start += text.text.content.length;
+  }
+
+  return range;
 }
 
 /** Default */

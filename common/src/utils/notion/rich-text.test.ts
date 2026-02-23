@@ -4,64 +4,6 @@ import * as RTF from "./rich-text.js";
 import { span } from "./wip.js";
 
 describe("Notion.RTF", () => {
-  describe("Notion.RTF.getLength", () => {
-    it("returns 0 for empty array", () => {
-      expect(RTF.getLength([])).toBe(0);
-    });
-
-    it("returns length of single text item", () => {
-      expect(RTF.getLength([span("hello")])).toBe(5);
-    });
-
-    it("returns combined length of multiple text items", () => {
-      expect(RTF.getLength([span("hello"), span(" world")])).toBe(11);
-    });
-
-    it("ignores non-text items", () => {
-      expect(
-        RTF.getLength([
-          span("hello"),
-          { type: "mention" as const, mention: {} },
-          span(" world"),
-        ]),
-      ).toBe(11);
-    });
-  });
-
-  describe("Notion.RTF.findByOffset", () => {
-    it("returns null for empty array", () => {
-      expect(RTF.findByOffset([], 0)).toBe(null);
-    });
-
-    it("returns null for offset beyond length", () => {
-      expect(RTF.findByOffset([span("hello")], 10)).toBe(null);
-    });
-
-    it("finds item at valid offset", () => {
-      for (let i = 0; i <= 5; ++i)
-        expect(RTF.findByOffset([span("hello")], i)).toEqual({
-          node: span("hello"),
-          index: 0,
-          start: 0,
-          length: 5,
-        });
-    });
-
-    it("finds nothing at invalid offset", () => {
-      expect(RTF.findByOffset([span("hello")], -1)).toEqual(null);
-      expect(RTF.findByOffset([span("hello")], 6)).toEqual(null);
-    });
-
-    it("finds correct item in multi-item array", () => {
-      expect(RTF.findByOffset([span("hello"), span(" world")], 7)).toEqual({
-        node: span(" world"),
-        index: 1,
-        start: 5,
-        length: 6,
-      });
-    });
-  });
-
   describe("Notion.RTF.slice", () => {
     it("returns empty array for empty input", () => {
       expect(RTF.slice([], 0, 5)).toEqual([]);

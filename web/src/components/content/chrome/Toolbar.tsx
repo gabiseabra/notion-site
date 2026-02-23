@@ -27,8 +27,8 @@ export function Toolbar({
   const selectedAnnotations =
     (selectedBlock &&
       selection &&
-      Notion.Block.getAnnotations(
-        selectedBlock,
+      Notion.RTF.getAnnotations(
+        Notion.Block.extractRichText(selectedBlock),
         selection.start,
         selection.end,
       )) ??

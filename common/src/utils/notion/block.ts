@@ -227,14 +227,3 @@ export function toggleAnnotations(
     ),
   );
 }
-
-export function getAnnotations(
-  block: Block,
-  start: number,
-  end: number,
-): Partial<RTF.Annotations> {
-  const rich_text = extractRichText(block);
-  return start === end
-    ? (RTF.findByOffset(rich_text, start)?.node.annotations ?? {})
-    : RTF.getAnnotations(rich_text, start, end);
-}
