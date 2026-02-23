@@ -1,5 +1,6 @@
 import { zNotion } from "../../dto/notion/schema/index.js";
 import { hasPropertyValue, isNonNullable } from "../guards.js";
+import { NonEmpty } from "../non-empty.js";
 import { keys, omitUndefined } from "../object.js";
 
 export type RichText = zNotion.rich_text.rich_text_item;
@@ -201,6 +202,23 @@ function replaceTextContent(
   };
 }
 
+export function foldText<T>(
+  rich_text: RichText,
+  f: (acc: T, item: Item<"text">, offset: number, index: number) => T,
+  initialValue: T,
+) {
+  return rich_text.reduce(
+    (acc, item, index) => {
+      if (item.type !== "text") return acc;
+      return {
+        value: f(acc.value, item, index, acc.offset),
+        offset: acc.offset + item.text.content.length,
+      };
+    },
+    { value: initialValue, offset: 0 },
+  ).value;
+}
+
 /** Annotations stuff */
 
 export type Annotations = zNotion.rich_text.annotations;
@@ -281,6 +299,85 @@ export function getAnnotations(
     ),
   );
 }
+
+/** Links */
+
+export type Link = Item<"text">["text"]["link"];
+
+export function setLink(
+  rich_text: RichText,
+  link: Link,
+  start: number,
+  end: number,
+): RichText {
+  const before = slice(rich_text, 0, start);
+  const middle = slice(rich_text, start, end).map((item) =>
+    item.type === "text"
+      ? {
+          ...item,
+          text: {
+            ...item.text,
+            link,
+          },
+        }
+      : item,
+  );
+  const after = slice(rich_text, end);
+
+  return normalize([...before, ...middle, ...after]);
+}
+
+export function getLink(
+  rich_text: RichText,
+  start: number,
+  end: number,
+): Link | undefined {
+  const textItems = findByRange(rich_text, start, end).filter(
+    hasPropertyValue("type", "text"),
+  );
+  if (!NonEmpty.isNonEmpty(textItems)) return null;
+
+  const first = textItems[0].text.link;
+  const isSameLink = textItems.every(
+    (item) => item.text.link?.url === first?.url,
+  );
+
+  return isSameLink ? first : undefined;
+}
+
+/**
+ * Find closest range that matches the given link.
+ */
+export function findLinkFocusRange(
+  rich_text: RichText,
+  link: Link,
+  offset: number = 0,
+): { start: number; end: number } | null {
+  return foldText<{ start: number; end: number } | null>(
+    rich_text,
+    (acc, item, itemStart) => {
+      const itemEnd = itemStart + item.text.content.length;
+
+      if (
+        // skip if item is out of range
+        itemEnd < offset ||
+        // skip if item url doesn't match
+        item.text.link?.url !== link?.url ||
+        // skip if already found closing tag
+        (acc && acc.end !== itemStart)
+      )
+        return acc;
+
+      return {
+        start: acc?.start ?? itemStart,
+        end: itemEnd,
+      };
+    },
+    null,
+  );
+}
+
+/** Default */
 
 export const empty_text: Item<"text"> = {
   type: "text",
