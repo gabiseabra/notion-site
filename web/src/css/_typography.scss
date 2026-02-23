@@ -114,6 +114,7 @@ blockquote {
 a {
   color: var(--color-link);
   text-decoration: underline;
+  cursor: pointer;
 
   &:has(h1),
   &:has(h2),

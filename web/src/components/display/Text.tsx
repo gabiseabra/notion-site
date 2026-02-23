@@ -110,7 +110,7 @@ Span.className = ({
     code && styles.code,
     redacted && styles.redacted,
     size && styles[`size-${size}`],
-    color && styles[`color-${color}`],
+    color && color !== "default" && styles[`color-${color}`],
   ]
     .filter(isTruthy)
     .join(" ");
