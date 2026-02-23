@@ -33,6 +33,8 @@ export function Filters({ title, query, filters }: FilterProps) {
 
   return (
     <Input
+      label="Search"
+      hiddenLabel
       type="search"
       size="l"
       value={query.value}

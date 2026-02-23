@@ -5,7 +5,7 @@ import styles from "./Input.module.scss";
 
 type InputProps = {
   type: "search" | "text";
-  label?: string;
+  label: string;
   hiddenLabel?: boolean;
   size?: "m" | "l";
 
@@ -34,7 +34,7 @@ export function Input({
     <label
       className={[styles["input-wrapper"], styles[`size-${size}`]].join(" ")}
     >
-      {!!label && !hiddenLabel && <div className={styles.label}>{label}</div>}
+      {!hiddenLabel && <div className={styles.label}>{label}</div>}
 
       <div className={styles.input}>
         {left}
