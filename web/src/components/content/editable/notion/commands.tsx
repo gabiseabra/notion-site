@@ -45,7 +45,7 @@ export const NotionCommand = {
     isActive: isAnnotated({ italic: true }),
     icon: <FaItalic />,
   },
-  striketrough: {
+  strikethrough: {
     key: `${Mod}+Shift+s`,
     command: toggleAnnotations({ strikethrough: true }),
     isActive: isAnnotated({ strikethrough: true }),

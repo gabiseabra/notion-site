@@ -8,7 +8,7 @@ import { useHistoryPlugin } from "../use-history-plugin.js";
 import { useHotkeyPlugin } from "../use-hotkey-plugin.js";
 import { useInlineMutationPlugin } from "../use-inline-mutation-plugin.js";
 import { useLoggerPlugin } from "../use-logger-plugin.js";
-import { NotionCommand } from "./command.js";
+import { toggleAnnotations } from "./commands.js";
 
 export type NotionPluginOptions = {
   multiline?: boolean;
@@ -66,8 +66,26 @@ export const useNotionPlugin = (
         return Notion.Block.split(block, offset, deleteRange);
       },
     }),
-    useHotkeyPlugin(NotionCommand.bold),
-    useHotkeyPlugin(NotionCommand.italic),
-    useHotkeyPlugin(NotionCommand.underline),
-    useHotkeyPlugin(NotionCommand.striketrough),
+    ...Object.values(NotionHotkeys).map(useHotkeyPlugin),
   );
+
+const Mod = env.IS_MAC ? "Meta" : "Ctrl";
+
+export const NotionHotkeys = {
+  bold: {
+    key: `${Mod}+b`,
+    command: toggleAnnotations({ bold: true }),
+  },
+  underline: {
+    key: `${Mod}+u`,
+    command: toggleAnnotations({ underline: true }),
+  },
+  italic: {
+    key: `${Mod}+i`,
+    command: toggleAnnotations({ italic: true }),
+  },
+  strikethrough: {
+    key: `${Mod}+Shift+s`,
+    command: toggleAnnotations({ strikethrough: true }),
+  },
+} as const;

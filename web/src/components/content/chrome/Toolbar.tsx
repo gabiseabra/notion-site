@@ -1,11 +1,15 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
+import {
+  FaBold,
+  FaCode,
+  FaItalic,
+  FaStrikethrough,
+  FaUnderline,
+} from "react-icons/fa";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { Divider } from "../../display/Divider.js";
 import { Row } from "../../layout/FlexBox.js";
-import {
-  NotionCommand,
-  toggleAnnotations,
-} from "../editable/notion/command.js";
+import { toggleAnnotations } from "../editable/notion/commands.js";
 import { Editor } from "../Editor.js";
 import { useEditorSelectionRange } from "../editor/use-editor-selection-range.js";
 import { TextColorButton } from "./TextColorButton.js";
@@ -41,23 +45,35 @@ export function Toolbar({
 
   return (
     <Row gap={0} alignX="start">
-      {(["bold", "italic", "underline", "striketrough"] as const)
-        .map((cmd) => [cmd, NotionCommand[cmd]] as const)
-        .map(([key, cmd]) => (
+      {(["bold", "italic", "underline", "strikethrough", "code"] as const).map(
+        (key) => (
           <ToolbarButton
             key={key}
             disabled={disabled || disabledAction}
             active={
               !!selectedBlock &&
               selection &&
-              cmd.isActive(selectedBlock, selection)
+              Notion.Block.isAnnotated(
+                selectedBlock,
+                { [key]: true },
+                selection.start,
+                selection.end,
+              )
             }
-            title={cmd.key}
-            onClick={() => execCommand(cmd.command)}
+            onClick={() => execCommand(toggleAnnotations({ [key]: true }))}
           >
-            {cmd.icon}
+            {
+              {
+                bold: <FaBold />,
+                italic: <FaItalic />,
+                underline: <FaUnderline />,
+                strikethrough: <FaStrikethrough />,
+                code: <FaCode />,
+              }[key]
+            }
           </ToolbarButton>
-        ))}
+        ),
+      )}
 
       <Divider direction="y" />
 
