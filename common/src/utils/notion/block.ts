@@ -233,5 +233,8 @@ export function getAnnotations(
   start: number,
   end: number,
 ): Partial<RTF.Annotations> {
-  return RTF.getAnnotations(extractRichText(block), start, end);
+  const rich_text = extractRichText(block);
+  return start === end
+    ? (RTF.findByOffset(rich_text, start)?.node.annotations ?? {})
+    : RTF.getAnnotations(rich_text, start, end);
 }

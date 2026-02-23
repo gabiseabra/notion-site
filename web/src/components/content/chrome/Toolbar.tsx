@@ -24,6 +24,15 @@ export function Toolbar({
 }) {
   const selection = useEditorSelectionRange(editor);
   const selectedBlock = selection && editor.get(selection.id);
+  const selectedAnnotations =
+    (selectedBlock &&
+      selection &&
+      Notion.Block.getAnnotations(
+        selectedBlock,
+        selection.start,
+        selection.end,
+      )) ??
+    undefined;
 
   disabled ??= !selection;
   const disabledAction =
@@ -79,16 +88,7 @@ export function Toolbar({
 
       <TextColorButton
         disabled={disabled || disabledAction}
-        value={
-          (selectedBlock &&
-            selection &&
-            Notion.Block.getAnnotations(
-              selectedBlock,
-              selection.start,
-              selection.end,
-            ).color) ??
-          undefined
-        }
+        value={selectedAnnotations?.color}
         onChange={(color) => execCommand(toggleAnnotations({ color }))}
       />
     </Row>
