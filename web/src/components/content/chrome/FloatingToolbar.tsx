@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useDocumentEventListener } from "../../../hooks/use-document-event-listener.js";
+import { useVisualViewportEventListener } from "../../../hooks/use-visual-viewport-event-listener.js";
 import { Popover } from "../../overlays/Popover.js";
 import { Editor } from "../Editor.js";
 import { Toolbar } from "./Toolbar.js";
@@ -7,7 +8,7 @@ import { Toolbar } from "./Toolbar.js";
 export function FloatingToolbar({ editor }: { editor: Editor }) {
   const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
 
-  useDocumentEventListener("selectionchange", () => {
+  function updateSelectionRect() {
     const sel = window.getSelection();
     const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
     const selectionRect = range?.getBoundingClientRect();
@@ -25,7 +26,11 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
     } else {
       setSelectionRect(null);
     }
-  });
+  }
+
+  useDocumentEventListener("selectionchange", updateSelectionRect);
+
+  useVisualViewportEventListener("resize", updateSelectionRect);
 
   return (
     <Popover
