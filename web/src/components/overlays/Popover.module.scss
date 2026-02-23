@@ -13,6 +13,14 @@
   @include shadow.border;
 }
 
+.popover[data-placement^="top"] {
+  transform: translateY(-100%);
+}
+
+.popover[data-placement^="left"] {
+  transform: translateX(-100%);
+}
+
 .content {
   background: var(--bg-from);
   border-radius: var(--radius);

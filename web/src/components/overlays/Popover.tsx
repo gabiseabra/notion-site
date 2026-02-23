@@ -123,6 +123,21 @@ export function Popover({
       tipEl.getBoundingClientRect(),
     );
 
+    // If we are inside a transformed popover, fixed positioning becomes relative
+    // to that ancestor. Convert viewport coords into that local space so nested
+    // popovers (e.g. floating toolbar menus) stay aligned.
+    if (coords) {
+      const fixedParent = triggerEl.closest(`.${styles.popover}`);
+      if (fixedParent instanceof HTMLElement) {
+        const transform = getComputedStyle(fixedParent).transform;
+        if (transform && transform !== "none") {
+          const parentRect = fixedParent.getBoundingClientRect();
+          coords.top -= parentRect.top;
+          coords.left -= parentRect.left;
+        }
+      }
+    }
+
     if (!coords) onOffScreenRef.current();
 
     setCoords(coords);
@@ -313,8 +328,8 @@ function getBestCoords(
 
   return {
     placement: best.placement,
-    top,
-    left,
+    top: base === "top" ? top + tip.height : top,
+    left: base === "left" ? left + tip.width : left,
     arrowLeft,
     arrowTop,
   };
