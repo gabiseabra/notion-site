@@ -12,8 +12,8 @@ import { Row } from "../../layout/FlexBox.js";
 import { setLink, toggleAnnotations } from "../editable/notion/commands.js";
 import { Editor } from "../Editor.js";
 import { useEditorSelectionRange } from "../editor/use-editor-selection-range.js";
-import { LinkButton } from "./LinkButton.js";
-import { TextColorButton } from "./TextColorButton.js";
+import { ColorControl } from "./ColorControl.js";
+import { LinkControl } from "./LinkControl.js";
 import { ToolbarButton } from "./ToolbarButton.js";
 
 export function Toolbar({
@@ -95,13 +95,13 @@ export function Toolbar({
 
       <Divider direction="y" />
 
-      <TextColorButton
+      <ColorControl
         disabled={disabled || disabledAction}
         value={selectedAnnotations?.color}
         onChange={(color) => execCommand(toggleAnnotations({ color }))}
       />
 
-      <LinkButton
+      <LinkControl
         disabled={disabled || disabledAction}
         value={selectedLink}
         onChange={(link) => execCommand(setLink(link))}

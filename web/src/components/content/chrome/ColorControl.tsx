@@ -4,7 +4,7 @@ import styles from "./Toolbar.module.scss";
 import { ToolbarButton } from "./ToolbarButton.js";
 import { ToolbarMenu } from "./ToolbarMenu.js";
 
-export function TextColorButton({
+export function ColorControl({
   disabled,
   value,
   onChange,

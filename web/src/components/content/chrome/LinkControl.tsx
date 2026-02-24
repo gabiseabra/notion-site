@@ -7,7 +7,7 @@ import { IsolationFrame } from "../../overlays/IsolationFrame.js";
 import { Popover } from "../../overlays/Popover.js";
 import { ToolbarButton } from "./ToolbarButton.js";
 
-export function LinkButton({
+export function LinkControl({
   disabled,
   value,
   onChange,
