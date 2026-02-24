@@ -9,7 +9,6 @@ import {
   useImperativeHandle,
   useLayoutEffect,
 } from "react";
-import { EditorEvent } from "./editor-event.js";
 import { ContentEditor } from "./types.js";
 import { useContentEditor } from "./use-content-editor.js";
 
@@ -18,23 +17,15 @@ type TestBlock = { id: string; text: string };
 type TestEditorProps = {
   ref?: Ref<ContentEditor<TestBlock> | null>;
   value: TestBlock[];
-  onReady?: (event: EditorEvent<TestBlock, "ready">) => void;
 };
 
-function TestEditor({ ref, value: initialValue, onReady }: TestEditorProps) {
+function TestEditor({ ref, value: initialValue }: TestEditorProps) {
   const { editor } = useContentEditor({
     initialValue,
     plugin: () => () => ({}),
   });
 
   useImperativeHandle(ref, () => editor, [editor]);
-
-  useLayoutEffect(() => {
-    if (!onReady) return;
-    const handler = (event) => onReady(event);
-    editor.bus.addEventListener("ready", handler);
-    return () => editor.bus.removeEventListener("ready", handler);
-  }, [editor, onReady]);
 
   return null;
 }
@@ -44,15 +35,24 @@ describe("useContentEditor", () => {
     it("fires ready on init", () => {
       const onReady = jest.fn();
 
-      render(
-        <TestEditor
-          value={[
+      const ReadyProbe = () => {
+        const { editor } = useContentEditor({
+          initialValue: [
             { id: "a", text: "Hello" },
             { id: "b", text: "World" },
-          ]}
-          onReady={onReady}
-        />,
-      );
+          ],
+          plugin: () => () => ({}),
+        });
+
+        useLayoutEffect(() => {
+          editor.bus.addEventListener("ready", onReady);
+          return () => editor.bus.removeEventListener("ready", onReady);
+        }, [editor]);
+
+        return null;
+      };
+
+      render(<ReadyProbe />);
 
       expect(onReady).toHaveBeenCalledTimes(1);
       expect(onReady).toHaveBeenCalledWith(
@@ -340,6 +340,31 @@ describe("useContentEditor", () => {
           { id: "a", text: "Updated" },
           { batchId: "a" },
         );
+      });
+
+      expect(editorRef.current?.blocks[0]?.text).toBe("Hello");
+      expect(editorRef.current?.peek("a")?.text).toBe("Updated");
+    });
+
+    it("returns pending history state from peek before commit", () => {
+      const editorRef: RefObject<ContentEditor<TestBlock> | null> = {
+        current: null,
+      };
+
+      render(
+        <TestEditor
+          ref={editorRef}
+          value={[
+            { id: "a", text: "Hello" },
+            { id: "b", text: "World" },
+          ]}
+        />,
+      );
+
+      expect(editorRef.current).toBeTruthy();
+
+      act(() => {
+        editorRef.current?.update({ id: "a", text: "Updated" });
       });
 
       expect(editorRef.current?.blocks[0]?.text).toBe("Hello");

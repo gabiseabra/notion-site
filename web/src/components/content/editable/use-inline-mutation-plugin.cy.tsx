@@ -7,6 +7,26 @@ const options = {
 };
 
 describe("useInlineMutationPlugin", () => {
+  it("types some text and saves", () => {
+    const onChange = cy.stub().as("onChange");
+
+    cy.mount(
+      <Editor
+        value={[p("a", span("Hello"))]}
+        onChange={onChange}
+        options={options}
+      />,
+    );
+
+    cy.get("p").click().type("{end} World").should("have.text", "Hello World");
+
+    cy.wait(options.autoCommit);
+
+    cy.get("@onChange").should("have.been.called");
+
+    cy.get("p").should("have.text", "Hello World");
+  });
+
   it("inserts newline into the palceholder span", () => {
     cy.mount(<Editor value={[p("a")]} onChange={() => {}} options={options} />);
 
@@ -16,6 +36,10 @@ describe("useInlineMutationPlugin", () => {
       .type("{shift}{enter}")
       .type("{shift}{enter}");
     cy.get("p span").should("have.text", "\n\n\n");
+
+    cy.wait(options.autoCommit);
+
+    cy.get("p").should("have.text", "\n\n\n");
   });
 
   it("inserts newline at the end of a rich-text span", () => {
@@ -31,6 +55,10 @@ describe("useInlineMutationPlugin", () => {
       .click()
       .type("{end}{shift}{enter}more")
       .should("have.text", "Hello\nmore");
+
+    cy.wait(options.autoCommit);
+
+    cy.get("p").should("have.text", "Hello\nmore");
   });
 
   it("prevents Shift+Enter newline when multiline is disabled", () => {
@@ -46,6 +74,10 @@ describe("useInlineMutationPlugin", () => {
       .click()
       .type("{end}{shift}{enter}")
       .should("have.text", "Hello");
+
+    cy.wait(options.autoCommit);
+
+    cy.get("p").should("have.text", "Hello");
   });
 
   it("handles type characters then backspace some", () => {

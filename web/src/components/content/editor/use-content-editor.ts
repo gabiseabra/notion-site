@@ -92,10 +92,12 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
       },
 
       peek(id) {
+        const state = history.getState();
+
         return (
           (batchRef.current
-            ? applyCommands(snapshot.state, ...batchRef.current.commands)
-            : snapshot.state
+            ? applyCommands(state, ...batchRef.current.commands)
+            : state
           ).find((block) => block.id === id) ?? null
         );
       },
