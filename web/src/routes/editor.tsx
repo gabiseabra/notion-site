@@ -51,12 +51,13 @@ export function Component() {
   return (
     <div>
       <Head>
-        <Favicon icon={{ type: "emoji", emoji: "⌨️" }} />
+        <title>Content Editor Demo</title>
+        <Favicon icon={{ type: "emoji", emoji: "✍️" }} />
       </Head>
 
       <Text as="h1">
         <Icon size="l" icon={{ type: "emoji", emoji: "⌨️" }} />
-        &nbsp; Content Editor Demo
+        &nbsp;Content Editor Demo
       </Text>
 
       <Editor
