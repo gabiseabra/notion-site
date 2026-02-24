@@ -9,9 +9,10 @@ import {
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { Divider } from "../../display/Divider.js";
 import { Row } from "../../layout/FlexBox.js";
-import { toggleAnnotations } from "../editable/notion/commands.js";
+import { setLink, toggleAnnotations } from "../editable/notion/commands.js";
 import { Editor } from "../Editor.js";
 import { useEditorSelectionRange } from "../editor/use-editor-selection-range.js";
+import { LinkButton } from "./LinkButton.js";
 import { TextColorButton } from "./TextColorButton.js";
 import { ToolbarButton } from "./ToolbarButton.js";
 
@@ -33,6 +34,14 @@ export function Toolbar({
         selection.end,
       )) ??
     undefined;
+  const selectedLink =
+    selectedBlock &&
+    selection &&
+    Notion.RTF.getLink(
+      Notion.Block.extractRichText(selectedBlock),
+      selection.start,
+      selection.end,
+    );
 
   disabled ??= !selection;
   const disabledAction =
@@ -90,6 +99,30 @@ export function Toolbar({
         disabled={disabled || disabledAction}
         value={selectedAnnotations?.color}
         onChange={(color) => execCommand(toggleAnnotations({ color }))}
+      />
+
+      <LinkButton
+        disabled={disabled || disabledAction}
+        value={selectedLink}
+        onChange={(link) => execCommand(setLink(link))}
+        onOpen={() => {
+          if (!selectedBlock || !selection || !selectedLink) return;
+
+          const range = Notion.RTF.findLinkRange(
+            Notion.Block.extractRichText(selectedBlock),
+            selection.start,
+          );
+          const element = editor.ref(selectedBlock.id);
+
+          if (
+            range &&
+            element &&
+            selection.start !== range.start &&
+            selection.end !== range.end
+          ) {
+            SelectionRange.apply(element, range);
+          }
+        }}
       />
     </Row>
   );
