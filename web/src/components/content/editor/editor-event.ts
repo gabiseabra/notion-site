@@ -1,7 +1,7 @@
 import { EmptyObject } from "@notion-site/common/types/object.js";
 import { TypedEventTarget } from "typescript-event-target";
 import { EditorCommandCmd } from "./editor-history.js";
-import { AnyBlock, ContentEditor } from "./types.js";
+import { AnyBlock, ContentEditor, ID } from "./types.js";
 
 type EditorEventMap<TBlock extends AnyBlock> = {
   /**
@@ -10,7 +10,17 @@ type EditorEventMap<TBlock extends AnyBlock> = {
    */
   edit: {
     cmd: EditorCommandCmd<TBlock>;
-    inTransaction: boolean;
+    batchId?: ID;
+    /** Data provided from the plugin that triggers it. You have to parse it */
+    data: unknown;
+  };
+  /**
+   * Batch will be saved to history.
+   * @cancellable
+   */
+  flush: {
+    batchId: ID;
+    commands: EditorCommandCmd<TBlock>[];
     /** Data provided from the plugin that triggers it. You have to parse it */
     data: unknown;
   };
@@ -29,10 +39,6 @@ type EditorEventMap<TBlock extends AnyBlock> = {
    */
   postcommit: EmptyObject;
   /**
-   * Notifies plugins to save changes before commit. Runs before commit.
-   */
-  flush: EmptyObject;
-  /**
    * Runs once after editor setup is done.
    */
   ready: EmptyObject;
@@ -47,7 +53,14 @@ export class EditorEvent<
     public editor: ContentEditor<TBlock>,
     public detail: EditorEventMap<TBlock>[E],
   ) {
-    super(eventType);
+    super(eventType, { cancelable: true });
+  }
+
+  static narrow<
+    E extends keyof EditorEventMap<TBlock>,
+    TBlock extends AnyBlock,
+  >(eventType: E, event: EditorEvent<TBlock>): event is EditorEvent<TBlock, E> {
+    return event.eventType === eventType;
   }
 }
 

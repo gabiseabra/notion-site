@@ -2,8 +2,12 @@ import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ContentEditorPlugin } from "../editable/types.js";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
-import { EditorCommand, EditorHistory } from "./editor-history.js";
-import { AnyBlock, ContentEditor } from "./types.js";
+import {
+  applyCommands,
+  EditorCommandCmd,
+  EditorHistory,
+} from "./editor-history.js";
+import { AnyBlock, ContentEditor, EditorBatch, ID } from "./types.js";
 
 /**
  * Creates shared state & controller for the editor plugins.
@@ -24,19 +28,45 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
   const history = useMemo(() => new EditorHistory(initialValue), []);
   const [snapshot, setSnapshot] = useState(() => history.snapshot());
-  const blocksRef = useRef<Map<string, HTMLElement | null>>(new Map());
-  const txRef = useRef<EditorCommand<TBlock>[] | null>(null);
+  const blocksRef = useRef<Map<TBlock["id"], HTMLElement | null>>(new Map());
+  const batchRef = useRef<EditorBatch<TBlock> | undefined>(undefined);
 
-  // create editor
+  /** Editor internals */
+
   const editorRef = useRef<ContentEditor<TBlock>>(null);
-  const flush = () => {
-    if (!editorRef.current) return false;
 
-    const event = new EditorEvent("flush", editorRef.current, {});
-    editorRef.current.bus.dispatchTypedEvent("flush", event);
+  /** Flush pending changes */
+  function flush(skipHistory = false) {
+    if (!batchRef.current) return false;
 
-    return !event.defaultPrevented;
-  };
+    const { commands } = batchRef.current;
+
+    batchRef.current = undefined;
+
+    if (!NonEmpty.isNonEmpty(commands) || skipHistory) return false;
+
+    history.push({
+      type: "apply",
+      commands,
+    });
+
+    return true;
+  }
+
+  function push(cmd: EditorCommandCmd<TBlock>, batchId?: ID) {
+    if (batchRef.current && batchRef.current.batchId === batchId) {
+      batchRef.current.commands.push(cmd);
+    } else if (batchId) {
+      flush();
+      batchRef.current = {
+        batchId,
+        commands: [cmd],
+      };
+    } else {
+      history.push(cmd);
+    }
+  }
+
   const editor = useMemo<ContentEditor<TBlock>>(
     () => ({
       blocks: snapshot.state,
@@ -44,21 +74,30 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
       history,
       bus,
 
-      get isDirty() {
-        return history.position !== snapshot.position;
+      inBatch(exceptId) {
+        return !!batchRef.current && batchRef.current.batchId !== exceptId;
       },
 
-      get(id) {
-        return snapshot.state.find((block) => block.id === id) ?? null;
+      flush(data) {
+        if (!editorRef.current || !batchRef.current) return false;
+
+        const event = new EditorEvent("flush", editorRef.current, {
+          batchId: batchRef.current.batchId,
+          commands: batchRef.current.commands,
+          data,
+        });
+        bus.dispatchTypedEvent("flush", event);
+
+        return flush(event.defaultPrevented);
       },
 
       peek(id) {
-        flush();
-        if (editorRef.current?.isDirty) {
-          return history.getState().find((block) => block.id === id) ?? null;
-        } else {
-          return snapshot.state.find((block) => block.id === id) ?? null;
-        }
+        return (
+          (batchRef.current
+            ? applyCommands(snapshot.state, ...batchRef.current.commands)
+            : snapshot.state
+          ).find((block) => block.id === id) ?? null
+        );
       },
 
       ref(id) {
@@ -75,14 +114,13 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
             selectionBefore: options?.selectionBefore,
             selectionAfter: options?.selectionAfter,
           },
-          inTransaction: !!txRef.current,
-          data: options?.data ?? {},
+          batchId: options?.batchId ?? batchRef.current?.batchId,
+          data: options?.data,
         });
         bus.dispatchTypedEvent("edit", event);
         if (event.defaultPrevented) return;
 
-        if (txRef.current) txRef.current.push(event.detail.cmd);
-        else history.push(event.detail.cmd);
+        push(event.detail.cmd, options?.batchId);
       },
 
       remove(block, options) {
@@ -95,14 +133,13 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
             selectionBefore: options?.selectionBefore,
             selectionAfter: options?.selectionAfter,
           },
-          inTransaction: !!txRef.current,
-          data: options?.data ?? {},
+          batchId: options?.batchId ?? batchRef.current?.batchId,
+          data: options?.data,
         });
         bus.dispatchTypedEvent("edit", event);
         if (event.defaultPrevented) return;
 
-        if (txRef.current) txRef.current.push(event.detail.cmd);
-        else history.push(event.detail.cmd);
+        push(event.detail.cmd, options?.batchId);
       },
 
       split(left, right, options) {
@@ -116,43 +153,26 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
             selectionBefore: options?.selectionBefore,
             selectionAfter: options?.selectionAfter,
           },
-          inTransaction: !!txRef.current,
-          data: options?.data ?? {},
+          batchId: options?.batchId ?? batchRef.current?.batchId,
+          data: options?.data,
         });
         bus.dispatchTypedEvent("edit", event);
         if (event.defaultPrevented) return;
 
-        if (txRef.current) txRef.current.push(event.detail.cmd);
-        else history.push(event.detail.cmd);
-      },
-
-      transaction(fn, options) {
-        txRef.current ??= [];
-        fn();
-        const commands = txRef.current;
-        txRef.current = null;
-
-        if (!NonEmpty.isNonEmpty(commands)) return;
-
-        history.push({
-          type: "apply",
-          commands: EditorCommand.flat(commands),
-          ...options,
-        });
+        push(event.detail.cmd, options?.batchId);
       },
 
       commit(data) {
         if (!editorRef.current) return;
 
         flush();
-        if (!this.isDirty) return;
 
         const snapshot = history.snapshot();
 
         const event = new EditorEvent("commit", editorRef.current, {
           blocks: snapshot.state,
           revision: snapshot.position,
-          data: data ?? {},
+          data: data,
         });
         bus.dispatchTypedEvent("commit", event);
         if (event.defaultPrevented) return;

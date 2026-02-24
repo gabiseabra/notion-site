@@ -15,7 +15,7 @@ export const useAutoCommitPlugin =
     const scheduleCommit = () => {
       if (commitTimeoutRef.current) clearTimeout(commitTimeoutRef.current);
       commitTimeoutRef.current = window.setTimeout(() => {
-        if (editor.isDirty) {
+        if (editor.history.position > editor.revision) {
           editor.commit("auto-commit-plugin");
         }
       }, debounceMs);

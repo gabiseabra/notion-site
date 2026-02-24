@@ -23,7 +23,7 @@ export function Toolbar({
   disabled?: boolean;
 }) {
   const selection = useEditorSelectionRange(editor);
-  const selectedBlock = selection && editor.get(selection.id);
+  const selectedBlock = selection && editor.peek(selection.id);
   const selectedAnnotations =
     (selectedBlock &&
       selection &&
