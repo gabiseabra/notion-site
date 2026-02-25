@@ -7,9 +7,9 @@ React-based content editor infrastructure for Notion-style block data.
 - `editor/` Core controller: `useContentEditor`, history, events, and types.
 - `editable/` Plugins: inline mutation, block mutation, history, navigation, hotkeys, auto-commit, Notion wiring.
 - `chrome/` Toolbars and editor chrome.
-- `Editor.tsx` Notion editor wiring (controller + plugins + view).
+- `Editor.tsx`, `InlineEditor.tsx` Notion editor wiring (controller + plugins + view).
 - `RootBlock.tsx` View-level nesting/structure for flat block lists.
-- `Block.tsx`, `InlineEditor.tsx`, `RichText.tsx` Render primitives.
+- `Block.tsx`, `RichText.tsx` Render primitives.
 
 ## Architecture (MVC)
 
@@ -20,7 +20,6 @@ The editor is a controller only. It does not define your model or render anythin
 - View: your React components.
 
 This avoids any model conversion layer and keeps the editor fully generic and typed.
-
 
 ### One Contenteditable Per Block
 
