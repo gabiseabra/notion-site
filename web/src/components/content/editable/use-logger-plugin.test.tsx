@@ -75,9 +75,6 @@ describe("useLoggerPlugin", () => {
       expect.objectContaining({ eventType: "edit" }),
     );
     expect(log).toHaveBeenCalledWith(
-      expect.objectContaining({ eventType: "flush" }),
-    );
-    expect(log).toHaveBeenCalledWith(
       expect.objectContaining({ eventType: "commit" }),
     );
     expect(log).toHaveBeenCalledWith(

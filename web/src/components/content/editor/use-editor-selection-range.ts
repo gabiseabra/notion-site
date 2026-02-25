@@ -3,18 +3,18 @@ import { useDocumentEventListener } from "../../../hooks/use-document-event-list
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { AnyBlock, ContentEditor } from "./types.js";
 
-type EditorSelectionRange = {
+type EditorSelectionRange<TBlock extends AnyBlock> = {
   /** Currently selected block id. */
-  id: string;
+  id: TBlock["id"];
 } & SelectionRange;
 
 export function useEditorSelectionRange<TBlock extends AnyBlock>(
   editor: ContentEditor<TBlock>,
-): EditorSelectionRange | null {
+): EditorSelectionRange<TBlock> | null {
   const [selectionRange, setSelectionRange] =
-    useState<EditorSelectionRange | null>(null);
+    useState<EditorSelectionRange<TBlock> | null>(null);
 
-  const readSelectionRange = useCallback((): EditorSelectionRange | null => {
+  const readSelectionRange = useCallback(() => {
     const sel = window.getSelection();
     const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
 

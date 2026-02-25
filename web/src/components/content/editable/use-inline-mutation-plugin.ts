@@ -1,8 +1,7 @@
 import { useCallback, useRef } from "react";
-import { useEventListener } from "../../../hooks/use-event-listener.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { SpliceRange } from "../../../utils/splice-range.js";
-import { AnyBlock } from "../editor/types.js";
+import { AnyBlock, ID } from "../editor/types.js";
 import { createEventListenerPlugin } from "./create-event-listener-plugin.js";
 import { ContentEditorPlugin } from "./types.js";
 
@@ -28,108 +27,82 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   splice,
 }: InlineMutationPluginOptions<TBlock>): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
-    // while the editor manages a list of blocks, users only edit one block at a time,
-    // so we remember the state of only one block, and make sure to clean-up properly
-    // before switching to another.
-    const pendingRef = useRef<{
-      block: TBlock;
-      selectionBefore?: SelectionRange;
-      selectionAfter?: SelectionRange;
-    }>(null);
-
-    const update = useCallback(
-      (block: TBlock, selectionAfter: SelectionRange, element: HTMLElement) => {
-        // if we switched to another block but there are still pending changes, we
-        // need to save the changes for that block first.
-        if (pendingRef.current && pendingRef.current.block.id !== block.id) {
-          flush();
+    const pendingRef = useRef<
+      | {
+          id: TBlock["id"];
+          batchId: ID;
+          selectionBefore: SelectionRange;
+          selectionAfter: SelectionRange;
         }
-
-        pendingRef.current ??= (() => {
-          const selectionBefore = SelectionRange.read(element) ?? undefined;
-
-          return {
-            block,
-            selectionBefore,
-          };
-        })();
-        pendingRef.current.block = block;
-        pendingRef.current.selectionAfter = selectionAfter;
-      },
-      [],
-    );
-
-    const flushTimerRef = useRef<number>(null);
+      | undefined
+    >(undefined);
+    const timerRef = useRef<number>(null);
 
     const flush = useCallback(() => {
-      if (pendingRef.current) {
-        const { block, selectionAfter, selectionBefore } = pendingRef.current;
+      pendingRef.current = undefined;
 
-        if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
-
-        editor.update(block, {
-          data: "inline-mutation-plugin",
-          selectionAfter,
-          selectionBefore,
-        });
-        pendingRef.current = null;
-
-        return true;
-      } else {
-        return false;
-      }
+      return editor.flush("inline-mutation-plugin");
     }, [editor]);
 
     const cancelFlush = useCallback(() => {
-      if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
     }, []);
 
     const scheduleFlush = useCallback(() => {
-      if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
-      flushTimerRef.current = window.setTimeout(flush, debounceMs);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = window.setTimeout(flush, debounceMs);
     }, [flush]);
-
-    useEventListener(editor.bus, "flush", flush);
 
     return (block) => (e) => {
       cancelFlush();
       try {
         if (!(e.target instanceof HTMLElement)) return;
 
-        const currentBlock =
-          pendingRef.current?.block.id === block.id
-            ? pendingRef.current.block
-            : editor.peek(block.id);
-        const selection =
-          pendingRef.current?.block.id === block.id
-            ? pendingRef.current.selectionAfter
-            : SelectionRange.read(e.target);
+        const currentBlock = editor.peek(block.id);
+        const actualSelection = SelectionRange.read(e.target);
 
-        if (!currentBlock || !selection) return;
+        if (!actualSelection || !currentBlock) return;
+
+        if (pendingRef.current?.id !== block.id) flush();
+        pendingRef.current ??= {
+          id: block.id,
+          batchId: Math.random(),
+          selectionBefore: actualSelection,
+          selectionAfter: actualSelection,
+        };
 
         const spliceRange = SpliceRange.fromInputEvent(
           e,
           e.target.textContent ?? "",
-          selection,
+          pendingRef.current.selectionAfter,
         );
 
         if (!spliceRange) return;
+
         // skip newline if multiline is disabled
         if (spliceRange.insert === "\n" && !multiline) {
           e.preventDefault();
           return;
         }
 
-        update(
+        const selectionAfter = SpliceRange.toSelectionRange(spliceRange, 1);
+
+        editor.update(
           splice(
             currentBlock,
             spliceRange.offset,
             spliceRange.deleteCount,
             spliceRange.insert,
           ),
-          SpliceRange.toSelectionRange(spliceRange, 1),
-          e.target,
+          {
+            data: "inline-mutation-plugin",
+            batchId: pendingRef.current.batchId,
+            selectionBefore: pendingRef.current.selectionAfter,
+            selectionAfter,
+          },
         );
+
+        pendingRef.current.selectionAfter = selectionAfter;
       } finally {
         scheduleFlush();
       }

@@ -57,19 +57,16 @@ export const useBlockMutationPlugin =
         if (!mergedBlock) return;
 
         // merge any text on the tail of this block into the previous block
-        editor.transaction(
-          () => {
-            editor.remove(currentBlock);
-            editor.update(mergedBlock);
-          },
-          {
-            selectionAfter,
-            selectionBefore: {
-              id: currentBlock.id,
-              ...selectionBefore,
-            },
-          },
-        );
+        editor.remove(currentBlock, {
+          data: "block-mutation-plugin",
+          batchId: "merge",
+        });
+        editor.update(mergedBlock, {
+          data: "block-mutation-plugin",
+          batchId: "merge",
+          selectionAfter,
+          selectionBefore,
+        });
 
         editor.commit("block-mutation-plugin: merge");
 
@@ -88,10 +85,11 @@ export const useBlockMutationPlugin =
         if (!splitBlocks) return null;
 
         editor.split(splitBlocks.left, splitBlocks.right, {
+          data: "block-mutation-plugin",
           selectionBefore,
           selectionAfter: { start: 0, end: 0 },
         });
-        editor.commit("block-mutation: split");
+        editor.commit("block-mutation-plugin: split");
 
         e.preventDefault();
       }

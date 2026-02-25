@@ -75,7 +75,7 @@ export const useHotkeyPlugin =
           selectionBefore: selection,
           selectionAfter: selection,
         });
-        editor.commit(`use-hotkey-plugin: ${key}`);
+        editor.commit(`hotkey-plugin: ${key}`);
 
         e.preventDefault();
         e.stopPropagation();
