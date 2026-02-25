@@ -142,6 +142,14 @@ export function normalize(rich_text: RichText) {
   }, []);
 }
 
+/** Get slice of the smallest unit of text containing the start & end range */
+function focus(rich_text: RichText, start: number, end: number): RichText {
+  if (start !== end) return slice(rich_text, start, end);
+  const text = _findByOffset(rich_text, start)?.node;
+  if (text) return [text];
+  return [];
+}
+
 /** Item stuff */
 
 export type ItemType = zNotion.rich_text.rich_text_item[number]["type"];
@@ -217,11 +225,22 @@ export function isItemAnnotated(item: Item<"text">, a: Partial<Annotations>) {
   );
 }
 
+export function isAnnotated(
+  rich_text: RichText,
+  a: Partial<Annotations>,
+  start: number = 0,
+  end: number = getContent(rich_text).length,
+) {
+  return focus(rich_text, start, end)
+    .filter(hasPropertyValue("type", "text"))
+    .every((item) => isItemAnnotated(item, a));
+}
+
 export function setAnnotations(
   rich_text: RichText,
   a: Partial<Annotations>,
-  start: number,
-  end: number,
+  start: number = 0,
+  end: number = getContent(rich_text).length,
 ): RichText {
   const before = slice(rich_text, 0, start);
   const middle = slice(rich_text, start, end).map((item) =>
@@ -237,19 +256,17 @@ export function setAnnotations(
   );
   const after = slice(rich_text, end);
 
+  console.log(rich_text, [before, middle, after]);
+
   return normalize([...before, ...middle, ...after]);
 }
 
 export function getAnnotations(
   rich_text: RichText,
-  start: number,
-  end: number,
+  start: number = 0,
+  end: number = getContent(rich_text).length,
 ): Partial<Annotations> {
-  if (start === end) {
-    return _findByOffset(rich_text, start)?.node.annotations ?? {};
-  }
-
-  const textItems = slice(rich_text, start, end).filter(
+  const textItems = focus(rich_text, start, end).filter(
     hasPropertyValue("type", "text"),
   );
   const first = textItems[0]?.annotations;
@@ -277,8 +294,8 @@ export type Link = Item<"text">["text"]["link"];
 export function setLink(
   rich_text: RichText,
   link: Link,
-  start: number,
-  end: number,
+  start: number = 0,
+  end: number = getContent(rich_text).length,
 ): RichText {
   const before = slice(rich_text, 0, start);
   const middle = slice(rich_text, start, end).map((item) =>
@@ -299,8 +316,8 @@ export function setLink(
 
 export function getLink(
   rich_text: RichText,
-  start: number,
-  end: number,
+  start: number = 0,
+  end: number = getContent(rich_text).length,
 ): Link | undefined {
   const textItems = findByRange(rich_text, start, end).filter(
     hasPropertyValue("type", "text"),
