@@ -1,0 +1,117 @@
+@use "../../../../css/mixins/color" as color;
+
+.text-color {
+  position: relative;
+  container-type: size;
+  text-align: center;
+  user-select: none;
+
+  .text-color--text {
+    line-height: 1;
+    pointer-events: none;
+    width: auto;
+    height: fit-content;
+    height: stretch;
+    padding: 10%;
+    overflow: visible;
+
+    path {
+      pointer-events: fill;
+    }
+  }
+
+  .text-color--text {
+    position: relative;
+    display: inline-block;
+    font-family: var(--font-monospace);
+    font-weight: bold;
+    z-index: 1;
+    fill: var(--color);
+  }
+
+  .text-color--bg {
+    position: absolute;
+    background: var(--bg);
+    border-radius: calc(var(--radius) / 2);
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    z-index: 0;
+  }
+
+  &.clickable > .text-color--bg:hover {
+    outline: 1px solid var(--color);
+  }
+
+  &.clickable > .text-color--text:hover {
+    path {
+      fill: color-mix(in oklch, var(--color), var(--bg) 50%);
+      stroke: var(--color);
+      stroke-width: 3pt;
+      paint-order: stroke fill; // stroke renders behind fill, keeps it clean
+    }
+  }
+
+
+}
+
+.bg-color-button {
+  width: 1em;
+  height: 1em;
+  border-radius: calc(var(--radius) / 2);
+  z-index: 2;
+
+  @each $name, $_ in color.$colors-codes {
+    &.#{"color-" + $name + "_background"} {
+      background-color: var(#{"--bg-" + $name});
+
+      &.active {
+        outline: 1.5px solid var(#{"--color-" + $name});
+      }
+    }
+  }
+}
+
+.color-swatch {
+}
+
+.color-swatch-palette {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: var(--space)
+}
+
+.color-swatch-button {
+  font-size: 1px;
+  background: currentColor;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  overflow: clip;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  @each $name, $_ in color.$colors-codes {
+    &.#{"color-" + $name} {
+
+      @if ($name == "default") {
+        color: currentColor;
+      } @else {
+        color: var(#{"--bg-" + $name });
+
+        &.active {
+          outline: 1.5px solid var(#{"--color-" + $name});
+        }
+      }
+    }
+  }
+}
+
+@each $name, $_ in color.$colors-codes {
+  .#{"color-" + $name} {
+    --color: var(#{"--color-" + $name});
+    --bg: var(#{"--bg-" + $name});
+  }
+}

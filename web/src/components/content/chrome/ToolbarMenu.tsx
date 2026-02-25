@@ -2,7 +2,7 @@ import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { Fragment, isValidElement, ReactNode } from "react";
 import { Col } from "../../layout/FlexBox.js";
-import styles from "./Toolbar.module.scss";
+import styles from "./ToolbarMenu.module.scss";
 
 export function ToolbarMenu({ children }: { children: ReactNode[] }) {
   return (

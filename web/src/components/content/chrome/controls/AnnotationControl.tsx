@@ -7,7 +7,7 @@ import {
   FaStrikethrough,
   FaUnderline,
 } from "react-icons/fa";
-import { ToolbarButton } from "./ToolbarButton.js";
+import { ToolbarButton } from "../ToolbarButton.js";
 
 const Annotations = [
   "bold",

@@ -1,0 +1,8 @@
+@use "../../../css/mixins/shadow" as shadow;
+
+.document-toolbar {
+  padding: var(--space);
+  background: var(--bg-default);
+  border-radius: var(--radius);
+  @include shadow.shadow(1);
+}

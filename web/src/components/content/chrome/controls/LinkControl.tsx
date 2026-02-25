@@ -1,11 +1,11 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { useEffect, useState } from "react";
 import { FaLink } from "react-icons/fa";
-import { Input } from "../../inputs/Input.js";
-import { Col } from "../../layout/FlexBox.js";
-import { IsolationFrame } from "../../overlays/IsolationFrame.js";
-import { Popover } from "../../overlays/Popover.js";
-import { ToolbarButton } from "./ToolbarButton.js";
+import { Input } from "../../../inputs/Input.js";
+import { Col } from "../../../layout/FlexBox.js";
+import { IsolationFrame } from "../../../overlays/IsolationFrame.js";
+import { Popover } from "../../../overlays/Popover.js";
+import { ToolbarButton } from "../ToolbarButton.js";
 
 export function LinkControl({
   disabled,
