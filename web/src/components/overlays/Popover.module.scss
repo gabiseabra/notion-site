@@ -21,6 +21,22 @@
   transform: translateX(-100%);
 }
 
+.popover[data-placement="top"] {
+  transform: translateX(-50%) translateY(-100%);
+}
+
+.popover[data-placement^="top"][data-placement$="-end"] {
+  transform: translateX(-100%) translateY(-100%);
+}
+
+.popover[data-placement="bottom"] {
+  transform: translateX(-50%);
+}
+
+.popover[data-placement^="bottom"][data-placement$="-end"] {
+  transform: translateX(-100%);
+}
+
 .content {
   background: var(--bg-from);
   border-radius: var(--radius);

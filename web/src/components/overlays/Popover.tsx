@@ -325,6 +325,7 @@ function getBestCoords(
   const left = clampLeftInViewport(best.left);
 
   const base = best.placement.split("-")[0];
+  const align = best.placement.split("-")[1] as "start" | "end" | undefined;
   const arrowLeft =
     base === "top" || base === "bottom"
       ? clamp(cx - left, arrowGutter, tip.width - arrowGutter)
@@ -337,7 +338,11 @@ function getBestCoords(
   return {
     placement: best.placement,
     top: base === "top" ? top + tip.height : top,
-    left: base === "left" ? left + tip.width : left,
+    left:
+      base === "left" ? left + tip.width :
+      (base === "top" || base === "bottom") && align === "end" ? left + tip.width :
+      (base === "top" || base === "bottom") && !align ? left + tip.width / 2 :
+      left,
     arrowLeft,
     arrowTop,
   };
