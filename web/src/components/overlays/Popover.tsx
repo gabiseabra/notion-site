@@ -56,8 +56,6 @@ type Coords = {
   left: number;
   arrowLeft?: number;
   arrowTop?: number;
-  arrowRight?: number;
-  arrowBottom?: number;
 };
 
 export function Popover({
@@ -89,41 +87,21 @@ export function Popover({
     const base = coords.placement.split("-")[0];
 
     if (base === "top" || base === "bottom") {
-      if (coords.arrowLeft != null) {
-        return {
-          left: coords.arrowLeft,
-          marginLeft: 0,
-          transform: "translateX(-50%) rotate(45deg)",
-        };
-      }
-      if (coords.arrowRight != null) {
-        return {
-          left: "auto",
-          right: coords.arrowRight,
-          marginLeft: 0,
-          transform: "translateX(50%) rotate(45deg)",
-        };
-      }
-      return undefined; // centered: CSS left: 50% handles it
+      if (coords.arrowLeft == null) return undefined;
+      return {
+        left: coords.arrowLeft,
+        marginLeft: 0,
+        transform: "translateX(-50%) rotate(45deg)",
+      };
     }
 
     if (base === "left" || base === "right") {
-      if (coords.arrowTop != null) {
-        return {
-          top: coords.arrowTop,
-          marginTop: 0,
-          transform: "translateY(-50%) rotate(45deg)",
-        };
-      }
-      if (coords.arrowBottom != null) {
-        return {
-          top: "auto",
-          bottom: coords.arrowBottom,
-          marginTop: 0,
-          transform: "translateY(50%) rotate(45deg)",
-        };
-      }
-      return undefined; // centered: CSS top: 50% handles it
+      if (coords.arrowTop == null) return undefined;
+      return {
+        top: coords.arrowTop,
+        marginTop: 0,
+        transform: "translateY(-50%) rotate(45deg)",
+      };
     }
 
     return undefined;
@@ -280,8 +258,7 @@ function getBestCoords(
     return clamp(top, viewportPad, maxTop);
   };
 
-  let best: { top: number; left: number; placement: PopoverPlacement } | null =
-    null;
+  let best: (Coords & { arrowLeft?: number; arrowTop?: number }) | null = null;
   let bestScore = Number.POSITIVE_INFINITY;
 
   for (const placement of placements) {
@@ -327,7 +304,16 @@ function getBestCoords(
 
     if (score < bestScore) {
       bestScore = score;
-      best = { top, left, placement };
+      const arrowLeft =
+        base === "top" || base === "bottom"
+          ? clamp(cx - left, arrowGutter, tip.width - arrowGutter)
+          : undefined;
+      const arrowTop =
+        base === "left" || base === "right"
+          ? clamp(cy - top, arrowGutter, tip.height - arrowGutter)
+          : undefined;
+
+      best = { top, left, placement, arrowLeft, arrowTop };
       if (score === 0) break; // keep preferred order when it fits
     }
   }
@@ -339,36 +325,20 @@ function getBestCoords(
   const left = clampLeftInViewport(best.left);
 
   const base = best.placement.split("-")[0];
-  const align = best.placement.split("-")[1] as "start" | "end" | undefined;
-
-  // Arrow positions are trigger-relative so they remain stable when content
-  // width/height changes (no dependency on tip.width / tip.height).
-  let arrowLeft: number | undefined;
-  let arrowTop: number | undefined;
-  let arrowRight: number | undefined;
-  let arrowBottom: number | undefined;
-
-  if (base === "top" || base === "bottom") {
-    if (align === "start") arrowLeft = cx - trigger.left;
-    else if (align === "end") arrowRight = trigger.right - cx;
-    // centered: leave undefined — CSS `left: 50%` handles it
-  } else {
-    if (align === "start") arrowTop = cy - trigger.top;
-    else if (align === "end") arrowBottom = trigger.bottom - cy;
-    // centered: leave undefined — CSS `top: 50%` handles it
-  }
+  const arrowLeft =
+    base === "top" || base === "bottom"
+      ? clamp(cx - left, arrowGutter, tip.width - arrowGutter)
+      : undefined;
+  const arrowTop =
+    base === "left" || base === "right"
+      ? clamp(cy - top, arrowGutter, tip.height - arrowGutter)
+      : undefined;
 
   return {
     placement: best.placement,
     top: base === "top" ? top + tip.height : top,
-    left:
-      base === "left" ? left + tip.width :
-      (base === "top" || base === "bottom") && align === "end" ? left + tip.width :
-      (base === "top" || base === "bottom") && !align ? left + tip.width / 2 :
-      left,
+    left: base === "left" ? left + tip.width : left,
     arrowLeft,
     arrowTop,
-    arrowRight,
-    arrowBottom,
   };
 }
