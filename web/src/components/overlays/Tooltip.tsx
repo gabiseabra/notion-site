@@ -9,7 +9,12 @@ export type TooltipProps = Omit<
   delay?: number;
 };
 
-export function Tooltip({ disabled, delay = 300, ...props }: TooltipProps) {
+export function Tooltip({
+  disabled,
+  delay = 300,
+  variant = "tooltip",
+  ...props
+}: TooltipProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
@@ -50,6 +55,7 @@ export function Tooltip({ disabled, delay = 300, ...props }: TooltipProps) {
         open={isOpen}
         onClickOutside={onClose}
         onOffScreen={onClose}
+        variant={variant}
         {...props}
       />
     </span>

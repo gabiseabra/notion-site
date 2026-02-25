@@ -27,15 +27,9 @@ export function TagsFilter<T extends string>({
         <Tooltip
           key={option.name}
           disabled={!option.description}
+          offset={1}
           content={
-            <Text
-              as="p"
-              size="caption"
-              color="muted"
-              p={1}
-              m={0}
-              style={{ maxWidth: 250 }}
-            >
+            <Text as="p" size="caption" p={1} m={0} style={{ maxWidth: 250 }}>
               {option.description}
             </Text>
           }

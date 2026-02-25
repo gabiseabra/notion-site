@@ -74,8 +74,7 @@ export function Filters({ title, query, filters }: FilterProps) {
             <Breakpoint.Else>
               <Popover
                 open={isFilterOverlayOpen}
-                onClickOutside={() => setIsFilterOverlayOpen(false)}
-                onOffScreen={() => setIsFilterOverlayOpen(false)}
+                onClose={() => setIsFilterOverlayOpen(false)}
                 placements={["bottom", "right", "left", "top"]}
                 offset={4}
                 content={

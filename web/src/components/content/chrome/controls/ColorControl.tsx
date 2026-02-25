@@ -2,8 +2,10 @@ import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { titleCase } from "@notion-site/common/utils/case.js";
 import { ComponentType, useState } from "react";
 import { IconControl } from "../../../display/Icon.js";
+import { Text } from "../../../display/Text.js";
 import { Row } from "../../../layout/FlexBox.js";
 import { AnchoredOverlay } from "../../../overlays/Overlay.js";
+import { Tooltip } from "../../../overlays/Tooltip.js";
 import { ToolbarButton } from "../ToolbarButton.js";
 import { ToolbarMenu } from "../ToolbarMenu.js";
 import styles from "./ColorControl.module.scss";
@@ -36,7 +38,10 @@ export function ColorControl({
         <Control disabled={disabled} value={value} onChange={onChange} />
       }
     >
-      <ToolbarButton disabled={disabled} onClick={() => setIsOpen(!disabled)}>
+      <ToolbarButton
+        disabled={disabled}
+        onClick={() => setIsOpen((open) => !disabled && !open)}
+      >
         <ColorControlIcon color={value} />
       </ToolbarButton>
     </Overlay>
@@ -98,21 +103,33 @@ export function SwatchColorControl({
 
   return (
     <Row alignY="center" p={1}>
-      <IconControl
-        as="span"
-        size="xl"
-        color="currentColor"
-        className={styles["color-swatch-text"]}
-        p={1.5}
+      <Tooltip
+        offset={0.5}
+        disabled={!!disabled || currentColor === "default"}
+        content={
+          <Text as="p" size="caption" m={1}>
+            Toggle background color
+          </Text>
+        }
       >
-        <ColorControlIcon
-          color={value}
-          disabled={disabled || currentColor === "default" ? "action" : false}
-          onClick={() =>
-            onChange(isBgEnabled ? currentColor : `${currentColor}_background`)
-          }
-        />
-      </IconControl>
+        <IconControl
+          as="span"
+          size="xl"
+          color="currentColor"
+          className={styles["color-swatch-text"]}
+          p={1.5}
+        >
+          <ColorControlIcon
+            color={value}
+            disabled={disabled || currentColor === "default" ? "action" : false}
+            onClick={() =>
+              onChange(
+                isBgEnabled ? currentColor : `${currentColor}_background`,
+              )
+            }
+          />
+        </IconControl>
+      </Tooltip>
 
       <Row flex={1} className={styles["color-swatch-palette"]}>
         {colors.map((color) => (

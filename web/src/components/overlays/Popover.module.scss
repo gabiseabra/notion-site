@@ -5,12 +5,35 @@
   display: inline-flex;
 }
 
+.variant-popover {
+  --popover-radius: var(--radius);
+  --popover-bg: var(--bg-from);
+  --popover-arrow-size: 10px;
+  --popover-arrow-shift: 2px;
+}
+
+.variant-tooltip {
+  --popover-radius: calc(var(--radius) / 2);
+  --popover-bg: rgba(21, 20, 30, 0.3);
+  --popover-arrow-size: 8px;
+  --popover-arrow-shift: 0px;
+}
+
 .popover {
   position: fixed;
   z-index: 1000;
   border-radius: var(--radius);
+}
+
+.variant-popover > .popover {
   @include shadow.shadow(1);
   @include shadow.border;
+}
+
+.variant-tooltip > .popover > .content {
+  backdrop-filter: blur(3px);
+  color: white;
+  text-shadow: -1px -1px var(--popover-bg);
 }
 
 .popover[data-placement^="top"] {
@@ -22,8 +45,8 @@
 }
 
 .content {
-  background: var(--bg-from);
-  border-radius: var(--radius);
+  background: var(--popover-bg);
+  border-radius: var(--popover-radius);
   z-index: 1;
   display: flex;
 }
@@ -31,41 +54,59 @@
 .arrow {
   position: absolute;
   z-index: -1;
+  overflow: clip;
+  padding: 0 calc(var(--popover-arrow-size) / 2);
+}
+
+.arrow::before {
+  display: block;
+  content: " ";
 
   border-radius: 2px;
-  width: 10px;
-  height: 10px;
-  transform: rotate(45deg);
+  width: var(--popover-arrow-size);
+  height: var(--popover-arrow-size);
 
-  background: var(--bg-from);
+  background: var(--popover-bg);
 
+  transform: translateY(50%) rotate(45deg);
+}
+
+.variant-popover > .popover > .arrow::before {
   @include shadow.shadow(1);
   @include shadow.border;
 }
 
 /* Arrow placement (simple + clean). */
 .popover[data-placement^="top"] > .arrow {
-  bottom: -5px;
+  bottom: calc(var(--popover-arrow-size) * -1);
   left: 50%;
-  margin-left: -5px;
+  margin-left: calc(var(--popover-arrow-size) / -2);
+  transform: rotate(180deg) translateX(50%)
+    translateY(calc(var(--popover-arrow-shift, 0px) * -1));
 }
 
 .popover[data-placement^="bottom"] > .arrow {
-  top: -5px;
+  top: calc(var(--popover-arrow-size) * -1);
   left: 50%;
-  margin-left: -5px;
+  margin-left: calc(var(--popover-arrow-size) / -2);
+  transform: translateX(-50%)
+    translateY(calc(var(--popover-arrow-shift, 0px) * -1));
 }
 
 .popover[data-placement^="left"] > .arrow {
-  right: -5px;
+  right: calc(var(--popover-arrow-size) * -1.5);
   top: 50%;
-  margin-top: -5px;
+  margin-top: calc(var(--popover-arrow-size) / -2);
+  transform: rotate(90deg) translateX(-25%)
+    translateY(calc(var(--popover-arrow-shift, 0px) * -1));
 }
 
 .popover[data-placement^="right"] > .arrow {
-  left: -5px;
+  left: calc(var(--popover-arrow-size) * -1.5);
   top: 50%;
-  margin-top: -5px;
+  margin-top: calc(var(--popover-arrow-size) / -2);
+  transform: rotate(-90deg) translateX(25%)
+    translateY(calc(var(--popover-arrow-shift, 0px) * -1));
 }
 
 /* Start/end variants nudge the arrow off-center. */

@@ -35,6 +35,7 @@ export type PopoverProps = {
   content: React.ReactNode;
   open: boolean;
   role?: "tooltip" | "popover";
+  variant?: "tooltip" | "popover";
 
   placements?: PopoverPlacement[]; // preferred order
   offset?: number; // space unit
@@ -63,9 +64,10 @@ export function Popover({
   content,
   open,
   role = "popover",
+  variant = "popover",
 
   placements = ["top", "bottom", "right", "left"],
-  offset = 2,
+  offset = 0,
 
   className = "",
   style,
@@ -75,7 +77,7 @@ export function Popover({
   onClose,
 }: PopoverProps) {
   const triggerRef = useRef<HTMLSpanElement | null>(null);
-  const tipRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   const [coords, setCoords] = useState<Coords | null>(null);
   const id = useId();
@@ -91,7 +93,6 @@ export function Popover({
       return {
         left: coords.arrowLeft,
         marginLeft: 0,
-        transform: "translateX(-50%) rotate(45deg)",
       };
     }
 
@@ -100,7 +101,6 @@ export function Popover({
       return {
         top: coords.arrowTop,
         marginTop: 0,
-        transform: "translateY(-50%) rotate(45deg)",
       };
     }
 
@@ -115,8 +115,9 @@ export function Popover({
 
   const updatePosition = useRafThrottledCallback(() => {
     const triggerEl = triggerRef.current;
-    const tipEl = tipRef.current;
-    if (!triggerEl || !tipEl) return;
+    const contentEl = contentRef.current;
+
+    if (!triggerEl || !contentEl) return;
 
     const triggerRect = getTriggerRect(triggerEl);
     const coords = getBestCoords(
@@ -125,7 +126,7 @@ export function Popover({
       css.toPx(css.computeProperty(css._space)) * 2,
       placements,
       triggerRect,
-      tipEl.getBoundingClientRect(),
+      contentEl.getBoundingClientRect(),
     );
 
     // If we are inside a transformed popover, fixed positioning becomes relative
@@ -162,7 +163,7 @@ export function Popover({
   useWindowEventListener("resize", updatePosition);
   useWindowEventListener("scroll", updatePosition);
   useResizeObserver(triggerRef, updatePosition);
-  useResizeObserver(tipRef, updatePosition);
+  useResizeObserver(contentRef, updatePosition);
 
   // Handle onClickOutside
   const onClickOutsideRef = useRef(() => {});
@@ -183,7 +184,7 @@ export function Popover({
   return (
     <span
       ref={triggerRef}
-      className={styles.wrap}
+      className={[styles.wrap, styles[`variant-${variant}`]].join(" ")}
       aria-describedby={open ? tooltipId : undefined}
       style={style?.wrap}
     >
@@ -191,7 +192,7 @@ export function Popover({
 
       {open && (
         <div
-          ref={tipRef}
+          ref={contentRef}
           id={tooltipId}
           role={role}
           className={[className, styles.popover].join(" ")}
