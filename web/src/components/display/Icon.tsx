@@ -34,7 +34,7 @@ export function Icon({ icon, size }: IconProps) {
 export type IconControlProps = {
   as: "div" | "span" | "a" | "button";
 
-  size: "xs" | "s" | "m" | "l";
+  size: "xs" | "s" | "m" | "l" | "xl";
   color: zNotion.primitives.color | "primary" | "secondary" | "currentColor";
 
   badge?: string;

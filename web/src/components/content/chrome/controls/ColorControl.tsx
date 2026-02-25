@@ -33,7 +33,11 @@ export function ColorControl({
       open={isOpen}
       onClose={() => setIsOpen(false)}
       content={
-        <Control disabled={disabled} value={value} onChange={onChange} />
+        <ColorControl.Swatch
+          disabled={disabled}
+          value={value}
+          onChange={onChange}
+        />
       }
     >
       <ToolbarButton disabled={disabled} onClick={() => setIsOpen(!disabled)}>
@@ -93,20 +97,21 @@ ColorControl.Swatch = function ColorControlSwatch({
   onChange,
 }: ColorControlProps) {
   const isBgEnabled = !!value && value.endsWith("background");
-  const currentColor = ((isBgEnabled ? value : value?.slice(0, -11)) ??
+  const currentColor = ((!isBgEnabled ? value : value?.slice(0, -11)) ??
     "default") as zNotion.primitives.color;
 
-  console.log(value, currentColor);
   return (
     <Row alignY="center" p={1}>
       <IconControl
         as="span"
-        size="l"
+        size="xl"
         color="currentColor"
         className={styles["color-swatch-text"]}
+        p={1.5}
       >
         <ColorControlIcon
           color={value}
+          disabled={disabled || currentColor === "default" ? "action" : false}
           onClickText={() => onChange(isBgEnabled ? currentColor : "default")}
           onClickBackground={() =>
             onChange(isBgEnabled ? currentColor : `${currentColor}_background`)
@@ -126,9 +131,11 @@ ColorControl.Swatch = function ColorControlSwatch({
             ].join(" ")}
             onClick={() =>
               onChange(
-                !isBgEnabled && currentColor === color
-                  ? `${color}_background`
-                  : color,
+                currentColor === color
+                  ? "default"
+                  : isBgEnabled
+                    ? `${color}_background`
+                    : color,
               )
             }
           >
@@ -142,30 +149,71 @@ ColorControl.Swatch = function ColorControlSwatch({
 
 function ColorControlIcon({
   color,
+  disabled,
   onClickText,
   onClickBackground,
 }: {
   color?: zNotion.primitives.api_color | null;
+  disabled?: boolean | "feedback" | "action";
   onClickText?: () => void;
   onClickBackground?: () => void;
 }) {
+  const isBgEnabled = !!color && color.endsWith("background");
+  const currentColor = ((!isBgEnabled ? color : color?.slice(0, -11)) ??
+    "default") as zNotion.primitives.color;
+
   return (
     <span
       className={[
         styles["text-color"],
-        color ? styles[`color-${color}`] : "",
-        !!(onClickText || onClickBackground) ? styles["clickable"] : "",
+        disabled === true || disabled === "feedback" ? styles["disabled"] : "",
+        currentColor ? styles[`color-${currentColor}`] : "",
+        isBgEnabled ? styles[`background`] : "",
+        !!(onClickText || onClickBackground) &&
+        !(disabled === true || disabled === "action")
+          ? styles["clickable"]
+          : "",
       ].join(" ")}
     >
-      <span className={styles["text-color--bg"]} onClick={onClickBackground} />
+      <span
+        className={styles["text-color--bg"]}
+        onClick={
+          disabled !== true && disabled !== "action"
+            ? onClickBackground
+            : undefined
+        }
+      />
 
       <svg
         viewBox="0 0 43.65 48.9"
         xmlns="http://www.w3.org/2000/svg"
         className={styles["text-color--text"]}
-        onClick={onClickText}
+        onClick={
+          disabled !== true && disabled !== "action" ? onClickText : undefined
+        }
       >
-        <path d="M 11.25 48.9 L 0 48.9 L 15.225 0 L 28.425 0 L 43.65 48.9 L 31.95 48.9 L 25.65 24.15 Q 24.75 20.475 23.7 16.35 Q 22.65 12.225 21.75 8.4 L 21.45 8.4 Q 20.55 12.225 19.575 16.35 Q 18.6 20.475 17.625 24.15 L 11.25 48.9 Z M 33.45 37.275 L 10.05 37.275 L 10.05 28.65 L 33.45 28.65 L 33.45 37.275 Z" />
+        <path
+          d={[
+            "M 11.25 48.9",
+            "L 0 48.9",
+            "L 15.225 0",
+            "L 28.425 0",
+            "L 43.65 48.9",
+            "L 31.95 48.9",
+            "L 25.65 24.15",
+            "Q 24.75 20.475 23.7 16.35",
+            "Q 22.65 12.225 21.75 8.4",
+            "L 21.45 8.4",
+            "Q 20.55 12.225 19.575 16.35",
+            "Q 18.6 20.475 17.625 24.15",
+            "L 11.25 48.9 Z",
+            "M 33.45 37.275",
+            "L 10.05 37.275",
+            "L 10.05 28.65",
+            "L 33.45 28.65",
+            "L 33.45 37.275 Z",
+          ].join(" ")}
+        />
       </svg>
     </span>
   );

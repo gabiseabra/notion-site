@@ -31,13 +31,17 @@
 
   .text-color--bg {
     position: absolute;
-    background: var(--bg);
     border-radius: calc(var(--radius) / 2);
     top: -2px;
     left: -2px;
     right: -2px;
     bottom: -2px;
     z-index: 0;
+    background: transparent;
+  }
+
+  &.background .text-color--bg {
+    background: var(--bg);
   }
 
   &.clickable > .text-color--bg:hover {
@@ -84,34 +88,23 @@
 
 .color-swatch-button {
   font-size: 1px;
-  background: currentColor;
+  background: var(--color);
+  background: var(--bg, var(--color));
+  color: var(--bg);
   border-radius: 50%;
-  width: 14px;
-  height: 14px;
+  width: 24px;
+  height: 24px;
   overflow: clip;
   border: none;
   padding: 0;
   margin: 0;
-
-  @each $name, $_ in color.$colors-codes {
-    &.#{"color-" + $name} {
-
-      @if ($name == "default") {
-        color: currentColor;
-      } @else {
-        color: var(#{"--bg-" + $name });
-
-        &.active {
-          outline: 1.5px solid var(#{"--color-" + $name});
-        }
-      }
-    }
-  }
 }
 
 @each $name, $_ in color.$colors-codes {
   .#{"color-" + $name} {
     --color: var(#{"--color-" + $name});
-    --bg: var(#{"--bg-" + $name});
+    @if ($name != "default") {
+      --bg: var(#{"--bg-" + $name});
+    }
   }
 }

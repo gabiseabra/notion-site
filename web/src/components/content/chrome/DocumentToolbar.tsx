@@ -15,7 +15,7 @@ export function DocumentToolbar({ editor }: { editor: Editor }) {
 function ToolbarPopover(props: AnchoredOverlayProps) {
   return (
     <Popover
-      offset={2}
+      offset={2.5}
       placements={["bottom", "left", "right", "top"]}
       {...props}
     />

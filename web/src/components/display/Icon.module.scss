@@ -14,6 +14,10 @@
   background: transparent;
   border: none;
 
+  width: var(--icon-size);
+  height: var(--icon-size);
+  box-sizing: border-box;
+
   &:focus,
   &:active {
     outline: none;
@@ -21,8 +25,8 @@
 
   & > * {
     display: block;
-    width: var(--icon-size);
-    height: var(--icon-size);
+    width: 100%;
+    height: 100%;
   }
 }
 
@@ -71,4 +75,9 @@
 .size-l {
   --icon-size: 32px;
   --badge-size: 16px;
+}
+
+.size-xl {
+  --icon-size: 64px;
+  --badge-size: 24px;
 }

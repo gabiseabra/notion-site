@@ -20,7 +20,7 @@ export function ToolbarButton({
     <IconControl
       as="button"
       size="s"
-      p={1}
+      m={1}
       color={
         active
           ? "blue"
