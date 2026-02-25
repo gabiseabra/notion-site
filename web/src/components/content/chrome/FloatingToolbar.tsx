@@ -1,43 +1,15 @@
-import { ReactNode, useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useDocumentEventListener } from "../../../hooks/use-document-event-listener.js";
 import { useVisualViewportEventListener } from "../../../hooks/use-visual-viewport-event-listener.js";
 import { AnchoredOverlayProps } from "../../overlays/Overlay.js";
 import { Popover } from "../../overlays/Popover.js";
 import { Editor } from "../Editor.js";
+import styles from "./FloatingMenu.module.scss";
 import { ToolbarControls } from "./ToolbarControls.js";
+import { SwatchColorControl } from "./controls/ColorControl.js";
 
 export function FloatingToolbar({ editor }: { editor: Editor }) {
-  const portalRef = useRef<HTMLDivElement>(null);
-  const PortalOverlay = useCallback(
-    (props: AnchoredOverlayProps) => (
-      <>
-        {props.children}
-
-        {portalRef.current &&
-          props.open &&
-          createPortal(props.content, portalRef.current)}
-      </>
-    ),
-    [],
-  );
-
-  return (
-    <FloatingToolbarTracker editor={editor}>
-      <ToolbarControls editor={editor} Overlay={PortalOverlay} />
-
-      <div ref={portalRef} />
-    </FloatingToolbarTracker>
-  );
-}
-
-function FloatingToolbarTracker({
-  editor,
-  children,
-}: {
-  editor: Editor;
-  children: ReactNode;
-}) {
   const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
 
   function updateSelectionRect() {
@@ -61,15 +33,38 @@ function FloatingToolbarTracker({
   }
 
   useDocumentEventListener("selectionchange", updateSelectionRect);
-
   useVisualViewportEventListener("resize", updateSelectionRect);
+
+  const portalRef = useRef<HTMLDivElement>(null);
+  const PortalOverlay = useCallback(
+    (props: AnchoredOverlayProps) => (
+      <>
+        {props.children}
+
+        {portalRef.current &&
+          props.open &&
+          createPortal(props.content, portalRef.current)}
+      </>
+    ),
+    [],
+  );
 
   return (
     <Popover
       open={!!selectionRect}
       offset={2}
       placements={["top", "right", "left", "bottom"]}
-      content={children}
+      content={
+        <div className={styles["floating-toolbar"]}>
+          <ToolbarControls
+            editor={editor}
+            Overlay={PortalOverlay}
+            ColorControl={SwatchColorControl}
+          />
+
+          <div ref={portalRef} />
+        </div>
+      }
       style={{ wrap: { position: "absolute" } }}
     >
       <div

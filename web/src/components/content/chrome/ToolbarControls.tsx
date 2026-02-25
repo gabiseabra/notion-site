@@ -14,9 +14,11 @@ import { ColorControl } from "./controls/ColorControl.js";
 export function ToolbarControls({
   editor,
   Overlay,
+  ColorControl: ColorControlControl,
 }: {
   editor: Editor;
   Overlay: AnchoredOverlay;
+  ColorControl: ColorControl;
 }) {
   const selection = useEditorSelectionRange(editor);
   const block =
@@ -42,7 +44,7 @@ export function ToolbarControls({
 
       <ColorControl
         Overlay={Overlay}
-        Control={ColorControl.Swatch}
+        Control={ColorControlControl}
         disabled={disabled || disabledAction}
         value={annotations?.color}
         onChange={pipe(

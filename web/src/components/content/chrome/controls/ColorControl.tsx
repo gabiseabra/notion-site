@@ -33,11 +33,7 @@ export function ColorControl({
       open={isOpen}
       onClose={() => setIsOpen(false)}
       content={
-        <ColorControl.Swatch
-          disabled={disabled}
-          value={value}
-          onChange={onChange}
-        />
+        <Control disabled={disabled} value={value} onChange={onChange} />
       }
     >
       <ToolbarButton disabled={disabled} onClick={() => setIsOpen(!disabled)}>
@@ -47,7 +43,7 @@ export function ColorControl({
   );
 }
 
-ColorControl.Menu = function ColorControlMenu({
+export function MenuColorControl({
   disabled,
   value,
   onChange,
@@ -89,9 +85,9 @@ ColorControl.Menu = function ColorControlMenu({
       })}
     </ToolbarMenu>
   );
-};
+}
 
-ColorControl.Swatch = function ColorControlSwatch({
+export function SwatchColorControl({
   disabled,
   value,
   onChange,
@@ -112,8 +108,7 @@ ColorControl.Swatch = function ColorControlSwatch({
         <ColorControlIcon
           color={value}
           disabled={disabled || currentColor === "default" ? "action" : false}
-          onClickText={() => onChange(isBgEnabled ? currentColor : "default")}
-          onClickBackground={() =>
+          onClick={() =>
             onChange(isBgEnabled ? currentColor : `${currentColor}_background`)
           }
         />
@@ -145,16 +140,18 @@ ColorControl.Swatch = function ColorControlSwatch({
       </Row>
     </Row>
   );
-};
+}
 
 function ColorControlIcon({
   color,
   disabled,
+  onClick,
   onClickText,
   onClickBackground,
 }: {
   color?: zNotion.primitives.api_color | null;
   disabled?: boolean | "feedback" | "action";
+  onClick?: () => void;
   onClickText?: () => void;
   onClickBackground?: () => void;
 }) {
@@ -169,11 +166,12 @@ function ColorControlIcon({
         disabled === true || disabled === "feedback" ? styles["disabled"] : "",
         currentColor ? styles[`color-${currentColor}`] : "",
         isBgEnabled ? styles[`background`] : "",
-        !!(onClickText || onClickBackground) &&
+        !!(onClick || onClickText || onClickBackground) &&
         !(disabled === true || disabled === "action")
           ? styles["clickable"]
           : "",
       ].join(" ")}
+      onClick={disabled !== true && disabled !== "action" ? onClick : undefined}
     >
       <span
         className={styles["text-color--bg"]}

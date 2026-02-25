@@ -1,0 +1,9 @@
+.floating-toolbar {
+  display: flex;
+  flex-direction: column;
+
+  &:has(> :last-child:not(:empty)) > :first-child {
+    display: none;
+  }
+
+}
