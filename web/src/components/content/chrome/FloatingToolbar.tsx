@@ -55,7 +55,10 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
       offset={2}
       placements={["top", "right", "left", "bottom"]}
       content={
-        <div className={styles["floating-toolbar"]}>
+        <div
+          className={styles["floating-toolbar"]}
+          style={{ userSelect: "none" }}
+        >
           <ToolbarControls
             editor={editor}
             Overlay={PortalOverlay}

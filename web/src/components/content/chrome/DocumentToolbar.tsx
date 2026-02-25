@@ -7,7 +7,7 @@ import { MenuColorControl } from "./controls/ColorControl.js";
 
 export function DocumentToolbar({ editor }: { editor: Editor }) {
   return (
-    <div className={styles["document-toolbar"]}>
+    <div className={styles["document-toolbar"]} style={{ userSelect: "none" }}>
       <ToolbarControls
         editor={editor}
         Overlay={ToolbarPopover}
