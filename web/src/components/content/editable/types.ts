@@ -36,4 +36,4 @@ export type AnyContentEditorPlugin<TDetail = ContentEditableProps> = <
 export type EditorCommand<TBlock> = (
   block: TBlock,
   selection: SelectionRange,
-) => TBlock | null;
+) => TBlock | undefined | void;

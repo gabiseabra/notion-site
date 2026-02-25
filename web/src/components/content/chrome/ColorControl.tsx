@@ -1,22 +1,50 @@
 import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { titleCase } from "@notion-site/common/utils/case.js";
+import { useState } from "react";
+import { AnchoredOverlay } from "../../overlays/Overlay.js";
 import styles from "./Toolbar.module.scss";
 import { ToolbarButton } from "./ToolbarButton.js";
 import { ToolbarMenu } from "./ToolbarMenu.js";
 
-export function ColorControl({
-  disabled,
-  value,
-  onChange,
-}: {
+type ColorControlProps = {
   disabled?: boolean | "feedback" | "action";
   value?: zNotion.primitives.api_color;
   onChange: (color: zNotion.primitives.api_color) => void;
+};
+
+export function ColorControl({
+  Overlay,
+  disabled,
+  value,
+  onChange,
+}: ColorControlProps & {
+  Overlay: AnchoredOverlay;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <ToolbarMenu
-      disabled={disabled === true || disabled === "action"}
-      options={colors.map((color) => {
+    <Overlay
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
+      content={
+        <ColorControlMenu
+          disabled={disabled}
+          value={value}
+          onChange={onChange}
+        />
+      }
+    >
+      <ToolbarButton disabled={disabled} onClick={() => setIsOpen(!disabled)}>
+        <ColorControlIcon color={value} />
+      </ToolbarButton>
+    </Overlay>
+  );
+}
+
+function ColorControlMenu({ disabled, value, onChange }: ColorControlProps) {
+  return (
+    <ToolbarMenu>
+      {colors.map((color) => {
         const isColorActive = color === value;
         const isBackgroundActive = `${color}_background` === value;
 
@@ -49,18 +77,14 @@ export function ColorControl({
           </ToolbarMenu.Item>
         );
       })}
-    >
-      <ToolbarButton disabled={disabled}>
-        <TextColorIcon color={value ?? "default"} />
-      </ToolbarButton>
     </ToolbarMenu>
   );
 }
 
-function TextColorIcon({
+function ColorControlIcon({
   color,
 }: {
-  color: zNotion.primitives.api_color | null;
+  color?: zNotion.primitives.api_color | null;
 }) {
   return (
     <span

@@ -47,6 +47,7 @@ export type PopoverProps = {
 
   onClickOutside?: () => void;
   onOffScreen?: () => void;
+  onClose?: () => void;
 };
 
 type Coords = {
@@ -71,6 +72,7 @@ export function Popover({
 
   onClickOutside,
   onOffScreen,
+  onClose,
 }: PopoverProps) {
   const triggerRef = useRef<HTMLSpanElement | null>(null);
   const tipRef = useRef<HTMLDivElement | null>(null);
@@ -106,7 +108,10 @@ export function Popover({
   }, [coords]);
 
   const onOffScreenRef = useRef(() => {});
-  onOffScreenRef.current = onOffScreen ?? (() => {});
+  onOffScreenRef.current = () => {
+    onOffScreen?.();
+    onClose?.();
+  };
 
   const updatePosition = useRafThrottledCallback(() => {
     const triggerEl = triggerRef.current;
@@ -161,7 +166,10 @@ export function Popover({
 
   // Handle onClickOutside
   const onClickOutsideRef = useRef(() => {});
-  onClickOutsideRef.current = onClickOutside ?? (() => {});
+  onClickOutsideRef.current = () => {
+    onClickOutside?.();
+    onClose?.();
+  };
 
   useDocumentEventListener(
     "pointerdown",

@@ -1,19 +1,21 @@
 import { ReactNode } from "react";
 import { IconControl } from "../../display/Icon.js";
 
+export type ToolbarButtonProps = {
+  children: ReactNode;
+  title?: string;
+  active?: boolean;
+  disabled?: boolean | "action" | "feedback";
+  onClick?: () => void;
+};
+
 export function ToolbarButton({
   children,
   title,
   active,
   disabled,
   onClick,
-}: {
-  children: ReactNode;
-  title?: string;
-  active?: boolean;
-  disabled?: boolean | "action" | "feedback";
-  onClick?: () => void;
-}) {
+}: ToolbarButtonProps) {
   return (
     <IconControl
       as="button"
