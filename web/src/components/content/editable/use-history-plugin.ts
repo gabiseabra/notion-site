@@ -21,8 +21,7 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
     if (!cmd) return;
 
     const id = EditorCommand.id(cmd, direction);
-    const selection =
-      direction === -1 ? cmd.selectionBefore : cmd.selectionAfter;
+    const selection = EditorCommand.selection(cmd, direction);
     const element = editor.ref(id);
     const currentSelection = element && SelectionRange.read(element);
 
@@ -53,16 +52,22 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
 
       if (!isMod) return;
 
-      if (isUndo(e) && isUndoable(block.id, editor)) {
-        editor.history.undo();
-        editor.commit("history-plugin: undo");
+      if (isUndo(e)) {
+        if (isUndoable(block.id, editor)) {
+          editor.history.undo();
+          editor.commit("history-plugin: undo");
+        }
+
         e.preventDefault();
         return;
       }
 
-      if (isRedo(e) && isRedoable(block.id, editor)) {
-        editor.history.redo();
-        editor.commit("history-plugin: redo");
+      if (isRedo(e)) {
+        if (isRedoable(block.id, editor)) {
+          editor.history.redo();
+          editor.commit("history-plugin: redo");
+        }
+
         e.preventDefault();
         return;
       }
@@ -72,7 +77,7 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
 
 const isUndo = (e: KeyboardEvent) => e.key === "z" && !e.shiftKey;
 const isUndoable = <TBlock extends AnyBlock>(
-  id: string,
+  id: TBlock["id"],
   editor: ContentEditor<TBlock>,
 ) => {
   editor.peek(id);
@@ -81,7 +86,7 @@ const isUndoable = <TBlock extends AnyBlock>(
 const isRedo = (e: KeyboardEvent) =>
   (e.key === "z" && e.shiftKey) || e.key === "y";
 const isRedoable = <TBlock extends AnyBlock>(
-  id: string,
+  id: TBlock["id"],
   editor: ContentEditor<TBlock>,
 ) => {
   editor.peek(id);

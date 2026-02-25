@@ -17,7 +17,7 @@ export default defineConfig(({ isSsrBuild, mode }) => ({
         : undefined,
   },
   server: {
-    port: VITE_PORT,
+    port: VITE_PORT + (mode === "test" ? 1 : 0),
     fs: {
       allow: [searchForWorkspaceRoot(__dirname)],
     },

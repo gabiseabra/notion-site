@@ -1,3 +1,4 @@
+import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import {
   FaBold,
@@ -23,7 +24,8 @@ export function Toolbar({
   disabled?: boolean;
 }) {
   const selection = useEditorSelectionRange(editor);
-  const selectedBlock = selection && editor.get(selection.id);
+  const selectedBlock =
+    selection && editor.blocks.find(hasPropertyValue("id", selection.id));
   const selectedAnnotations =
     (selectedBlock &&
       selection &&

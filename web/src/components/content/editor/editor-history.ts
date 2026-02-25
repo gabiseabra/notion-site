@@ -1,3 +1,4 @@
+import { hasNonNullableProperty } from "@notion-site/common/utils/guards.js";
 import { History } from "@notion-site/common/utils/history.js";
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { match } from "ts-pattern";
@@ -33,8 +34,6 @@ export type EditorCommand<TBlock extends AnyBlock> =
   | {
       type: "apply";
       commands: NonEmpty<EditorCommandCmd<TBlock>>;
-      selectionBefore?: SelectionRange & { id: string };
-      selectionAfter?: SelectionRange & { id: string };
     }
   | EditorCommandCmd<TBlock>;
 
@@ -45,16 +44,18 @@ export const EditorCommand = {
    * - undo: first non-empty { selectionBefore, block: { id } }
    * - redo: last non-empty { selectionAfter, block: { id } }
    */
-  id<TBlock extends { id: string }>(
+  id<TBlock extends AnyBlock>(
     cmd: EditorCommand<TBlock>,
     direction: 1 | -1,
-  ): string {
+  ): TBlock["id"] {
     return match(cmd)
-      .with(
-        { type: "apply" },
-        (cmd) =>
-          cmd[direction === -1 ? "selectionBefore" : "selectionAfter"]?.id ??
-          EditorCommand.id(cmd.commands[0], direction),
+      .with({ type: "apply" }, (cmd) =>
+        EditorCommand.id(
+          direction === 1
+            ? cmd.commands[cmd.commands.length - 1]
+            : cmd.commands[0],
+          direction,
+        ),
       )
       .with(
         { type: "split" },
@@ -63,7 +64,7 @@ export const EditorCommand = {
       .otherwise((cmd) => cmd.block.id);
   },
 
-  flat<TBlock extends { id: string }>([cmd, ...cmds]: NonEmpty<
+  flat<TBlock extends AnyBlock>([cmd, ...cmds]: NonEmpty<
     EditorCommand<TBlock>
   >): NonEmpty<EditorCommandCmd<TBlock>> {
     return NonEmpty.merge(
@@ -73,9 +74,24 @@ export const EditorCommand = {
       NonEmpty.isNonEmpty(cmds) ? EditorCommand.flat(cmds) : [],
     );
   },
+
+  selection<TBlock extends AnyBlock>(
+    cmd: EditorCommand<TBlock>,
+    direction: 1 | -1,
+  ): SelectionRange | undefined {
+    if (direction === -1) {
+      if (cmd.type !== "apply") return cmd.selectionBefore;
+      return cmd.commands.filter(hasNonNullableProperty("selectionBefore"))[0]
+        ?.selectionBefore;
+    } else {
+      if (cmd.type !== "apply") return cmd.selectionAfter;
+      return cmd.commands.filter(hasNonNullableProperty("selectionAfter")).pop()
+        ?.selectionAfter;
+    }
+  },
 };
 
-export class EditorHistory<TBlock extends { id: string }> extends History<
+export class EditorHistory<TBlock extends AnyBlock> extends History<
   TBlock[],
   EditorCommand<TBlock>
 > {
@@ -84,7 +100,7 @@ export class EditorHistory<TBlock extends { id: string }> extends History<
   }
 }
 
-function applyCommand<TBlock extends { id: string }>(
+function applyCommand<TBlock extends AnyBlock>(
   blocks: TBlock[],
   cmd: EditorCommand<TBlock>,
 ): TBlock[] {
@@ -103,4 +119,12 @@ function applyCommand<TBlock extends { id: string }>(
     case "apply":
       return cmd.commands.reduce(applyCommand, blocks);
   }
+}
+
+export function applyCommands<TBlock extends AnyBlock>(
+  blocks: TBlock[],
+  ...commands: EditorCommandCmd<TBlock>[]
+) {
+  if (!NonEmpty.isNonEmpty(commands)) return blocks;
+  return applyCommand(blocks, { type: "apply", commands });
 }
