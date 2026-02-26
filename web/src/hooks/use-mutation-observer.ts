@@ -23,12 +23,7 @@ export function useMutationObserver(
       return;
     }
 
-    if (typeof MutationObserver === "undefined") {
-      console.warn(
-        `Failed to register mutation observer: MutationObserver nor available`,
-      );
-      return;
-    }
+    if (typeof MutationObserver === "undefined") return;
 
     const observer = new MutationObserver((records) => {
       onMutationRef.current(records);

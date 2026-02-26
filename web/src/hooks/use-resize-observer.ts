@@ -23,12 +23,7 @@ export function useResizeObserver(
       return;
     }
 
-    if (typeof ResizeObserver === "undefined") {
-      console.warn(
-        `Failed to register resize observer: ResizeObserver nor available`,
-      );
-      return;
-    }
+    if (typeof ResizeObserver === "undefined") return;
 
     const ro = new ResizeObserver(() => {
       onResizeRef.current();
