@@ -256,8 +256,6 @@ export function setAnnotations(
   );
   const after = slice(rich_text, end);
 
-  console.log(rich_text, [before, middle, after]);
-
   return normalize([...before, ...middle, ...after]);
 }
 
