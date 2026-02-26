@@ -4,6 +4,10 @@ import { Editor } from "../Editor.js";
 import styles from "./DocumentToolbar.module.scss";
 import { ToolbarControls } from "./ToolbarControls.js";
 import { MenuColorControl } from "./controls/ColorControl.js";
+import {
+  LinkControlProps,
+  PreviewLinkControl,
+} from "./controls/LinkControl.js";
 
 export function DocumentToolbar({ editor }: { editor: Editor }) {
   return (
@@ -12,6 +16,7 @@ export function DocumentToolbar({ editor }: { editor: Editor }) {
         editor={editor}
         Overlay={ToolbarPopover}
         ColorControl={MenuColorControl}
+        LinkControl={ToolbarLinkControl}
       />
     </div>
   );
@@ -25,4 +30,8 @@ function ToolbarPopover(props: AnchoredOverlayProps) {
       {...props}
     />
   );
+}
+
+function ToolbarLinkControl(props: LinkControlProps) {
+  return <PreviewLinkControl reverse {...props} />;
 }

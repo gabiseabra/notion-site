@@ -20,11 +20,12 @@ import { LinkControl } from "./controls/LinkControl.js";
 export function ToolbarControls({
   editor,
   Overlay,
-  ColorControl: ColorControlControl,
+  ...controls
 }: {
   editor: Editor;
   Overlay: AnchoredOverlay;
   ColorControl: ColorControl;
+  LinkControl: LinkControl;
 }) {
   const selection = useEditorSelectionRange(editor);
   const block =
@@ -53,7 +54,7 @@ export function ToolbarControls({
 
       <ColorControl
         Overlay={Overlay}
-        Control={ColorControlControl}
+        Control={controls.ColorControl}
         disabled={disabled || disabledAction}
         value={annotations?.color}
         onChange={pipe(
@@ -65,6 +66,7 @@ export function ToolbarControls({
 
       <LinkControl
         Overlay={Overlay}
+        Control={controls.LinkControl}
         disabled={disabled || disabledAction}
         value={link}
         onChange={pipe(setLink, execCommand(editor, selection))}

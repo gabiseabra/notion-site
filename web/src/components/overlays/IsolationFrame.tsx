@@ -1,10 +1,15 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useMutationObserver } from "../../hooks/use-mutation-observer.js";
+import { useRafThrottledCallback } from "../../hooks/use-raf-throttled-callback.js";
 import styles from "./IsolationFrame.module.scss";
 
 type IsolationFrameProps = {
   children: ReactNode;
+  style?: CSSProperties;
 };
+
+const CLONED_STYLE_ATTR = "data-isolation-frame-style";
 
 /**
  * Renders children into an iframe.
@@ -13,9 +18,34 @@ type IsolationFrameProps = {
  * This is useful to render content that you can interact without interfering
  * with the selection state of the outer document.
  */
-export function IsolationFrame({ children }: IsolationFrameProps) {
+export function IsolationFrame({ children, style }: IsolationFrameProps) {
   const [root, setRoot] = useState<HTMLElement | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const headRef = useRef<HTMLElement | null>(null);
+
+  headRef.current = typeof document === "undefined" ? null : document.head;
+
+  const syncStyles = useRafThrottledCallback(() => {
+    const doc = iframeRef.current?.contentDocument;
+    if (!doc) return;
+
+    const targetHead = doc.head;
+    if (!targetHead) return;
+
+    for (const node of Array.from(
+      targetHead.querySelectorAll(`[${CLONED_STYLE_ATTR}]`),
+    )) {
+      node.remove();
+    }
+
+    for (const style of Array.from(document.head.querySelectorAll("style"))) {
+      const cloned = style.cloneNode(true);
+      if (cloned instanceof HTMLStyleElement) {
+        cloned.setAttribute(CLONED_STYLE_ATTR, "true");
+        targetHead.appendChild(cloned);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const doc = iframeRef.current?.contentDocument;
@@ -25,15 +55,17 @@ export function IsolationFrame({ children }: IsolationFrameProps) {
 
     doc.documentElement.className = styles.html;
 
-    for (const style of Array.from(document.head.querySelectorAll("style"))) {
-      const cloned = style.cloneNode(true);
-      if (cloned instanceof HTMLStyleElement) {
-        doc.head.appendChild(cloned);
-      }
-    }
+    syncStyles();
 
     setRoot(body);
   }, []);
+
+  useMutationObserver(headRef, () => syncStyles(), {
+    childList: true,
+    subtree: true,
+    characterData: true,
+    attributes: true,
+  });
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -55,7 +87,11 @@ export function IsolationFrame({ children }: IsolationFrameProps) {
   }, [root]);
 
   return (
-    <iframe ref={iframeRef} className={styles.frame} style={{ height: 0 }}>
+    <iframe
+      ref={iframeRef}
+      className={styles.frame}
+      style={{ height: 0, ...style }}
+    >
       {root ? createPortal(children, root) : null}
     </iframe>
   );

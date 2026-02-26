@@ -10,6 +10,7 @@ import { Editor } from "../Editor.js";
 import styles from "./FloatingMenu.module.scss";
 import { ToolbarControls } from "./ToolbarControls.js";
 import { SwatchColorControl } from "./controls/ColorControl.js";
+import { PreviewLinkControl } from "./controls/LinkControl.js";
 
 export function FloatingToolbar({ editor }: { editor: Editor }) {
   const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
@@ -56,7 +57,7 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
       open={!!selectionRect}
       updateKey={hash(selectionRect)}
       offset={2}
-      placements={["top", "right", "left", "bottom"]}
+      placements={["top", "bottom", "right", "left"]}
       content={
         <div
           className={styles["floating-toolbar"]}
@@ -66,6 +67,7 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
             editor={editor}
             Overlay={PortalOverlay}
             ColorControl={SwatchColorControl}
+            LinkControl={PreviewLinkControl}
           />
 
           <div ref={portalRef} />
