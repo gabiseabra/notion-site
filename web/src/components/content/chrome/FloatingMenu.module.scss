@@ -2,8 +2,11 @@
   display: flex;
   flex-direction: column;
 
+  & > *:first-child {
+    padding-inline: calc(var(--space) / 2);
+  }
+
   &:has(> :last-child:not(:empty)) > :first-child {
     display: none;
   }
-
 }
