@@ -81,32 +81,28 @@
   bottom: calc(var(--popover-arrow-size) * -1);
   left: 50%;
   margin-left: calc(var(--popover-arrow-size) / -2);
-  transform: rotate(180deg) translateX(50%)
-    translateY(calc(var(--popover-arrow-shift, 0px) * -1));
+  transform: rotate(180deg) translateX(50%) translateY(calc(var(--popover-arrow-shift, 0px) * -1));
 }
 
 .popover[data-placement^="bottom"] > .arrow {
   top: calc(var(--popover-arrow-size) * -1);
   left: 50%;
   margin-left: calc(var(--popover-arrow-size) / -2);
-  transform: translateX(-50%)
-    translateY(calc(var(--popover-arrow-shift, 0px) * -1));
+  transform: translateX(-50%) translateY(calc(var(--popover-arrow-shift, 0px) * -1));
 }
 
 .popover[data-placement^="left"] > .arrow {
   right: calc(var(--popover-arrow-size) * -1.5);
   top: 50%;
   margin-top: calc(var(--popover-arrow-size) / -2);
-  transform: rotate(90deg) translateX(-25%)
-    translateY(calc(var(--popover-arrow-shift, 0px) * -1));
+  transform: rotate(90deg) translateX(-25%) translateY(calc(var(--popover-arrow-shift, 0px) * -1));
 }
 
 .popover[data-placement^="right"] > .arrow {
   left: calc(var(--popover-arrow-size) * -1.5);
   top: 50%;
   margin-top: calc(var(--popover-arrow-size) / -2);
-  transform: rotate(-90deg) translateX(25%)
-    translateY(calc(var(--popover-arrow-shift, 0px) * -1));
+  transform: rotate(-90deg) translateX(25%) translateY(calc(var(--popover-arrow-shift, 0px) * -1));
 }
 
 /* Start/end variants nudge the arrow off-center. */
@@ -131,7 +127,6 @@
 
 .popover[data-placement$="-end"][data-placement^="left"] > .arrow,
 .popover[data-placement$="-end"][data-placement^="right"] > .arrow {
-  top: auto;
-  bottom: 14px;
+  top: calc(100% - 14px - var(--popover-arrow-size));
   margin-top: 0;
 }
