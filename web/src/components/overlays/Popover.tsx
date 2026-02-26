@@ -125,6 +125,9 @@ export function Popover({
 
     if (!triggerEl || !contentEl) return;
 
+    const tipRect = contentEl.getBoundingClientRect();
+    if (!tipRect.width || !tipRect.height) return; // not laid out yet; ResizeObserver will re-trigger
+
     const triggerRect = getTriggerRect(triggerEl);
     const coords = getBestCoords(
       css.toPx(css.computeProperty(css._space)) * offset,
@@ -206,6 +209,7 @@ export function Popover({
           top: coords?.top ?? 0,
           left: coords?.left ?? 0,
           opacity: open && coords ? 1 : 0,
+          display: open ? "block" : "none",
           ...style?.container,
         }}
       >
