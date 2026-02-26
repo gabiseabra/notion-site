@@ -6,8 +6,8 @@ import { EditorCommand } from "../types.js";
 export const isAnnotated =
   (annotations: Partial<Notion.RTF.Annotations>) =>
   (block: Notion.Block, selection: SelectionRange) =>
-    Notion.Block.isAnnotated(
-      block,
+    Notion.RTF.isAnnotated(
+      Notion.Block.extractRichText(block),
       annotations,
       selection.start,
       selection.end,
@@ -36,7 +36,8 @@ export const focusOnLink: EditorCommand<Notion.Block> = (block, selection) => {
     selection.start,
   );
   const sel = document.getSelection();
-  const element = sel?.getRangeAt(0)?.commonAncestorContainer.parentElement;
+  const element =
+    sel?.getRangeAt(0)?.commonAncestorContainer.parentElement?.parentElement;
 
   if (
     range &&

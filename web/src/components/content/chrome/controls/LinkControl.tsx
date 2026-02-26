@@ -1,52 +1,32 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaLink } from "react-icons/fa";
 import { Input } from "../../../inputs/Input.js";
 import { Col } from "../../../layout/FlexBox.js";
 import { IsolationFrame } from "../../../overlays/IsolationFrame.js";
-import { Popover } from "../../../overlays/Popover.js";
+import { AnchoredOverlay } from "../../../overlays/Overlay.js";
 import { ToolbarButton } from "../ToolbarButton.js";
 
 export function LinkControl({
+  Overlay,
   disabled,
   value,
   onChange,
-  onOpen: _onOpen,
-  onClose: _onClose,
+  onOpen,
   ...props
 }: {
+  Overlay: AnchoredOverlay;
   disabled?: boolean | "feedback" | "action";
   value?: Notion.RTF.Link;
   onChange: (link: Notion.RTF.Link) => void;
   onOpen?: () => void;
-  onClose?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const disabledAction = disabled == true || disabled === "action";
-
-  const onToggle = () => {
-    const x = !disabledAction && !isOpen;
-    setIsOpen(x);
-    if (x) _onOpen?.();
-    else _onClose?.();
-  };
-  const onClose = () => {
-    setIsOpen(false);
-    _onClose?.();
-  };
-
-  useEffect(() => {
-    if (disabled) setIsOpen(false);
-  }, [disabled]);
-
   return (
-    <Popover
+    <Overlay
       open={isOpen}
-      offset={1}
-      placements={["bottom", "left", "right", "top"]}
-      onClickOutside={onClose}
-      onOffScreen={onClose}
+      onClose={() => setIsOpen(false)}
       content={
         <IsolationFrame>
           <Col p={2}>
@@ -63,9 +43,17 @@ export function LinkControl({
       }
       {...props}
     >
-      <ToolbarButton disabled={disabled} active={!!value} onClick={onToggle}>
+      <ToolbarButton
+        disabled={disabled}
+        active={!!value}
+        onClick={() => {
+          const _isOpen = !disabled && !isOpen;
+          setIsOpen(_isOpen);
+          if (_isOpen) onOpen?.();
+        }}
+      >
         <FaLink />
       </ToolbarButton>
-    </Popover>
+    </Overlay>
   );
 }

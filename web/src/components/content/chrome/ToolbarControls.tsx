@@ -5,11 +5,17 @@ import { SelectionRange } from "../../../utils/selection-range.js";
 import { Divider } from "../../display/Divider.js";
 import { Row } from "../../layout/FlexBox.js";
 import { AnchoredOverlay } from "../../overlays/Overlay.js";
-import { execCommand, toggleAnnotations } from "../editable/notion/commands.js";
+import {
+  execCommand,
+  focusOnLink,
+  setLink,
+  toggleAnnotations,
+} from "../editable/notion/commands.js";
 import { Editor } from "../Editor.js";
 import { useEditorSelectionRange } from "../editor/use-editor-selection-range.js";
 import { AnnotationControl } from "./controls/AnnotationControl.js";
 import { ColorControl } from "./controls/ColorControl.js";
+import { LinkControl } from "./controls/LinkControl.js";
 
 export function ToolbarControls({
   editor,
@@ -26,6 +32,9 @@ export function ToolbarControls({
   const text = block && Notion.Block.extractRichText(block);
   const annotations = text
     ? Notion.RTF.getAnnotations(text, selection.start, selection.end)
+    : undefined;
+  const link = text
+    ? Notion.RTF.getLink(text, selection.start, selection.end)
     : undefined;
 
   const disabled = !selection;
@@ -52,6 +61,14 @@ export function ToolbarControls({
           toggleAnnotations,
           execCommand(editor, selection),
         )}
+      />
+
+      <LinkControl
+        Overlay={Overlay}
+        disabled={disabled || disabledAction}
+        value={link}
+        onChange={pipe(setLink, execCommand(editor, selection))}
+        onOpen={() => execCommand(editor, selection)(focusOnLink)}
       />
     </Row>
   );
