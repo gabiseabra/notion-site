@@ -38,10 +38,21 @@ export function IsolationFrame({ children, style }: IsolationFrameProps) {
       node.remove();
     }
 
-    for (const style of Array.from(document.head.querySelectorAll("style"))) {
-      const cloned = style.cloneNode(true);
+    for (const node of Array.from(
+      document.head.querySelectorAll('style, link[rel~="stylesheet"]'),
+    )) {
+      const cloned = node.cloneNode(true);
       if (cloned instanceof HTMLStyleElement) {
         cloned.setAttribute(CLONED_STYLE_ATTR, "true");
+        targetHead.appendChild(cloned);
+      }
+
+      if (cloned instanceof HTMLLinkElement) {
+        cloned.setAttribute(CLONED_STYLE_ATTR, "true");
+        // Ensure absolute URL for iframe resolution in production.
+        if (node instanceof HTMLLinkElement && node.href) {
+          cloned.href = node.href;
+        }
         targetHead.appendChild(cloned);
       }
     }
