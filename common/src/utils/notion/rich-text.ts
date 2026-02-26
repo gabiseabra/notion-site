@@ -375,18 +375,18 @@ export function findLinkRange(
     end: target.start + target.node.text.content.length,
   };
 
-  for (let i = target.index; i > 0; --i) {
+  for (let i = target.index - 1; i >= 0; --i) {
     const text = rich_text[i];
     if (!(text && text.type === "text" && text.text.link?.url === link.url))
       break;
     range.start -= text.text.content.length;
   }
 
-  for (let i = target.index; i < rich_text.length; ++i) {
+  for (let i = target.index + 1; i < rich_text.length; ++i) {
     const text = rich_text[i];
     if (!(text && text.type === "text" && text.text.link?.url === link.url))
       break;
-    range.start += text.text.content.length;
+    range.end += text.text.content.length;
   }
 
   return range;

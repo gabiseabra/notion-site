@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 import { zNotion } from "../../dto/notion/schema/index.js";
 import * as RTF from "./rich-text.js";
-import { span } from "./wip.js";
+import { a, span } from "./wip.js";
 
 describe("Notion.RTF", () => {
   describe("Notion.RTF.slice", () => {
@@ -112,6 +112,85 @@ describe("Notion.RTF", () => {
   const toUpperCaseAsync = async (item: zNotion.rich_text.text) => ({
     ...item,
     text: { ...item.text, content: item.text.content.toUpperCase() },
+  });
+
+  describe("Notion.RTF.findByRange", () => {
+    it("returns empty array for empty input", () => {
+      expect(RTF.findByRange([], 0, 0)).toEqual([]);
+    });
+
+    it("returns the item at offset for a zero-width range", () => {
+      expect(RTF.findByRange([span("hello")], 2, 2)).toEqual([span("hello")]);
+    });
+
+    it("returns empty array when zero-width offset is past the end", () => {
+      expect(RTF.findByRange([span("hello")], 10, 10)).toEqual([]);
+    });
+
+    it("returns a slice for a non-zero range", () => {
+      expect(RTF.findByRange([span("hello")], 1, 4)).toEqual([span("ell")]);
+    });
+
+    it("returns a slice across multiple items for a non-zero range", () => {
+      expect(
+        RTF.findByRange(
+          [span("hello", { bold: true }), span(" world")],
+          3,
+          8,
+        ),
+      ).toEqual([span("lo", { bold: true }), span(" wo")]);
+    });
+  });
+
+  describe("Notion.RTF.findLinkRange", () => {
+    it("returns null for empty input", () => {
+      expect(RTF.findLinkRange([])).toBeNull();
+    });
+
+    it("returns null when offset is on a non-link item", () => {
+      expect(RTF.findLinkRange([span("hello")], 2)).toBeNull();
+    });
+
+    it("returns null when offset is negative", () => {
+      expect(RTF.findLinkRange([a("hello", "https://example.com")], -1)).toBeNull();
+    });
+
+    it("returns null when offset is past the end", () => {
+      expect(RTF.findLinkRange([a("hello", "https://example.com")], 10)).toBeNull();
+    });
+
+    it("returns the range of a single link item", () => {
+      expect(RTF.findLinkRange([a("hello", "https://example.com")], 2)).toEqual(
+        { start: 0, end: 5 },
+      );
+    });
+
+    it("does not expand to an adjacent item with a different url", () => {
+      expect(
+        RTF.findLinkRange(
+          [span("x"), a("foo", "https://a.com"), a("bar", "https://b.com")],
+          2,
+        ),
+      ).toEqual({ start: 1, end: 4 });
+    });
+
+    it("expands forwards to include adjacent items with the same url", () => {
+      expect(
+        RTF.findLinkRange(
+          [span("x"), a("foo", "https://example.com"), a("bar", "https://example.com")],
+          2,
+        ),
+      ).toEqual({ start: 1, end: 7 });
+    });
+
+    it("expands backwards to include adjacent items with the same url", () => {
+      expect(
+        RTF.findLinkRange(
+          [a("foo", "https://example.com"), a("bar", "https://example.com"), span("x")],
+          4,
+        ),
+      ).toEqual({ start: 0, end: 6 });
+    });
   });
 
   describe("Notion.RTF.traverseText", () => {
