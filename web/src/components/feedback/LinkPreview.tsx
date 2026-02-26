@@ -43,19 +43,19 @@ function LinkPreviewLoader({ url, className = "" }: LinkPreviewProps) {
     <a
       href={url}
       title={preview.title}
-      className={[styles.link, className].join(" ")}
+      className={[styles.preview, className].join(" ")}
     >
-      <Col as="div">
-        {media && (
-          <div className={styles.media}>
-            <img
-              className={styles.image}
-              src={preview.image ?? preview.favicon}
-              alt=""
-            />
-          </div>
-        )}
+      {media && (
+        <div className={styles.media}>
+          <img
+            className={styles.image}
+            src={preview.image ?? preview.favicon}
+            alt=""
+          />
+        </div>
+      )}
 
+      <div className={styles.content}>
         <Row as="div" alignY="center">
           {preview.favicon && (
             <Icon
@@ -69,12 +69,16 @@ function LinkPreviewLoader({ url, className = "" }: LinkPreviewProps) {
           </Text>
         </Row>
 
-        {preview.description && (
-          <Text as="div" size="caption" color="muted">
-            {preview.description}
-          </Text>
-        )}
-      </Col>
+        <Text
+          as="div"
+          size="caption"
+          color="muted"
+          style={{ textDecoration: "underline" }}
+          className={styles.url}
+        >
+          {url}
+        </Text>
+      </div>
     </a>
   );
 }

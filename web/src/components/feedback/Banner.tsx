@@ -28,7 +28,12 @@ export function Banner({ type, size, title, children }: BannerProps) {
     >
       <BannerIcon type={type} size={size} />
 
-      <Col>
+      <Col
+        style={{
+          maxWidth: "100%",
+          minWidth: 0,
+        }}
+      >
         {title && <h4>{title}</h4>}
 
         {children}
