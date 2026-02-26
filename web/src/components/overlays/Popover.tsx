@@ -119,14 +119,14 @@ export function Popover({
     onClose?.();
   };
 
-  const updatePosition = useRafThrottledCallback(() => {
+  const computeCoords = useCallback(() => {
     const triggerEl = triggerRef.current;
     const contentEl = contentRef.current;
 
-    if (!triggerEl || !contentEl) return;
+    if (!triggerEl || !contentEl) return undefined;
 
     const tipRect = contentEl.getBoundingClientRect();
-    if (!tipRect.width || !tipRect.height) return; // not laid out yet; ResizeObserver will re-trigger
+    if (!tipRect.width || !tipRect.height) return undefined; // not laid out yet; ResizeObserver will re-trigger
 
     const triggerRect = getTriggerRect(triggerEl);
     const coords = getBestCoords(
@@ -135,28 +135,20 @@ export function Popover({
       css.toPx(css.computeProperty(css._space)) * 2,
       placements,
       triggerRect,
-      contentEl.getBoundingClientRect(),
+      tipRect,
     );
 
-    // If we are inside a transformed popover, fixed positioning becomes relative
-    // to that ancestor. Convert viewport coords into that local space so nested
-    // popovers (e.g. floating toolbar menus) stay aligned.
-    if (coords) {
-      const fixedParent = triggerEl.closest(`.${styles.popover}`);
-      if (fixedParent instanceof HTMLElement) {
-        const transform = getComputedStyle(fixedParent).transform;
-        if (transform && transform !== "none") {
-          const parentRect = fixedParent.getBoundingClientRect();
-          coords.top -= parentRect.top;
-          coords.left -= parentRect.left;
-        }
-      }
-    }
+    if (!coords) return null;
 
-    if (!coords) onOffScreenRef.current();
-
-    setCoords(guardDispatch(coords));
+    return adjustCoordsForFixedParent(triggerEl, coords);
   }, [hash(placements), offset]);
+
+  const updatePosition = useRafThrottledCallback(() => {
+    const nextCoords = computeCoords();
+    if (nextCoords === undefined) return;
+    if (nextCoords === null) onOffScreenRef.current();
+    setCoords(guardDispatch(nextCoords));
+  }, [computeCoords]);
 
   // Position when opening + whenever content/placements change
   useLayoutEffect(() => {
@@ -165,8 +157,8 @@ export function Popover({
       return;
     }
 
-    updatePosition();
-  }, [open, updatePosition, updateKey]);
+    setCoords(computeCoords() ?? null);
+  }, [open, computeCoords, updateKey]);
 
   // Reposition on scroll/resize while open
   useWindowEventListener("resize", updatePosition);
@@ -238,6 +230,29 @@ function getTriggerRect(triggerEl: HTMLElement): DOMRect {
 
 const clamp = (v: number, min: number, max: number) =>
   Math.min(max, Math.max(min, v));
+
+/**
+ * Convert viewport coords into local space for fixed elements inside a transformed parent.
+ * @internal
+ */
+function adjustCoordsForFixedParent(
+  triggerEl: HTMLElement,
+  coords: Coords,
+): Coords {
+  const fixedParent = triggerEl.closest(`.${styles.popover}`);
+  if (!(fixedParent instanceof HTMLElement)) return coords;
+
+  const transform = getComputedStyle(fixedParent).transform;
+  if (!transform || transform === "none") return coords;
+
+  const parentRect = fixedParent.getBoundingClientRect();
+
+  return {
+    ...coords,
+    top: coords.top - parentRect.top,
+    left: coords.left - parentRect.left,
+  };
+}
 
 /**
  * Vibecoded with ChatGPT. Don't ask how it works.
