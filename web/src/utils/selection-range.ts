@@ -84,7 +84,7 @@ function apply(element: HTMLElement, selection: SelectionRange) {
     return;
   }
 
-  clear(element);
+  window.getSelection()?.removeAllRanges();
 
   if (!element.textContent && selection.start === 0 && selection.end === 0) {
     element.focus();

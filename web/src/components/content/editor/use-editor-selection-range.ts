@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { guardDispatch } from "../../../hooks/guard-dispatch.js";
 import { useDocumentEventListener } from "../../../hooks/use-document-event-listener.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { AnyBlock, ContentEditor } from "./types.js";
@@ -14,7 +15,7 @@ export function useEditorSelectionRange<TBlock extends AnyBlock>(
   const [selectionRange, setSelectionRange] =
     useState<EditorSelectionRange<TBlock> | null>(null);
 
-  const readSelectionRange = useCallback(() => {
+  function readSelectionRange() {
     const sel = window.getSelection();
     const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
 
@@ -32,10 +33,10 @@ export function useEditorSelectionRange<TBlock extends AnyBlock>(
       }
     }
     return null;
-  }, [editor]);
+  }
 
   useDocumentEventListener("selectionchange", () => {
-    setSelectionRange(readSelectionRange());
+    setSelectionRange(guardDispatch(readSelectionRange()));
   });
 
   // Set selection on mount

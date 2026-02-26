@@ -1,6 +1,8 @@
+import { hash } from "@notion-site/common/utils/hash.js";
 import { useCallback, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useDocumentEventListener } from "../../../hooks/use-document-event-listener.js";
+import { useRafThrottledCallback } from "../../../hooks/use-raf-throttled-callback.js";
 import { useVisualViewportEventListener } from "../../../hooks/use-visual-viewport-event-listener.js";
 import { AnchoredOverlayProps } from "../../overlays/Overlay.js";
 import { Popover } from "../../overlays/Popover.js";
@@ -12,7 +14,7 @@ import { SwatchColorControl } from "./controls/ColorControl.js";
 export function FloatingToolbar({ editor }: { editor: Editor }) {
   const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
 
-  function updateSelectionRect() {
+  const updateSelectionRect = useRafThrottledCallback(() => {
     const sel = window.getSelection();
     const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
     const selectionRect = range?.getBoundingClientRect();
@@ -30,7 +32,7 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
     } else {
       setSelectionRect(null);
     }
-  }
+  }, [editor]);
 
   useDocumentEventListener("selectionchange", updateSelectionRect);
   useVisualViewportEventListener("resize", updateSelectionRect);
@@ -52,6 +54,7 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
   return (
     <Popover
       open={!!selectionRect}
+      updateKey={hash(selectionRect)}
       offset={2}
       placements={["top", "right", "left", "bottom"]}
       content={

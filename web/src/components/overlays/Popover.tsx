@@ -1,6 +1,7 @@
 import { hash } from "@notion-site/common/utils/hash.js";
 import React, {
   CSSProperties,
+  Key,
   useCallback,
   useId,
   useLayoutEffect,
@@ -9,6 +10,7 @@ import React, {
   useState,
 } from "react";
 import * as css from "../../css/index.js";
+import { guardDispatch } from "../../hooks/guard-dispatch.js";
 import { useDocumentEventListener } from "../../hooks/use-document-event-listener.js";
 import { useRafThrottledCallback } from "../../hooks/use-raf-throttled-callback.js";
 import { useResizeObserver } from "../../hooks/use-resize-observer.js";
@@ -49,6 +51,8 @@ export type PopoverProps = {
   onClickOutside?: () => void;
   onOffScreen?: () => void;
   onClose?: () => void;
+
+  updateKey?: Key;
 };
 
 type Coords = {
@@ -75,6 +79,8 @@ export function Popover({
   onClickOutside,
   onOffScreen,
   onClose,
+
+  updateKey,
 }: PopoverProps) {
   const triggerRef = useRef<HTMLSpanElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -146,7 +152,7 @@ export function Popover({
 
     if (!coords) onOffScreenRef.current();
 
-    setCoords(coords);
+    setCoords(guardDispatch(coords));
   }, [hash(placements), offset]);
 
   // Position when opening + whenever content/placements change
@@ -157,7 +163,7 @@ export function Popover({
     }
 
     updatePosition();
-  }, [open, content, updatePosition]);
+  }, [open, updatePosition, updateKey]);
 
   // Reposition on scroll/resize while open
   useWindowEventListener("resize", updatePosition);
@@ -239,7 +245,7 @@ function getBestCoords(
   placements: PopoverPlacement[],
   trigger: DOMRect,
   tip: DOMRect,
-) {
+): Coords | null {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
