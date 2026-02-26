@@ -46,7 +46,7 @@ export function Input({
           placeholder={placeholder}
         />
 
-        {!!value && type === "search" && onClear && (
+        {!!value && onClear && (
           <IconControl
             as="button"
             color="default"
