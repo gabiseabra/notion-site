@@ -6,13 +6,22 @@
   text-align: center;
   user-select: none;
 
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   .text-color--text {
     line-height: 1;
     pointer-events: none;
-    width: auto;
-    height: fit-content;
-    height: stretch;
-    padding: 10%;
+    // width: auto;
+    // height: fit-content;
+    // height: stretch;
+    // padding: 10%;
+
+    width: 80%;
+    height: 80%;
+    display: block;
+
     overflow: visible;
 
     path {
@@ -74,7 +83,7 @@
 .color-swatch-palette {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  padding: var(--space)
+  padding: var(--space);
 }
 
 .color-swatch-button {
