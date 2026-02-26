@@ -133,11 +133,7 @@ describe("Notion.RTF", () => {
 
     it("returns a slice across multiple items for a non-zero range", () => {
       expect(
-        RTF.findByRange(
-          [span("hello", { bold: true }), span(" world")],
-          3,
-          8,
-        ),
+        RTF.findByRange([span("hello", { bold: true }), span(" world")], 3, 8),
       ).toEqual([span("lo", { bold: true }), span(" wo")]);
     });
   });
@@ -152,11 +148,15 @@ describe("Notion.RTF", () => {
     });
 
     it("returns null when offset is negative", () => {
-      expect(RTF.findLinkRange([a("hello", "https://example.com")], -1)).toBeNull();
+      expect(
+        RTF.findLinkRange([a("hello", "https://example.com")], -1),
+      ).toBeNull();
     });
 
     it("returns null when offset is past the end", () => {
-      expect(RTF.findLinkRange([a("hello", "https://example.com")], 10)).toBeNull();
+      expect(
+        RTF.findLinkRange([a("hello", "https://example.com")], 10),
+      ).toBeNull();
     });
 
     it("returns the range of a single link item", () => {
@@ -177,7 +177,11 @@ describe("Notion.RTF", () => {
     it("expands forwards to include adjacent items with the same url", () => {
       expect(
         RTF.findLinkRange(
-          [span("x"), a("foo", "https://example.com"), a("bar", "https://example.com")],
+          [
+            span("x"),
+            a("foo", "https://example.com"),
+            a("bar", "https://example.com"),
+          ],
           2,
         ),
       ).toEqual({ start: 1, end: 7 });
@@ -186,7 +190,11 @@ describe("Notion.RTF", () => {
     it("expands backwards to include adjacent items with the same url", () => {
       expect(
         RTF.findLinkRange(
-          [a("foo", "https://example.com"), a("bar", "https://example.com"), span("x")],
+          [
+            a("foo", "https://example.com"),
+            a("bar", "https://example.com"),
+            span("x"),
+          ],
           4,
         ),
       ).toEqual({ start: 0, end: 6 });
@@ -211,6 +219,189 @@ describe("Notion.RTF", () => {
       expect(result[0]).toEqual(span("HELLO"));
       expect(result[1]).toBe(mention);
       expect(result[2]).toEqual(span("WORLD"));
+    });
+  });
+
+  describe("Notion.RTF.foldText", () => {
+    it("returns initial value for empty input", () => {
+      expect(RTF.foldText([], (acc, item) => acc + item.text.content, "")).toBe(
+        "",
+      );
+    });
+
+    it("accumulates text content with character offsets", () => {
+      const offsets: number[] = [];
+      const result = RTF.foldText(
+        [span("hello"), span(" world")],
+        (acc, item, offset) => {
+          offsets.push(offset);
+          return acc + item.text.content;
+        },
+        "",
+      );
+      expect(result).toBe("hello world");
+      expect(offsets).toEqual([0, 5]);
+    });
+
+    it("skips non-text items", () => {
+      const mention = { type: "mention" as const, mention: {} };
+      const result = RTF.foldText(
+        [span("hello"), mention, span("world")],
+        (acc, item) => acc + item.text.content,
+        "",
+      );
+      expect(result).toBe("helloworld");
+    });
+  });
+
+  describe("Notion.RTF.getContent", () => {
+    it("returns empty string for empty input", () => {
+      expect(RTF.getContent([])).toBe("");
+    });
+
+    it("returns content from a single item", () => {
+      expect(RTF.getContent([span("hello")])).toBe("hello");
+    });
+
+    it("concatenates content across multiple items", () => {
+      expect(RTF.getContent([span("hello"), span(" world")])).toBe(
+        "hello world",
+      );
+    });
+  });
+
+  describe("Notion.RTF.isAnnotated", () => {
+    it("returns true when all items in range match the annotation", () => {
+      expect(
+        RTF.isAnnotated([span("hello", { bold: true })], { bold: true }),
+      ).toBe(true);
+    });
+
+    it("returns false when not all items match", () => {
+      expect(
+        RTF.isAnnotated([span("hello", { bold: true }), span(" world")], {
+          bold: true,
+        }),
+      ).toBe(false);
+    });
+
+    it("checks a sub-range within rich text", () => {
+      expect(
+        RTF.isAnnotated(
+          [span("hello"), span(" world", { bold: true })],
+          { bold: true },
+          5,
+          11,
+        ),
+      ).toBe(true);
+    });
+
+    it("returns true at a zero-width cursor on an annotated item", () => {
+      expect(
+        RTF.isAnnotated([span("hello", { bold: true })], { bold: true }, 2, 2),
+      ).toBe(true);
+    });
+  });
+
+  describe("Notion.RTF.setAnnotations", () => {
+    it("sets annotation on the full range", () => {
+      expect(RTF.setAnnotations([span("hello")], { bold: true })).toEqual([
+        span("hello", { bold: true }),
+      ]);
+    });
+
+    it("sets annotation on a sub-range, preserving surrounding text", () => {
+      expect(
+        RTF.setAnnotations([span("hello world")], { bold: true }, 6, 11),
+      ).toEqual([span("hello "), span("world", { bold: true })]);
+    });
+
+    it("normalizes adjacent items after setting same annotations", () => {
+      expect(
+        RTF.setAnnotations([span("hello", { bold: true }), span(" world")], {
+          bold: true,
+        }),
+      ).toEqual([span("hello world", { bold: true })]);
+    });
+  });
+
+  describe("Notion.RTF.getAnnotations", () => {
+    it("returns all annotations for a single item", () => {
+      expect(RTF.getAnnotations([span("hello", { bold: true })])).toEqual({
+        bold: true,
+        italic: false,
+        strikethrough: false,
+        underline: false,
+        code: false,
+        color: "default",
+      });
+    });
+
+    it("returns only consistent annotations across mixed items", () => {
+      expect(
+        RTF.getAnnotations([
+          span("hello", { bold: true }),
+          span(" world", { italic: true }),
+        ]),
+      ).toEqual({
+        strikethrough: false,
+        underline: false,
+        code: false,
+        color: "default",
+      });
+    });
+
+    it("returns empty object for empty input", () => {
+      expect(RTF.getAnnotations([])).toEqual({});
+    });
+  });
+
+  describe("Notion.RTF.setLink", () => {
+    it("sets link on the full range", () => {
+      expect(
+        RTF.setLink([span("hello")], { url: "https://example.com" }),
+      ).toEqual([a("hello", "https://example.com")]);
+    });
+
+    it("sets link on a sub-range", () => {
+      expect(
+        RTF.setLink(
+          [span("hello world")],
+          { url: "https://example.com" },
+          6,
+          11,
+        ),
+      ).toEqual([span("hello "), a("world", "https://example.com")]);
+    });
+
+    it("removes link by setting null", () => {
+      expect(RTF.setLink([a("hello", "https://example.com")], null)).toEqual([
+        span("hello"),
+      ]);
+    });
+  });
+
+  describe("Notion.RTF.getLink", () => {
+    it("returns null for empty input", () => {
+      expect(RTF.getLink([])).toBeNull();
+    });
+
+    it("returns link when all items share the same url", () => {
+      expect(
+        RTF.getLink([
+          a("hello", "https://example.com"),
+          a(" world", "https://example.com"),
+        ]),
+      ).toEqual({ url: "https://example.com" });
+    });
+
+    it("returns undefined when items have different links", () => {
+      expect(
+        RTF.getLink([
+          a("hello", "https://a.com"),
+          a(" world", "https://b.com"),
+        ]),
+      ).toBeUndefined();
     });
   });
 });
