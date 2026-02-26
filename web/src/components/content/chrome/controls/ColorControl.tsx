@@ -42,7 +42,7 @@ export function ColorControl({
         disabled={disabled}
         onClick={() => setIsOpen((open) => !disabled && !open)}
       >
-        <ColorControlIcon color={value} />
+        <ColorControlIcon disabled={disabled} color={value} />
       </ToolbarButton>
     </Overlay>
   );
@@ -139,7 +139,7 @@ export function SwatchColorControl({
             className={[
               styles["color-swatch-button"],
               styles[`color-${color}`],
-              color === currentColor ? styles["active"] : "",
+              value && color === currentColor ? styles["active"] : "",
             ].join(" ")}
             onClick={() =>
               onChange(
@@ -173,8 +173,11 @@ function ColorControlIcon({
   onClickBackground?: () => void;
 }) {
   const isBgEnabled = !!color && color.endsWith("background");
-  const currentColor = ((!isBgEnabled ? color : color?.slice(0, -11)) ??
-    "default") as zNotion.primitives.color;
+  const currentColor =
+    disabled === true || disabled === "feedback"
+      ? "gray"
+      : (((!isBgEnabled ? color : color?.slice(0, -11)) ??
+          "default") as zNotion.primitives.color);
 
   return (
     <span
