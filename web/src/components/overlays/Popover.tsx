@@ -190,24 +190,30 @@ export function Popover({
     >
       {children}
 
-      {open && (
-        <div
-          ref={contentRef}
-          id={tooltipId}
-          role={role}
-          className={[className, styles.popover].join(" ")}
-          data-placement={coords?.placement ?? placements[0] ?? "top"}
-          style={{
-            top: coords?.top ?? 0,
-            left: coords?.left ?? 0,
-            opacity: coords ? 1 : 0,
-            ...style?.container,
-          }}
-        >
-          <div className={styles.content}>{content}</div>
-          <div className={styles.arrow} aria-hidden="true" style={arrowStyle} />
-        </div>
-      )}
+      <div
+        ref={contentRef}
+        id={tooltipId}
+        role={role}
+        className={[className, styles.popover].join(" ")}
+        data-placement={coords?.placement ?? placements[0] ?? "top"}
+        style={{
+          top: coords?.top ?? 0,
+          left: coords?.left ?? 0,
+          opacity: open && coords ? 1 : 0,
+          ...style?.container,
+        }}
+      >
+        {open && (
+          <>
+            <div className={styles.content}>{content}</div>
+            <div
+              className={styles.arrow}
+              aria-hidden="true"
+              style={arrowStyle}
+            />
+          </>
+        )}
+      </div>
     </span>
   );
 }
