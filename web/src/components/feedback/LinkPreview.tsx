@@ -24,7 +24,7 @@ export function LinkPreview({ url, className = "" }: LinkPreviewProps) {
         </Col>
       }
       error={(error) => (
-        <Banner type="error" size="m">
+        <Banner type="error" size="m" style={{ margin: 0 }}>
           {extractErrorMessage(error)}
         </Banner>
       )}

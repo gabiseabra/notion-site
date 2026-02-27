@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 import { PiWarningBold, PiWarningCircleBold } from "react-icons/pi";
 import { match } from "ts-pattern";
 import { Col } from "../layout/FlexBox.js";
@@ -11,15 +11,17 @@ type BannerProps = {
   size: "m" | "l";
   title?: string;
   children: ReactNode;
+  style?: CSSProperties;
 };
 
 /**
  * Renders an error message or warning.
  * @direction block
  */
-export function Banner({ type, size, title, children }: BannerProps) {
+export function Banner({ type, size, title, children, style }: BannerProps) {
   return (
     <div
+      style={style}
       className={[
         styles.banner,
         styles[`type-${type}`],
