@@ -66,7 +66,9 @@ export function PreviewLinkControl({
   const debouncedUrl = useDebounce(value?.url, 300);
 
   return (
-    <IsolationFrame style={{ width: 350 }}>
+    <IsolationFrame
+      style={{ width: "min(calc(100vw - var(--gutter-content) * 2), 300px)" }}
+    >
       <Col
         p={2}
         gap={2}
