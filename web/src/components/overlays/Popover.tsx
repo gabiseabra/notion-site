@@ -9,6 +9,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 import * as css from "../../css/index.js";
 import { guardDispatch } from "../../hooks/guard-dispatch.js";
 import { useDocumentEventListener } from "../../hooks/use-document-event-listener.js";
@@ -147,7 +148,9 @@ export function Popover({
     const nextCoords = computeCoords();
     if (nextCoords === undefined) return;
     if (nextCoords === null) onOffScreenRef.current();
-    setCoords(guardDispatch(nextCoords));
+    flushSync(() => {
+      setCoords(guardDispatch(nextCoords));
+    });
   }, [computeCoords]);
 
   // Position when opening + whenever content/placements change
