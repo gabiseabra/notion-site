@@ -36,6 +36,11 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
   }, [editor]);
 
   useDocumentEventListener("selectionchange", updateSelectionRect);
+  useDocumentEventListener("scroll", updateSelectionRect, {
+    capture: true,
+    passive: true,
+  });
+  useVisualViewportEventListener("scroll", updateSelectionRect);
   useVisualViewportEventListener("resize", updateSelectionRect);
 
   const portalRef = useRef<HTMLDivElement>(null);
@@ -74,6 +79,7 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
         </div>
       }
       style={{ wrap: { position: "absolute" } }}
+      onClose={() => setSelectionRect(null)}
     >
       <div
         style={{
