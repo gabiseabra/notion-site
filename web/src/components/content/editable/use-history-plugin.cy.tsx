@@ -101,4 +101,73 @@ describe("useHistoryPlugin", () => {
         });
       });
   });
+
+  it("restores changes across blocks with undo / redo", () => {
+    cy.mount(
+      <Editor
+        value={[p("a", span("First")), p("b", span("Second"))]}
+        onChange={() => {}}
+        options={options}
+      />,
+    );
+
+    const assertBlocks = (expected: string[]) => {
+      cy.get("p").should("have.length", expected.length);
+      expected.forEach((text, index) => {
+        if (text === "") {
+          cy.get("p").eq(index).invoke("text").should("match", /^\s*$/);
+        } else {
+          cy.get("p").eq(index).should("contain.text", text);
+        }
+      });
+    };
+
+    assertBlocks(["First", "Second"]);
+
+    // type in block 1
+    cy.get("p").eq(0).click().type("{moveToEnd} One");
+    cy.wait(options.autoCommit);
+    assertBlocks(["First One", "Second"]);
+
+    // add one block between 1 and 2
+    cy.get("p").eq(0).click().type("{moveToEnd}{enter}");
+    cy.wait(options.autoCommit);
+    assertBlocks(["First One", "", "Second"]);
+
+    // type in new block
+    cy.get("p").eq(1).click().type("Middle");
+    cy.wait(options.autoCommit);
+    assertBlocks(["First One", "Middle", "Second"]);
+
+    // type in last block
+    cy.get("p").eq(2).click().type("{moveToEnd} Last");
+    cy.wait(options.autoCommit);
+    assertBlocks(["First One", "Middle", "Second Last"]);
+
+    // undo step-by-step
+    cy.get("p").eq(0).type("{ctrl}z");
+    assertBlocks(["First One", "Middle", "Second"]);
+
+    cy.get("p").eq(0).type("{ctrl}z");
+    assertBlocks(["First One", "", "Second"]);
+
+    cy.get("p").eq(0).type("{ctrl}z");
+    assertBlocks(["First One", "Second"]);
+
+    cy.get("p").eq(0).type("{ctrl}z");
+    assertBlocks(["First", "Second"]);
+
+    // redo step-by-step
+    cy.get("p").eq(0).type("{ctrl}y");
+    assertBlocks(["First One", "Second"]);
+
+    cy.get("p").eq(0).type("{ctrl}y");
+    assertBlocks(["First One", "", "Second"]);
+
+    cy.get("p").eq(0).type("{ctrl}y");
+    assertBlocks(["First One", "Middle", "Second"]);
+
+    cy.get("p").eq(0).type("{ctrl}y");
+    assertBlocks(["First One", "Middle", "Second Last"]);
+  });
 });
