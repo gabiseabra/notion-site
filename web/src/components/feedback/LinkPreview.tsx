@@ -19,8 +19,8 @@ export function LinkPreview({ url, className = "" }: LinkPreviewProps) {
     <SuspenseBoundary
       key={url}
       loading={
-        <Col alignX="center" py={2}>
-          <Spinner size="l" />
+        <Col alignX="center" py={4}>
+          <Spinner size="m" />
         </Col>
       }
       error={(error) => (
