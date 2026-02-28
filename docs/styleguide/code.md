@@ -134,6 +134,12 @@ const selection =
 const caretLeft = getCaretLeft(element, direction);
 ```
 
+## Avoid Single-Use Variables
+
+If a variable or function is only used once, inline it unless it materially improves readability.
+This includes intermediate values that can be computed inline without increasing complexity.
+Prefer direct expressions to avoid unnecessary noise.
+
 ## Document Functions
 
 When writing utility modules, add a short jsdoc explaining what the function is doing if it isn't trivial.
@@ -339,4 +345,3 @@ Organize exports in this order:
   }
   ```
   
-
