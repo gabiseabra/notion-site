@@ -12,6 +12,7 @@
     "dev": "nodemon --watch 'src/**' --watch '../common/src/**' --ext ts,tsx,js,json --exec 'npm run build && dotenvx run -f ../.env -- npm run start'"
   },
   "dependencies": {
+    "@dotenvx/dotenvx": "^1.51.4",
     "@notion-site/common": "*",
     "@notion-site/web": "*",
     "@notionhq/client": "^2.2.1",

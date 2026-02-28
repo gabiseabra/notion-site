@@ -1,0 +1,9 @@
+.DS_Store
+.idea
+.env
+routes.json
+node_modules
+dist
+tsconfig.tsbuildinfo
+NOTES.md
+cypress/screenshots
