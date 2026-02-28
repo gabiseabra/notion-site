@@ -4,6 +4,7 @@ import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { DistributiveOmit } from "@notion-site/common/types/union.js";
 import { showError } from "@notion-site/common/utils/error.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
+import { hash } from "@notion-site/common/utils/hash.js";
 import {
   APIResponseError,
   Client as NotionClient,
@@ -16,6 +17,7 @@ import {
   QueryDatabaseParameters,
 } from "@notionhq/client/build/src/api-endpoints.js";
 import z from "zod";
+import { memoize } from "../../utils/memoize.js";
 
 const notionToken = process.env.NOTION_TOKEN;
 const notion = new NotionClient({ auth: notionToken });
@@ -76,12 +78,13 @@ export type QueryNotionDatabaseOptions<DB extends NotionResource> = {
   after?: string;
   filter?: NotionResourceFilterExpr<DB>;
   sorts?: NotionResourceSorting<DB>[];
+  cache?: boolean;
 };
 
 /**
  * Queries a Notion database with filter types inferred from the provided zod schema, and parses results.
  */
-export async function queryNotionDatabase<DB extends NotionResource>(
+async function _queryNotionDatabase<DB extends NotionResource>(
   databaseId: string,
   schema: z.ZodSchema<DB>,
   { limit, after, filter, sorts }: QueryNotionDatabaseOptions<DB>,
@@ -122,10 +125,16 @@ export async function queryNotionDatabase<DB extends NotionResource>(
   };
 }
 
+export const queryNotionDatabase = memoize(_queryNotionDatabase, {
+  ttl: 60_000,
+  hash: (id, db, options) => hash({ id, options }),
+  skip: (id, db, { cache }) => !cache,
+});
+
 /**
  * Get a notion page by id and parse it with the given schema.
  */
-export async function getNotionDatabase<DB extends NotionDatabase>(
+export async function _getNotionDatabase<DB extends NotionDatabase>(
   id: string,
   schema: z.ZodSchema<DB>,
 ) {
@@ -161,10 +170,15 @@ export async function getNotionDatabase<DB extends NotionDatabase>(
   return parseResult.data;
 }
 
+export const getNotionDatabase = memoize(_getNotionDatabase, {
+  ttl: 60_000,
+  hash: (id) => id,
+});
+
 /**
  * Get a notion page by id and parse it with the given schema.
  */
-export async function getNotionPage<DB extends NotionResource>(
+async function _getNotionPage<DB extends NotionResource>(
   id: string,
   schema: z.ZodSchema<DB>,
 ) {
@@ -200,10 +214,15 @@ export async function getNotionPage<DB extends NotionResource>(
   return parseResult.data;
 }
 
+export const getNotionPage = memoize(_getNotionPage, {
+  ttl: 60_000,
+  hash: (id) => id,
+});
+
 /**
  * Recursively fetches all blocks for a page (depth-first) and parses them.
  */
-export async function getNotionBlocks(id: string) {
+async function _getNotionBlocks(id: string) {
   const blocks: zNotion.blocks.block[] = [];
   const errors: { id: string; error: Error }[] = [];
 
@@ -260,3 +279,8 @@ export async function getNotionBlocks(id: string) {
 
   return { blocks, errors };
 }
+
+export const getNotionBlocks = memoize(_getNotionBlocks, {
+  ttl: 60_000,
+  hash: (id) => id,
+});

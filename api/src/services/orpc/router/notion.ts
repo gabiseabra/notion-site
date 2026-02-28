@@ -93,6 +93,11 @@ export const notion = c.router({
       env.BLOG_POSTS_DATABASE_ID,
       BlogPost,
       (input) => ({
+        cache:
+          !input.query &&
+          !input.after &&
+          !input.tags?.length &&
+          !input.statuses?.length,
         limit: input.limit,
         after: input.after,
         sorts: [
