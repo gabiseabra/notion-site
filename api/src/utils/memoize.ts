@@ -1,5 +1,12 @@
-import Keyv from "keyv";
-import { z } from "zod";
+import Keyv, { KeyvOptions } from "keyv";
+
+export class MemoryCache<T> extends Keyv<T> {
+  constructor(options: KeyvOptions) {
+    super(options);
+    this.serialize = undefined;
+    this.deserialize = undefined;
+  }
+}
 
 export type MemoizeOptions<Args extends unknown[], Value> = {
   /**
@@ -14,10 +21,6 @@ export type MemoizeOptions<Args extends unknown[], Value> = {
    * Skip cache for a call.
    */
   skip?: (...args: Args) => boolean;
-  /**
-   * Zod schema used to parse cached values.
-   */
-  schema?: (...args: Args) => z.ZodType<Value>;
 };
 
 /**
@@ -32,13 +35,9 @@ export function memoize<F extends (...args: any[]) => Promise<any>>(
 ): F;
 export function memoize<Args extends unknown[], Value>(
   fn: (...args: Args) => Promise<Value>,
-  { cache, hash, skip, schema }: MemoizeOptions<Args, Value>,
+  { cache, hash, skip }: MemoizeOptions<Args, Value>,
 ) {
-  const store = cache ?? new Keyv<Value>();
-  if (!cache) {
-    store.serialize = undefined;
-    store.deserialize = undefined;
-  }
+  const store = cache ?? new MemoryCache<Value>({});
   const inflight = new Map<string, Promise<Value>>();
 
   return async (...args: Args) => {
@@ -49,12 +48,7 @@ export function memoize<Args extends unknown[], Value>(
     const key = hash(...args);
     const cached = await store.get(key);
     if (cached !== undefined) {
-      if (!schema) return cached;
-
-      const parsed = schema(...args).safeParse(cached);
-      if (parsed.success) return parsed.data;
-
-      await store.delete(key);
+      return cached;
     }
 
     const existing = inflight.get(key);

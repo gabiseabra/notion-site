@@ -7,18 +7,17 @@ import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { hash } from "@notion-site/common/utils/hash.js";
 import {
   APIResponseError,
-  Client as NotionClient,
   isFullBlock,
   isFullDatabase,
   isFullPage,
+  Client as NotionClient,
 } from "@notionhq/client";
 import {
   type ListBlockChildrenResponse,
   QueryDatabaseParameters,
 } from "@notionhq/client/build/src/api-endpoints.js";
-import Keyv from "keyv";
 import z from "zod";
-import { memoize } from "../../utils/memoize.js";
+import { memoize, MemoryCache } from "../../utils/memoize.js";
 
 const notionToken = process.env.NOTION_TOKEN;
 const notion = new NotionClient({ auth: notionToken });
@@ -127,7 +126,7 @@ async function _queryNotionDatabase<DB extends NotionResource>(
 }
 
 export const queryNotionDatabase = memoize(_queryNotionDatabase, {
-  cache: new Keyv({ ttl: 5 * 60_000 }),
+  cache: new MemoryCache({ ttl: 5 * 60_000 }),
   hash: (id, db, options) => hash({ id, options }),
   skip: (id, db, { cache }) => !cache,
 });
@@ -172,7 +171,7 @@ export async function _getNotionDatabase<DB extends NotionDatabase>(
 }
 
 export const getNotionDatabase = memoize(_getNotionDatabase, {
-  cache: new Keyv({ ttl: 60_000 }),
+  cache: new MemoryCache({ ttl: 60_000 }),
   hash: (id) => id,
 });
 
@@ -216,7 +215,7 @@ async function _getNotionPage<DB extends NotionResource>(
 }
 
 export const getNotionPage = memoize(_getNotionPage, {
-  cache: new Keyv({ ttl: 60_000 }),
+  cache: new MemoryCache({ ttl: 60_000 }),
   hash: (id) => id,
 });
 
@@ -282,6 +281,6 @@ async function _getNotionBlocks(id: string) {
 }
 
 export const getNotionBlocks = memoize(_getNotionBlocks, {
-  cache: new Keyv({ ttl: 60_000 }),
+  cache: new MemoryCache({ ttl: 60_000 }),
   hash: (id) => id,
 });
