@@ -64,7 +64,11 @@ export async function render(
     const { pipe, abort } = renderToPipeableStream(
       <React.StrictMode>
         <RootPovider url={apiUrl} fetch={fetch}>
-          <StaticRouterProvider router={router} context={context} />
+          <StaticRouterProvider
+            router={router}
+            context={context}
+            hydrate={false}
+          />
         </RootPovider>
       </React.StrictMode>,
       {
