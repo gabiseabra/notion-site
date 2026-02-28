@@ -22,10 +22,14 @@ export function Icon({ icon, size }: IconProps) {
       {match(icon)
         .with({ type: "emoji" }, (icon) => icon.emoji)
         .with({ type: "custom_emoji" }, (icon) => (
-          <img src={icon.custom_emoji.url} />
+          <img loading="lazy" src={icon.custom_emoji.url} />
         ))
-        .with({ type: "external" }, (icon) => <img src={icon.external.url} />)
-        .with({ type: "file" }, (icon) => <img src={icon.file.url} />)
+        .with({ type: "external" }, (icon) => (
+          <img loading="lazy" src={icon.external.url} />
+        ))
+        .with({ type: "file" }, (icon) => (
+          <img loading="lazy" src={icon.file.url} />
+        ))
         .exhaustive()}
     </IconControl>
   );
