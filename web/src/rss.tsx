@@ -6,7 +6,7 @@ import {
   StaticRouterProvider,
 } from "react-router";
 import { RootPovider } from "./providers/RootProvider.js";
-import * as route from "./routes/index.js";
+import * as route from "./routes/rss.js";
 
 const routes = [route];
 const handler = createStaticHandler(routes);
