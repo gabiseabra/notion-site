@@ -1,4 +1,5 @@
 import Keyv from "keyv";
+import { z } from "zod";
 
 export type MemoizeOptions<Args extends unknown[], Value> = {
   /**
@@ -13,16 +14,16 @@ export type MemoizeOptions<Args extends unknown[], Value> = {
    * Skip cache for a call.
    */
   skip?: (...args: Args) => boolean;
+  /**
+   * Zod schema used to parse cached values.
+   */
+  schema?: (...args: Args) => z.ZodType<Value>;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type MemoizedFn<F extends (...args: any[]) => any> = (
-  ...args: Parameters<F>
-) => Promise<Awaited<ReturnType<F>>>;
-
 /**
- * Memoize an async/sync function using Keyv as the cache store.
- * Dedupe in-flight calls for the same key.
+ * Memoize an async function using Keyv as the cache store.
+ *
+ * @note In-flight calls with the same key are deduped.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function memoize<F extends (...args: any[]) => Promise<any>>(
@@ -31,9 +32,13 @@ export function memoize<F extends (...args: any[]) => Promise<any>>(
 ): F;
 export function memoize<Args extends unknown[], Value>(
   fn: (...args: Args) => Promise<Value>,
-  { cache, hash, skip }: MemoizeOptions<Args, Value>,
+  { cache, hash, skip, schema }: MemoizeOptions<Args, Value>,
 ) {
   const store = cache ?? new Keyv<Value>();
+  if (!cache) {
+    store.serialize = undefined;
+    store.deserialize = undefined;
+  }
   const inflight = new Map<string, Promise<Value>>();
 
   return async (...args: Args) => {
@@ -43,7 +48,14 @@ export function memoize<Args extends unknown[], Value>(
 
     const key = hash(...args);
     const cached = await store.get(key);
-    if (cached !== undefined) return cached;
+    if (cached !== undefined) {
+      if (!schema) return cached;
+
+      const parsed = schema(...args).safeParse(cached);
+      if (parsed.success) return parsed.data;
+
+      await store.delete(key);
+    }
 
     const existing = inflight.get(key);
     if (existing) return existing;

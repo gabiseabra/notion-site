@@ -8,10 +8,6 @@
       "types": "./dist/ts/src/env.d.ts",
       "default": "./dist/server/env.js"
     },
-    "./server.js": {
-      "types": "./dist/ts/src/server.d.ts",
-      "default": "./dist/server/server.js"
-    },
     "./rss.js": {
       "types": "./dist/ts/src/rss.d.ts",
       "default": "./dist/server/rss.js"

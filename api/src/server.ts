@@ -1,14 +1,16 @@
-import { onError } from "@orpc/server";
-import { RPCHandler as FetchRPCHandler } from "@orpc/server/fetch";
-import { RPCHandler } from "@orpc/server/node";
+import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
 import * as env from "./env.js";
+import { httpErrorMiddleware } from "./services/express/http-error-middleware.js";
+import { streamMiddleware } from "./services/express/stream-middleware.js";
+import { BlogPostsDB } from "./services/notion/database/blog-posts.js";
+import { createNotionDatabaseFeed } from "./services/notion/feed.js";
+import { nodeRPCHandler } from "./services/orpc/handler.js";
 import { orpcMiddleware } from "./services/orpc/middleware.js";
-import { router } from "./services/orpc/router/index.js";
-import { viteMiddleware } from "./services/vite/middleware.js";
 import { ViteServer } from "./services/vite/server.js";
+import { httpError } from "./utils/http-error.js";
 
 async function createServer() {
   const app = express();
@@ -16,25 +18,25 @@ async function createServer() {
   app.use(cors({ origin: env.CORS_ORIGIN }));
   app.use(morgan("dev"));
 
-  const handler = new RPCHandler(router, {
-    interceptors: [
-      onError((error) => {
-        console.error(error);
-      }),
-    ],
-  });
+  app.get(
+    "/feed",
+    streamMiddleware(() =>
+      !env.BLOG_POSTS_DATABASE_ID
+        ? httpError(502, `Blog posts database not implemented`)
+        : createNotionDatabaseFeed(
+            env.BLOG_POSTS_DATABASE_ID,
+            BlogPost,
+            BlogPostsDB.feedOptions({
+              query: "",
+              limit: 25,
+            }),
+          ),
+    ),
+  );
 
-  const ssrHandler = new FetchRPCHandler(router, {
-    interceptors: [
-      onError((error) => {
-        console.error(error);
-      }),
-    ],
-  });
+  app.use(orpcMiddleware("/api", nodeRPCHandler));
 
-  app.use(orpcMiddleware("/api", handler));
-
-  app.use(viteMiddleware("/api", ssrHandler));
+  app.use(httpErrorMiddleware);
 
   const server = app.listen(env.PORT, () => {
     console.log(`Running a API server on http://localhost:${env.PORT}`);
