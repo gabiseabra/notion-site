@@ -84,7 +84,7 @@ export function Span({ children, style, className, ...props }: SpanProps) {
     <span
       style={style}
       className={[className, Span.className(props)].filter(isTruthy).join(" ")}
-      {...props}
+      {...omit(props, [...annotationProps])}
     >
       {children}
     </span>
@@ -115,3 +115,14 @@ Span.className = ({
     .filter(isTruthy)
     .join(" ");
 };
+
+const annotationProps = [
+  "bold",
+  "italic",
+  "underline",
+  "strikethrough",
+  "code",
+  "color",
+  "redacted",
+  "size",
+] as const;

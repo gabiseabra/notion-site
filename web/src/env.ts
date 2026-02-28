@@ -12,3 +12,7 @@ export const SITE_TITLE: string =
 export const SITE_URL: string | undefined = import.meta.env.VITE_SITE_URL;
 
 export const IS_MAC = navigator.userAgent.match(/OS X 10/);
+
+export const SITE_IMAGE = "/wizz.jpg";
+
+export const SITE_FAVICON = "/gator.ico";

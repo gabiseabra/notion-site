@@ -34,10 +34,10 @@ export default defineConfig(({ isSsrBuild, mode }) => ({
   build: isSsrBuild
     ? {
         ssr: true,
-        outDir: "dist/server",
+        outDir: "dist/rss",
         rollupOptions: {
           input: {
-            server: "src/server.tsx",
+            rss: "src/rss.tsx",
             env: "src/env.ts",
           },
         },

@@ -22,10 +22,14 @@ export function Icon({ icon, size }: IconProps) {
       {match(icon)
         .with({ type: "emoji" }, (icon) => icon.emoji)
         .with({ type: "custom_emoji" }, (icon) => (
-          <img src={icon.custom_emoji.url} />
+          <img loading="lazy" src={icon.custom_emoji.url} />
         ))
-        .with({ type: "external" }, (icon) => <img src={icon.external.url} />)
-        .with({ type: "file" }, (icon) => <img src={icon.file.url} />)
+        .with({ type: "external" }, (icon) => (
+          <img loading="lazy" src={icon.external.url} />
+        ))
+        .with({ type: "file" }, (icon) => (
+          <img loading="lazy" src={icon.file.url} />
+        ))
         .exhaustive()}
     </IconControl>
   );
@@ -62,6 +66,15 @@ export function IconControl({
   onClick,
   ...props
 }: IconControlProps) {
+  // apply PX size inline for RSS feed
+  const pxSize = {
+    xs: 14,
+    s: 18,
+    m: 24,
+    l: 32,
+    xl: 64,
+  }[size];
+
   return (
     <Component
       className={[
@@ -74,6 +87,9 @@ export function IconControl({
         .filter(isTruthy)
         .join(" ")}
       style={{
+        display: "inline-block",
+        width: pxSize,
+        height: pxSize,
         ...style,
         ...css.getPaddingStyles(props),
         ...css.getMarginStyles(props),

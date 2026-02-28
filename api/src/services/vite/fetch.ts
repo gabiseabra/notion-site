@@ -1,5 +1,5 @@
 import { EmptyObject } from "@notion-site/common/types/object.js";
-import { Fetch } from "@notion-site/web/server.js";
+import { Fetch } from "@notion-site/web/rss.js";
 import { RPCHandler } from "@orpc/server/fetch";
 
 export function createFetch({

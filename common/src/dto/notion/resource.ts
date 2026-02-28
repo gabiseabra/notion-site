@@ -18,6 +18,9 @@ export const _NotionResource = z.object({
   icon: zNotion.media.icon.nullable(),
   cover: zNotion.media.cover.nullable(),
 
+  created_time: z.coerce.date(),
+  last_edited_time: z.coerce.date(),
+
   properties: z.record(zNotion.properties.property),
 });
 
