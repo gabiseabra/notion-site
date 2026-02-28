@@ -75,9 +75,18 @@ async function _getLinkPreview(url: string): Promise<LinkPreview> {
 }
 
 export const getLinkPreview = memoize(_getLinkPreview, {
-  cache: new Keyv({ store: new QuickLRU({ maxSize: 500 }) }),
-  hash: (url) => `link-preview:${url}`,
-  ttl: 60_000,
+  cache: new Keyv({
+    store: new QuickLRU({ maxSize: 500 }),
+    ttl: 10 * 60_000,
+  }),
+  hash: (url) =>
+    new URL({
+      ...new URL(url),
+      search: "",
+      searchParams: new URLSearchParams([]),
+    })
+      .toString()
+      .toLowerCase(),
 });
 
 /** @internal */

@@ -16,6 +16,7 @@ import {
   type ListBlockChildrenResponse,
   QueryDatabaseParameters,
 } from "@notionhq/client/build/src/api-endpoints.js";
+import Keyv from "keyv";
 import z from "zod";
 import { memoize } from "../../utils/memoize.js";
 
@@ -126,7 +127,7 @@ async function _queryNotionDatabase<DB extends NotionResource>(
 }
 
 export const queryNotionDatabase = memoize(_queryNotionDatabase, {
-  ttl: 60_000,
+  cache: new Keyv({ ttl: 5 * 60_000 }),
   hash: (id, db, options) => hash({ id, options }),
   skip: (id, db, { cache }) => !cache,
 });
@@ -171,7 +172,7 @@ export async function _getNotionDatabase<DB extends NotionDatabase>(
 }
 
 export const getNotionDatabase = memoize(_getNotionDatabase, {
-  ttl: 60_000,
+  cache: new Keyv({ ttl: 60_000 }),
   hash: (id) => id,
 });
 
@@ -215,7 +216,7 @@ async function _getNotionPage<DB extends NotionResource>(
 }
 
 export const getNotionPage = memoize(_getNotionPage, {
-  ttl: 60_000,
+  cache: new Keyv({ ttl: 60_000 }),
   hash: (id) => id,
 });
 
@@ -281,6 +282,6 @@ async function _getNotionBlocks(id: string) {
 }
 
 export const getNotionBlocks = memoize(_getNotionBlocks, {
-  ttl: 60_000,
+  cache: new Keyv({ ttl: 60_000 }),
   hash: (id) => id,
 });

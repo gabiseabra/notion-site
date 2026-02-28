@@ -13,10 +13,6 @@ export type MemoizeOptions<Args extends unknown[], Value> = {
    * Skip cache for a call.
    */
   skip?: (...args: Args) => boolean;
-  /**
-   * TTL in milliseconds.
-   */
-  ttl?: number;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,7 +31,7 @@ export function memoize<F extends (...args: any[]) => Promise<any>>(
 ): F;
 export function memoize<Args extends unknown[], Value>(
   fn: (...args: Args) => Promise<Value>,
-  { cache, hash, skip, ttl }: MemoizeOptions<Args, Value>,
+  { cache, hash, skip }: MemoizeOptions<Args, Value>,
 ) {
   const store = cache ?? new Keyv<Value>();
   const inflight = new Map<string, Promise<Value>>();
@@ -54,7 +50,7 @@ export function memoize<Args extends unknown[], Value>(
 
     const run = Promise.resolve(fn(...args))
       .then(async (value) => {
-        await store.set(key, value, ttl);
+        await store.set(key, value);
         return value;
       })
       .finally(() => {
