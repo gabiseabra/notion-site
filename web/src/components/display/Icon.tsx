@@ -62,6 +62,15 @@ export function IconControl({
   onClick,
   ...props
 }: IconControlProps) {
+  // apply PX size inline for RSS feed
+  const pxSize = {
+    xs: 14,
+    s: 18,
+    m: 24,
+    l: 32,
+    xl: 64,
+  }[size];
+
   return (
     <Component
       className={[
@@ -74,6 +83,9 @@ export function IconControl({
         .filter(isTruthy)
         .join(" ")}
       style={{
+        display: "inline-block",
+        width: pxSize,
+        height: pxSize,
         ...style,
         ...css.getPaddingStyles(props),
         ...css.getMarginStyles(props),
