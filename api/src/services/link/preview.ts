@@ -79,14 +79,12 @@ export const getLinkPreview = memoize(_getLinkPreview, {
     store: new QuickLRU({ maxSize: 500 }),
     ttl: 10 * 60_000,
   }),
-  hash: (url) =>
-    new URL({
-      ...new URL(url),
-      search: "",
-      searchParams: new URLSearchParams([]),
-    })
-      .toString()
-      .toLowerCase(),
+  hash: (url) => {
+    const normalized = new URL(url);
+    normalized.search = "";
+    normalized.hash = "";
+    return normalized.toString().toLowerCase();
+  },
 });
 
 /** @internal */
