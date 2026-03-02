@@ -33,7 +33,8 @@ export type AnyContentEditorPlugin<TDetail = ContentEditableProps> = <
   editor: ContentEditor<TBlock>,
 ) => (block: TBlock) => TDetail;
 
-export type EditorCommand<TBlock> = (
+export type EditorCommand<TBlock extends AnyBlock> = (
   block: TBlock,
   selection: SelectionRange,
+  editor: ContentEditor<TBlock>,
 ) => TBlock | undefined | void;

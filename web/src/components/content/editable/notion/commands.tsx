@@ -56,7 +56,7 @@ export const execCommand =
   ) =>
   (fn: EditorCommand<Notion.Block>) => {
     const currentBlock = selection && editor.peek(selection.id);
-    const newBlock = currentBlock && fn(currentBlock, selection);
+    const newBlock = currentBlock && fn(currentBlock, selection, editor);
 
     if (newBlock) {
       editor.update(newBlock, {

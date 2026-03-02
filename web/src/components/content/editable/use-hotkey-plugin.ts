@@ -44,7 +44,7 @@ type Key =
 
 export type Hotkey = `${Mod}+${Key}` | `${Mod}+${Mod}+${Key}` | Key;
 
-export type HotkeyPluginOptions<TBlock> = MaybeReadonly<{
+export type HotkeyPluginOptions<TBlock extends AnyBlock> = MaybeReadonly<{
   key: Hotkey | Hotkey[];
   command: EditorCommand<TBlock>;
 }>;
@@ -68,7 +68,7 @@ export const useHotkeyPlugin =
         return;
 
       const currentBlock = editor.peek(block.id) ?? block;
-      const nextBlock = hotkey.command(currentBlock, selection);
+      const nextBlock = hotkey.command(currentBlock, selection, editor);
 
       if (nextBlock) {
         editor.update(nextBlock, {
