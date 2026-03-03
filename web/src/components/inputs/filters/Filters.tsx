@@ -77,7 +77,7 @@ export function Filters({ title, query, filters }: FilterProps) {
                 open={isFilterOverlayOpen}
                 onClose={() => setIsFilterOverlayOpen(false)}
                 placements={["bottom", "right", "left", "top"]}
-                offset={4}
+                offset={3}
                 content={
                   <div style={{ width: 350 }}>
                     <FiltersFilters filters={filters} />
@@ -107,7 +107,8 @@ function FiltersIcon({
   return (
     <IconControl
       as="button"
-      size="s"
+      size="l"
+      px={1}
       title="Filters"
       color={activeCount ? "secondary" : "default"}
       onClick={onClick}

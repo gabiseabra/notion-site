@@ -1,10 +1,13 @@
 import { isTruthy } from "@notion-site/common/utils/guards.js";
+import { isElementType } from "@testing-library/user-event/dist/cjs/utils/index.js";
 import { ReactNode } from "react";
 import { IoIosClose } from "react-icons/io";
 import { IconControl } from "../display/Icon.js";
 import styles from "./Input.module.scss";
 
 type InputProps = {
+  as?: "input" | "textarea" | "div";
+
   type: "search" | "text";
   label: string;
   hiddenLabel?: boolean;
@@ -21,6 +24,8 @@ type InputProps = {
 };
 
 export function Input({
+  as: Component = "input",
+
   label,
   hiddenLabel,
   size = "m",
@@ -54,10 +59,19 @@ export function Input({
       <div className={styles.input}>
         {left}
 
-        <input
+        <Component
           type={type}
           value={value}
-          onChange={(e) => onChange?.(e.currentTarget.value)}
+          contentEditable={Component === "div" && !!onChange}
+          suppressContentEditableWarning
+          onChange={(e) => {
+            const element = e.currentTarget;
+            onChange?.(
+              (isElementType(element, "div")
+                ? element.textContent
+                : element.value) ?? "",
+            );
+          }}
           placeholder={placeholder}
         />
 
