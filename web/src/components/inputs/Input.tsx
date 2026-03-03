@@ -1,6 +1,6 @@
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { isElementType } from "@testing-library/user-event/dist/cjs/utils/index.js";
-import { ReactNode } from "react";
+import { MouseEvent, ReactNode } from "react";
 import { IoIosClose } from "react-icons/io";
 import { IconControl } from "../display/Icon.js";
 import styles from "./Input.module.scss";
@@ -13,10 +13,12 @@ type InputProps = {
   hiddenLabel?: boolean;
   size?: "s" | "m" | "l";
   elevation?: 0 | 0.5 | 1;
+  className?: string;
 
   value?: string;
   onChange?: (value: string) => void;
   onClear?: () => void;
+  onClick?: (e: MouseEvent<HTMLElement>) => void;
   placeholder?: string;
 
   left?: ReactNode;
@@ -30,11 +32,13 @@ export function Input({
   hiddenLabel,
   size = "m",
   elevation = 0,
+  className,
 
   type,
   value,
   onChange,
   onClear,
+  onClick,
   placeholder,
 
   left,
@@ -43,6 +47,7 @@ export function Input({
   return (
     <label
       className={[
+        className,
         styles["input-wrapper"],
         styles[`size-${size}`],
         {
@@ -53,6 +58,7 @@ export function Input({
       ]
         .filter(isTruthy)
         .join(" ")}
+      onClick={onClick}
     >
       {!hiddenLabel && <div className={styles.label}>{label}</div>}
 
@@ -62,8 +68,6 @@ export function Input({
         <Component
           type={type}
           value={value}
-          contentEditable={Component === "div" && !!onChange}
-          suppressContentEditableWarning
           onChange={(e) => {
             const element = e.currentTarget;
             onChange?.(
