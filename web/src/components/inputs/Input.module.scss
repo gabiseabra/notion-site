@@ -15,7 +15,6 @@
   background: var(--bg-from);
   border-radius: var(--radius);
 
-  @include shadow.shadow(1);
   @include shadow.border;
 
   > input {
@@ -45,6 +44,14 @@
   &:focus-within {
     outline: 1.5px solid var(--color-primary);
   }
+}
+
+.elevation-1 .input {
+  @include shadow.shadow(1);
+}
+
+.elevation-05 .input {
+  @include shadow.shadow(0.5);
 }
 
 .size-m .input > input {

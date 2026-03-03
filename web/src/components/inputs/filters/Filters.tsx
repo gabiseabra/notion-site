@@ -37,6 +37,7 @@ export function Filters({ title, query, filters }: FilterProps) {
       hiddenLabel
       type="search"
       size="l"
+      elevation={1}
       value={query.value}
       onChange={query.onChange}
       onClear={query.onClear}

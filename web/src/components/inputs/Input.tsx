@@ -1,3 +1,4 @@
+import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { ReactNode } from "react";
 import { IoIosClose } from "react-icons/io";
 import { IconControl } from "../display/Icon.js";
@@ -7,7 +8,8 @@ type InputProps = {
   type: "search" | "text";
   label: string;
   hiddenLabel?: boolean;
-  size?: "m" | "l";
+  size?: "s" | "m" | "l";
+  elevation?: 0 | 0.5 | 1;
 
   value?: string;
   onChange?: (value: string) => void;
@@ -22,17 +24,30 @@ export function Input({
   label,
   hiddenLabel,
   size = "m",
+  elevation = 0,
+
   type,
   value,
   onChange,
   onClear,
   placeholder,
+
   left,
   right,
 }: InputProps) {
   return (
     <label
-      className={[styles["input-wrapper"], styles[`size-${size}`]].join(" ")}
+      className={[
+        styles["input-wrapper"],
+        styles[`size-${size}`],
+        {
+          [0]: "",
+          [0.5]: styles["elevation-05"],
+          [1]: styles["elevation-1"],
+        }[elevation],
+      ]
+        .filter(isTruthy)
+        .join(" ")}
     >
       {!hiddenLabel && <div className={styles.label}>{label}</div>}
 
@@ -51,7 +66,7 @@ export function Input({
             as="button"
             color="default"
             title={label ? `Clear ${label}` : "Clear search"}
-            size={({ m: "s", l: "m" } as const)[size]}
+            size={({ s: "xs", m: "s", l: "m" } as const)[size]}
             onClick={onClear}
           >
             <IoIosClose />
