@@ -1,6 +1,6 @@
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { isElementType } from "@testing-library/user-event/dist/cjs/utils/index.js";
-import { MouseEvent, ReactNode } from "react";
+import { HTMLInputTypeAttribute, MouseEvent, ReactNode } from "react";
 import { IoIosClose } from "react-icons/io";
 import { IconControl } from "../display/Icon.js";
 import styles from "./Input.module.scss";
@@ -8,7 +8,7 @@ import styles from "./Input.module.scss";
 type InputProps = {
   as?: "input" | "textarea" | "div";
 
-  type: "search" | "text";
+  type: HTMLInputTypeAttribute;
   label: string;
   hiddenLabel?: boolean;
   size?: "s" | "m" | "l";

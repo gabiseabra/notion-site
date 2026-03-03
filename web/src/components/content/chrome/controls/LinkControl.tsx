@@ -81,7 +81,7 @@ export function PreviewLinkControl({
         {debouncedUrl && <LinkPreview url={debouncedUrl} />}
 
         <Input
-          type="text"
+          type="url"
           label="URL"
           size="m"
           value={value?.url ?? ""}
