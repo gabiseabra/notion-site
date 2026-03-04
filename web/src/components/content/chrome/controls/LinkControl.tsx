@@ -67,7 +67,7 @@ export function PreviewLinkControl({
 
   return (
     <IsolationFrame
-      resize="x"
+      resize="y"
       style={{ width: "min(calc(100vw - var(--gutter-content) * 2), 300px)" }}
     >
       <Col
