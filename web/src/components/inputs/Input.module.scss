@@ -1,7 +1,9 @@
 @use "../../css/mixins/shadow" as shadow;
 
 .input-wrapper {
+  display: block;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .input {

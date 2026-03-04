@@ -38,7 +38,8 @@ export type PopoverProps = {
   content: React.ReactNode;
   open: boolean;
   role?: "tooltip" | "popover";
-  variant?: "tooltip" | "popover";
+  variant?: "tooltip" | "popover" | "menu";
+  elevation?: 0 | 0.5 | 1;
 
   placements?: PopoverPlacement[]; // preferred order
   offset?: number; // space unit
@@ -70,6 +71,7 @@ export function Popover({
   open,
   role = "popover",
   variant = "popover",
+  elevation = 1,
 
   placements = ["top", "bottom", "right", "left"],
   offset = 0,
@@ -188,7 +190,15 @@ export function Popover({
   return (
     <span
       ref={triggerRef}
-      className={[styles.wrap, styles[`variant-${variant}`]].join(" ")}
+      className={[
+        styles.wrap,
+        styles[`variant-${variant}`],
+        {
+          [0]: "",
+          [0.5]: styles["elevation-05"],
+          [1]: styles["elevation-1"],
+        }[elevation],
+      ].join(" ")}
       aria-describedby={open ? tooltipId : undefined}
       style={style?.wrap}
     >

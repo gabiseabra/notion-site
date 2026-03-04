@@ -1,11 +1,16 @@
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { isElementType } from "@testing-library/user-event/dist/cjs/utils/index.js";
-import { HTMLInputTypeAttribute, MouseEvent, ReactNode } from "react";
+import {
+  CSSProperties,
+  HTMLInputTypeAttribute,
+  MouseEvent,
+  ReactNode,
+} from "react";
 import { IoIosClose } from "react-icons/io";
 import { IconControl } from "../display/Icon.js";
 import styles from "./Input.module.scss";
 
-type InputProps = {
+export type InputProps = {
   as?: "input" | "textarea" | "div";
 
   type: HTMLInputTypeAttribute;
@@ -14,6 +19,7 @@ type InputProps = {
   size?: "s" | "m" | "l";
   elevation?: 0 | 0.5 | 1;
   className?: string;
+  style?: CSSProperties;
 
   value?: string;
   onChange?: (value: string) => void;
@@ -33,6 +39,7 @@ export function Input({
   size = "m",
   elevation = 0,
   className,
+  style,
 
   type,
   value,
@@ -58,6 +65,7 @@ export function Input({
       ]
         .filter(isTruthy)
         .join(" ")}
+      style={style}
       onClick={onClick}
     >
       {!hiddenLabel && <div className={styles.label}>{label}</div>}
