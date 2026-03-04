@@ -27,7 +27,7 @@ export function AnnotationControl({
   enabledAnnotations?: MaybeReadonly<Annotations[]>;
   value?: Partial<Notion.RTF.Annotations>;
   onChange: (annotations: Partial<Notion.RTF.Annotations>) => void;
-  disabled: boolean | "action" | "feedback";
+  disabled: boolean | "action";
 }) {
   return (
     <>

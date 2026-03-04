@@ -11,7 +11,7 @@ import { ToolbarMenu } from "../ToolbarMenu.js";
 import styles from "./ColorControl.module.scss";
 
 type ColorControlProps = {
-  disabled?: boolean | "feedback" | "action";
+  disabled?: boolean | "action";
   value?: zNotion.primitives.api_color;
   onChange: (color: zNotion.primitives.api_color) => void;
 };

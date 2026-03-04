@@ -27,7 +27,7 @@ export function LinkControl({
 }: {
   Overlay: AnchoredOverlay;
   Control: LinkControl;
-  disabled?: boolean | "feedback" | "action";
+  disabled?: boolean | "action";
   value?: Notion.RTF.Link;
   onChange: (link: Notion.RTF.Link) => void;
   onOpen?: () => void;

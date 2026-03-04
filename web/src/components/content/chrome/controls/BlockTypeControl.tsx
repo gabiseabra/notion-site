@@ -35,7 +35,7 @@ export function BlockTypeControl({
   value,
   onChange,
 }: {
-  disabled?: boolean | "feedback" | "action";
+  disabled?: boolean | "action";
   value?: Notion.Block.BlockType;
   onChange: (color: Notion.Block.BlockType) => void;
 }) {
