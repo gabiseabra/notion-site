@@ -1,3 +1,4 @@
+import { MaybeReadonly } from "@notion-site/common/types/readonly.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { Fragment, Key, ReactNode, useEffect, useRef, useState } from "react";
 import { useResizeObserver } from "../../hooks/use-resize-observer.js";
@@ -20,12 +21,14 @@ export type DropdownProps<Option extends DropdownOption> = {
     | ReactNode
     | ((dropdown: {
         value?: string;
-        onChange: (value: string) => void;
+        onChange: (value: string | undefined) => void;
+        open: boolean;
+        onClick: () => void;
       }) => ReactNode);
 
-  value?: string;
+  initialValue?: string;
   disabled?: boolean;
-  options: Option[];
+  options: MaybeReadonly<Option[]>;
   renderOption: (option: Option) => ReactNode;
   filterOption?: (value: string | undefined) => (option: Option) => boolean;
 };
@@ -38,7 +41,7 @@ export function Dropdown<Option extends DropdownOption>({
 
   children,
 
-  value: initialValue,
+  initialValue,
   disabled,
   options,
   renderOption,
@@ -46,8 +49,8 @@ export function Dropdown<Option extends DropdownOption>({
     !value || new RegExp(`${value}`, "i").test(option.title ?? ""),
 }: DropdownProps<Option>) {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [value, setValue] = useState(initialValue);
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState<string | undefined>();
   const [width, setWidth] = useState(0);
 
   const updateWidth = () => {
@@ -57,13 +60,17 @@ export function Dropdown<Option extends DropdownOption>({
   useResizeObserver(wrapperRef, updateWidth);
 
   useEffect(() => {
-    setValue(initialValue);
+    setValue(undefined);
   }, [initialValue]);
+
+  const onClick = () => {
+    if (!disabled) setOpen((open) => !open);
+  };
 
   return (
     <Popover
-      open={isOpen}
-      onClose={() => setIsOpen(false)}
+      open={open && !disabled}
+      onClose={() => setOpen(false)}
       offset={offset}
       variant={variant}
       elevation={elevation}
@@ -76,12 +83,9 @@ export function Dropdown<Option extends DropdownOption>({
         </Col>
       }
     >
-      <Row
-        ref={wrapperRef}
-        onClick={() => setIsOpen((open) => !disabled && !open)}
-      >
+      <Row ref={wrapperRef} onClick={onClick}>
         {children instanceof Function
-          ? children({ value, onChange: setValue })
+          ? children({ value, onChange: setValue, open, onClick })
           : children}
       </Row>
     </Popover>

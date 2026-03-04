@@ -49,6 +49,27 @@ export const focusOnLink: EditorCommand<Notion.Block> = (block, selection) => {
   }
 };
 
+export const setBlockType =
+  (type: Notion.Block.BlockType): EditorCommand<Notion.Block> =>
+  (block) => {
+    console.log(
+      type,
+      Notion.Block.extractRichText(block),
+      Notion.Block.mapRichText(Notion.WIP.create({ type }), () =>
+        Notion.Block.extractRichText(block),
+      ),
+    );
+    return Notion.Block.mapRichText(
+      Notion.WIP.create({
+        type,
+        id: block.id,
+        has_children: block.has_children,
+        parent: block.parent,
+      }),
+      () => Notion.Block.extractRichText(block),
+    );
+  };
+
 export const execCommand =
   (
     editor: ContentEditor<Notion.Block>,

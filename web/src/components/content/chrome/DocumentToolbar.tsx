@@ -1,24 +1,45 @@
+import { pipe } from "ts-functional-pipe";
+import { Divider } from "../../display/Divider.js";
+import { Row } from "../../layout/FlexBox.js";
 import { AnchoredOverlayProps } from "../../overlays/Overlay.js";
 import { Popover } from "../../overlays/Popover.js";
 import { Editor } from "../Editor.js";
+import { setBlockType } from "../editable/notion/commands.js";
 import styles from "./DocumentToolbar.module.scss";
-import { ToolbarControls } from "./ToolbarControls.js";
+import { BlockTypeControl } from "./controls/BlockTypeControl.js";
 import { MenuColorControl } from "./controls/ColorControl.js";
+import { InlineControls } from "./controls/InlineControls.js";
 import {
   LinkControlProps,
   PreviewLinkControl,
 } from "./controls/LinkControl.js";
+import { useToolbarControls } from "./controls/use-toolbar-controls.js";
 
 export function DocumentToolbar({ editor }: { editor: Editor }) {
+  const { block, execCommand, disabled } = useToolbarControls(editor);
+
   return (
-    <div className={styles["document-toolbar"]} style={{ userSelect: "none" }}>
-      <ToolbarControls
+    <Row
+      gap={0}
+      alignY="center"
+      className={styles["document-toolbar"]}
+      style={{ userSelect: "none" }}
+    >
+      <BlockTypeControl
+        disabled={disabled}
+        value={block?.type}
+        onChange={pipe(setBlockType, execCommand)}
+      />
+
+      <Divider direction="y" mx={1} />
+
+      <InlineControls
         editor={editor}
         Overlay={ToolbarPopover}
         ColorControl={MenuColorControl}
         LinkControl={ToolbarLinkControl}
       />
-    </div>
+    </Row>
   );
 }
 

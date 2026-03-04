@@ -8,8 +8,8 @@ import { AnchoredOverlayProps } from "../../overlays/Overlay.js";
 import { Popover } from "../../overlays/Popover.js";
 import { Editor } from "../Editor.js";
 import styles from "./FloatingMenu.module.scss";
-import { ToolbarControls } from "./ToolbarControls.js";
 import { SwatchColorControl } from "./controls/ColorControl.js";
+import { InlineControls } from "./controls/InlineControls.js";
 import { PreviewLinkControl } from "./controls/LinkControl.js";
 
 export function FloatingToolbar({ editor }: { editor: Editor }) {
@@ -68,7 +68,7 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
           className={styles["floating-toolbar"]}
           style={{ userSelect: "none" }}
         >
-          <ToolbarControls
+          <InlineControls
             editor={editor}
             Overlay={PortalOverlay}
             ColorControl={SwatchColorControl}

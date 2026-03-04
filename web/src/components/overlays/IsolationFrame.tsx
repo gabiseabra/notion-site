@@ -1,10 +1,19 @@
-import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
+import {
+  CSSProperties,
+  ReactNode,
+  Ref,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { useMutationObserver } from "../../hooks/use-mutation-observer.js";
 import { useRafThrottledCallback } from "../../hooks/use-raf-throttled-callback.js";
 import styles from "./IsolationFrame.module.scss";
 
 type IsolationFrameProps = {
+  ref?: Ref<{ iframe: HTMLIFrameElement | null }>;
   children: ReactNode;
   style?: CSSProperties;
   resize?: true | "y" | "x";
@@ -20,6 +29,7 @@ const CLONED_STYLE_ATTR = "data-isolation-frame-style";
  * with the selection state of the outer document.
  */
 export function IsolationFrame({
+  ref,
   children,
   style,
   resize,
@@ -29,6 +39,16 @@ export function IsolationFrame({
   const headRef = useRef<HTMLElement | null>(null);
 
   headRef.current = typeof document === "undefined" ? null : document.head;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      get iframe() {
+        return iframeRef.current;
+      },
+    }),
+    [ref],
+  );
 
   const syncStyles = useRafThrottledCallback(() => {
     const doc = iframeRef.current?.contentDocument;
@@ -103,7 +123,7 @@ export function IsolationFrame({
     ro.observe(body);
 
     return () => ro.disconnect();
-  }, [root]);
+  }, [root, resize]);
 
   return (
     <iframe

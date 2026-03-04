@@ -22,9 +22,12 @@ export type InputProps = {
   style?: CSSProperties;
 
   value?: string;
+  disabled?: boolean | "feedback" | "action";
   onChange?: (value: string) => void;
   onClear?: () => void;
   onClick?: (e: MouseEvent<HTMLElement>) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
   placeholder?: string;
 
   left?: ReactNode;
@@ -43,9 +46,12 @@ export function Input({
 
   type,
   value,
+  disabled,
   onChange,
   onClear,
   onClick,
+  onFocus,
+  onBlur,
   placeholder,
 
   left,
@@ -57,6 +63,7 @@ export function Input({
         className,
         styles["input-wrapper"],
         styles[`size-${size}`],
+        disabled === true && styles["disabled"],
         {
           [0]: "",
           [0.5]: styles["elevation-05"],
@@ -66,7 +73,7 @@ export function Input({
         .filter(isTruthy)
         .join(" ")}
       style={style}
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
     >
       {!hiddenLabel && <div className={styles.label}>{label}</div>}
 
@@ -76,6 +83,7 @@ export function Input({
         <Component
           type={type}
           value={value}
+          disabled={!!disabled}
           onChange={(e) => {
             const element = e.currentTarget;
             onChange?.(
@@ -84,16 +92,18 @@ export function Input({
                 : element.value) ?? "",
             );
           }}
+          onFocus={onFocus}
+          onBlur={onBlur}
           placeholder={placeholder}
         />
 
         {!!value && onClear && (
           <IconControl
             as="button"
-            color="default"
+            color={disabled === true ? "default" : "gray"}
             title={label ? `Clear ${label}` : "Clear search"}
             size={({ s: "xs", m: "s", l: "m" } as const)[size]}
-            onClick={onClear}
+            onClick={disabled ? undefined : onClear}
           >
             <IoIosClose />
           </IconControl>
