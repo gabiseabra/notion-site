@@ -70,7 +70,7 @@ export function BlockTypeControl({
               style={{ padding: 2 }}
               placeholder="Block type"
               disabled={disabled}
-              value={dropdown.value ?? selectedOption?.title}
+              value={dropdown.value ?? selectedOption?.title ?? ""}
               onChange={dropdown.onChange}
               onClick={dropdown.onClick}
               onFocus={dropdown.onClick}
