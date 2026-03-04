@@ -7,6 +7,7 @@ import styles from "./IsolationFrame.module.scss";
 type IsolationFrameProps = {
   children: ReactNode;
   style?: CSSProperties;
+  resize?: true | "y" | "x";
 };
 
 const CLONED_STYLE_ATTR = "data-isolation-frame-style";
@@ -18,7 +19,11 @@ const CLONED_STYLE_ATTR = "data-isolation-frame-style";
  * This is useful to render content that you can interact without interfering
  * with the selection state of the outer document.
  */
-export function IsolationFrame({ children, style }: IsolationFrameProps) {
+export function IsolationFrame({
+  children,
+  style,
+  resize,
+}: IsolationFrameProps) {
   const [root, setRoot] = useState<HTMLElement | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const headRef = useRef<HTMLElement | null>(null);
@@ -83,15 +88,18 @@ export function IsolationFrame({ children, style }: IsolationFrameProps) {
     const doc = iframe?.contentDocument;
     const body = doc?.body;
 
-    if (!iframe || !doc || !body) return;
+    if (!resize || !iframe || !doc || !body) return;
 
-    const resize = () => {
-      iframe.style.height = `${body.offsetHeight}px`;
+    const setSesize = () => {
+      if (resize === true || resize === "y")
+        iframe.style.height = `${body.offsetHeight}px`;
+      if (resize === true || resize === "x")
+        iframe.style.width = `${body.offsetWidth}px`;
     };
 
-    resize();
+    setSesize();
 
-    const ro = new ResizeObserver(resize);
+    const ro = new ResizeObserver(setSesize);
     ro.observe(body);
 
     return () => ro.disconnect();
