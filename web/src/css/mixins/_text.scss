@@ -3,18 +3,23 @@
     $width $width 0 $color,
     $width 0 0 $color,
     0 $width 0 $color,
-      ($width * -1) ($width * -1) 0 $color,
-      ($width * -1) 0 0 $color,
+    ($width * -1) ($width * -1) 0 $color,
+    ($width * -1) 0 0 $color,
     0 ($width * -1) 0 $color
   );
 }
 
-@mixin heading-size($level, $min: var(--size-h4), $max: var(--size-h1), $levels: 4) {
+@mixin heading-size(
+  $level,
+  $min: var(--size-h4),
+  $max: var(--size-h1),
+  $levels: 4
+) {
   font-size: calc(
     #{$max} - ((#{$level} - 1) / (#{$levels} - 1)) * (#{$max} - #{$min})
   );
 }
 
 @mixin indent($indent: 0) {
-  padding: 0 calc(var(--indentation) * $indent);
+  padding-left: calc(var(--indentation) * $indent);
 }
