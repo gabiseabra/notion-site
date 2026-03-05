@@ -41,8 +41,10 @@
     }
   }
   .span:empty::after {
-    display: inline;
+    display: inline-block;
     content: "\200B";
+    height: 100%;
+    width: 1px;
   }
 }
 
