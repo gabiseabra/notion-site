@@ -16,7 +16,7 @@ export const useAutoCommitPlugin =
       if (commitTimeoutRef.current) clearTimeout(commitTimeoutRef.current);
       commitTimeoutRef.current = window.setTimeout(() => {
         if (editor.history.position > editor.revision) {
-          editor.commit("auto-commit-plugin");
+          editor.commit(new useAutoCommitPlugin.EventData());
         }
       }, debounceMs);
     };
@@ -27,3 +27,7 @@ export const useAutoCommitPlugin =
       },
     });
   };
+
+useAutoCommitPlugin.EventData = class AutoCommitEventData {
+  constructor() {}
+};

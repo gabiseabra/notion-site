@@ -56,19 +56,24 @@ export const useBlockMutationPlugin =
 
         if (!mergedBlock) return;
 
+        const data = new useBlockMutationPlugin.MergeData(
+          prevBlock,
+          currentBlock,
+        );
+
         // merge any text on the tail of this block into the previous block
         editor.remove(currentBlock, {
-          data: "block-mutation-plugin",
+          data,
           batchId: "merge",
         });
         editor.update(mergedBlock, {
-          data: "block-mutation-plugin",
+          data,
           batchId: "merge",
           selectionAfter,
           selectionBefore,
         });
 
-        editor.commit("block-mutation-plugin: merge");
+        editor.commit(data);
 
         e.preventDefault();
       } else if (e.key === "Enter" && !e.shiftKey) {
@@ -76,22 +81,48 @@ export const useBlockMutationPlugin =
 
         if (!currentBlock) return;
 
-        const splitBlocks = split(
-          currentBlock,
-          selectionBefore.start,
-          Math.max(0, selectionBefore.end - selectionBefore.start),
+        const offset = selectionBefore.start;
+        const deleteRange = Math.max(
+          0,
+          selectionBefore.end - selectionBefore.start,
         );
+        const splitBlocks = split(currentBlock, offset, deleteRange);
 
         if (!splitBlocks) return null;
 
+        const data = new useBlockMutationPlugin.SplitData(
+          block,
+          offset,
+          deleteRange,
+        );
+
         editor.split(splitBlocks.left, splitBlocks.right, {
-          data: "block-mutation-plugin",
+          data,
           selectionBefore,
           selectionAfter: { start: 0, end: 0 },
         });
-        editor.commit("block-mutation-plugin: split");
+        editor.commit(data);
 
         e.preventDefault();
       }
     },
   });
+
+useBlockMutationPlugin.MergeData = class BlockMutationMergeData<
+  TBlock extends AnyBlock,
+> {
+  constructor(
+    public left: TBlock,
+    public right: TBlock,
+  ) {}
+};
+
+useBlockMutationPlugin.SplitData = class BlockMutationSplitData<
+  TBlock extends AnyBlock,
+> {
+  constructor(
+    public block: TBlock,
+    public offset: number,
+    public deleteRange: number,
+  ) {}
+};

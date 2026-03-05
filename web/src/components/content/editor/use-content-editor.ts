@@ -179,7 +179,10 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
         bus.dispatchTypedEvent("commit", event);
         if (event.defaultPrevented) return;
 
-        setSnapshot(snapshot);
+        setSnapshot({
+          state: event.detail.blocks,
+          position: event.detail.revision,
+        });
       },
     }),
     [bus, history, snapshot],

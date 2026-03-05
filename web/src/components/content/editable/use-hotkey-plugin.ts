@@ -71,11 +71,14 @@ export const useHotkeyPlugin =
       const nextBlock = hotkey.command(currentBlock, selection, editor);
 
       if (nextBlock) {
+        const data = new useHotkeyPlugin.EventData(block, key);
+
         editor.update(nextBlock, {
+          data,
           selectionBefore: selection,
           selectionAfter: selection,
         });
-        editor.commit(`hotkey-plugin: ${key}`);
+        editor.commit(data);
 
         e.preventDefault();
         e.stopPropagation();
@@ -94,3 +97,10 @@ function toHotkey(e: KeyboardEvent): Hotkey {
     e.key === " " ? "Space" : e.key.length === 1 ? e.key.toLowerCase() : e.key;
   return (mods.length ? `${mods.join("+")}+${key}` : key) as Hotkey;
 }
+
+useHotkeyPlugin.EventData = class HotkeyEventData<TBlock extends AnyBlock> {
+  constructor(
+    public block: TBlock,
+    public hotkey: Hotkey,
+  ) {}
+};

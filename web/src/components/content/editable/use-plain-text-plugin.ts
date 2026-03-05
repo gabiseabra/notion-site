@@ -19,7 +19,7 @@ export type PlainTextBlock = {
 export const usePlainTextPlugin = (editor: ContentEditor<PlainTextBlock>) =>
   composePlugins<PlainTextBlock>(
     useAutoCommitPlugin(600),
-    useHistoryPlugin,
+    useHistoryPlugin(),
     useInlineMutationPlugin({
       splice: ({ id, content }, offset, deleteCount, insert) => ({
         id,

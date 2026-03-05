@@ -41,7 +41,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
     const flush = useCallback(() => {
       pendingRef.current = undefined;
 
-      return editor.flush("inline-mutation-plugin");
+      return editor.flush(new useInlineMutationPlugin.FlushData());
     }, [editor]);
 
     const cancelFlush = useCallback(() => {
@@ -87,6 +87,12 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
 
         const selectionAfter = SpliceRange.toSelectionRange(spliceRange, 1);
 
+        const data = new useInlineMutationPlugin.SpliceData(
+          currentBlock,
+          spliceRange.offset,
+          spliceRange.deleteCount,
+          spliceRange.insert,
+        );
         editor.update(
           splice(
             currentBlock,
@@ -95,7 +101,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
             spliceRange.insert,
           ),
           {
-            data: "inline-mutation-plugin",
+            data,
             batchId: pendingRef.current.batchId,
             selectionBefore: pendingRef.current.selectionAfter,
             selectionAfter,
@@ -108,3 +114,16 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
       }
     };
   });
+
+useInlineMutationPlugin.SpliceData = class InlineMutationSplice<
+  TBlock extends AnyBlock,
+> {
+  constructor(
+    public block: TBlock,
+    public offset: number,
+    public deleteCount: number,
+    public insert: string,
+  ) {}
+};
+
+useInlineMutationPlugin.FlushData = class InlineMutationFlush {};

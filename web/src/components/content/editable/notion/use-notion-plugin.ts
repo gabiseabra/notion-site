@@ -32,7 +32,7 @@ export const useNotionPlugin = (
         console.info(event.eventType, event.detail, event.editor);
     }),
     useAutoCommitPlugin(options.autoCommit ?? 600),
-    useHistoryPlugin,
+    useHistoryPlugin(),
     useInlineMutationPlugin({
       multiline: options.multiline,
       splice(block, ...params) {

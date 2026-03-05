@@ -14,7 +14,7 @@ import { AnyContentEditorPlugin } from "./types.js";
  * | `Ctrl+Shift+Z` | `Cmd+Shift+Z`: Redo
  * | `Ctrl+Y` | `Cmd+Y`: Redo (alternative)
  */
-export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
+export const useHistoryPlugin = (): AnyContentEditorPlugin => (editor) => {
   useEffect(() => {
     const direction = editor.history.direction;
     const cmd = editor.history.command;
@@ -55,7 +55,7 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
       if (isUndo(e)) {
         if (isUndoable(block.id, editor)) {
           editor.history.undo();
-          editor.commit("history-plugin: undo");
+          editor.commit(new useHistoryPlugin.EventData("undo"));
         }
 
         e.preventDefault();
@@ -65,7 +65,7 @@ export const useHistoryPlugin: AnyContentEditorPlugin = (editor) => {
       if (isRedo(e)) {
         if (isRedoable(block.id, editor)) {
           editor.history.redo();
-          editor.commit("history-plugin: redo");
+          editor.commit(new useHistoryPlugin.EventData("redo"));
         }
 
         e.preventDefault();
@@ -91,4 +91,8 @@ const isRedoable = <TBlock extends AnyBlock>(
 ) => {
   editor.peek(id);
   return editor.history.commands.length > editor.history.position;
+};
+
+useHistoryPlugin.EventData = class HistoryEventData {
+  constructor(public action: "undo" | "redo") {}
 };
