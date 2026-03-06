@@ -1,6 +1,7 @@
 import { zNotion } from "../../dto/notion/schema/index.js";
 import { UnionToTuple } from "../../types/union.js";
 import { keys } from "../object.js";
+import { create as createTree, flat as flatTree } from "./block-tree.js";
 import * as RTF from "./rich-text.js";
 import { create } from "./wip.js";
 
@@ -151,6 +152,10 @@ export function traverse<T extends BlockType>(
   return f(extract(block)).then((node) => map(block, () => node));
 }
 
+export function sort(blocks: Block[]): Block[] {
+  return flatTree(createTree(blocks));
+}
+
 /**
  * Split `Notion.Block` in ltr direction, preserving the current block on the left side.
  * @todo support rtl
@@ -166,7 +171,10 @@ export function split(
   if (!isRichText(block)) {
     return {
       left: block,
-      right: create({ type: "paragraph" }),
+      right: create({
+        type: "paragraph",
+        parent: block.parent,
+      }),
     };
   }
 
@@ -179,6 +187,7 @@ export function split(
     })),
     right: create({
       type: "paragraph",
+      parent: block.parent,
       paragraph: {
         color: "default",
         rich_text: RTF.slice(node.rich_text, offset + deleteRange),

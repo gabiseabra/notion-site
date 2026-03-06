@@ -44,14 +44,15 @@ export const Editor = memo(function ContentEditor({
 
       <RootBlock
         value={editor.blocks}
-        render={(block, path) => (
+        render={(children, block) => (
           <Block
-            indent={path.indent}
             value={block}
             editable={!disabled}
             onEditorChange={editor.update}
             {...editable(block)}
-          />
+          >
+            {children}
+          </Block>
         )}
       />
     </div>

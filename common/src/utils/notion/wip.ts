@@ -72,6 +72,19 @@ export function p(id: string, ...rich_text: RichText): Block {
   };
 }
 
+export function ol(id: string, ...rich_text: RichText): Block {
+  return {
+    ...create({
+      type: "numbered_list_item",
+      numbered_list_item: {
+        color: "default",
+        rich_text,
+      },
+    }),
+    id,
+  };
+}
+
 export function span(content: string, annotations?: Partial<Annotations>) {
   return {
     type: "text",
