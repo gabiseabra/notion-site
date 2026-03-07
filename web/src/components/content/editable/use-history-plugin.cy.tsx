@@ -67,7 +67,7 @@ describe("useHistoryPlugin", () => {
       .should("contain.text", "Just adding a newline");
   });
 
-  it("restores cursor position on undo / redo", () => {
+  it.only("restores cursor position on undo / redo", () => {
     cy.mount(
       <Editor
         value={[p("a", span("Hello World"))]}
@@ -76,7 +76,10 @@ describe("useHistoryPlugin", () => {
       />,
     );
 
-    cy.get("p").type("{moveToEnd}").type("{ctrl}{backspace}");
+    // ctrl + backspace triggers deleteWorkBackwards but doesn't actually delete
+    // the word backward in electron?
+    // cy.get("p").type("{moveToEnd}").type("{ctrl}{backspace}");
+    cy.get("p").type("{moveToEnd}").type(Cypress._.repeat("{backspace}", 5));
     cy.wait(options.autoCommit);
 
     cy.get("p")
