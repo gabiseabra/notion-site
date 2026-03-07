@@ -155,7 +155,7 @@ function moveVertically(
 }
 
 /** Small inset in px to probe inside element bounds and avoid boundary precision issues. */
-const PROBE_INSET_PX = 2;
+const PROBE_INSET_PX = 10;
 
 /**
  * Move vertically between blocks using layout geometry.
