@@ -29,7 +29,7 @@
 .popover {
   position: fixed;
   z-index: 1000;
-  border-radius: var(--radius);
+  border-radius: var(--popover-radius);
 }
 
 .elevation-1 > .popover {
