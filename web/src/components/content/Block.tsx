@@ -82,9 +82,7 @@ export function Block({
               {...editableProps}
             />
 
-            <IndentationLevel.Provider value={indent + 1}>
-              {children}
-            </IndentationLevel.Provider>
+            {children}
           </li>
         ))
         .with({ type: "numbered_list_item" }, (block) => (
@@ -96,9 +94,7 @@ export function Block({
               {...editableProps}
             />
 
-            <IndentationLevel.Provider value={indent + 1}>
-              {children}
-            </IndentationLevel.Provider>
+            {children}
           </li>
         ))
         .with({ type: "to_do" }, (block) => (

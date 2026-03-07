@@ -10,6 +10,7 @@ import {
 import { createPortal } from "react-dom";
 import { useMutationObserver } from "../../hooks/use-mutation-observer.js";
 import { useRafThrottledCallback } from "../../hooks/use-raf-throttled-callback.js";
+import { useResizeObserver } from "../../hooks/use-resize-observer.js";
 import styles from "./IsolationFrame.module.scss";
 
 type IsolationFrameProps = {
@@ -103,27 +104,22 @@ export function IsolationFrame({
     attributes: true,
   });
 
-  useEffect(() => {
+    useResizeObserver({
+      get current() {
+        return iframeRef.current?.contentDocument?.body ??  null
+      }
+    }, () => {
     const iframe = iframeRef.current;
     const doc = iframe?.contentDocument;
     const body = doc?.body;
 
     if (!resize || !iframe || !doc || !body) return;
 
-    const setSesize = () => {
       if (resize === true || resize === "y")
         iframe.style.height = `${body.offsetHeight}px`;
       if (resize === true || resize === "x")
         iframe.style.width = `${body.offsetWidth}px`;
-    };
-
-    setSesize();
-
-    const ro = new ResizeObserver(setSesize);
-    ro.observe(body);
-
-    return () => ro.disconnect();
-  }, [root, resize]);
+  })
 
   return (
     <iframe
