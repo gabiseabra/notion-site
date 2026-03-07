@@ -104,22 +104,25 @@ export function IsolationFrame({
     attributes: true,
   });
 
-    useResizeObserver({
+  useResizeObserver(
+    {
       get current() {
-        return iframeRef.current?.contentDocument?.body ??  null
-      }
-    }, () => {
-    const iframe = iframeRef.current;
-    const doc = iframe?.contentDocument;
-    const body = doc?.body;
+        return iframeRef.current?.contentDocument?.body ?? null;
+      },
+    },
+    () => {
+      const iframe = iframeRef.current;
+      const doc = iframe?.contentDocument;
+      const body = doc?.body;
 
-    if (!resize || !iframe || !doc || !body) return;
+      if (!resize || !iframe || !doc || !body) return;
 
       if (resize === true || resize === "y")
         iframe.style.height = `${body.offsetHeight}px`;
       if (resize === true || resize === "x")
         iframe.style.width = `${body.offsetWidth}px`;
-  })
+    },
+  );
 
   return (
     <iframe
