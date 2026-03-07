@@ -9,7 +9,7 @@ import { AnyBlock } from "./types.js";
  * Commands for history tracking. Each command can be applied forward
  * to reconstruct state from a snapshot.
  */
-export type EditorCommandCmd<TBlock extends AnyBlock> =
+export type EditorActionCmd<TBlock extends AnyBlock> =
   | {
       type: "update";
       block: TBlock;
@@ -30,14 +30,14 @@ export type EditorCommandCmd<TBlock extends AnyBlock> =
       selectionAfter?: SelectionRange;
     };
 
-export type EditorCommand<TBlock extends AnyBlock> =
+export type EditorAction<TBlock extends AnyBlock> =
   | {
       type: "apply";
-      commands: NonEmpty<EditorCommandCmd<TBlock>>;
+      commands: NonEmpty<EditorActionCmd<TBlock>>;
     }
-  | EditorCommandCmd<TBlock>;
+  | EditorActionCmd<TBlock>;
 
-export const EditorCommand = {
+export const EditorAction = {
   /**
    * Get the target block id of the selection going in the given direction
    * @note selection will be restored on history events in the following order:
@@ -45,12 +45,12 @@ export const EditorCommand = {
    * - redo: last non-empty { selectionAfter, block: { id } }
    */
   id<TBlock extends AnyBlock>(
-    cmd: EditorCommand<TBlock>,
+    cmd: EditorAction<TBlock>,
     direction: 1 | -1,
   ): TBlock["id"] {
     return match(cmd)
       .with({ type: "apply" }, (cmd) =>
-        EditorCommand.id(
+        EditorAction.id(
           direction === 1
             ? cmd.commands[cmd.commands.length - 1]
             : cmd.commands[0],
@@ -65,18 +65,16 @@ export const EditorCommand = {
   },
 
   flat<TBlock extends AnyBlock>([cmd, ...cmds]: NonEmpty<
-    EditorCommand<TBlock>
-  >): NonEmpty<EditorCommandCmd<TBlock>> {
+    EditorAction<TBlock>
+  >): NonEmpty<EditorActionCmd<TBlock>> {
     return NonEmpty.merge(
-      cmd.type === "apply"
-        ? EditorCommand.flat(cmd.commands)
-        : ([cmd] as const),
-      NonEmpty.isNonEmpty(cmds) ? EditorCommand.flat(cmds) : [],
+      cmd.type === "apply" ? EditorAction.flat(cmd.commands) : ([cmd] as const),
+      NonEmpty.isNonEmpty(cmds) ? EditorAction.flat(cmds) : [],
     );
   },
 
   selection<TBlock extends AnyBlock>(
-    cmd: EditorCommand<TBlock>,
+    cmd: EditorAction<TBlock>,
     direction: 1 | -1,
   ): SelectionRange | undefined {
     if (direction === -1) {
@@ -93,16 +91,16 @@ export const EditorCommand = {
 
 export class EditorHistory<TBlock extends AnyBlock> extends History<
   TBlock[],
-  EditorCommand<TBlock>
+  EditorAction<TBlock>
 > {
   constructor(initialValue: TBlock[]) {
-    super(initialValue, (blocks, cmd) => applyCommand(blocks, cmd));
+    super(initialValue, (blocks, cmd) => applyAction(blocks, cmd));
   }
 }
 
-function applyCommand<TBlock extends AnyBlock>(
+function applyAction<TBlock extends AnyBlock>(
   blocks: TBlock[],
-  cmd: EditorCommand<TBlock>,
+  cmd: EditorAction<TBlock>,
 ): TBlock[] {
   switch (cmd.type) {
     case "update":
@@ -117,14 +115,14 @@ function applyCommand<TBlock extends AnyBlock>(
       return result;
     }
     case "apply":
-      return cmd.commands.reduce(applyCommand, blocks);
+      return cmd.commands.reduce(applyAction, blocks);
   }
 }
 
-export function applyCommands<TBlock extends AnyBlock>(
+export function applyActions<TBlock extends AnyBlock>(
   blocks: TBlock[],
-  ...commands: EditorCommandCmd<TBlock>[]
+  ...commands: EditorActionCmd<TBlock>[]
 ) {
   if (!NonEmpty.isNonEmpty(commands)) return blocks;
-  return applyCommand(blocks, { type: "apply", commands });
+  return applyAction(blocks, { type: "apply", commands });
 }

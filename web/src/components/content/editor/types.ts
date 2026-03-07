@@ -1,6 +1,6 @@
 import { SelectionRange } from "../../../utils/selection-range.js";
 import type { EditorEventTarget } from "./editor-event.js";
-import { EditorCommandCmd, EditorHistory } from "./editor-history.js";
+import { EditorActionCmd, EditorHistory } from "./editor-history.js";
 
 export type ID = string | number | symbol;
 
@@ -22,7 +22,7 @@ export type CommandOptions = {
 
 export type EditorBatch<TBlock extends AnyBlock> = {
   batchId: ID;
-  commands: EditorCommandCmd<TBlock>[];
+  commands: EditorActionCmd<TBlock>[];
 };
 
 /**

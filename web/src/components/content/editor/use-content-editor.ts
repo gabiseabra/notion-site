@@ -3,8 +3,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ContentEditorPlugin } from "../editable/types.js";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
 import {
-  applyCommands,
-  EditorCommandCmd,
+  applyActions,
+  EditorActionCmd,
   EditorHistory,
 } from "./editor-history.js";
 import { AnyBlock, ContentEditor, EditorBatch, ID } from "./types.js";
@@ -53,7 +53,7 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
     return true;
   }
 
-  function push(cmd: EditorCommandCmd<TBlock>, batchId?: ID) {
+  function push(cmd: EditorActionCmd<TBlock>, batchId?: ID) {
     if (batchRef.current && batchRef.current.batchId === batchId) {
       batchRef.current.commands.push(cmd);
     } else if (batchId) {
@@ -96,7 +96,7 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
 
         return (
           (batchRef.current
-            ? applyCommands(state, ...batchRef.current.commands)
+            ? applyActions(state, ...batchRef.current.commands)
             : state
           ).find((block) => block.id === id) ?? null
         );

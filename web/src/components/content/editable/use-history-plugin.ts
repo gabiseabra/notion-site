@@ -1,6 +1,6 @@
 import { KeyboardEvent, useEffect } from "react";
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { EditorCommand } from "../editor/editor-history.js";
+import { EditorAction } from "../editor/editor-history.js";
 import { AnyBlock, ContentEditor } from "../editor/types.js";
 import { AnyContentEditorPlugin } from "./types.js";
 
@@ -20,8 +20,8 @@ export const useHistoryPlugin = (): AnyContentEditorPlugin => (editor) => {
     const cmd = editor.history.command;
     if (!cmd) return;
 
-    const id = EditorCommand.id(cmd, direction);
-    const selection = EditorCommand.selection(cmd, direction);
+    const id = EditorAction.id(cmd, direction);
+    const selection = EditorAction.selection(cmd, direction);
     const element = editor.ref(id);
     const currentSelection = element && SelectionRange.read(element);
 

@@ -1,8 +1,8 @@
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { SelectionRange } from "../../../../utils/selection-range.js";
-import { execCommand } from "../../editable/notion/commands.js";
 import { Editor } from "../../Editor.js";
+import { execCommand } from "../../editor/editor-command.js";
 import { useEditorSelectionRange } from "../../editor/use-editor-selection-range.js";
 
 export function useToolbarControls(editor: Editor) {

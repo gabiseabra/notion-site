@@ -1,6 +1,5 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { SelectionRange } from "../../../../utils/selection-range.js";
-import { ContentEditor } from "../../editor/types.js";
 import { EditorCommand } from "../types.js";
 
 export const isAnnotated =
@@ -61,22 +60,4 @@ export const setBlockType =
       }),
       () => Notion.Block.extractRichText(block),
     );
-  };
-
-export const execCommand =
-  (
-    editor: ContentEditor<Notion.Block>,
-    selection: (SelectionRange & { id: string }) | null,
-  ) =>
-  (fn: EditorCommand<Notion.Block>) => {
-    const currentBlock = selection && editor.peek(selection.id);
-    const newBlock = currentBlock && fn(currentBlock, selection, editor);
-
-    if (newBlock) {
-      editor.update(newBlock, {
-        selectionBefore: selection,
-        selectionAfter: selection,
-      });
-      editor.commit();
-    }
   };

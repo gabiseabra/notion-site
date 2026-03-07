@@ -1,5 +1,5 @@
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
-import { EditorHistory, type EditorCommandCmd } from "./editor-history.js";
+import { EditorHistory, type EditorActionCmd } from "./editor-history.js";
 
 type Block = { id: string; text: string };
 
@@ -12,7 +12,7 @@ describe("EditorHistory", () => {
       block("b", "bravo"),
     ]);
 
-    const commands = NonEmpty.create<EditorCommandCmd<Block>>(
+    const commands = NonEmpty.create<EditorActionCmd<Block>>(
       { type: "update", block: block("a", "alpha!") },
       {
         type: "split",

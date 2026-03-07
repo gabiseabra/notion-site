@@ -1,6 +1,6 @@
 import { EmptyObject } from "@notion-site/common/types/object.js";
 import { TypedEventTarget } from "typescript-event-target";
-import { EditorCommandCmd } from "./editor-history.js";
+import { EditorActionCmd } from "./editor-history.js";
 import { AnyBlock, ContentEditor, ID } from "./types.js";
 
 type EditorEventMap<TBlock extends AnyBlock> = {
@@ -9,7 +9,7 @@ type EditorEventMap<TBlock extends AnyBlock> = {
    * @cancellable
    */
   edit: {
-    cmd: EditorCommandCmd<TBlock>;
+    cmd: EditorActionCmd<TBlock>;
     batchId?: ID;
     /** Data provided from the plugin that triggers it. You have to parse it */
     data: unknown;
@@ -20,7 +20,7 @@ type EditorEventMap<TBlock extends AnyBlock> = {
    */
   flush: {
     batchId: ID;
-    commands: EditorCommandCmd<TBlock>[];
+    commands: EditorActionCmd<TBlock>[];
     /** Data provided from the plugin that triggers it. You have to parse it */
     data: unknown;
   };
