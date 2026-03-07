@@ -92,7 +92,8 @@ export const useBlockMutationPlugin =
         if (!splitBlocks) return null;
 
         const data = new useBlockMutationPlugin.SplitData(
-          block,
+          splitBlocks.left,
+          splitBlocks.right,
           offset,
           deleteRange,
         );
@@ -123,7 +124,8 @@ useBlockMutationPlugin.SplitData = class BlockMutationSplitData<
   TBlock extends AnyBlock,
 > {
   constructor(
-    public block: TBlock,
+    public left: TBlock,
+    public right: TBlock,
     public offset: number,
     public deleteRange: number,
   ) {}
