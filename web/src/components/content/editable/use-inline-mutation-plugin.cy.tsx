@@ -1,4 +1,5 @@
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
+import { SelectionRange } from "../../../utils/selection-range.js";
 import { Editor } from "../Editor.js";
 
 const options = {
@@ -152,5 +153,26 @@ describe("useInlineMutationPlugin", () => {
 
     cy.get("p").eq(0).should("have.text", "First line");
     cy.get("p").eq(1).should("exist");
+  });
+
+  it("keeps current selection after inline flush", () => {
+    cy.mount(
+      <Editor
+        value={[p("a", span("Line 1"))]}
+        onChange={() => {}}
+        options={options}
+      />,
+    );
+
+    cy.get("p")
+      .click()
+      .type("{moveToEnd}{shift}{enter}Line 2")
+      .type("{moveToEnd}!{uparrow}{home}");
+
+    cy.wait(options.autoCommit);
+
+    cy.get("p").then(([p]) => {
+      expect(SelectionRange.read(p)).to.deep.equal({ start: 0, end: 0 });
+    });
   });
 });

@@ -39,9 +39,32 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
     const timerRef = useRef<number>(null);
 
     const flush = useCallback(() => {
+      const data = new useInlineMutationPlugin.FlushData();
+      const pending = pendingRef.current;
       pendingRef.current = undefined;
 
-      return editor.flush(new useInlineMutationPlugin.FlushData());
+      // try to read current selection to retore it later
+      if (pending) {
+        const block = editor.peek(pending.id);
+        const blockEl = editor.ref(pending.id);
+        const selection = blockEl && SelectionRange.read(blockEl);
+
+        if (
+          block &&
+          selection &&
+          (selection.start !== pending.selectionAfter.start ||
+            selection.end !== pending.selectionAfter.end)
+        ) {
+          editor.update(block, {
+            data,
+            batchId: pending.batchId,
+            selectionBefore: pending.selectionAfter,
+            selectionAfter: selection,
+          });
+        }
+      }
+
+      return editor.flush(data);
     }, [editor]);
 
     const cancelFlush = useCallback(() => {
