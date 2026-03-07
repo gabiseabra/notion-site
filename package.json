@@ -20,7 +20,7 @@
     "test:common": "NODE_OPTIONS=--experimental-vm-modules node --loader ts-node/esm ./node_modules/jest/bin/jest.js -c jest.config.ts --selectProjects common --",
     "test:api": "NODE_OPTIONS=--experimental-vm-modules node --loader ts-node/esm ./node_modules/jest/bin/jest.js -c jest.config.ts --selectProjects api --",
     "test:web": "NODE_OPTIONS=--experimental-vm-modules node --loader ts-node/esm ./node_modules/jest/bin/jest.js -c jest.config.ts --selectProjects web --",
-    "test:cy": "cypress run --component --"
+    "test:cy": "cypress run --component"
   },
   "engines": {
     "node": ">=22",
