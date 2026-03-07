@@ -61,6 +61,7 @@ export const useBlockMutationPlugin =
           currentBlock,
         );
 
+        editor.flush(data);
         // merge any text on the tail of this block into the previous block
         editor.remove(currentBlock, {
           data,
@@ -96,6 +97,7 @@ export const useBlockMutationPlugin =
           deleteRange,
         );
 
+        editor.flush(data);
         editor.split(splitBlocks.left, splitBlocks.right, {
           data,
           selectionBefore,
