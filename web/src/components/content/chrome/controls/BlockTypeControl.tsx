@@ -1,10 +1,16 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
+import { useEffect } from "react";
 import { FaHeading, FaParagraph } from "react-icons/fa";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
 import { IconControl } from "../../../display/Icon.js";
 import { Span } from "../../../display/Text.js";
-import { Dropdown, DropdownOption } from "../../../inputs/Dropdown.js";
+import {
+  Dropdown,
+  DropdownOption,
+  useDropdown,
+} from "../../../inputs/Dropdown.js";
 import { Input } from "../../../inputs/Input.js";
+import { Row } from "../../../layout/FlexBox.js";
 import { IsolationFrame } from "../../../overlays/IsolationFrame.js";
 
 const options = [
@@ -41,49 +47,78 @@ export function BlockTypeControl({
 }) {
   const selectedOption = value && options.find((option) => option.id === value);
 
-  return (
-    <Dropdown
-      disabled={disabled === true || disabled === "action"}
-      initialValue={selectedOption?.title}
-      options={options}
-      renderOption={(option) => (
-        <DropdownOption
-          active={option.id === value}
-          onClick={() => onChange(option.id)}
-        >
-          <IconControl as="span" size="s" color="currentColor">
-            {option.icon}
-          </IconControl>
+  const dropdown = useDropdown({
+    options,
+    disabled: !!disabled,
+    filter: (option, value) =>
+      !value || new RegExp(value, "i").test(option.title),
+    initialFocusedId: selectedOption?.id,
+  });
 
-          <Span size="body">{option.title}</Span>
-        </DropdownOption>
-      )}
+  useEffect(() => {
+    dropdown.reset();
+  }, [value]);
+
+  return (
+    <Row
+      onKeyDown={(e) => {
+        const direction = (() => {
+          if (e.key === "ArrowDown") return 1;
+          if (e.key === "ArrowUp") return -1;
+        })();
+        const option = direction && Dropdown.rotate(dropdown, direction);
+
+        if (option) {
+          dropdown.setFocusedId(option.id);
+          document.getElementById(`block-type--${option.id}`)?.focus();
+        }
+      }}
     >
-      {(dropdown) => (
-        <div style={{ margin: -2 }}>
-          <IsolationFrame resize="y" style={{ width: 160 }}>
-            <Input
-              type="text"
-              label="Block type"
-              hiddenLabel
-              size="s"
-              style={{ padding: 2 }}
-              placeholder="Block type"
-              disabled={disabled}
-              value={dropdown.value ?? selectedOption?.title ?? ""}
-              onChange={dropdown.onChange}
-              onClick={dropdown.onClick}
-              onFocus={dropdown.onClick}
-              onBlur={() => dropdown.onChange(undefined)}
-              right={
-                <IconControl as="span" size="m" color="currentColor">
-                  {dropdown.open ? <RxCaretDown /> : <RxCaretUp />}
-                </IconControl>
+      <Dropdown
+        open={dropdown.open}
+        onClose={() => dropdown.setOpen(false)}
+        options={dropdown.visibleOptions}
+        renderOption={(option) => (
+          <DropdownOption
+            id={`block-type--${option.id}`}
+            active={option.id === value}
+            focused={dropdown.focusedId === option.id}
+            onClick={() => onChange(option.id)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === "Space") {
+                onChange(option.id);
+                e.preventDefault();
               }
-            />
-          </IsolationFrame>
-        </div>
-      )}
-    </Dropdown>
+            }}
+          >
+            <IconControl as="span" size="s" color="currentColor">
+              {option.icon}
+            </IconControl>
+
+            <Span size="body">{option.title}</Span>
+          </DropdownOption>
+        )}
+      >
+        <IsolationFrame resize="y" style={{ width: 160 }}>
+          <Input
+            type="text"
+            label="Block type"
+            hiddenLabel
+            size="s"
+            style={{ padding: 2 }}
+            placeholder="Block type"
+            disabled={disabled}
+            value={dropdown.value ?? selectedOption?.title ?? ""}
+            onChange={dropdown.setValue}
+            onFocus={() => Dropdown.toggle(dropdown)}
+            right={
+              <IconControl as="span" size="m" color="currentColor">
+                {dropdown.open ? <RxCaretDown /> : <RxCaretUp />}
+              </IconControl>
+            }
+          />
+        </IsolationFrame>
+      </Dropdown>
+    </Row>
   );
 }
