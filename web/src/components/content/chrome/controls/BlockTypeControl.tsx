@@ -76,7 +76,7 @@ export function BlockTypeControl({
     >
       <Dropdown
         open={dropdown.open}
-        onClose={() => dropdown.setOpen(false)}
+        onClose={() => dropdown.reset()}
         options={dropdown.visibleOptions}
         renderOption={(option) => (
           <DropdownOption
