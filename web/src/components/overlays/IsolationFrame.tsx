@@ -14,13 +14,15 @@ import { useResizeObserver } from "../../hooks/use-resize-observer.js";
 import styles from "./IsolationFrame.module.scss";
 
 type IsolationFrameProps = {
-  ref?: Ref<{ iframe: HTMLIFrameElement | null }>;
+  ref?: Ref<IsolationFrame>;
   children: ReactNode;
   style?: CSSProperties;
   resize?: true | "y" | "x";
 };
 
 const CLONED_STYLE_ATTR = "data-isolation-frame-style";
+
+export type IsolationFrame = { iframe: HTMLIFrameElement | null };
 
 /**
  * Renders children into an iframe.

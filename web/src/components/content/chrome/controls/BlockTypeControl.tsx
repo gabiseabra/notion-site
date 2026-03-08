@@ -1,7 +1,8 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { FaHeading, FaParagraph } from "react-icons/fa";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
+import { useDocumentEventListener } from "../../../../hooks/use-document-event-listener.js";
 import { IconControl } from "../../../display/Icon.js";
 import { Span } from "../../../display/Text.js";
 import {
@@ -45,6 +46,8 @@ export function BlockTypeControl({
   value?: Notion.Block.BlockType;
   onChange: (color: Notion.Block.BlockType) => void;
 }) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<IsolationFrame>(null);
   const selectedOption = value && options.find((option) => option.id === value);
 
   const dropdown = useDropdown({
@@ -59,8 +62,23 @@ export function BlockTypeControl({
     dropdown.reset();
   }, [value]);
 
+  // reset on focus out
+  useDocumentEventListener("focusin", () => {
+    const wrapper = wrapperRef.current;
+    const iframeDoc = frameRef.current?.iframe?.contentDocument;
+    const target = document.activeElement;
+    if (
+      wrapper &&
+      iframeDoc &&
+      target &&
+      !(wrapper.contains(target) || iframeDoc.contains(target))
+    )
+      dropdown.reset();
+  });
+
   return (
     <Row
+      ref={wrapperRef}
       onKeyDown={(e) => {
         const direction = (() => {
           if (e.key === "ArrowDown") return 1;
@@ -84,6 +102,7 @@ export function BlockTypeControl({
             active={option.id === value}
             focused={dropdown.focusedId === option.id}
             onClick={() => onChange(option.id)}
+            onFocus={() => dropdown.setFocusedId(option.id)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === "Space") {
                 onChange(option.id);
@@ -99,7 +118,7 @@ export function BlockTypeControl({
           </DropdownOption>
         )}
       >
-        <IsolationFrame resize="y" style={{ width: 160 }}>
+        <IsolationFrame ref={frameRef} resize="y" style={{ width: 160 }}>
           <Input
             type="text"
             label="Block type"
