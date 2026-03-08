@@ -178,21 +178,24 @@ export function split(
     };
   }
 
-  const node = extract(block);
+  const rich_text = extractRichText(block);
+  const type =
+    block.type === "bulleted_list_item" || block.type === "numbered_list_item"
+      ? block.type
+      : "paragraph";
 
   return {
     left: map(block, (node) => ({
       ...node,
       rich_text: RTF.slice(node.rich_text, 0, offset),
     })),
-    right: create({
-      type: "paragraph",
-      parent: block.parent,
-      paragraph: {
-        color: "default",
-        rich_text: RTF.slice(node.rich_text, offset + deleteRange),
-      },
-    }),
+    right: mapRichText(
+      create({
+        type: type,
+        parent: block.parent,
+      }),
+      () => RTF.slice(rich_text, offset + deleteRange),
+    ),
   };
 }
 

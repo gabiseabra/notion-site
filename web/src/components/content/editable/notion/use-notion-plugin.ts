@@ -10,6 +10,7 @@ import { useHotkeyPlugin } from "../use-hotkey-plugin.js";
 import { useInlineMutationPlugin } from "../use-inline-mutation-plugin.js";
 import { useLoggerPlugin } from "../use-logger-plugin.js";
 import { toggleAnnotations } from "./commands.js";
+import { useNotionPrefixPlugin } from "./use-notion-prefix-plugin.js";
 
 export type NotionPluginOptions = {
   multiline?: boolean;
@@ -68,6 +69,10 @@ export const useNotionPlugin = (
       },
     }),
     ...Object.values(NotionHotkeys).map(useHotkeyPlugin),
+    useNotionPrefixPlugin("#", "heading_1"),
+    useNotionPrefixPlugin("##", "heading_2"),
+    useNotionPrefixPlugin("###", "heading_3"),
+    useNotionPrefixPlugin("-", "bulleted_list_item"),
   );
 
 const Mod = env.IS_MAC ? "Meta" : "Ctrl";
