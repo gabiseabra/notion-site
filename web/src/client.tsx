@@ -16,7 +16,7 @@ if (!root) {
 
 createRoot(root).render(
   <React.StrictMode>
-    <RootPovider url={env.API_URL}>
+    <RootPovider platform="web" url={env.API_URL}>
       <RouterProvider router={router} />
     </RootPovider>
   </React.StrictMode>,

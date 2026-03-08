@@ -63,7 +63,7 @@ export async function render(
 
     const { pipe, abort } = renderToPipeableStream(
       <React.StrictMode>
-        <RootPovider url={apiUrl} fetch={fetch}>
+        <RootPovider platform="rss" url={apiUrl} fetch={fetch}>
           <StaticRouterProvider
             router={router}
             context={context}

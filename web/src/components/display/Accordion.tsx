@@ -1,5 +1,6 @@
 import { ReactNode, useState } from "react";
 import { RxCaretUp } from "react-icons/rx";
+import { Platform } from "../layout/Platform.js";
 import styles from "./Accordion.module.scss";
 import { IconControl } from "./Icon.js";
 
@@ -29,11 +30,14 @@ export function Accordion({ summary, children }: AccordionProps) {
       }}
     >
       <summary>
-        <div className={styles.toggle}>
-          <IconControl as="span" size="m" color="currentColor">
-            <RxCaretUp />
-          </IconControl>
-        </div>
+        <Platform.Web>
+          <div className={styles.toggle}>
+            <IconControl as="span" size="m" color="currentColor">
+              <RxCaretUp />
+            </IconControl>
+          </div>
+        </Platform.Web>
+
         {summary}
       </summary>
 

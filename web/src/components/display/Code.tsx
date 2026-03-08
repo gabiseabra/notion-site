@@ -10,6 +10,7 @@ import { ReactNode, useMemo } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import * as css from "../../css/index.js";
 import { CopyButton } from "../inputs/CopyButton.js";
+import { Platform } from "../layout/Platform.js";
 import styles from "./Code.module.scss";
 import { IconControl } from "./Icon.js";
 
@@ -39,14 +40,16 @@ export function Code({ code, language, before, after, indent = 0 }: CodeProps) {
 
   return (
     <div className={styles.wrapper} style={{ marginLeft: css.indent(indent) }}>
-      <span className={styles.language}>
-        {language}
-        <CopyButton as="button" copyText={code}>
-          <IconControl as="span" size="xs" color="currentColor">
-            <FaRegCopy />
-          </IconControl>
-        </CopyButton>
-      </span>
+      <Platform.Web>
+        <span className={styles.language}>
+          {language}
+          <CopyButton as="button" copyText={code}>
+            <IconControl as="span" size="xs" color="currentColor">
+              <FaRegCopy />
+            </IconControl>
+          </CopyButton>
+        </span>
+      </Platform.Web>
 
       {before}
 
