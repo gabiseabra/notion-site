@@ -1,11 +1,11 @@
 import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import { _NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { NotionPage } from "@notion-site/common/dto/pages/index.js";
-import { api } from "@notion-site/common/orpc/index.js";
+import { api, context } from "@notion-site/common/orpc/index.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { isUuid } from "@notion-site/common/utils/uuid.js";
-import { implement } from "@orpc/server";
+import { implement, Router } from "@orpc/server";
 import * as env from "../../../env.js";
 import { extractUuid, getRouteByResource } from "../../../utils/route.js";
 import { getNotionBlocks, getNotionPage } from "../../notion/api.js";
@@ -19,7 +19,7 @@ import {
 
 const c = implement(api.notion);
 
-export const notion = c.router({
+export const notion: Router<api["notion"], context> = c.router({
   getBlocks: c.getBlocks.handler(
     routeHandler(async ({ route, errors }) => {
       const result = await getNotionBlocks(route.id);

@@ -1,4 +1,4 @@
-import { api } from "@notion-site/common/orpc/index.js";
+import { api, context } from "@notion-site/common/orpc/index.js";
 import { hash } from "@notion-site/common/utils/hash.js";
 import { ClientContext, createORPCClient, onError } from "@orpc/client";
 import { RPCLink, RPCLinkOptions } from "@orpc/client/fetch";
@@ -9,10 +9,10 @@ import {
 } from "@orpc/contract";
 import { createContext, ReactNode, useContext, useMemo } from "react";
 
-export type OrpcContext = ContractRouterClient<typeof api>;
+export type OrpcContext = ContractRouterClient<api, context>;
 const OrpcContext = createContext<OrpcContext | null>(null);
 
-export function useOrpc() {
+export function useOrpc(): OrpcContext {
   const client = useContext(OrpcContext);
 
   if (!client) {

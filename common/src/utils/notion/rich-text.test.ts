@@ -114,6 +114,15 @@ describe("Notion.RTF", () => {
     text: { ...item.text, content: item.text.content.toUpperCase() },
   });
 
+  const page_mention: zNotion.rich_text.mention = {
+    type: "mention",
+    mention: {
+      type: "page",
+      page: { id: "page-id" },
+    },
+    annotations: { ...RTF.empty_text.annotations },
+  };
+
   describe("Notion.RTF.findByRange", () => {
     it("returns empty array for empty input", () => {
       expect(RTF.findByRange([], 0, 0)).toEqual([]);
@@ -209,15 +218,13 @@ describe("Notion.RTF", () => {
     });
 
     it("preserves non-text items", async () => {
-      const mention = { type: "mention" as const, mention: {} };
-
       const result = await RTF.traverseText(
-        [span("hello"), mention, span("world")],
+        [span("hello"), page_mention, span("world")],
         toUpperCaseAsync,
       );
 
       expect(result[0]).toEqual(span("HELLO"));
-      expect(result[1]).toBe(mention);
+      expect(result[1]).toBe(page_mention);
       expect(result[2]).toEqual(span("WORLD"));
     });
   });
@@ -244,9 +251,8 @@ describe("Notion.RTF", () => {
     });
 
     it("skips non-text items", () => {
-      const mention = { type: "mention" as const, mention: {} };
       const result = RTF.foldText(
-        [span("hello"), mention, span("world")],
+        [span("hello"), page_mention, span("world")],
         (acc, item) => acc + item.text.content,
         "",
       );

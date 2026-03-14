@@ -22,3 +22,25 @@ export const workspace = z.object({
   type: z.literal("workspace"),
 });
 export type workspace = z.infer<typeof workspace>;
+
+export const user = z.object({
+  type: z.literal("user"),
+  user: z.object({ id: z.string() }),
+});
+export type user = z.infer<typeof user>;
+
+export const page = z.object({
+  type: z.literal("page"),
+  page: z.object({
+    id: z.string(),
+  }),
+});
+export type page = z.infer<typeof page>;
+
+export const database = z.object({
+  type: z.literal("database"),
+  database: z.object({
+    id: z.string(),
+  }),
+});
+export type database = z.infer<typeof database>;

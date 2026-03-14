@@ -5,7 +5,7 @@ import { BlogPostStatus } from "./status.js";
 
 export const BlogPost = NotionResource({
   Title: zNotion.properties.title,
-  "Publish Date": zNotion.properties.date,
+  "Publish Date": zNotion.primitives.date,
   Tags: zNotion.properties.multi_select(z.string()),
   Status: zNotion.properties.status(BlogPostStatus),
 });

@@ -30,3 +30,14 @@ export type background_color = z.infer<typeof background_color>;
 
 export const api_color = z.union([color, background_color]);
 export type api_color = z.infer<typeof api_color>;
+
+export const date = z.object({
+  type: z.literal("date"),
+  date: z
+    .object({
+      start: z.coerce.date(),
+      end: z.coerce.date().nullable(),
+    })
+    .nullable(),
+});
+export type date = z.infer<typeof date>;

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zDiscriminatedUnionOption } from "../../../types/zod.js";
 import { external, file } from "./media.js";
-import { color } from "./primitives.js";
+import { color, date } from "./primitives.js";
 import { rich_text_item } from "./rich_text.js";
 
 export const number = z.object({
@@ -72,17 +72,6 @@ export const phone_number = z.object({
   phone_number: z.string().nullable(),
 });
 export type phone_number = z.infer<typeof phone_number>;
-
-export const date = z.object({
-  type: z.literal("date"),
-  date: z
-    .object({
-      start: z.coerce.date(),
-      end: z.coerce.date().nullable(),
-    })
-    .nullable(),
-});
-export type date = z.infer<typeof date>;
 
 export const checkbox = z.object({
   type: z.literal("checkbox"),
