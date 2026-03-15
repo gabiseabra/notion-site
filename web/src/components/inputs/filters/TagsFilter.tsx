@@ -48,11 +48,7 @@ export function TagsFilter<T extends string>({
               size="s"
               status={option.status ?? undefined}
               color={option.color}
-              style={{
-                outline: value.includes(option.name)
-                  ? "1px solid currentColor"
-                  : undefined,
-              }}
+              active={value.includes(option.name)}
             >
               {option.name}
             </Badge>

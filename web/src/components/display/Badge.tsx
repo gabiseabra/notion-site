@@ -8,6 +8,7 @@ export type BadgeProps = {
   color: zNotion.primitives.color;
   size: "xs" | "s" | "m" | "l";
   status?: Status;
+  active?: boolean;
 
   children: ReactNode;
   className?: string;
@@ -21,6 +22,7 @@ export function Badge({
   color,
   size,
   status,
+  active,
   className,
   ...props
 }: BadgeProps) {
@@ -32,6 +34,7 @@ export function Badge({
         styles[`size-${size}`],
         styles[`color-${color}`],
         status && styles[`status-${status}`],
+        active && styles.active,
       ]
         .filter(isTruthy)
         .join(" ")}

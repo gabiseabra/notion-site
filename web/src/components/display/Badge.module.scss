@@ -20,7 +20,7 @@
 }
 
 .size-xs {
-  transform: scale(.85);
+  transform: scale(0.85);
 }
 
 .size-m {
@@ -62,11 +62,7 @@
 .status-in-progress {
   &::before {
     border: 1px solid currentColor;
-    background: linear-gradient(
-        to right,
-        currentColor 50%,
-        transparent 50%
-    );
+    background: linear-gradient(to right, currentColor 50%, transparent 50%);
   }
 }
 
@@ -74,4 +70,8 @@
   &::before {
     background: currentColor;
   }
+}
+
+.active {
+  outline: 1.5px solid currentColor;
 }
