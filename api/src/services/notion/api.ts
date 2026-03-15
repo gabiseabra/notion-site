@@ -252,8 +252,6 @@ async function _getNotionBlocks(id: string) {
         continue;
       }
 
-      console.log(JSON.stringify(block, null, 2));
-
       const parseResult = zNotion.blocks.block.safeParse(block);
 
       if (!parseResult.success) {

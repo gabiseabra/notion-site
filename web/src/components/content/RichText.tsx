@@ -1,5 +1,7 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
+import { Link } from "react-router";
 import { match } from "ts-pattern";
+import { Icon } from "../display/Icon.js";
 import { Span, TextProps } from "../display/Text.js";
 import { Alert } from "../feedback/Banner.js";
 import { MaybeLink } from "../navigation/MaybeLink.js";
@@ -34,6 +36,29 @@ export function RichText({ value, ...props }: RichTextProps) {
                     {item.text.content}
                   </Span>
                 </MaybeLink>
+              ),
+            )
+            .with(
+              { type: "mention", mention: { type: "link_mention" } },
+              ({ mention: { link_mention: link } }) => (
+                <Link to={link.href} {...props}>
+                  {link.icon_url && (
+                    <>
+                      <Icon
+                        icon={{
+                          type: "external",
+                          external: { url: link.icon_url },
+                        }}
+                        size="s"
+                      />
+                      &nbsp;
+                    </>
+                  )}
+
+                  <Span {...item.annotations} {...props}>
+                    {link.title}
+                  </Span>
+                </Link>
               ),
             )
             .otherwise(() => <Alert type="warning">Unsupported block</Alert>),
