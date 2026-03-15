@@ -41,6 +41,7 @@
   width: auto;
   border-radius: calc(var(--badge-size) / 2);
   font-size: calc(var(--badge-size) * 0.85);
+  line-height: 1.25;
 }
 
 .clickable {
