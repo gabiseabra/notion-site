@@ -21,6 +21,12 @@ export function Layout({ children }: { children: ReactNode }) {
         <p>
           <a href="https://gabiseabra.dev">gabiseabra.dev</a> &copy; 2025
         </p>
+
+        <nav>
+          <Link to="/blog">Blog</Link>
+          <a href="https://rss.gabiseabra.dev/feed">RSS</a>
+          <a href="mailto:hey@gabiseabra.dev">Email</a>
+        </nav>
       </footer>
     </div>
   );
