@@ -1,6 +1,6 @@
 import { pipe } from "ts-functional-pipe";
 import { Divider } from "../../display/Divider.js";
-import { Row } from "../../layout/FlexBox.js";
+import { Row, RowProps } from "../../layout/FlexBox.js";
 import { AnchoredOverlayProps } from "../../overlays/Overlay.js";
 import { Popover } from "../../overlays/Popover.js";
 import { Editor } from "../Editor.js";
@@ -15,15 +15,21 @@ import {
 } from "./controls/LinkControl.js";
 import { useToolbarControls } from "./controls/use-toolbar-controls.js";
 
-export function DocumentToolbar({ editor }: { editor: Editor }) {
+export function DocumentToolbar({
+  editor,
+  className = "",
+  style,
+  ...props
+}: { editor: Editor } & Omit<RowProps, "children">) {
   const { block, execCommand, disabled } = useToolbarControls(editor);
 
   return (
     <Row
       gap={0}
       alignY="center"
-      className={styles["document-toolbar"]}
-      style={{ userSelect: "none" }}
+      className={[className, styles["document-toolbar"]].join(" ")}
+      style={{ userSelect: "none", ...style }}
+      {...props}
     >
       <BlockTypeControl
         disabled={disabled}
