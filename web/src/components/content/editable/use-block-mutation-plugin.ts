@@ -31,7 +31,7 @@ export const useBlockMutationPlugin =
   (block) => ({
     onKeyDown(e) {
       const selectionBefore = SelectionRange.read(e.target as HTMLElement);
-      if (!selectionBefore) return;
+      if (!selectionBefore || e.defaultPrevented) return;
 
       if (
         e.key === "Backspace" &&

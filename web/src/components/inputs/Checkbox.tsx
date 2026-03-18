@@ -1,3 +1,4 @@
+import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { HTMLAttributes } from "react";
 import { BsCheck } from "react-icons/bs";
 import * as css from "../../css/index.js";
@@ -20,7 +21,17 @@ export function Checkbox({
   ...props
 }: CheckboxProps) {
   return (
-    <label className={styles.label} style={{ marginLeft: css.indent(indent) }}>
+    <label
+      className={[styles.label, props.contentEditable && styles.editable]
+        .filter(isTruthy)
+        .join(" ")}
+      style={{ marginLeft: css.indent(indent) }}
+      onClick={(e) => {
+        if (props.contentEditable) {
+          e.preventDefault();
+        }
+      }}
+    >
       <input
         className={styles.input}
         type="checkbox"
@@ -29,11 +40,19 @@ export function Checkbox({
         checked={checked}
         onChange={(e) => onToggleChecked?.(e.currentTarget.checked)}
       />
-      <div className={styles.box} aria-hidden="true">
+      <div
+        className={styles.box}
+        aria-hidden="true"
+        onClick={() => {
+          if (props.contentEditable) {
+            onToggleChecked?.(!checked);
+          }
+        }}
+      >
         {checked && <BsCheck />}
       </div>
 
-      <div className={styles.content} {...props} />
+      <p className={styles.content} {...props} />
     </label>
   );
 }

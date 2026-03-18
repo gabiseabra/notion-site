@@ -19,6 +19,7 @@
 
 /* The custom UI */
 .box {
+  user-select: none;
   display: block;
   width: 1em;
   height: 1em;
@@ -26,14 +27,25 @@
   background: var(--bg-gray);
   border-radius: calc(var(--radius) / 2);
   transform: translateY(4px);
-  @include shadow.shadow(0.5, $inset: true);
+  @include shadow.shadow(1, $inset: true);
+  outline: 0.75px solid var(--bg-from);
 
   svg {
     transform: scale(1.2) translateY(-1px);
   }
 }
 
+.editable .box:hover {
+  outline: 1.5px solid currentColor;
+  cursor: pointer;
+}
+
 .input:checked + .box {
   background: var(--color-text);
   color: var(--bg-from);
+}
+
+.content {
+  margin: 0;
+  width: 100%;
 }

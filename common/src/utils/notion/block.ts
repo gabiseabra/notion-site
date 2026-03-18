@@ -1,5 +1,4 @@
 import { zNotion } from "../../dto/notion/schema/index.js";
-import { UnionToTuple } from "../../types/union.js";
 import { keys } from "../object.js";
 import { create as createTree, flat as flatTree } from "./block-tree.js";
 import * as RTF from "./rich-text.js";
@@ -18,6 +17,7 @@ export const RichTextType = [
   "code",
   "callout",
   "toggle",
+  "to_do",
 ] as const;
 
 /** Block restricted to a union type */
@@ -32,10 +32,6 @@ export type Node<T extends BlockType = BlockType> = T extends BlockType
     ? X
     : never
   : never;
-
-/** Node restricted to a type, but if the resulting type is a union it explodes */
-export type UniqueNode<T extends BlockType> =
-  UnionToTuple<Node<T>> extends [Node<T>] ? Node<T> : never;
 
 /** Block utilities */
 
@@ -55,7 +51,7 @@ export function isRichText(
   return narrow(block, ...RichTextType);
 }
 
-export function extract<T extends BlockType>(block: Block<T>): UniqueNode<T>;
+export function extract<T extends BlockType>(block: Block<T>): Node<T>;
 export function extract(block: Block): Node {
   switch (block.type) {
     case "paragraph":
@@ -98,7 +94,7 @@ export function extractRichText(block: Block) {
 
 export function map<T extends BlockType>(
   block: Block<T>,
-  f: (node: UniqueNode<T>) => UniqueNode<T>,
+  f: (node: Node<T>) => Node<T>,
 ): Block<T> {
   switch (block.type) {
     case "paragraph":
@@ -147,7 +143,7 @@ export function mapRichText(
 
 export function traverse<T extends BlockType>(
   block: Block<T>,
-  f: (node: UniqueNode<T>) => Promise<UniqueNode<T>>,
+  f: (node: Node<T>) => Promise<Node<T>>,
 ): Promise<Block<T>> {
   return f(extract(block)).then((node) => map(block, () => node));
 }
@@ -180,7 +176,9 @@ export function split(
 
   const rich_text = extractRichText(block);
   const type =
-    block.type === "bulleted_list_item" || block.type === "numbered_list_item"
+    block.type === "bulleted_list_item" ||
+    block.type === "numbered_list_item" ||
+    block.type === "to_do"
       ? block.type
       : "paragraph";
 
@@ -237,5 +235,14 @@ export function toggleAnnotations(
       start,
       end,
     ),
+  );
+}
+
+export function parentEquals(a: Block["parent"], b: Block["parent"]) {
+  return (
+    (a.type === "page_id" && b.type === "page_id" && a.page_id === b.page_id) ||
+    (a.type === "block_id" &&
+      b.type === "block_id" &&
+      a.block_id === b.block_id)
   );
 }

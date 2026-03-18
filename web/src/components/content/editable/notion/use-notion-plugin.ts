@@ -44,6 +44,7 @@ export const useNotionPlugin = (
         }));
       },
     }),
+    useNotionPrefixPlugin,
     useBlockNavigationPlugin,
     useBlockMutationPlugin({
       merge(left, right) {
@@ -69,10 +70,6 @@ export const useNotionPlugin = (
       },
     }),
     ...Object.values(NotionHotkeys).map(useHotkeyPlugin),
-    useNotionPrefixPlugin("#", "heading_1"),
-    useNotionPrefixPlugin("##", "heading_2"),
-    useNotionPrefixPlugin("###", "heading_3"),
-    useNotionPrefixPlugin("-", "bulleted_list_item"),
   );
 
 const Mod = env.IS_MAC ? "Meta" : "Ctrl";

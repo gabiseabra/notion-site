@@ -101,6 +101,15 @@ export function Block({
           <>
             <Checkbox
               checked={block.to_do.checked}
+              onToggleChecked={(checked) =>
+                onEditorChange?.({
+                  ...block,
+                  to_do: {
+                    ...block.to_do,
+                    checked,
+                  },
+                })
+              }
               {...contentProps(block.to_do.rich_text)}
               {...editableProps}
             />

@@ -8,6 +8,7 @@ import {
   NotionPluginOptions,
   useNotionPlugin,
 } from "./editable/notion/use-notion-plugin.js";
+import { EditorSelection } from "./editor/editor-selection.js";
 import { ContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
 
@@ -48,7 +49,21 @@ export const Editor = memo(function ContentEditor({
           <Block
             value={block}
             editable={!disabled}
-            onEditorChange={editor.update}
+            onEditorChange={(block) => {
+              const selection = EditorSelection.read(editor);
+              editor.update(block, {
+                selectionAfter:
+                  selection?.id === block.id
+                    ? selection
+                    : {
+                        start: 0,
+                        end: 0,
+                        id: block.id,
+                      },
+                selectionBefore: selection ?? undefined,
+              });
+              editor.commit();
+            }}
             {...editable(block)}
           >
             {children}

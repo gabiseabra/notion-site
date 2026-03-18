@@ -1,6 +1,12 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { useEffect, useRef } from "react";
-import { FaHeading, FaParagraph } from "react-icons/fa";
+import {
+  FaCheckSquare,
+  FaHeading,
+  FaListOl,
+  FaListUl,
+  FaParagraph,
+} from "react-icons/fa";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
 import { useDocumentEventListener } from "../../../../hooks/use-document-event-listener.js";
 import { IconControl } from "../../../display/Icon.js";
@@ -34,6 +40,21 @@ const options = [
     id: "heading_3",
     title: "Heading 3",
     icon: <FaHeading style={{ transform: "scale(0.75)" }} />,
+  },
+  {
+    id: "bulleted_list_item",
+    title: "Bulleted list",
+    icon: <FaListUl />,
+  },
+  {
+    id: "numbered_list_item",
+    title: "Numbered list",
+    icon: <FaListOl />,
+  },
+  {
+    id: "to_do",
+    title: "To do",
+    icon: <FaCheckSquare />,
   },
 ] as const;
 
@@ -89,6 +110,7 @@ export function BlockTypeControl({
         if (option) {
           dropdown.setFocusedId(option.id);
           document.getElementById(`block-type--${option.id}`)?.focus();
+          e.preventDefault();
         }
       }}
     >

@@ -57,6 +57,7 @@ export const numbered_list_item = z.object({
   numbered_list_item: z.object({
     rich_text: rich_text_item,
     color: api_color,
+    list_start_index: z.number().optional(),
   }),
 });
 export type numbered_list_item = z.infer<typeof numbered_list_item>;
@@ -269,5 +270,9 @@ export const rich_text_type = z.enum([
   "quote",
   "bulleted_list_item",
   "numbered_list_item",
+  "code",
+  "callout",
+  "toggle",
+  "to_do",
 ]);
 export type rich_text_type = z.infer<typeof rich_text_type>;

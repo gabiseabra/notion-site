@@ -4,6 +4,7 @@
  * 2. Builds a top-level render stream that groups adjacent list items.
  * 3. Renders recursively with stable keys and indentation.
  */
+import { isNonNullable } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { Fragment, ReactNode } from "react";
 import { match } from "ts-pattern";
@@ -38,8 +39,15 @@ export function RootBlock({
         .with({ type: "bulleted_list" }, ({ id }) => (
           <ul key={id}>{children}</ul>
         ))
-        .with({ type: "numbered_list" }, ({ id }) => (
-          <ol key={id}>{children}</ol>
+        .with({ type: "numbered_list" }, ({ id, children: items }) => (
+          <ol
+            key={id}
+            start={items
+              .map((item) => item.numbered_list_item.list_start_index)
+              .find(isNonNullable)}
+          >
+            {children}
+          </ol>
         ))
         .exhaustive(),
   );
