@@ -10,6 +10,7 @@ import { useHotkeyPlugin } from "../use-hotkey-plugin.js";
 import { useInlineMutationPlugin } from "../use-inline-mutation-plugin.js";
 import { useLoggerPlugin } from "../use-logger-plugin.js";
 import { toggleAnnotations } from "./commands.js";
+import { useNotionBackspacePlugin } from "./use-notion-backspace-plugin.js";
 import { useNotionPrefixPlugin } from "./use-notion-prefix-plugin.js";
 
 export type NotionPluginOptions = {
@@ -44,7 +45,7 @@ export const useNotionPlugin = (
         }));
       },
     }),
-    useNotionPrefixPlugin,
+    useNotionBackspacePlugin,
     useBlockNavigationPlugin,
     useBlockMutationPlugin({
       merge(left, right) {
@@ -69,6 +70,7 @@ export const useNotionPlugin = (
         return Notion.Block.split(block, offset, deleteRange);
       },
     }),
+    useNotionPrefixPlugin,
     ...Object.values(NotionHotkeys).map(useHotkeyPlugin),
   );
 

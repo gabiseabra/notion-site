@@ -72,6 +72,31 @@ export function p(id: string, ...rich_text: RichText): Block {
   };
 }
 
+export function todo(id: string, ...rich_text: RichText): Block {
+  return {
+    ...create({
+      type: "to_do",
+      to_do: {
+        rich_text,
+        checked: false,
+      },
+    }),
+    id,
+  };
+}
+export function ul(id: string, ...rich_text: RichText): Block {
+  return {
+    ...create({
+      type: "bulleted_list_item",
+      bulleted_list_item: {
+        color: "default",
+        rich_text,
+      },
+    }),
+    id,
+  };
+}
+
 export function ol(id: string, ...rich_text: RichText): Block {
   return {
     ...create({
