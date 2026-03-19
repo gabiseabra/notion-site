@@ -51,25 +51,32 @@ const useNotionPrefixPlugin =
     },
   });
 
-const createBlock =
-  (
-    type: Notion.Block.BlockType,
-  ): EditorCommand<Notion.Block, RegExpMatchArray> =>
-  (block, match) => {
+function createBlock<T extends Notion.Block.BlockType>(
+  type: T,
+  map?: (block: Notion.Block.Block<T>) => Notion.Block.Block<T>,
+): EditorCommand<Notion.Block, RegExpMatchArray>;
+function createBlock(
+  type: Notion.Block.BlockType,
+  map: (block: Notion.Block) => Notion.Block = (x) => x,
+): EditorCommand<Notion.Block, RegExpMatchArray> {
+  return (block, match) => {
     if (block.type === type) return;
-    return Notion.Block.mapRichText(
-      Notion.WIP.create({
-        type,
-        id: block.id,
-        parent: block.parent,
-      }),
-      () =>
-        Notion.RTF.slice(
-          Notion.Block.extractRichText(block),
-          match[0].length + 1,
-        ),
+    return map(
+      Notion.Block.mapRichText(
+        Notion.WIP.create({
+          type,
+          id: block.id,
+          parent: block.parent,
+        }),
+        () =>
+          Notion.RTF.slice(
+            Notion.Block.extractRichText(block),
+            match[0].length + 1,
+          ),
+      ),
     );
   };
+}
 
 const createNumberedList: EditorCommand<Notion.Block, RegExpMatchArray> = (
   block,
@@ -115,6 +122,16 @@ const useNotionPrefixPluginPreset = composePlugins(
   useNotionPrefixPlugin(/^-/, createBlock("bulleted_list_item")),
   useNotionPrefixPlugin(/^(\d+)\./, createNumberedList),
   useNotionPrefixPlugin(/^\[ \]/, createBlock("to_do")),
+  useNotionPrefixPlugin(
+    /^\[x\]/,
+    createBlock("to_do", (block) => ({
+      ...block,
+      to_do: {
+        ...block.to_do,
+        checked: true,
+      },
+    })),
+  ),
 );
 
 export { useNotionPrefixPluginPreset as useNotionPrefixPlugin };

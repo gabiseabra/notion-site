@@ -51,12 +51,21 @@ describe("useNotionPrefixPlugin", () => {
     cy.get("li").should("have.text", "test");
   });
 
-  it("converts paragraph to to-do on typing '[ ] '", () => {
+  it("converts paragraph to unchecked to-do on typing '[ ] '", () => {
     cy.mount(<Editor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("[ ] test");
 
-    cy.get("input[type=checkbox]").should("exist");
+    cy.get("input[type=checkbox]").should("not.be.checked");
+    cy.get("label").should("have.text", "test");
+  });
+
+  it("converts paragraph to checked to-do on typing '[x] '", () => {
+    cy.mount(<Editor value={[p("a")]} onChange={() => {}} />);
+
+    cy.get("p").click().type("[x] test");
+
+    cy.get("input[type=checkbox]").should("be.checked");
     cy.get("label").should("have.text", "test");
   });
 
