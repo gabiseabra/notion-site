@@ -44,7 +44,7 @@ export const useHistoryPlugin = (): AnyContentEditorPlugin => (editor) => {
       return;
 
     SelectionRange.apply(element, selection);
-  });
+  }, [editor]);
 
   return (block) => ({
     onKeyDown(e) {
