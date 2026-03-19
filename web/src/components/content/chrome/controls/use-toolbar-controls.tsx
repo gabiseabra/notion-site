@@ -4,10 +4,10 @@ import { SelectionRange } from "../../../../utils/selection-range.js";
 import { Editor } from "../../Editor.js";
 import { EditorCommand } from "../../editor/editor-command.js";
 import { EditorSelection } from "../../editor/editor-selection.js";
-import { useEditorSelectionRange } from "../../editor/use-editor-selection-range.js";
+import { useEditorSelection } from "../../editor/use-editor-selection.js";
 
 export function useToolbarControls(editor: Editor) {
-  const selection = useEditorSelectionRange(editor);
+  const selection = useEditorSelection(editor);
   const block =
     selection &&
     (editor.blocks.find(hasPropertyValue("id", selection.id)) ?? null);

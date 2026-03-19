@@ -11,6 +11,7 @@ import {
 import { EditorSelection } from "./editor/editor-selection.js";
 import { ContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
+import { EditorSelectionProvider } from "./editor/use-editor-selection.js";
 
 export type Editor = ContentEditor<Notion.Block>;
 
@@ -38,38 +39,40 @@ export const Editor = memo(function ContentEditor({
   useImperativeHandle(ref, () => editor, [editor]);
 
   return (
-    <div>
-      <FloatingToolbar editor={editor} />
+    <EditorSelectionProvider editor={editor}>
+      <div>
+        <FloatingToolbar editor={editor} />
 
-      <DocumentToolbar mb={4} editor={editor} />
+        <DocumentToolbar mb={4} editor={editor} />
 
-      <RootBlock
-        value={editor.blocks}
-        render={(children, block) => (
-          <Block
-            value={block}
-            editable={!disabled}
-            onEditorChange={(block) => {
-              const selection = EditorSelection.read(editor);
-              editor.update(block, {
-                selectionAfter:
-                  selection?.id === block.id
-                    ? selection
-                    : {
-                        start: 0,
-                        end: 0,
-                        id: block.id,
-                      },
-                selectionBefore: selection ?? undefined,
-              });
-              editor.commit();
-            }}
-            {...editable(block)}
-          >
-            {children}
-          </Block>
-        )}
-      />
-    </div>
+        <RootBlock
+          value={editor.blocks}
+          render={(children, block) => (
+            <Block
+              value={block}
+              editable={!disabled}
+              onEditorChange={(block) => {
+                const selection = EditorSelection.read(editor);
+                editor.update(block, {
+                  selectionAfter:
+                    selection?.id === block.id
+                      ? selection
+                      : {
+                          start: 0,
+                          end: 0,
+                          id: block.id,
+                        },
+                  selectionBefore: selection ?? undefined,
+                });
+                editor.commit();
+              }}
+              {...editable(block)}
+            >
+              {children}
+            </Block>
+          )}
+        />
+      </div>
+    </EditorSelectionProvider>
   );
 });
