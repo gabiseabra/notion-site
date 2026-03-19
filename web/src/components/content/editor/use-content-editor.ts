@@ -18,11 +18,15 @@ import { AnyBlock, ContentEditor, EditorBatch, ID } from "./types.js";
 export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   initialValue,
   plugin,
-  onChange,
+  onReady,
+  onCommit,
+  onPostCommit,
 }: {
   initialValue: TBlock[];
   plugin: ContentEditorPlugin<TBlock, TDetail>;
-  onChange?: (blocks: TBlock[]) => void;
+  onReady?: () => void;
+  onCommit?: (blocks: TBlock[]) => void;
+  onPostCommit?: (blocks: TBlock[]) => void;
 }) {
   const isReadyRef = useRef(false);
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
@@ -30,6 +34,17 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   const [snapshot, setSnapshot] = useState(() => history.snapshot());
   const blocksRef = useRef<Map<TBlock["id"], HTMLElement | null>>(new Map());
   const batchRef = useRef<EditorBatch<TBlock> | undefined>(undefined);
+
+  /** Callback refs */
+
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
+
+  const onCommitRef = useRef(onCommit);
+  onCommitRef.current = onCommit;
+
+  const onPostCommitRef = useRef(onPostCommit);
+  onPostCommitRef.current = onPostCommit;
 
   /** Editor internals */
 
@@ -183,6 +198,7 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
           state: event.detail.blocks,
           position: event.detail.revision,
         });
+        onCommitRef.current?.(event.detail.blocks);
       },
     }),
     [bus, history, snapshot],
@@ -199,7 +215,9 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
       : new EditorEvent("postcommit", editor, {});
 
     if (isReadyRef.current) {
-      onChange?.(editor.blocks);
+      onPostCommitRef.current?.(editor.blocks);
+    } else {
+      onReadyRef.current?.();
     }
 
     editor.bus.dispatchTypedEvent(event.eventType, event);

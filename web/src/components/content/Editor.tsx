@@ -33,7 +33,7 @@ export const Editor = memo(function ContentEditor({
   const { editor, editable } = useContentEditor({
     initialValue,
     plugin: useNotionPlugin(options),
-    onChange,
+    onCommit: onChange,
   });
 
   useImperativeHandle(ref, () => editor, [editor]);
