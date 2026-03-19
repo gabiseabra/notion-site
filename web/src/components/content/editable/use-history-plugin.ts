@@ -26,7 +26,7 @@ export const useHistoryPlugin = (): AnyContentEditorPlugin => (editor) => {
     const currentSelection = element && SelectionRange.read(element);
 
     if (!element || !selection) {
-      console.warn("Failed to restore selection after commit.", element, {
+      console.warn("Failed to restore selection after commit.", {
         id,
         cmd,
         direction,
