@@ -19,9 +19,9 @@ describe("useHistoryPlugin", () => {
   });
 
   it("undoes on Cmd+Z", async () => {
-    const blocks = [p("a", span("Hello"))];
-
-    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
+    const { container } = render(
+      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();
@@ -40,9 +40,9 @@ describe("useHistoryPlugin", () => {
   });
 
   it("redoes on Cmd+Shift+Z", async () => {
-    const blocks = [p("a", span("Hello"))];
-
-    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
+    const { container } = render(
+      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();
@@ -61,9 +61,9 @@ describe("useHistoryPlugin", () => {
   });
 
   it("redoes on Cmd+Y", async () => {
-    const blocks = [p("a", span("Hello"))];
-
-    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
+    const { container } = render(
+      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();
@@ -82,9 +82,9 @@ describe("useHistoryPlugin", () => {
   });
 
   it("does nothing when no command in history", () => {
-    const blocks = [p("a", span("Hello"))];
-
-    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
+    const { container } = render(
+      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();
@@ -95,9 +95,9 @@ describe("useHistoryPlugin", () => {
   });
 
   it("restores selection before undo", async () => {
-    const blocks = [p("a", span("Hello"))];
-
-    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
+    const { container } = render(
+      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();
@@ -114,9 +114,9 @@ describe("useHistoryPlugin", () => {
   });
 
   it("restores selection after redo", async () => {
-    const blocks = [p("a", span("Hello"))];
-
-    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
+    const { container } = render(
+      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     const el = container.querySelector("p")!;
     expect(el).toBeTruthy();

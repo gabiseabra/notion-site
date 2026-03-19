@@ -8,9 +8,12 @@ import { Editor } from "../Editor.js";
 
 describe("useBlockNavigationPlugin", () => {
   it("moves caret to next block on ArrowRight at end", () => {
-    const blocks = [p("a", span("First")), p("b", span("Second"))];
-
-    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
+    const { container } = render(
+      <Editor
+        value={[p("a", span("First")), p("b", span("Second"))]}
+        onChange={() => {}}
+      />,
+    );
 
     const [first, second] = Array.from(container.querySelectorAll("p"));
     expect(first).toBeTruthy();
@@ -31,8 +34,12 @@ describe("useBlockNavigationPlugin", () => {
   });
 
   it("moves caret to previous block on ArrowLeft at start", () => {
-    const blocks = [p("a", span("First")), p("b", span("Second"))];
-    const { container } = render(<Editor value={blocks} onChange={() => {}} />);
+    const { container } = render(
+      <Editor
+        value={[p("a", span("First")), p("b", span("Second"))]}
+        onChange={() => {}}
+      />,
+    );
 
     const [first, second] = Array.from(container.querySelectorAll("p"));
 

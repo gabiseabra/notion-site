@@ -20,11 +20,10 @@ describe("useAutoCommitPlugin", () => {
 
   it("commits after debounce when input occurs", () => {
     const onChange = jest.fn();
-    const blocks = [p("a", span("Hello"))];
 
     const { container } = render(
       <Editor
-        value={blocks}
+        value={[p("a", span("Hello"))]}
         onChange={onChange}
         options={{ autoCommit: 200 }}
       />,
