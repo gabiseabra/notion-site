@@ -31,7 +31,7 @@ export const InlineEditor = memo(function InlineEditor({
   const { editor, editable } = useContentEditor({
     initialValue: [p(id, ...initialValue)],
     plugin: useNotionPlugin(options),
-    onChange: (blocks) =>
+    onCommit: (blocks) =>
       onChange(blocks.flatMap(Notion.Block.extractRichText)),
   });
 
