@@ -1,7 +1,7 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p } from "@notion-site/common/utils/notion/wip.js";
 import { memo, Ref, useImperativeHandle } from "react";
-import { Text } from "../display/Text.js";
+import { Text, TextProps } from "../display/Text.js";
 import { richTextToHTML } from "./Block.js";
 import { RichText } from "./RichText.js";
 import {
@@ -18,7 +18,7 @@ export type InlineEditorProps = {
   onChange: (block: Notion.RichText) => void;
   options?: Omit<NotionPluginOptions, "multiline">;
   disabled?: boolean;
-};
+} & Omit<TextProps, "children">;
 
 export const InlineEditor = memo(function InlineEditor({
   id,
@@ -27,6 +27,7 @@ export const InlineEditor = memo(function InlineEditor({
   onChange,
   options,
   disabled,
+  ...props
 }: InlineEditorProps) {
   const { editor, editable } = useContentEditor({
     initialValue: [p(id, ...initialValue)],
@@ -41,8 +42,6 @@ export const InlineEditor = memo(function InlineEditor({
 
   return (
     <Text
-      as="p"
-      m={0}
       {...(disabled
         ? {
             children: <RichText value={rich_text} />,
@@ -56,6 +55,7 @@ export const InlineEditor = memo(function InlineEditor({
             },
             ...editable(p(id, ...rich_text)),
           })}
+      {...props}
     />
   );
 });
