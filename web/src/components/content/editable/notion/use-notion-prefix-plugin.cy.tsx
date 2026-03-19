@@ -42,7 +42,7 @@ describe("useNotionPrefixPlugin", () => {
     cy.get("li").should("have.text", "test");
   });
 
-  it.only("converts paragraph to numbered list on typing 'n. '", () => {
+  it("converts paragraph to numbered list on typing 'n. '", () => {
     cy.mount(<Editor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("123. test");
