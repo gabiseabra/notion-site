@@ -36,7 +36,7 @@
 .text[contenteditable] {
   * {
     display: inline;
-    &:only-child {
+    &:empty:only-child {
       display: inline-block;
     }
   }
