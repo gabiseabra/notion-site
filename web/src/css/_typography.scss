@@ -6,10 +6,14 @@
 // @import "prism-themes/themes/prism-material-light.css";
 // @import "prism-themes/themes/prism-dracula.css";
 @import "prism-themes/themes/prism-vs.css";
+// @import "prismjs/themes/prism.css";
 
+textarea[class*="language-"],
 code[class*="language-"],
 pre[class*="language-"] {
   font-size: 0.85em;
+  font-family:
+    "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
 }
 
 /** Outfit */

@@ -5,8 +5,10 @@
       "ES2020",
       "DOM"
     ],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    // "module": "NodeNext",
+    // "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

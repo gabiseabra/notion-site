@@ -406,3 +406,14 @@ export const empty_text: Item<"text"> = {
     color: "default",
   },
 };
+
+export function text(
+  content: string,
+  annotations: Annotations = { ...empty_text.annotations },
+): Item<"text"> {
+  return {
+    type: "text",
+    text: { content, link: null },
+    annotations,
+  };
+}

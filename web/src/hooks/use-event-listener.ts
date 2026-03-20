@@ -16,7 +16,7 @@ export function useEventListener<
   TTarget extends EventTarget,
   TEventType extends keyof ExtractEventMap<TTarget> & string,
 >(
-  elementOrRef: TTarget | RefObject<TTarget>,
+  elementOrRef: TTarget | RefObject<TTarget> | null,
   type: TEventType,
   listener: (ev: ExtractEventMap<TTarget>[TEventType]) => void,
   options?: boolean | AddEventListenerOptions,

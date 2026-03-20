@@ -132,6 +132,7 @@ const useNotionPrefixPluginPreset = composePlugins(
       },
     })),
   ),
+  useNotionPrefixPlugin(/^```/, createBlock("code")),
 );
 
 export { useNotionPrefixPluginPreset as useNotionPrefixPlugin };

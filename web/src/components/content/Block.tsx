@@ -231,6 +231,7 @@ export function Block({
               block={block}
               indent={indent}
               onEditorChange={onEditorChange}
+              editable={editable}
             />
 
             <IndentationLevel.Provider value={indent + 1}>

@@ -15,18 +15,21 @@
   margin: 0;
 }
 
+.badge {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 .language {
   --lang-bg: var(--bg-gray);
   --lang-color: var(--color-text);
 
-  z-index: 1;
-  position: absolute;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: var(--space);
-  top: 0;
-  right: 0;
   background: var(--lang-bg);
   color: var(--lang-color);
   font-size: 0.75em;
