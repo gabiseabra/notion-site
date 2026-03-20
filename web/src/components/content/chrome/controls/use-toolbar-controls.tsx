@@ -2,8 +2,7 @@ import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { SelectionRange } from "../../../../utils/selection-range.js";
 import { Editor } from "../../Editor.js";
-import { EditorCommand } from "../../editor/editor-command.js";
-import { EditorSelection } from "../../editor/editor-selection.js";
+import { ExecCommand } from "../../editor/editor-command.js";
 import { useEditorSelection } from "../../editor/use-editor-selection.js";
 
 export function useToolbarControls(editor: Editor) {
@@ -15,7 +14,10 @@ export function useToolbarControls(editor: Editor) {
 
   const disabled = !selection;
   const disabledAction =
-    (!selection || SelectionRange.isCollapsed(selection)) && "action";
+    (!selection ||
+      selection.type == "focus" ||
+      SelectionRange.isCollapsed(selection)) &&
+    "action";
 
   return {
     selection,
@@ -23,20 +25,6 @@ export function useToolbarControls(editor: Editor) {
     text,
     disabled,
     disabledAction,
-    execCommand(
-      fn: EditorCommand<Notion.Block, EditorSelection<Notion.Block>>,
-    ) {
-      const currentBlock = selection && editor.peek(selection.id);
-      const newBlock =
-        currentBlock && selection && fn(currentBlock, selection, editor);
-
-      if (newBlock) {
-        editor.update(newBlock, {
-          selectionBefore: selection,
-          selectionAfter: selection,
-        });
-        editor.commit();
-      }
-    },
-  } as const;
+    execCommand: ExecCommand(editor, selection, block ?? undefined),
+  };
 }

@@ -1,9 +1,11 @@
 import {
   createContext,
   ReactNode,
+  Ref,
   useCallback,
   useContext,
   useEffect,
+  useImperativeHandle,
   useState,
 } from "react";
 import { guardDispatch } from "../../../hooks/guard-dispatch.js";
@@ -25,21 +27,22 @@ export function useEditorSelection<TBlock extends AnyBlock>(
 }
 
 export function EditorSelectionProvider<TBlock extends AnyBlock>({
+  ref,
   editor,
   children,
 }: {
+  ref?: Ref<EditorSelectionProvider.Ref<TBlock>>;
   editor: ContentEditor<TBlock>;
   children: ReactNode;
 }) {
-  const [selectionRange, setSelectionRange] =
+  const [selection, setSelectionRange] =
     useState<EditorSelection<TBlock> | null>(null);
   const getSelection = useCallback<GetSelection>(
     (targetEditor) => {
-      if ((targetEditor as unknown) === (editor as unknown))
-        return selectionRange;
+      if ((targetEditor as unknown) === (editor as unknown)) return selection;
       return null;
     },
-    [editor, selectionRange],
+    [editor, selection],
   );
 
   useDocumentEventListener("selectionchange", () => {
@@ -51,9 +54,17 @@ export function EditorSelectionProvider<TBlock extends AnyBlock>({
     setSelectionRange(EditorSelection.read(editor));
   }, []);
 
+  useImperativeHandle(ref, () => ({ selection }), [selection]);
+
   return (
     <EditorSelectionContext.Provider value={getSelection}>
       {children}
     </EditorSelectionContext.Provider>
   );
+}
+
+export namespace EditorSelectionProvider {
+  export type Ref<TBlock extends AnyBlock> = {
+    selection: EditorSelection<TBlock> | null;
+  };
 }

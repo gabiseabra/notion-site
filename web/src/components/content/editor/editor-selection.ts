@@ -1,9 +1,15 @@
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { AnyBlock, ContentEditor } from "./types.js";
 
-export type EditorSelection<TBlock extends AnyBlock> = SelectionRange & {
-  id: TBlock["id"];
-};
+export type EditorSelection<TBlock extends AnyBlock> =
+  | (SelectionRange & {
+      type: "range";
+      id: TBlock["id"];
+    })
+  | {
+      type: "focus";
+      id: TBlock["id"];
+    };
 
 export const EditorSelection = {
   read<TBlock extends AnyBlock>(
@@ -22,7 +28,10 @@ export const EditorSelection = {
       const selection = SelectionRange.read(element);
 
       if (selection) {
-        return { id, ...selection };
+        return { type: "range", id, ...selection };
+      }
+      if (element.contains(document.activeElement)) {
+        return { type: "focus", id };
       }
     }
     return null;
