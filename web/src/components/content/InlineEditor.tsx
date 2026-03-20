@@ -18,7 +18,7 @@ export type InlineEditorProps = {
   onChange: (block: Notion.RichText) => void;
   options?: Omit<NotionPluginOptions, "multiline">;
   disabled?: boolean;
-} & Omit<TextProps, "children">;
+} & Omit<TextProps, "children" | "onChange">;
 
 export const InlineEditor = memo(function InlineEditor({
   id,

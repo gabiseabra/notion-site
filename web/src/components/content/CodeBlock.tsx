@@ -24,6 +24,8 @@ export function CodeBlock({
         block.code.caption.length > 0 && (
           <InlineEditor
             id="caption"
+            as="p"
+            m={0}
             value={block.code.caption}
             disabled={!editable}
             onChange={(rich_text) =>
