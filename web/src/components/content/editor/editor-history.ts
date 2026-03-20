@@ -54,9 +54,9 @@ export const EditorAction = {
           direction === 1
             ? ([...cmd.commands]
                 .reverse()
-                .find((c) => c.selectionAfter !== null) ??
+                .find(hasNonNullableProperty("selectionAfter")) ??
                 cmd.commands[cmd.commands.length - 1])
-            : (cmd.commands.find((c) => c.selectionBefore !== null) ??
+            : (cmd.commands.find(hasNonNullableProperty("selectionBefore")) ??
                 cmd.commands[0]),
           direction,
         ),

@@ -388,4 +388,46 @@ describe("useNotionIndentPlugin", () => {
       { type: "page_id", page_id: "" },
     );
   });
+
+  it("restores cursor to position 0 on the block after unindenting", () => {
+    const { container } = render(
+      <Editor
+        value={[
+          p("a", span("A")),
+          child("b", "a", span("B")),
+          child("c", "b", span("C")),
+        ]}
+        onChange={() => {}}
+      />,
+    );
+
+    const el = container.querySelectorAll("p")[1]!;
+    expect(el).toBeTruthy();
+
+    SelectionRange.apply(el, { start: 0, end: 0 });
+    inputEvent.delete(el);
+
+    expect(container.querySelectorAll("p")[1]).toMatchVisualSelection("|B");
+  });
+
+  it("restores cursor to its original position after indenting", () => {
+    const { container } = render(
+      <Editor
+        value={[
+          p("a", span("A")),
+          p("b", span("BB")),
+          child("c", "b", span("C")),
+        ]}
+        onChange={() => {}}
+      />,
+    );
+
+    const el = container.querySelectorAll("p")[1]!;
+    expect(el).toBeTruthy();
+
+    SelectionRange.apply(el, { start: 1, end: 1 });
+    fireEvent.keyDown(el, { key: "Tab" });
+
+    expect(container.querySelectorAll("p")[1]).toMatchVisualSelection("B|B");
+  });
 });
