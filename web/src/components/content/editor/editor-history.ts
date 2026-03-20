@@ -52,8 +52,12 @@ export const EditorAction = {
       .with({ type: "apply" }, (cmd) =>
         EditorAction.id(
           direction === 1
-            ? cmd.commands[cmd.commands.length - 1]
-            : cmd.commands[0],
+            ? ([...cmd.commands]
+                .reverse()
+                .find((c) => c.selectionAfter !== null) ??
+                cmd.commands[cmd.commands.length - 1])
+            : (cmd.commands.find((c) => c.selectionBefore !== null) ??
+                cmd.commands[0]),
           direction,
         ),
       )

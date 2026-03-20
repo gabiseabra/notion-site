@@ -11,6 +11,8 @@ import { useInlineMutationPlugin } from "../use-inline-mutation-plugin.js";
 import { useLoggerPlugin } from "../use-logger-plugin.js";
 import { toggleAnnotations } from "./commands.js";
 import { useNotionBackspacePlugin } from "./use-notion-backspace-plugin.js";
+import { useNotionIndentPlugin } from "./use-notion-indent-plugin.js";
+import { useNotionOrphanagePlugin } from "./use-notion-orphanage-plugin.js";
 import { useNotionPrefixPlugin } from "./use-notion-prefix-plugin.js";
 
 export type NotionPluginOptions = {
@@ -30,7 +32,10 @@ export const useNotionPlugin = (
       if (!options.logging) return;
       else if (options.logging == "verbose")
         console.info(event.eventType, event.detail, event.editor);
-      else if (!EditorEvent.narrow("edit", event) || !event.detail.batchId)
+      else if (
+        (!EditorEvent.narrow("edit", event) || !event.detail.batchId) &&
+        !EditorEvent.narrow("postcommit", event)
+      )
         console.info(event.eventType, event.detail, event.editor);
     }),
     useAutoCommitPlugin(options.autoCommit ?? 600),
@@ -46,6 +51,7 @@ export const useNotionPlugin = (
       },
     }),
     useNotionBackspacePlugin,
+    useNotionIndentPlugin({}),
     useBlockNavigationPlugin,
     useBlockMutationPlugin({
       merge(left, right) {
@@ -71,6 +77,7 @@ export const useNotionPlugin = (
       },
     }),
     useNotionPrefixPlugin,
+    useNotionOrphanagePlugin,
     ...Object.values(NotionHotkeys).map(useHotkeyPlugin),
   );
 
