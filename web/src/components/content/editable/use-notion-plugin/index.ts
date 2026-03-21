@@ -39,9 +39,7 @@ export const useNotionPlugin = (
         console.info(event.eventType, event.detail, event.editor);
     }),
     useAutoCommitPlugin({
-      disabled: options.autoCommit === false,
-      debounceMs:
-        typeof options.autoCommit === "number" ? options.autoCommit : 600,
+      debounceMs: options.autoCommit,
     }),
     useHistoryPlugin(),
     useInlineMutationPlugin({
