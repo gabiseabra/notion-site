@@ -1,0 +1,54 @@
+import { SelectionRange } from "../../../utils/selection-range.js";
+import { EditorCommand } from "../editor/editor-command.js";
+import { AnyBlock } from "../editor/types";
+import { ContentEditorPlugin } from "./types.js";
+
+/**
+ * Creates a plugin that converts a block when the user types a recognized prefix followed by a space.
+ *
+ * Triggered on space input when the caret is positioned immediately after the prefix.
+ * On trigger, the block is replaced with the result of `transform`.
+ * If `transform` returns `undefined`, the conversion is skipped.
+ *
+ * @param regExp - Regex matched against the block's full text content.
+ * @param transform - Command that produces the replacement block from the current block and regex match
+ */
+export const useRegExpTransformPlugin =
+  <TBlock extends AnyBlock>(
+    regExp: RegExp,
+    transform: EditorCommand<TBlock, RegExpMatchArray>,
+  ): ContentEditorPlugin<TBlock> =>
+  (editor) =>
+  (block) => ({
+    onInput(e) {
+      if (e.nativeEvent.data !== " ") return;
+
+      const selection = SelectionRange.read(e.currentTarget);
+
+      if (!selection || !SelectionRange.isCollapsed(selection)) return;
+
+      const match = e.currentTarget.textContent?.match(regExp);
+      const end = (match?.index ?? 0) + (match?.[0].length ?? 0) + 1;
+
+      if (!match || end !== selection.start) return;
+
+      const newBlock = transform({
+        block: editor.peek(block.id) ?? block,
+        data: match,
+        editor,
+      });
+
+      if (!newBlock) return;
+
+      const data = new useRegExpTransformPlugin.EventData();
+      editor.flush(data);
+      editor.update(newBlock, {
+        data,
+        selectionBefore: selection,
+        selectionAfter: { start: 0, end: 0 },
+      });
+      editor.commit(data);
+    },
+  });
+
+useRegExpTransformPlugin.EventData = class RegExpTransformData {};
