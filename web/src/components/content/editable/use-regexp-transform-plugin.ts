@@ -11,17 +11,19 @@ import { ContentEditorPlugin } from "./types.js";
  * If `transform` returns `undefined`, the conversion is skipped.
  *
  * @param regExp - Regex matched against the block's full text content.
+ * @param char - Character that triggers the transform when inserted after the prefix.
  * @param transform - Command that produces the replacement block from the current block and regex match
  */
 export const useRegExpTransformPlugin =
   <TBlock extends AnyBlock>(
     regExp: RegExp,
+    char: string,
     transform: EditorCommand<TBlock, RegExpMatchArray>,
   ): ContentEditorPlugin<TBlock> =>
   (editor) =>
   (block) => ({
     onInput(e) {
-      if (e.nativeEvent.data !== " ") return;
+      if (e.nativeEvent.data !== char) return;
 
       const selection = SelectionRange.read(e.currentTarget);
 

@@ -7,7 +7,7 @@ import { RichText } from "./RichText.js";
 import {
   NotionPluginOptions,
   useNotionPlugin,
-} from "./editable/notion/use-notion-plugin.js";
+} from "./editable/use-notion-plugin/index.js";
 import { ContentEditor as TContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
 

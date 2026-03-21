@@ -69,14 +69,15 @@ const createNumberedList: EditorCommand<Notion.Block, RegExpMatchArray> = ({
 };
 
 export const useNotionPrefixPlugin = composePlugins(
-  useRegExpTransformPlugin(/^#/, createBlock("heading_1")),
-  useRegExpTransformPlugin(/^##/, createBlock("heading_2")),
-  useRegExpTransformPlugin(/^###/, createBlock("heading_3")),
-  useRegExpTransformPlugin(/^-/, createBlock("bulleted_list_item")),
-  useRegExpTransformPlugin(/^(\d+)\./, createNumberedList),
-  useRegExpTransformPlugin(/^\[ \]/, createBlock("to_do")),
+  useRegExpTransformPlugin(/^#/, " ", createBlock("heading_1")),
+  useRegExpTransformPlugin(/^##/, " ", createBlock("heading_2")),
+  useRegExpTransformPlugin(/^###/, " ", createBlock("heading_3")),
+  useRegExpTransformPlugin(/^-/, " ", createBlock("bulleted_list_item")),
+  useRegExpTransformPlugin(/^(\d+)\./, " ", createNumberedList),
+  useRegExpTransformPlugin(/^\[ \]/, " ", createBlock("to_do")),
   useRegExpTransformPlugin(
     /^\[x\]/,
+    " ",
     createBlock("to_do", (block) => ({
       ...block,
       to_do: {
@@ -85,5 +86,5 @@ export const useNotionPrefixPlugin = composePlugins(
       },
     })),
   ),
-  useRegExpTransformPlugin(/^```/, createBlock("code")),
+  useRegExpTransformPlugin(/^```/, " ", createBlock("code")),
 );

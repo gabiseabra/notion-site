@@ -7,7 +7,7 @@ import { FloatingToolbar } from "./chrome/FloatingToolbar.js";
 import {
   NotionPluginOptions,
   useNotionPlugin,
-} from "./editable/notion/use-notion-plugin.js";
+} from "./editable/use-notion-plugin/index.js";
 import { EditorTarget } from "./editor/editor-target.js";
 import { ContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";

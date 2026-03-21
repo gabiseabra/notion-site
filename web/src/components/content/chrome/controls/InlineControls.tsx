@@ -7,7 +7,7 @@ import {
   focusOnLink,
   setLink,
   toggleAnnotations,
-} from "../../editable/notion/commands.js";
+} from "../../editable/use-notion-plugin/commands.js";
 import { Editor } from "../../Editor.js";
 import { AnnotationControl } from "./AnnotationControl.js";
 import { ColorControl } from "./ColorControl.js";

@@ -4,7 +4,7 @@ import { Row, RowProps } from "../../layout/FlexBox.js";
 import { AnchoredOverlayProps } from "../../overlays/Overlay.js";
 import { Popover } from "../../overlays/Popover.js";
 import { Editor } from "../Editor.js";
-import { setBlockType } from "../editable/notion/commands.js";
+import { setBlockType } from "../editable/use-notion-plugin/commands.js";
 import styles from "./DocumentToolbar.module.scss";
 import { BlockTypeControl } from "./controls/BlockTypeControl.js";
 import { MenuColorControl } from "./controls/ColorControl.js";
