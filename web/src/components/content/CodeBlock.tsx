@@ -1,7 +1,7 @@
 import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import type { Block as NotionBlock } from "@notion-site/common/utils/notion/block.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
-import { highlight, languages } from "prismjs";
+import Prism from "prismjs";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-jsx";
 import "prismjs/components/prism-markup";
@@ -51,7 +51,7 @@ export function CodeBlock({
           value={code}
           readOnly={!editable}
           highlight={(code) =>
-            highlight(code, languages[prismLanguage], prismLanguage)
+            Prism.highlight(code, Prism.languages[prismLanguage], prismLanguage)
           }
           styles={{
             editor: {
