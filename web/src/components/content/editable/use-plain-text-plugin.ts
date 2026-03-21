@@ -18,7 +18,7 @@ export type PlainTextBlock = {
  */
 export const usePlainTextPlugin = (editor: ContentEditor<PlainTextBlock>) =>
   composePlugins<PlainTextBlock>(
-    useAutoCommitPlugin(600),
+    useAutoCommitPlugin({ debounceMs: 600 }),
     useHistoryPlugin(),
     useInlineMutationPlugin({
       splice: ({ id, content }, offset, deleteCount, insert) => ({
