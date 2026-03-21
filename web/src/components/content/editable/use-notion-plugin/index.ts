@@ -45,7 +45,7 @@ export const useNotionPlugin = (
     }),
     useHistoryPlugin(),
     useInlineMutationPlugin({
-      multiline: options.multiline,
+      multiLine: options.multiline,
       splice(block, ...params) {
         if (!Notion.Block.isRichText(block)) return block;
         return Notion.Block.map(block, (node) => ({

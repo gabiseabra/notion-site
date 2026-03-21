@@ -10,7 +10,7 @@ export type AnyBlock = { id: ID };
  * Optional selection overrides for editor commands.
  * If not provided, defaults to current DOM selection.
  */
-export type CommandOptions = {
+export type ActionOptions = {
   data?: unknown;
   /** @note undefined id flushes everything */
   batchId?: ID;
@@ -83,18 +83,18 @@ export type ContentEditor<TBlock extends AnyBlock> = {
   /**
    * Replace a block's data. Dispatches an `edit` event (can be cancelled).
    */
-  update(block: TBlock, options?: CommandOptions): void;
+  update(block: TBlock, options?: ActionOptions): void;
 
   /**
    * Remove a block from state. Dispatches an `edit` event (can be cancelled).
    */
-  remove(block: TBlock, options?: CommandOptions): void;
+  remove(block: TBlock, options?: ActionOptions): void;
 
   /**
    * Update the block on the left and insert the block on the right next to it.
    * Dispatches an `edit` event (can be cancelled).
    */
-  split(left: TBlock, right: TBlock, options?: CommandOptions): void;
+  split(left: TBlock, right: TBlock, options?: ActionOptions): void;
 
   /**
    * Sync React state with history.
