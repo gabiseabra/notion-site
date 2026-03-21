@@ -30,11 +30,11 @@ export function InlineControls({
     useToolbarControls(editor);
 
   const annotations =
-    text && selection
+    text && selection && selection.type === "range"
       ? Notion.RTF.getAnnotations(text, selection.start, selection.end)
       : undefined;
   const link =
-    text && selection
+    text && selection && selection.type === "range"
       ? Notion.RTF.getLink(text, selection.start, selection.end)
       : undefined;
 

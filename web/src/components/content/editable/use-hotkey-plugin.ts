@@ -1,7 +1,8 @@
 import { MaybeReadonly } from "@notion-site/common/types/readonly.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
+import { EditorCommand } from "../editor/editor-command";
 import { AnyBlock } from "../editor/types.js";
-import { ContentEditorPlugin, EditorCommand } from "./types.js";
+import { ContentEditorPlugin } from "./types.js";
 
 type Mod = "Ctrl" | "Alt" | "Shift" | "Meta";
 type Key =
