@@ -60,10 +60,12 @@ const options = [
 
 export function BlockTypeControl({
   disabled,
+  readOnly,
   value,
   onChange,
 }: {
-  disabled?: boolean | "action";
+  disabled?: boolean;
+  readOnly?: boolean;
   value?: Notion.Block.BlockType;
   onChange: (color: Notion.Block.BlockType) => void;
 }) {
@@ -73,7 +75,7 @@ export function BlockTypeControl({
 
   const dropdown = useDropdown({
     options,
-    disabled: !!disabled,
+    disabled,
     filter: (option, value) =>
       !value || new RegExp(value, "i").test(option.title),
     initialFocusedId: selectedOption?.id,
@@ -149,6 +151,7 @@ export function BlockTypeControl({
             style={{ padding: 2 }}
             placeholder="Block type"
             disabled={disabled}
+            readOnly={readOnly}
             value={dropdown.value ?? selectedOption?.title ?? ""}
             onChange={dropdown.setValue}
             onFocus={() => Dropdown.toggle(dropdown)}

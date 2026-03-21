@@ -26,7 +26,7 @@ export function InlineControls({
   ColorControl: ColorControl;
   LinkControl: LinkControl;
 }) {
-  const { selection, text, disabled, disabledAction, execCommand } =
+  const { selection, text, disabled, readOnly, execCommand } =
     useToolbarControls(editor);
 
   const annotations =
@@ -41,7 +41,8 @@ export function InlineControls({
   return (
     <Row gap={0} alignX="start" alignY="center">
       <AnnotationControl
-        disabled={disabled || disabledAction}
+        disabled={disabled}
+        readOnly={readOnly}
         value={annotations}
         onChange={pipe(toggleAnnotations, execCommand)}
       />
@@ -51,7 +52,8 @@ export function InlineControls({
       <ColorControl
         Overlay={Overlay}
         Control={controls.ColorControl}
-        disabled={disabled || disabledAction}
+        disabled={disabled}
+        readOnly={readOnly}
         value={annotations?.color}
         onChange={pipe((color) => ({ color }), toggleAnnotations, execCommand)}
       />
@@ -59,7 +61,8 @@ export function InlineControls({
       <LinkControl
         Overlay={Overlay}
         Control={controls.LinkControl}
-        disabled={disabled || disabledAction}
+        disabled={disabled}
+        readOnly={readOnly}
         value={link}
         onChange={pipe(setLink, execCommand)}
         onOpen={() => execCommand(focusOnLink)}

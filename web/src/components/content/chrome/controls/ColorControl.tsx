@@ -11,9 +11,10 @@ import { ToolbarMenu } from "../ToolbarMenu.js";
 import styles from "./ColorControl.module.scss";
 
 type ColorControlProps = {
-  disabled?: boolean | "action";
   value?: zNotion.primitives.api_color;
   onChange: (color: zNotion.primitives.api_color) => void;
+  disabled?: boolean;
+  readOnly?: boolean;
 };
 
 export type ColorControl = ComponentType<ColorControlProps>;
@@ -21,9 +22,10 @@ export type ColorControl = ComponentType<ColorControlProps>;
 export function ColorControl({
   Overlay,
   Control,
-  disabled,
   value,
   onChange,
+  disabled,
+  readOnly,
 }: ColorControlProps & {
   Overlay: AnchoredOverlay;
   Control: ColorControl;
@@ -35,11 +37,17 @@ export function ColorControl({
       open={isOpen}
       onClose={() => setIsOpen(false)}
       content={
-        <Control disabled={disabled} value={value} onChange={onChange} />
+        <Control
+          disabled={disabled}
+          readOnly={readOnly}
+          value={value}
+          onChange={onChange}
+        />
       }
     >
       <ToolbarButton
         disabled={disabled}
+        readOnly={readOnly}
         onClick={() => setIsOpen((open) => !disabled && !open)}
       >
         <ColorControlIcon disabled={disabled} color={value} />
@@ -49,9 +57,10 @@ export function ColorControl({
 }
 
 export function MenuColorControl({
-  disabled,
   value,
   onChange,
+  disabled,
+  readOnly,
 }: ColorControlProps) {
   return (
     <ToolbarMenu>
@@ -63,6 +72,7 @@ export function MenuColorControl({
           <ToolbarMenu.Item
             key={color}
             disabled={disabled}
+            readOnly={readOnly}
             active={isColorActive || isBackgroundActive}
             color={color}
             onClick={() => onChange(color)}
@@ -93,9 +103,10 @@ export function MenuColorControl({
 }
 
 export function SwatchColorControl({
-  disabled,
   value,
   onChange,
+  disabled,
+  readOnly,
 }: ColorControlProps) {
   const isBgEnabled = !!value && value.endsWith("background");
   const currentColor = ((!isBgEnabled ? value : value?.slice(0, -11)) ??
@@ -105,7 +116,7 @@ export function SwatchColorControl({
     <Row alignY="center" p={1}>
       <Tooltip
         offset={0.5}
-        disabled={!!disabled || currentColor === "default"}
+        disabled={disabled || currentColor === "default"}
         content={
           <Text as="p" size="caption" m={1}>
             Toggle background color
@@ -121,7 +132,7 @@ export function SwatchColorControl({
         >
           <ColorControlIcon
             color={value}
-            disabled={disabled || currentColor === "default" ? "action" : false}
+            disabled={disabled || currentColor === "default"}
             onClick={() =>
               onChange(
                 isBgEnabled ? currentColor : `${currentColor}_background`,
@@ -135,7 +146,7 @@ export function SwatchColorControl({
         {colors.map((color) => (
           <button
             key={color}
-            disabled={!!disabled}
+            disabled={disabled || readOnly}
             className={[
               styles["color-swatch-button"],
               styles[`color-${color}`],
@@ -162,53 +173,48 @@ export function SwatchColorControl({
 function ColorControlIcon({
   color,
   disabled,
+  readOnly,
   onClick,
   onClickText,
   onClickBackground,
 }: {
   color?: zNotion.primitives.api_color | null;
-  disabled?: boolean | "feedback" | "action";
+  disabled?: boolean;
+  readOnly?: boolean;
   onClick?: () => void;
   onClickText?: () => void;
   onClickBackground?: () => void;
 }) {
   const isBgEnabled = !!color && color.endsWith("background");
-  const currentColor =
-    disabled === true || disabled === "feedback"
-      ? "gray"
-      : (((!isBgEnabled ? color : color?.slice(0, -11)) ??
-          "default") as zNotion.primitives.color);
+  const currentColor = disabled
+    ? "gray"
+    : (((!isBgEnabled ? color : color?.slice(0, -11)) ??
+        "default") as zNotion.primitives.color);
 
   return (
     <span
       className={[
         styles["text-color"],
-        disabled === true || disabled === "feedback" ? styles["disabled"] : "",
+        disabled ? styles["disabled"] : "",
         currentColor ? styles[`color-${currentColor}`] : "",
         isBgEnabled ? styles[`background`] : "",
         !!(onClick || onClickText || onClickBackground) &&
-        !(disabled === true || disabled === "action")
+        !(disabled || readOnly)
           ? styles["clickable"]
           : "",
       ].join(" ")}
-      onClick={disabled !== true && disabled !== "action" ? onClick : undefined}
+      onClick={!(disabled || readOnly) ? onClick : undefined}
     >
       <span
         className={styles["text-color--bg"]}
-        onClick={
-          disabled !== true && disabled !== "action"
-            ? onClickBackground
-            : undefined
-        }
+        onClick={!(disabled || readOnly) ? onClickBackground : undefined}
       />
 
       <svg
         viewBox="0 0 43.65 48.9"
         xmlns="http://www.w3.org/2000/svg"
         className={styles["text-color--text"]}
-        onClick={
-          disabled !== true && disabled !== "action" ? onClickText : undefined
-        }
+        onClick={!(disabled || readOnly) ? onClickText : undefined}
       >
         <path
           d={[

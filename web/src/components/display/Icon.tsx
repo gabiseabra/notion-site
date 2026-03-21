@@ -48,6 +48,8 @@ export type IconControlProps = {
   style?: CSSProperties;
   title?: string;
 
+  disabled?: boolean;
+  readOnly?: boolean;
   onClick?: () => void;
 } & PaddingProps &
   MarginProps;
@@ -63,6 +65,8 @@ export function IconControl({
   children,
   className,
   style,
+  disabled,
+  readOnly,
   onClick,
   ...props
 }: IconControlProps) {
@@ -82,7 +86,8 @@ export function IconControl({
         styles.icon,
         styles[`size-${size}`],
         color && styles[`color-${color}`],
-        onClick && styles.clickable,
+        disabled && styles[`color-gray`],
+        onClick && !disabled && !readOnly && styles.clickable,
       ]
         .filter(isTruthy)
         .join(" ")}
@@ -94,7 +99,7 @@ export function IconControl({
         ...css.getPaddingStyles(props),
         ...css.getMarginStyles(props),
       }}
-      onClick={() => onClick?.()}
+      onClick={disabled || readOnly ? undefined : () => onClick?.()}
       {...omit(props, [...css.paddingProps, ...css.marginProps])}
     >
       {children}

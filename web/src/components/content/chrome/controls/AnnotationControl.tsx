@@ -23,11 +23,13 @@ export function AnnotationControl({
   value,
   onChange,
   disabled,
+  readOnly,
 }: {
   enabledAnnotations?: MaybeReadonly<Annotations[]>;
   value?: Partial<Notion.RTF.Annotations>;
-  onChange: (annotations: Partial<Notion.RTF.Annotations>) => void;
-  disabled: boolean | "action";
+  onChange?: (annotations: Partial<Notion.RTF.Annotations>) => void;
+  disabled?: boolean;
+  readOnly?: boolean;
 }) {
   return (
     <>
@@ -35,8 +37,9 @@ export function AnnotationControl({
         <ToolbarButton
           key={key}
           disabled={disabled}
+          readOnly={readOnly}
           active={value?.[key] === true}
-          onClick={() => onChange({ [key]: true })}
+          onClick={() => onChange?.({ [key]: true })}
         >
           {
             {

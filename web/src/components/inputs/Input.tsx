@@ -22,7 +22,8 @@ export type InputProps = {
   style?: CSSProperties;
 
   value?: string;
-  disabled?: boolean | "feedback" | "action";
+  disabled?: boolean;
+  readOnly?: boolean;
   onChange?: (value: string) => void;
   onClear?: () => void;
   onClick?: (e: MouseEvent<HTMLElement>) => void;
@@ -47,6 +48,7 @@ export function Input({
   type,
   value,
   disabled,
+  readOnly,
   onChange,
   onClear,
   onClick,
@@ -63,7 +65,7 @@ export function Input({
         className,
         styles["input-wrapper"],
         styles[`size-${size}`],
-        disabled === true && styles["disabled"],
+        disabled && styles["disabled"],
         {
           [0]: "",
           [0.5]: styles["elevation-05"],
@@ -73,7 +75,7 @@ export function Input({
         .filter(isTruthy)
         .join(" ")}
       style={style}
-      onClick={disabled ? undefined : onClick}
+      onClick={disabled || readOnly ? undefined : onClick}
     >
       {!hiddenLabel && <div className={styles.label}>{label}</div>}
 
@@ -83,7 +85,8 @@ export function Input({
         <Component
           type={type}
           value={value}
-          disabled={!!disabled}
+          disabled={disabled}
+          readOnly={readOnly}
           onChange={(e) => {
             const element = e.currentTarget;
             onChange?.(
@@ -100,10 +103,12 @@ export function Input({
         {!!value && onClear && (
           <IconControl
             as="button"
+            disabled={disabled}
+            readOnly={readOnly}
             color={disabled === true ? "default" : "gray"}
             title={label ? `Clear ${label}` : "Clear search"}
             size={({ s: "xs", m: "s", l: "m" } as const)[size]}
-            onClick={disabled ? undefined : onClear}
+            onClick={onClear}
           >
             <IoIosClose />
           </IconControl>

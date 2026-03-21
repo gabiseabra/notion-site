@@ -5,7 +5,8 @@ export type ToolbarButtonProps = {
   children: ReactNode;
   title?: string;
   active?: boolean;
-  disabled?: boolean | "action";
+  disabled?: boolean;
+  readOnly?: boolean;
   onClick?: () => void;
 };
 
@@ -14,6 +15,7 @@ export function ToolbarButton({
   title,
   active,
   disabled,
+  readOnly,
   onClick,
 }: ToolbarButtonProps) {
   return (
@@ -21,18 +23,11 @@ export function ToolbarButton({
       as="button"
       size="s"
       m={1}
-      color={active ? "blue" : disabled === true ? "gray" : "default"}
+      color={active ? "blue" : disabled ? "gray" : "default"}
       title={title}
-      onClick={
-        disabled === false || disabled !== "action" ? onClick : undefined
-      }
+      onClick={!(disabled || readOnly) ? onClick : undefined}
       style={{
-        cursor:
-          disabled === "action"
-            ? "not-allowed"
-            : disabled === false
-              ? "pointer"
-              : "default",
+        cursor: readOnly ? "not-allowed" : disabled ? "default" : "pointer",
       }}
     >
       {children}

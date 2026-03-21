@@ -12,16 +12,15 @@ export function useToolbarControls(editor: Editor) {
   const text = block && Notion.Block.extractRichText(block);
 
   const disabled = !target;
-  const disabledAction =
-    (!target || target.type == "focus" || SelectionRange.isCollapsed(target)) &&
-    ("action" as const);
+  const readOnly =
+    !target || target.type == "focus" || SelectionRange.isCollapsed(target);
 
   return {
     selection: target,
     block,
     text,
     disabled,
-    disabledAction,
+    readOnly,
     execCommand: target ? ExecCommand(editor, target) : () => {},
   };
 }

@@ -21,12 +21,14 @@ ToolbarMenu.Item = function ToolbarMenuItem({
   color,
   active,
   disabled,
+  readOnly,
   onClick,
 }: {
   children: ReactNode;
   color?: zNotion.primitives.color;
   active?: boolean;
-  disabled?: boolean | "feedback" | "action";
+  disabled?: boolean;
+  readOnly?: boolean;
   onClick?: () => void;
 }) {
   return (
@@ -35,14 +37,12 @@ ToolbarMenu.Item = function ToolbarMenuItem({
         styles["toolbar-menu-item"],
         color && styles[`color-${color}`],
         active && styles["active"],
-        (disabled === true || disabled === "feedback") && styles["disabled"],
-        disabled !== "action" && styles["clickable"],
+        disabled && styles["disabled"],
+        !(disabled || readOnly) && styles["clickable"],
       ]
         .filter(isTruthy)
         .join(" ")}
-      onClick={
-        disabled === false || disabled !== "action" ? onClick : undefined
-      }
+      onClick={!(disabled || readOnly) ? onClick : undefined}
     >
       {children}
     </button>

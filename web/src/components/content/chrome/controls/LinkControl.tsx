@@ -20,6 +20,7 @@ export function LinkControl({
   Overlay,
   Control,
   disabled,
+  readOnly,
   value,
   onChange,
   onOpen,
@@ -27,7 +28,8 @@ export function LinkControl({
 }: {
   Overlay: AnchoredOverlay;
   Control: LinkControl;
-  disabled?: boolean | "action";
+  disabled?: boolean;
+  readOnly?: boolean;
   value?: Notion.RTF.Link;
   onChange: (link: Notion.RTF.Link) => void;
   onOpen?: () => void;
@@ -43,6 +45,7 @@ export function LinkControl({
     >
       <ToolbarButton
         disabled={disabled}
+        readOnly={readOnly}
         active={!!value}
         onClick={() => {
           const _isOpen = !disabled && !isOpen;
