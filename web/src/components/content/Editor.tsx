@@ -1,9 +1,10 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { memo, Ref, useImperativeHandle } from "react";
+import { renderSlot, Slot } from "../../utils/slot";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
-import { DocumentToolbar } from "./chrome/DocumentToolbar.js";
-import { FloatingToolbar } from "./chrome/FloatingToolbar.js";
+import { DocumentToolbar } from "./chrome/DocumentToolbar";
+import { FloatingToolbar } from "./chrome/FloatingToolbar";
 import {
   NotionPluginOptions,
   useNotionPlugin,
@@ -21,6 +22,9 @@ export type EditorProps = {
   onChange: (block: Notion.Block[]) => void;
   options?: NotionPluginOptions;
   disabled?: boolean;
+
+  before?: Slot<Editor>;
+  after?: Slot<Editor>;
 };
 
 export const Editor = memo(function ContentEditor({
@@ -29,6 +33,14 @@ export const Editor = memo(function ContentEditor({
   onChange,
   options,
   disabled,
+
+  before = (editor) => (
+    <>
+      <FloatingToolbar editor={editor} />
+      <DocumentToolbar mb={4} editor={editor} />
+    </>
+  ),
+  after,
 }: EditorProps) {
   const { editor, editable } = useContentEditor({
     initialValue,
@@ -41,9 +53,7 @@ export const Editor = memo(function ContentEditor({
   return (
     <EditorTargetProvider editor={editor}>
       <div>
-        <FloatingToolbar editor={editor} />
-
-        <DocumentToolbar mb={4} editor={editor} />
+        {renderSlot(editor, before)}
 
         <RootBlock
           value={editor.blocks}
@@ -69,6 +79,8 @@ export const Editor = memo(function ContentEditor({
             </Block>
           )}
         />
+
+        {renderSlot(editor, after)}
       </div>
     </EditorTargetProvider>
   );
