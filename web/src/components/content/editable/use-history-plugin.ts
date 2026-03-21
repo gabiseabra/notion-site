@@ -17,7 +17,7 @@ import { AnyContentEditorPlugin } from "./types.js";
 export const useHistoryPlugin = (): AnyContentEditorPlugin => (editor) => {
   useEffect(() => {
     const direction = editor.history.direction;
-    const cmd = editor.history.command;
+    const cmd = editor.history.action;
     if (!cmd) return;
 
     const id = EditorAction.id(cmd, direction);
@@ -90,7 +90,7 @@ const isRedoable = <TBlock extends AnyBlock>(
   editor: ContentEditor<TBlock>,
 ) => {
   editor.peek(id);
-  return editor.history.commands.length > editor.history.position;
+  return editor.history.actions.length > editor.history.position;
 };
 
 useHistoryPlugin.EventData = class HistoryEventData {

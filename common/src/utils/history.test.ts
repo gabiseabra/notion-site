@@ -10,7 +10,7 @@ describe("History", () => {
 
     expect(history.getState()).toEqual([]);
     expect(history.position).toBe(0);
-    expect(history.command).toBeNull();
+    expect(history.action).toBeNull();
   });
 
   it("applies pushed commands in order", () => {
@@ -21,7 +21,7 @@ describe("History", () => {
 
     expect(history.getState()).toEqual(["A", "B"]);
     expect(history.position).toBe(2);
-    expect(history.command).toBe("B");
+    expect(history.action).toBe("B");
     expect(history.direction).toBe(1);
   });
 
@@ -64,7 +64,7 @@ describe("History", () => {
     history.undo();
 
     expect(history.direction).toBe(-1);
-    expect(history.command).toBe("C");
+    expect(history.action).toBe("C");
   });
 
   it("command is last redone after redo in the middle", () => {
@@ -80,7 +80,7 @@ describe("History", () => {
     history.redo(); // position: 2 (not at end)
 
     expect(history.direction).toBe(1);
-    expect(history.command).toBe("B");
+    expect(history.action).toBe("B");
   });
 
   it("truncates redo stack on push after undo", () => {

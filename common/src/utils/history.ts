@@ -1,5 +1,5 @@
-export class History<State, Cmd> {
-  readonly commands: Cmd[] = [];
+export class History<State, Act> {
+  readonly actions: Act[] = [];
   private currentPosition = 0;
   private lastPosition = 0;
   private snapshots: Map<number, State> = new Map();
@@ -7,7 +7,7 @@ export class History<State, Cmd> {
 
   constructor(
     private initialState: State,
-    private apply: (state: State, cmd: Cmd) => State,
+    private apply: (state: State, cmd: Act) => State,
   ) {}
 
   getState(): State {
@@ -21,14 +21,14 @@ export class History<State, Cmd> {
       }
     }
 
-    return this.commands
+    return this.actions
       .slice(startPos, this.currentPosition)
       .reduce((s, cmd) => this.apply(s, cmd), state);
   }
 
-  push(cmd: Cmd) {
-    this.commands.length = this.currentPosition; // truncate to current cursor
-    this.commands.push(cmd);
+  push(cmd: Act) {
+    this.actions.length = this.currentPosition; // truncate to current cursor
+    this.actions.push(cmd);
     this.lastPosition = this.currentPosition;
     this.currentPosition++;
 
@@ -45,7 +45,7 @@ export class History<State, Cmd> {
   }
 
   redo(): State | null {
-    if (this.currentPosition === this.commands.length) return null;
+    if (this.currentPosition === this.actions.length) return null;
     this.lastPosition = this.currentPosition;
     this.currentPosition++;
     return this.getState();
@@ -55,11 +55,11 @@ export class History<State, Cmd> {
     return { state: this.getState(), position: this.currentPosition };
   }
 
-  get command(): Cmd | null {
-    if (this.commands.length === 0) return null;
+  get action(): Act | null {
+    if (this.actions.length === 0) return null;
     return this.direction === -1
-      ? (this.commands[this.currentPosition] ?? null)
-      : (this.commands[this.currentPosition - 1] ?? null);
+      ? (this.actions[this.currentPosition] ?? null)
+      : (this.actions[this.currentPosition - 1] ?? null);
   }
 
   get position() {

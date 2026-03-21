@@ -90,8 +90,8 @@ export function usePendingChanges<TBlock extends AnyBlock>({
       const selectionBefore =
         changes.selectionBefore ??
         pending?.selectionAfter ??
-        (editor.history.command
-          ? EditorAction.selectionAfter(editor.history.command)
+        (editor.history.action
+          ? EditorAction.selectionAfter(editor.history.action)
           : undefined);
       const selectionAfter = changes.selectionAfter;
 
