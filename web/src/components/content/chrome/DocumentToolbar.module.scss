@@ -5,4 +5,5 @@
   background: var(--bg-default);
   border-radius: var(--radius);
   @include shadow.shadow(1);
+  overflow-x: auto;
 }
