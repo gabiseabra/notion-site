@@ -77,19 +77,29 @@ export const EditorAction = {
     );
   },
 
+  /** @deprecated */
   selection<TBlock extends AnyBlock>(
     cmd: EditorAction<TBlock>,
     direction: 1 | -1,
   ): SelectionRange | undefined {
-    if (direction === -1) {
-      if (cmd.type !== "apply") return cmd.selectionBefore;
-      return cmd.commands.filter(hasNonNullableProperty("selectionBefore"))[0]
-        ?.selectionBefore;
-    } else {
-      if (cmd.type !== "apply") return cmd.selectionAfter;
-      return cmd.commands.filter(hasNonNullableProperty("selectionAfter")).pop()
-        ?.selectionAfter;
-    }
+    if (direction === -1) return EditorAction.selectionBefore(cmd);
+    else return EditorAction.selectionAfter(cmd);
+  },
+
+  selectionBefore<TBlock extends AnyBlock>(
+    cmd: EditorAction<TBlock>,
+  ): SelectionRange | undefined {
+    if (cmd.type !== "apply") return cmd.selectionBefore;
+    return cmd.commands.filter(hasNonNullableProperty("selectionBefore"))[0]
+      ?.selectionBefore;
+  },
+
+  selectionAfter<TBlock extends AnyBlock>(
+    cmd: EditorAction<TBlock>,
+  ): SelectionRange | undefined {
+    if (cmd.type !== "apply") return cmd.selectionAfter;
+    return cmd.commands.filter(hasNonNullableProperty("selectionAfter")).pop()
+      ?.selectionAfter;
   },
 };
 

@@ -1,6 +1,7 @@
 import { WithRequired } from "@notion-site/common/types/object.js";
 import { useRef } from "react";
 import { SelectionRange } from "../../../utils/selection-range";
+import { EditorAction } from "./editor-history";
 import { ActionOptions, AnyBlock, ContentEditor, ID } from "./types";
 
 type Changes<TBlock> = { block: TBlock } & Omit<ActionOptions, "batchId">;
@@ -87,7 +88,11 @@ export function usePendingChanges<TBlock extends AnyBlock>({
     }: WithRequired<Changes<TBlock>, "selectionAfter">) {
       const pending = pendingRef.current;
       const selectionBefore =
-        changes.selectionBefore ?? pending?.selectionAfter;
+        changes.selectionBefore ??
+        pending?.selectionAfter ??
+        (editor.history.command
+          ? EditorAction.selectionAfter(editor.history.command)
+          : undefined);
       const selectionAfter = changes.selectionAfter;
 
       editor.update(block, {
