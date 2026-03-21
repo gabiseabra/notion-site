@@ -11,6 +11,18 @@ type PendingChanges<TBlock> = { batchId: ID } & WithRequired<
   "selectionAfter" | "selectionBefore"
 >;
 
+/**
+ * Tracks pending block changes from a plugin or toolbar component and groups them
+ * into a single history entry on flush.
+ *
+ * Call `begin` at the start of a user gesture to declare the affected block and capture
+ * the initial cursor position. Call `update` as changes accumulate. When the gesture ends,
+ * call `flush` directly or debounce it with `schedule`. Switching to a different block
+ * mid-gesture automatically flushes the previous one.
+ *
+ * Pass `debounceMs: false` for toolbar actions that should take effect right away — in
+ * this mode every `update` commits immediately without batching.
+ */
 export function usePendingChanges<TBlock extends AnyBlock>({
   editor,
   debounceMs,
@@ -22,6 +34,8 @@ export function usePendingChanges<TBlock extends AnyBlock>({
   const timerRef = useRef<number>(null);
 
   return Object.assign(pendingRef, {
+    /** Closes the pending batch and pushes it to history. Records any cursor drift
+     * since the last `update` so redo restores the exact caret position. */
     flush() {
       const pending = pendingRef.current;
       pendingRef.current = undefined;
@@ -52,16 +66,21 @@ export function usePendingChanges<TBlock extends AnyBlock>({
       // return editor.flush(data);
     },
 
+    /** Cancels a pending scheduled flush. */
     cancel() {
       if (timerRef.current) clearTimeout(timerRef.current);
     },
 
+    /** Schedules a `flush` after `debounceMs`. Resets the timer on each call. */
     schedule() {
       if (typeof debounceMs !== "number") return;
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = window.setTimeout(() => this.flush(), debounceMs);
     },
 
+    /** Starts or resumes a pending change for a block. If a different block is already
+     * pending, it is flushed first. Safe to call multiple times for the same block —
+     * `selectionBefore` is preserved from the first call. */
     begin(changes: Omit<PendingChanges<TBlock>, "batchId">) {
       if (debounceMs === false) {
         return {
@@ -82,6 +101,8 @@ export function usePendingChanges<TBlock extends AnyBlock>({
       return pendingRef.current;
     },
 
+    /** Applies a new block state to the pending change and records it in the editor
+     * batch. Commits immediately when `debounceMs` is `false`. */
     update({
       block,
       ...changes
