@@ -1,7 +1,7 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { SelectionRange } from "../../../../utils/selection-range.js";
 import { EditorCommand } from "../../editor/editor-command";
-import { EditorSelection } from "../../editor/editor-selection";
+import { EditorTarget } from "../../editor/editor-target.js";
 
 export const isAnnotated =
   (annotations: Partial<Notion.RTF.Annotations>) =>
@@ -15,7 +15,7 @@ export const isAnnotated =
 
 export const toggleAnnotations =
   (annotations: Partial<Notion.RTF.Annotations>): EditorCommand<Notion.Block> =>
-  (block, selection) =>
+  ({ block, data: selection }) =>
     selection.type === "range"
       ? Notion.Block.toggleAnnotations(
           block,
@@ -27,14 +27,17 @@ export const toggleAnnotations =
 
 export const setLink =
   (link: Notion.RTF.Link): EditorCommand<Notion.Block> =>
-  (block, selection) =>
+  ({ block, data: selection }) =>
     selection.type === "range"
       ? Notion.Block.mapRichText(block, (rich_text) =>
           Notion.RTF.setLink(rich_text, link, selection.start, selection.end),
         )
       : undefined;
 
-export const focusOnLink: EditorCommand<Notion.Block> = (block, selection) => {
+export const focusOnLink: EditorCommand<Notion.Block> = ({
+  block,
+  data: selection,
+}) => {
   const selectionRange =
     selection.type === "range"
       ? selection
@@ -63,7 +66,7 @@ export const focusOnLink: EditorCommand<Notion.Block> = (block, selection) => {
 
 export const setBlockType =
   (type: Notion.Block.BlockType): EditorCommand<Notion.Block> =>
-  (block) => {
+  ({ block }) => {
     return Notion.Block.mapRichText(
       Notion.WIP.create({
         type,
@@ -77,7 +80,7 @@ export const setBlockType =
 
 export const downgradeBlock =
   (block: Notion.Block): EditorCommand<Notion.Block> =>
-  (_block, _selection, editor) => {
+  ({ editor }) => {
     const data = "delete-block-command";
 
     editor.update(
@@ -100,9 +103,9 @@ export const downgradeBlock =
 
 export const updateBlock =
   (block: Notion.Block): EditorCommand<Notion.Block> =>
-  (_block, _selection, editor) => {
+  ({ editor }) => {
     const data = "update-block-command";
-    const selection = EditorSelection.read(editor);
+    const selection = EditorTarget.read(editor);
     const selectionRange =
       !selection || selection.type === "focus"
         ? {

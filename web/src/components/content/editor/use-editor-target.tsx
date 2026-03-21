@@ -10,34 +10,35 @@ import {
 } from "react";
 import { guardDispatch } from "../../../hooks/guard-dispatch.js";
 import { useDocumentEventListener } from "../../../hooks/use-document-event-listener.js";
-import { EditorSelection } from "./editor-selection.js";
+import { EditorTarget } from "./editor-target.js";
 import { AnyBlock, ContentEditor } from "./types.js";
 
-type GetSelection = <TBlock extends AnyBlock>(
+type GetTarget = <TBlock extends AnyBlock>(
   editor: ContentEditor<TBlock>,
-) => EditorSelection<TBlock> | null;
+) => EditorTarget<TBlock> | null;
 
-const EditorSelectionContext = createContext<GetSelection>(() => null);
+const EditorTargetContext = createContext<GetTarget>(() => null);
 
-export function useEditorSelection<TBlock extends AnyBlock>(
+export function useEditorTarget<TBlock extends AnyBlock>(
   editor: ContentEditor<TBlock>,
-): EditorSelection<TBlock> | null {
-  const getSelection = useContext(EditorSelectionContext);
+): EditorTarget<TBlock> | null {
+  const getSelection = useContext(EditorTargetContext);
   return getSelection(editor);
 }
 
-export function EditorSelectionProvider<TBlock extends AnyBlock>({
+export function EditorTargetProvider<TBlock extends AnyBlock>({
   ref,
   editor,
   children,
 }: {
-  ref?: Ref<EditorSelectionProvider.Ref<TBlock>>;
+  ref?: Ref<EditorTargetProvider.Ref<TBlock>>;
   editor: ContentEditor<TBlock>;
   children: ReactNode;
 }) {
-  const [selection, setSelectionRange] =
-    useState<EditorSelection<TBlock> | null>(null);
-  const getSelection = useCallback<GetSelection>(
+  const [selection, setSelectionRange] = useState<EditorTarget<TBlock> | null>(
+    null,
+  );
+  const getSelection = useCallback<GetTarget>(
     (targetEditor) => {
       if ((targetEditor as unknown) === (editor as unknown)) return selection;
       return null;
@@ -46,25 +47,25 @@ export function EditorSelectionProvider<TBlock extends AnyBlock>({
   );
 
   useDocumentEventListener("selectionchange", () => {
-    setSelectionRange(guardDispatch(EditorSelection.read(editor)));
+    setSelectionRange(guardDispatch(EditorTarget.read(editor)));
   });
 
   // Set selection on mount
   useEffect(() => {
-    setSelectionRange(EditorSelection.read(editor));
+    setSelectionRange(EditorTarget.read(editor));
   }, []);
 
   useImperativeHandle(ref, () => ({ selection }), [selection]);
 
   return (
-    <EditorSelectionContext.Provider value={getSelection}>
+    <EditorTargetContext.Provider value={getSelection}>
       {children}
-    </EditorSelectionContext.Provider>
+    </EditorTargetContext.Provider>
   );
 }
 
-export namespace EditorSelectionProvider {
+export namespace EditorTargetProvider {
   export type Ref<TBlock extends AnyBlock> = {
-    selection: EditorSelection<TBlock> | null;
+    selection: EditorTarget<TBlock> | null;
   };
 }

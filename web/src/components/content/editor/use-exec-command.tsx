@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from "react";
 import { EditorCommand, ExecCommand } from "./editor-command";
-import { EditorSelection } from "./editor-selection";
+import { EditorTarget } from "./editor-target";
 import { AnyBlock, ContentEditor } from "./types";
-import { useEditorSelection } from "./use-editor-selection";
+import { useEditorTarget } from "./use-editor-target";
 
 function useFallback<T>(value: T | null, fallback: T): T | null {
   return value === null ? null : (value ?? fallback);
@@ -10,10 +10,10 @@ function useFallback<T>(value: T | null, fallback: T): T | null {
 
 export function useExecCommand<TBlock extends AnyBlock>(
   editor: ContentEditor<TBlock>,
-  overrideSelection?: EditorSelection<TBlock> | null,
+  overrideSelection?: EditorTarget<TBlock> | null,
   overrideBlock?: TBlock | null,
 ): ExecCommand<TBlock> {
-  const selection = useFallback(overrideSelection, useEditorSelection(editor));
+  const selection = useFallback(overrideSelection, useEditorTarget(editor));
   const block =
     useFallback(
       overrideBlock,
@@ -26,16 +26,14 @@ export function useExecCommand<TBlock extends AnyBlock>(
       ),
     ) ?? undefined;
 
-  console.log(selection, block);
-
   return useCallback(
     (command: EditorCommand<TBlock>) =>
       ExecCommand(
         editor,
         selection,
         block,
-      )((editor, selection, block) => {
-        if (selection) command(editor, selection, block);
+      )(({ editor, data, block }) => {
+        if (data) command({ editor, data, block });
       }),
     [editor, selection, block],
   );

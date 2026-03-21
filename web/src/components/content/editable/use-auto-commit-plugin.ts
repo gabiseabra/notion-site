@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { EditorSelection } from "../editor/editor-selection.js";
+import { EditorTarget } from "../editor/editor-target.js";
 import { AnyContentEditorPlugin } from "./types.js";
 
 /**
@@ -19,14 +19,15 @@ export const useAutoCommitPlugin =
       commitTimeoutRef.current = window.setTimeout(() => {
         if (editor.history.position <= editor.revision) return;
 
-        const activeSelection = EditorSelection.read(editor);
+        const target = EditorTarget.read(editor);
+        const selection = target && EditorTarget.extractRange(target);
 
-        if (activeSelection) {
+        if (selection) {
           editor.bus.addEventListener(
             "postcommit",
             () => {
-              const element = editor.ref(activeSelection.id);
-              if (element) SelectionRange.apply(element, activeSelection);
+              const element = editor.ref(target.id);
+              if (element) SelectionRange.apply(element, selection);
             },
             { once: true },
           );

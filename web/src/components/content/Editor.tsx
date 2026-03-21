@@ -8,10 +8,10 @@ import {
   NotionPluginOptions,
   useNotionPlugin,
 } from "./editable/notion/use-notion-plugin.js";
-import { EditorSelection } from "./editor/editor-selection.js";
+import { EditorTarget } from "./editor/editor-target.js";
 import { ContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
-import { EditorSelectionProvider } from "./editor/use-editor-selection.js";
+import { EditorTargetProvider } from "./editor/use-editor-target.js";
 
 export type Editor = ContentEditor<Notion.Block>;
 
@@ -39,7 +39,7 @@ export const Editor = memo(function ContentEditor({
   useImperativeHandle(ref, () => editor, [editor]);
 
   return (
-    <EditorSelectionProvider editor={editor}>
+    <EditorTargetProvider editor={editor}>
       <div>
         <FloatingToolbar editor={editor} />
 
@@ -52,16 +52,13 @@ export const Editor = memo(function ContentEditor({
               value={block}
               editable={!disabled}
               onEditorChange={(block) => {
-                const selection = EditorSelection.read(editor);
+                const target = EditorTarget.read(editor);
+                const selection = target && EditorTarget.extractRange(target);
                 editor.update(block, {
                   selectionAfter:
                     selection?.id === block.id
                       ? selection
-                      : {
-                          start: 0,
-                          end: 0,
-                          id: block.id,
-                        },
+                      : { start: 0, end: 0 },
                   selectionBefore: selection ?? undefined,
                 });
                 editor.commit();
@@ -73,6 +70,6 @@ export const Editor = memo(function ContentEditor({
           )}
         />
       </div>
-    </EditorSelectionProvider>
+    </EditorTargetProvider>
   );
 });

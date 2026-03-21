@@ -1,7 +1,7 @@
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { AnyBlock, ContentEditor } from "./types.js";
 
-export type EditorSelection<TBlock extends AnyBlock> =
+export type EditorTarget<TBlock extends AnyBlock> =
   | (SelectionRange & {
       type: "range";
       id: TBlock["id"];
@@ -11,10 +11,10 @@ export type EditorSelection<TBlock extends AnyBlock> =
       id: TBlock["id"];
     };
 
-export const EditorSelection = {
+export const EditorTarget = {
   read<TBlock extends AnyBlock>(
     editor: ContentEditor<TBlock>,
-  ): EditorSelection<TBlock> | null {
+  ): EditorTarget<TBlock> | null {
     const sel = window.getSelection();
     const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
 
@@ -35,5 +35,17 @@ export const EditorSelection = {
       }
     }
     return null;
+  },
+
+  isRange<TBlock extends AnyBlock>(
+    selection: EditorTarget<TBlock>,
+  ): selection is Extract<EditorTarget<TBlock>, { type: "range" }> {
+    return selection.type === "range";
+  },
+
+  extractRange<TBlock extends AnyBlock>(
+    selection: EditorTarget<TBlock>,
+  ): Extract<EditorTarget<TBlock>, { type: "range" }> | null {
+    return EditorTarget.isRange(selection) ? selection : null;
   },
 };

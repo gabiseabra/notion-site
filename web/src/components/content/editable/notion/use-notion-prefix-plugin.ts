@@ -36,7 +36,11 @@ const useNotionPrefixPlugin =
       )
         return;
 
-      const newBlock = transform(editor.peek(block.id) ?? block, match, editor);
+      const newBlock = transform({
+        block: editor.peek(block.id) ?? block,
+        data: match,
+        editor,
+      });
 
       if (!newBlock) return;
 
@@ -59,7 +63,7 @@ function createBlock(
   type: Notion.Block.BlockType,
   map: (block: Notion.Block) => Notion.Block = (x) => x,
 ): EditorCommand<Notion.Block, RegExpMatchArray> {
-  return (block, match) => {
+  return ({ block, data: match }) => {
     if (block.type === type) return;
     return map(
       Notion.Block.mapRichText(
@@ -78,11 +82,11 @@ function createBlock(
   };
 }
 
-const createNumberedList: EditorCommand<Notion.Block, RegExpMatchArray> = (
+const createNumberedList: EditorCommand<Notion.Block, RegExpMatchArray> = ({
   block,
-  match,
+  data: match,
   editor,
-) => {
+}) => {
   const siblings = editor.blocks.filter((b) =>
     Notion.Block.parentEquals(b.parent, block.parent),
   );

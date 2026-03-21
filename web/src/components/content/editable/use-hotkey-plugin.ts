@@ -1,6 +1,6 @@
 import { MaybeReadonly } from "@notion-site/common/types/readonly.js";
-import { SelectionRange } from "../../../utils/selection-range.js";
 import { EditorCommand } from "../editor/editor-command";
+import { EditorTarget } from "../editor/editor-target";
 import { AnyBlock } from "../editor/types.js";
 import { ContentEditorPlugin } from "./types.js";
 
@@ -58,7 +58,8 @@ export const useHotkeyPlugin =
   (block) => ({
     onKeyDown(e) {
       const key = toHotkey(e.nativeEvent);
-      const selection = SelectionRange.read(e.currentTarget);
+      const target = EditorTarget.read(editor);
+      const selection = target && EditorTarget.extractRange(target);
 
       if (
         !selection ||
@@ -69,7 +70,11 @@ export const useHotkeyPlugin =
         return;
 
       const currentBlock = editor.peek(block.id) ?? block;
-      const nextBlock = hotkey.command(currentBlock, selection, editor);
+      const nextBlock = hotkey.command({
+        block: currentBlock,
+        data: target,
+        editor,
+      });
 
       if (nextBlock) {
         const data = new useHotkeyPlugin.EventData(block, key);
