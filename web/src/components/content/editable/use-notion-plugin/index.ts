@@ -25,6 +25,7 @@ export const useNotionPlugin = (
   options: NotionPluginOptions = {
     multiline: true,
     logging: env.DEV,
+    autoCommit: 600,
   },
 ) =>
   composePlugins<Notion.Block>(
