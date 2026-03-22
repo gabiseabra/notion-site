@@ -3,7 +3,7 @@ import { History } from "./history.js";
 
 describe("History", () => {
   const createHistory = () =>
-    new History<string[], string>([], (state, cmd) => [...state, cmd]);
+    new History<string, string[]>([], (state, cmd) => [...state, cmd]);
 
   it("returns initial state with no commands", () => {
     const history = createHistory();
@@ -95,7 +95,7 @@ describe("History.map", () => {
   type MappedAct = { replace: string };
 
   const createBase = () =>
-    new History<Record<string, string>, BaseAct>(
+    new History<BaseAct, Record<string, string>>(
       { content: "hello", other: "world" },
       (state, cmd) => ({ ...state, [cmd.key]: cmd.replace }),
     );

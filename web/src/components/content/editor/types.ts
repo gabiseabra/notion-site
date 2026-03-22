@@ -47,7 +47,7 @@ export interface ContentEditor<TBlock extends AnyBlock> {
    * does not flush pending changes, so if you have any, they will be overwritten.
    * Make sure to flush by calling `peek` before doing it.
    */
-  readonly history: IHistory<TBlock[], EditorAction<TBlock>>;
+  readonly history: IHistory<EditorAction<TBlock>, TBlock[]>;
 
   /**
    * Emits lifecycle events.

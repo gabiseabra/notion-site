@@ -104,8 +104,8 @@ export const EditorAction = {
 };
 
 export class EditorHistory<TBlock extends AnyBlock> extends History<
-  TBlock[],
-  EditorAction<TBlock>
+  EditorAction<TBlock>,
+  TBlock[]
 > {
   constructor(initialValue: TBlock[]) {
     super(initialValue, (blocks, cmd) => applyAction(blocks, cmd));

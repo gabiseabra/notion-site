@@ -1,4 +1,4 @@
-export interface IHistory<State, Act> {
+export interface IHistory<Act, State> {
   readonly action: Act | null;
   readonly position: number;
   readonly direction: 1 | -1;
@@ -8,7 +8,7 @@ export interface IHistory<State, Act> {
   redo(dryRun?: boolean): boolean;
 }
 
-export class History<State, Act> implements IHistory<State, Act> {
+export class History<Act, State> implements IHistory<Act, State> {
   readonly actions: Act[] = [];
   private currentPosition = 0;
   private lastPosition = 0;
@@ -78,7 +78,7 @@ export class History<State, Act> implements IHistory<State, Act> {
     return this.currentPosition >= this.lastPosition ? 1 : -1;
   }
 
-  static clone<T, A>(base: History<T, A>): History<T, A> {
+  static clone<A, T>(base: History<A, T>): History<A, T> {
     const h = new History(base.initialState, base.apply);
 
     h.actions.push(...base.actions);
@@ -94,11 +94,11 @@ export class History<State, Act> implements IHistory<State, Act> {
    * State is projected and actions are translated when pushed. The mapped
    * history's bus fires the same events as the base.
    */
-  static map<S, A, T, B>(
-    base: History<S, A>,
+  static map<A, S, B, T>(
+    base: History<A, S>,
     mapState: (s: S) => T,
     mapAction: (a: B) => A,
-  ): IHistory<T, B> {
+  ): IHistory<B, T> {
     return {
       action: null,
       get position() {
