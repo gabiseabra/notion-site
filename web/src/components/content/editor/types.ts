@@ -1,6 +1,7 @@
+import { IHistory } from "@notion-site/common/utils/history.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import type { EditorEventTarget } from "./editor-event.js";
-import { EditorActionCmd, EditorHistory } from "./editor-history.js";
+import { EditorAction, EditorActionCmd } from "./editor-history.js";
 
 export type ID = string | number | symbol;
 
@@ -28,17 +29,17 @@ export type EditorBatch<TBlock extends AnyBlock> = {
 /**
  * Shared state passed to plugins in their editor setup phase.
  */
-export type ContentEditor<TBlock extends AnyBlock> = {
+export interface ContentEditor<TBlock extends AnyBlock> {
   /**
    * Last committed state. Updated after `commit()`.
    * May be stale if edits were made since last commit — check `isDirty`.
    */
-  blocks: TBlock[];
+  readonly blocks: TBlock[];
   /**
    * History position at the time of last commit.
    * Increases with each edit, decreases on undo.
    */
-  revision: number;
+  readonly revision: number;
 
   /**
    * Manages state of uncommitted changes.
@@ -46,12 +47,13 @@ export type ContentEditor<TBlock extends AnyBlock> = {
    * does not flush pending changes, so if you have any, they will be overwritten.
    * Make sure to flush by calling `peek` before doing it.
    */
-  history: EditorHistory<TBlock>;
+  readonly history: IHistory<TBlock[], EditorAction<TBlock>>;
+
   /**
    * Emits lifecycle events.
    * Plugins subscribe here to intercept or react to editor changes.
    */
-  bus: EditorEventTarget<TBlock>;
+  readonly bus: EditorEventTarget<TBlock>;
 
   // Batch stuff
 
@@ -100,4 +102,4 @@ export type ContentEditor<TBlock extends AnyBlock> = {
    * Sync React state with history.
    */
   commit(data?: unknown): void;
-};
+}

@@ -1,4 +1,14 @@
-export class History<State, Act> {
+export interface IHistory<State, Act> {
+  readonly action: Act | null;
+  readonly position: number;
+  readonly direction: 1 | -1;
+  snapshot(): { state: State; position: number };
+  push(cmd: Act): void;
+  undo(dryRun?: boolean): boolean;
+  redo(dryRun?: boolean): boolean;
+}
+
+export class History<State, Act> implements IHistory<State, Act> {
   readonly actions: Act[] = [];
   private currentPosition = 0;
   private lastPosition = 0;
@@ -10,7 +20,11 @@ export class History<State, Act> {
     private apply: (state: State, cmd: Act) => State,
   ) {}
 
-  getState(): State {
+  snapshot(): { state: State; position: number } {
+    return { state: this.getState(), position: this.currentPosition };
+  }
+
+  getState() {
     let startPos = 0;
     let state = this.initialState;
 
@@ -37,22 +51,22 @@ export class History<State, Act> {
     }
   }
 
-  undo(): State | null {
-    if (this.currentPosition === 0) return null;
-    this.lastPosition = this.currentPosition;
-    this.currentPosition--;
-    return this.getState();
+  undo(dryRun?: boolean) {
+    if (this.currentPosition === 0) return false;
+    if (!dryRun) {
+      this.lastPosition = this.currentPosition;
+      this.currentPosition--;
+    }
+    return true;
   }
 
-  redo(): State | null {
-    if (this.currentPosition === this.actions.length) return null;
-    this.lastPosition = this.currentPosition;
-    this.currentPosition++;
-    return this.getState();
-  }
-
-  snapshot(): { state: State; position: number } {
-    return { state: this.getState(), position: this.currentPosition };
+  redo(dryRun?: boolean) {
+    if (this.currentPosition === this.actions.length) return false;
+    if (!dryRun) {
+      this.lastPosition = this.currentPosition;
+      this.currentPosition++;
+    }
+    return true;
   }
 
   get action(): Act | null {
@@ -68,5 +82,50 @@ export class History<State, Act> {
 
   get direction(): 1 | -1 {
     return this.currentPosition >= this.lastPosition ? 1 : -1;
+  }
+
+  static clone<T, A>(base: History<T, A>): History<T, A> {
+    const h = new History(base.initialState, base.apply);
+
+    h.actions.push(...base.actions);
+    h.currentPosition = base.currentPosition;
+    h.lastPosition = base.lastPosition;
+    h.snapshotInterval = base.snapshotInterval;
+
+    h.snapshots = new Map(base.snapshots);
+
+    return h;
+  }
+
+  static map<S, A, T, B>(
+    base: History<S, A>,
+    mapState: (s: S) => T,
+    mapAction: (a: B) => A,
+  ): IHistory<T, B> {
+    return {
+      action: null,
+      get position() {
+        return base.position;
+      },
+      get direction() {
+        return base.direction;
+      },
+      snapshot() {
+        const snapshot = base.snapshot();
+        return {
+          state: mapState(snapshot.state),
+          position: snapshot.position,
+        };
+      },
+      push(cmd) {
+        return base.push(mapAction(cmd));
+      },
+      undo(dryRun) {
+        return base.undo(dryRun);
+      },
+      redo(dryRun) {
+        return base.undo(dryRun);
+      },
+    };
   }
 }

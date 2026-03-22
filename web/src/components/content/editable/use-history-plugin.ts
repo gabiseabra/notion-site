@@ -1,7 +1,6 @@
 import { KeyboardEvent, useEffect } from "react";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { EditorAction } from "../editor/editor-history.js";
-import { AnyBlock, ContentEditor } from "../editor/types.js";
 import { AnyContentEditorPlugin } from "./types.js";
 
 /**
@@ -52,21 +51,17 @@ export const useHistoryPlugin = (): AnyContentEditorPlugin => (editor) => {
 
       if (!isMod) return;
 
-      if (isUndo(e)) {
-        if (isUndoable(block.id, editor)) {
-          editor.history.undo();
-          editor.commit(new useHistoryPlugin.EventData("undo"));
-        }
+      if (isUndo(e) && editor.peek(block.id) && editor.history.undo(true)) {
+        editor.history.undo();
+        editor.commit(new useHistoryPlugin.EventData("undo"));
 
         e.preventDefault();
         return;
       }
 
-      if (isRedo(e)) {
-        if (isRedoable(block.id, editor)) {
-          editor.history.redo();
-          editor.commit(new useHistoryPlugin.EventData("redo"));
-        }
+      if (isRedo(e) && editor.peek(block.id) && editor.history.redo(true)) {
+        editor.history.redo();
+        editor.commit(new useHistoryPlugin.EventData("redo"));
 
         e.preventDefault();
         return;
@@ -76,22 +71,8 @@ export const useHistoryPlugin = (): AnyContentEditorPlugin => (editor) => {
 };
 
 const isUndo = (e: KeyboardEvent) => e.key === "z" && !e.shiftKey;
-const isUndoable = <TBlock extends AnyBlock>(
-  id: TBlock["id"],
-  editor: ContentEditor<TBlock>,
-) => {
-  editor.peek(id);
-  return editor.history.position !== 0;
-};
 const isRedo = (e: KeyboardEvent) =>
   (e.key === "z" && e.shiftKey) || e.key === "y";
-const isRedoable = <TBlock extends AnyBlock>(
-  id: TBlock["id"],
-  editor: ContentEditor<TBlock>,
-) => {
-  editor.peek(id);
-  return editor.history.actions.length > editor.history.position;
-};
 
 useHistoryPlugin.EventData = class HistoryEventData {
   constructor(public action: "undo" | "redo") {}
