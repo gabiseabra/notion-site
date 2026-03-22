@@ -4,7 +4,7 @@ import { Editor } from "../Editor.js";
 
 const options = {
   autoCommit: 200,
-  multiline: true,
+  multiLine: true,
 };
 
 describe("useInlineMutationPlugin", () => {
@@ -67,7 +67,7 @@ describe("useInlineMutationPlugin", () => {
       <Editor
         value={[p("a", span("Hello"))]}
         onChange={() => {}}
-        options={{ ...options, multiline: false }}
+        options={{ ...options, multiLine: false }}
       />,
     );
 

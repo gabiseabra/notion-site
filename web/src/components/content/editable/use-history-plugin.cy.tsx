@@ -4,7 +4,7 @@ import { Editor } from "../Editor.js";
 
 const options = {
   autoCommit: 200,
-  multiline: true,
+  multiLine: true,
 };
 
 describe("useHistoryPlugin", () => {

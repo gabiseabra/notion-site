@@ -16,14 +16,14 @@ import { useNotionOrphanagePlugin } from "./use-notion-orphanage-plugin.js";
 import { useNotionPrefixPlugin } from "./use-notion-prefix-plugin.js";
 
 export type NotionPluginOptions = {
-  multiline?: boolean;
+  multiLine?: boolean;
   logging?: boolean | "verbose";
   autoCommit?: number | false;
 };
 
 export const useNotionPlugin = (
   options: NotionPluginOptions = {
-    multiline: true,
+    multiLine: true,
     logging: env.DEV,
     autoCommit: 600,
   },
@@ -44,7 +44,7 @@ export const useNotionPlugin = (
     }),
     useHistoryPlugin(),
     useInlineMutationPlugin({
-      multiLine: options.multiline,
+      multiLine: options.multiLine,
       splice(block, ...params) {
         if (!Notion.Block.isRichText(block)) return block;
         return Notion.Block.map(block, (node) => ({
@@ -59,7 +59,7 @@ export const useNotionPlugin = (
     useBlockMutationPlugin({
       merge(left, right) {
         if (
-          !options.multiline ||
+          !options.multiLine ||
           !Notion.Block.isRichText(left) ||
           !Notion.Block.isRichText(right)
         )
@@ -74,7 +74,7 @@ export const useNotionPlugin = (
         }));
       },
       split(block, offset, deleteRange) {
-        if (!options.multiline || !Notion.Block.isRichText(block)) return null;
+        if (!options.multiLine || !Notion.Block.isRichText(block)) return null;
 
         return Notion.Block.split(block, offset, deleteRange);
       },
