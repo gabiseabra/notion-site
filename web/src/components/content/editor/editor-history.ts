@@ -33,7 +33,7 @@ export type EditorActionCmd<TBlock extends AnyBlock> =
 export type EditorAction<TBlock extends AnyBlock> =
   | {
       type: "apply";
-      commands: NonEmpty<EditorActionCmd<TBlock>>;
+      actions: NonEmpty<EditorActionCmd<TBlock>>;
     }
   | EditorActionCmd<TBlock>;
 
@@ -52,12 +52,12 @@ export const EditorAction = {
       .with({ type: "apply" }, (cmd) =>
         EditorAction.id(
           direction === 1
-            ? ([...cmd.commands]
+            ? ([...cmd.actions]
                 .reverse()
                 .find(hasNonNullableProperty("selectionAfter")) ??
-                cmd.commands[cmd.commands.length - 1])
-            : (cmd.commands.find(hasNonNullableProperty("selectionBefore")) ??
-                cmd.commands[0]),
+                cmd.actions[cmd.actions.length - 1])
+            : (cmd.actions.find(hasNonNullableProperty("selectionBefore")) ??
+                cmd.actions[0]),
           direction,
         ),
       )
@@ -72,7 +72,7 @@ export const EditorAction = {
     EditorAction<TBlock>
   >): NonEmpty<EditorActionCmd<TBlock>> {
     return NonEmpty.merge(
-      cmd.type === "apply" ? EditorAction.flat(cmd.commands) : ([cmd] as const),
+      cmd.type === "apply" ? EditorAction.flat(cmd.actions) : ([cmd] as const),
       NonEmpty.isNonEmpty(cmds) ? EditorAction.flat(cmds) : [],
     );
   },
@@ -90,7 +90,7 @@ export const EditorAction = {
     cmd: EditorAction<TBlock>,
   ): SelectionRange | undefined {
     if (cmd.type !== "apply") return cmd.selectionBefore;
-    return cmd.commands.filter(hasNonNullableProperty("selectionBefore"))[0]
+    return cmd.actions.filter(hasNonNullableProperty("selectionBefore"))[0]
       ?.selectionBefore;
   },
 
@@ -98,7 +98,7 @@ export const EditorAction = {
     cmd: EditorAction<TBlock>,
   ): SelectionRange | undefined {
     if (cmd.type !== "apply") return cmd.selectionAfter;
-    return cmd.commands.filter(hasNonNullableProperty("selectionAfter")).pop()
+    return cmd.actions.filter(hasNonNullableProperty("selectionAfter")).pop()
       ?.selectionAfter;
   },
 };
@@ -129,7 +129,7 @@ function applyAction<TBlock extends AnyBlock>(
       return result;
     }
     case "apply":
-      return cmd.commands.reduce(applyAction, blocks);
+      return cmd.actions.reduce(applyAction, blocks);
   }
 }
 
@@ -138,5 +138,5 @@ export function applyActions<TBlock extends AnyBlock>(
   ...commands: EditorActionCmd<TBlock>[]
 ) {
   if (!NonEmpty.isNonEmpty(commands)) return blocks;
-  return applyAction(blocks, { type: "apply", commands });
+  return applyAction(blocks, { type: "apply", actions: commands });
 }

@@ -62,7 +62,7 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
 
     history.push({
       type: "apply",
-      commands,
+      actions: commands,
     });
 
     return true;

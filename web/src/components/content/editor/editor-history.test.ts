@@ -22,7 +22,7 @@ describe("EditorHistory", () => {
       { type: "remove", block: block("b", "bravo") },
     );
 
-    history.push({ type: "apply", commands });
+    history.push({ type: "apply", actions: commands });
 
     expect(history.getState()).toEqual([block("a", "al"), block("c", "pha!")]);
   });
