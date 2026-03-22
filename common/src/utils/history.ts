@@ -13,7 +13,6 @@ export class History<State, Act> implements IHistory<State, Act> {
   private currentPosition = 0;
   private lastPosition = 0;
   private snapshots: Map<number, State> = new Map();
-  private snapshotInterval = 50;
 
   constructor(
     private initialState: State,
@@ -40,15 +39,10 @@ export class History<State, Act> implements IHistory<State, Act> {
       .reduce((s, cmd) => this.apply(s, cmd), state);
   }
 
-  push(cmd: Act) {
-    this.actions.length = this.currentPosition; // truncate to current cursor
-    this.actions.push(cmd);
+  push(action: Act) {
+    this.actions.splice(this.currentPosition, this.actions.length, action);
     this.lastPosition = this.currentPosition;
     this.currentPosition++;
-
-    if (this.currentPosition % this.snapshotInterval === 0) {
-      this.snapshots.set(this.currentPosition, this.getState());
-    }
   }
 
   undo(dryRun?: boolean) {
@@ -90,13 +84,16 @@ export class History<State, Act> implements IHistory<State, Act> {
     h.actions.push(...base.actions);
     h.currentPosition = base.currentPosition;
     h.lastPosition = base.lastPosition;
-    h.snapshotInterval = base.snapshotInterval;
-
     h.snapshots = new Map(base.snapshots);
 
     return h;
   }
 
+  /**
+   * Creates a view of this history with a different state and action type.
+   * State is projected and actions are translated when pushed. The mapped
+   * history's bus fires the same events as the base.
+   */
   static map<S, A, T, B>(
     base: History<S, A>,
     mapState: (s: S) => T,
@@ -117,14 +114,14 @@ export class History<State, Act> implements IHistory<State, Act> {
           position: snapshot.position,
         };
       },
-      push(cmd) {
-        return base.push(mapAction(cmd));
+      push(b) {
+        base.push(mapAction(b));
       },
       undo(dryRun) {
         return base.undo(dryRun);
       },
       redo(dryRun) {
-        return base.undo(dryRun);
+        return base.redo(dryRun);
       },
     };
   }
