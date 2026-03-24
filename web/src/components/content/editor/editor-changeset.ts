@@ -15,18 +15,14 @@ export type EditorChangeset<TBlock extends AnyBlock> = {
   /** Clears the pending batch without committing it to history. */
   discard(): void;
 
-  /** Commits the pending batch to history. Records a `focus` action if the current
-   * DOM selection differs from `selectionAfter`, so redo can restore the exact caret
-   * position. Returns `false` if the batch was empty. */
-  flush(data?: unknown): boolean;
+  /** Commits the pending batch to history. */
+  flush(data?: unknown): void;
 
-  /** Returns the block including any pending actions.
-   * If the pending batch targets a different block, flushes first to synchronize,
-   * then delegates to the editor. */
+  /** Returns the block including any pending changes. */
   peek(id: TBlock["id"]): TBlock | null;
 
-  /** Appends an action to the pending batch. Infers `selectionBefore` from the
-   * pending batch's `selectionAfter` or the last committed history action if not
+  /** Appends an action to the pending batch. `selectionBefore` is inferred from
+   * the pending batch's `selectionAfter` or the last committed history action if not
    * already set on the action. */
   push(action: EditorActionCmd<TBlock>): void;
 };

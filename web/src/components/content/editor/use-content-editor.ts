@@ -54,13 +54,17 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
         return blocksRef.current.get(id) ?? null;
       },
 
-      peek(id) {
-        if (!editorRef.current) return null;
+      flush(data?: unknown) {
+        if (!editorRef.current) return;
 
         bus.dispatchTypedEvent(
           "flush",
-          new EditorEvent("flush", editorRef.current, { data: undefined }),
+          new EditorEvent("flush", editorRef.current, { data }),
         );
+      },
+
+      peek(id) {
+        if (!editorRef.current) return null;
 
         return history.getState().find((block) => block.id === id) ?? null;
       },

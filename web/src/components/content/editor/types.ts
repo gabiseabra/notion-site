@@ -1,30 +1,10 @@
 import { IHistory } from "@notion-site/common/utils/history.js";
-import { SelectionRange } from "../../../utils/selection-range.js";
 import type { EditorEventTarget } from "./editor-event.js";
-import { EditorAction, EditorActionCmd } from "./editor-history.js";
+import { EditorAction } from "./editor-history.js";
 
 export type ID = string | number | symbol;
 
 export type AnyBlock = { id: ID };
-
-/**
- * Optional selection overrides for editor commands.
- * If not provided, defaults to current DOM selection.
- */
-export type ActionOptions = {
-  data?: unknown;
-  /** @note undefined id flushes everything */
-  batchId?: ID;
-  /** Selection before the change (for undo). */
-  selectionBefore?: SelectionRange;
-  /** Selection after the change (for redo). */
-  selectionAfter?: SelectionRange;
-};
-
-export type EditorBatch<TBlock extends AnyBlock> = {
-  batchId: ID;
-  commands: EditorActionCmd<TBlock>[];
-};
 
 /**
  * Shared state passed to plugins in their editor setup phase.
@@ -64,8 +44,12 @@ export interface ContentEditor<TBlock extends AnyBlock> {
   ref(id: TBlock["id"]): HTMLElement | null;
 
   /**
-   * Dispatches a flush event (prompting changesets to commit their pending actions
-   * to history) and returns the latest history state for the given block id.
+   * Notifies other plugins to flush pending changes immediatelly! ! !
+   */
+  flush(data?: unknown): void;
+
+  /**
+   * Returns the latest history state for the given block id.
    * Use instead of `blocks` when you need up-to-date state mid-edit.
    */
   peek(id: TBlock["id"]): TBlock | null;
