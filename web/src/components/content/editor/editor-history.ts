@@ -11,7 +11,7 @@ import { AnyBlock } from "./types.js";
  */
 export type EditorActionCmd<TBlock extends AnyBlock> =
   | {
-      type: "touch";
+      type: "focus";
       block: { id: TBlock["id"] };
       selectionBefore?: SelectionRange;
       selectionAfter?: SelectionRange;
@@ -125,7 +125,7 @@ function applyAction<TBlock extends AnyBlock>(
   cmd: EditorAction<TBlock>,
 ): TBlock[] {
   switch (cmd.type) {
-    case "touch":
+    case "focus":
       return blocks;
     case "update":
       return blocks.map((b) => (b.id === cmd.block.id ? cmd.block : b));

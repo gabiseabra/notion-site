@@ -15,7 +15,7 @@ export type EditorChangeset<TBlock extends AnyBlock> = {
   /** Clears the pending batch without committing it to history. */
   discard(): void;
 
-  /** Commits the pending batch to history. Records a `touch` action if the current
+  /** Commits the pending batch to history. Records a `focus` action if the current
    * DOM selection differs from `selectionAfter`, so redo can restore the exact caret
    * position. Returns `false` if the batch was empty. */
   flush(data?: unknown): boolean;

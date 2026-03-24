@@ -57,7 +57,7 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
     ) {
       editor.push(
         {
-          type: "touch",
+          type: "focus",
           block: { id: block.id },
           selectionBefore: selectionAfter ?? selection,
           selectionAfter: selection,
