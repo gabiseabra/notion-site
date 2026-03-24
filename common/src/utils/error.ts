@@ -37,7 +37,17 @@ export function isErrorRecoverable(error: unknown) {
  */
 export function showError(error: unknown) {
   const message = extractErrorMessage(error, "");
-  const details = JSON.stringify(error, undefined, 2);
+  const details = JSON.stringify(
+    error,
+    (prop, value) => {
+      if (value instanceof HTMLElement) {
+        // todo: render htlm element
+        return value.tagName;
+      }
+      return value;
+    },
+    2,
+  );
 
   if (message) {
     return `${message}: ${details}`;

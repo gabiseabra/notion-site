@@ -48,12 +48,9 @@ describe("useLoggerPlugin", () => {
     const log = jest.fn();
     const blocks = [{ id: "a", content: "Hello" }];
 
-    render(<TestEditor value={blocks} log={log} />);
-
-    expect(log).toHaveBeenCalledTimes(1);
-    expect(log).toHaveBeenCalledWith(
-      expect.objectContaining({ eventType: "ready" }),
-    );
+    expect(log).toBeCalledDuring(() => {
+      render(<TestEditor value={blocks} log={log} />);
+    }, [expect.objectContaining({ eventType: "ready" })]);
   });
 
   it("logs edit and commit events when editor commits changes", () => {
@@ -64,22 +61,19 @@ describe("useLoggerPlugin", () => {
     };
 
     render(<TestEditor ref={editorRef} value={blocks} log={log} />);
-    log.mockClear();
 
-    act(() => {
-      editorRef.current?.update({ id: "a", content: "World" });
+    expect(log).toBeCalledDuring(() => {
+      editorRef.current?.push({
+        type: "update",
+        block: { id: "a", content: "World" },
+      });
       editorRef.current?.commit();
-    });
-
-    expect(log).toHaveBeenCalledWith(
-      expect.objectContaining({ eventType: "edit" }),
-    );
-    expect(log).toHaveBeenCalledWith(
+    }, [
+      expect.objectContaining({ eventType: "push" }),
+      // expect.objectContaining({ eventType: "flush" }),
       expect.objectContaining({ eventType: "commit" }),
-    );
-    expect(log).toHaveBeenCalledWith(
       expect.objectContaining({ eventType: "postcommit" }),
-    );
+    ]);
   });
 
   it("logs postcommit event when reaching start of history", () => {
@@ -93,18 +87,20 @@ describe("useLoggerPlugin", () => {
     log.mockClear();
 
     act(() => {
-      editorRef.current?.update({ id: "a", content: "World" });
+      editorRef.current?.push({
+        type: "update",
+        block: { id: "a", content: "World" },
+      });
       editorRef.current?.commit();
     });
     log.mockClear();
 
-    act(() => {
+    expect(log).toBeCalledDuring(() => {
       editorRef.current?.history.undo();
       editorRef.current?.commit();
-    });
-
-    expect(log).toHaveBeenCalledWith(
+    }, [
+      expect.objectContaining({ eventType: "commit" }),
       expect.objectContaining({ eventType: "postcommit" }),
-    );
+    ]);
   });
 });

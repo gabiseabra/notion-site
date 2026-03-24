@@ -1,13 +1,8 @@
-import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ContentEditorPlugin } from "../editable/types.js";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
-import {
-  applyActions,
-  EditorActionCmd,
-  EditorHistory,
-} from "./editor-history.js";
-import { AnyBlock, ContentEditor, EditorBatch, ID } from "./types.js";
+import { EditorHistory } from "./editor-history.js";
+import { AnyBlock, ContentEditor } from "./types.js";
 
 /**
  * Creates shared state & controller for the editor plugins.
@@ -33,7 +28,6 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   const history = useMemo(() => new EditorHistory(initialValue), []);
   const [snapshot, setSnapshot] = useState(() => history.snapshot());
   const blocksRef = useRef<Map<TBlock["id"], HTMLElement | null>>(new Map());
-  const batchRef = useRef<EditorBatch<TBlock> | undefined>(undefined);
 
   /** Callback refs */
 
@@ -49,39 +43,6 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   /** Editor internals */
 
   const editorRef = useRef<ContentEditor<TBlock>>(null);
-
-  /** Flush pending changes */
-  function flush(skipHistory = false) {
-    if (!batchRef.current) return false;
-
-    const { commands } = batchRef.current;
-
-    batchRef.current = undefined;
-
-    if (!NonEmpty.isNonEmpty(commands) || skipHistory) return false;
-
-    history.push({
-      type: "apply",
-      actions: commands,
-    });
-
-    return true;
-  }
-
-  function push(cmd: EditorActionCmd<TBlock>, batchId?: ID) {
-    if (batchRef.current && batchRef.current.batchId === batchId) {
-      batchRef.current.commands.push(cmd);
-    } else if (batchId) {
-      flush();
-      batchRef.current = {
-        batchId,
-        commands: [cmd],
-      };
-    } else {
-      history.push(cmd);
-    }
-  }
-
   const editor = useMemo<ContentEditor<TBlock>>(
     () => ({
       blocks: snapshot.state,
@@ -89,100 +50,37 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
       history,
       bus,
 
-      inBatch(exceptId) {
-        return !!batchRef.current && batchRef.current.batchId !== exceptId;
-      },
-
-      flush(data) {
-        if (!editorRef.current || !batchRef.current) return false;
-
-        const event = new EditorEvent("flush", editorRef.current, {
-          batchId: batchRef.current.batchId,
-          commands: batchRef.current.commands,
-          data,
-        });
-        bus.dispatchTypedEvent("flush", event);
-
-        return flush(event.defaultPrevented);
-      },
-
-      peek(id) {
-        const state = history.getState();
-
-        return (
-          (batchRef.current
-            ? applyActions(state, ...batchRef.current.commands)
-            : state
-          ).find((block) => block.id === id) ?? null
-        );
-      },
-
       ref(id) {
         return blocksRef.current.get(id) ?? null;
       },
 
-      update(block, options) {
-        if (!editorRef.current) return;
+      peek(id) {
+        if (!editorRef.current) return null;
 
-        const event = new EditorEvent("edit", editorRef.current, {
-          cmd: {
-            type: "update",
-            block,
-            selectionBefore: options?.selectionBefore,
-            selectionAfter: options?.selectionAfter,
-          },
-          batchId: options?.batchId ?? batchRef.current?.batchId,
-          data: options?.data,
-        });
-        bus.dispatchTypedEvent("edit", event);
-        if (event.defaultPrevented) return;
+        bus.dispatchTypedEvent(
+          "flush",
+          new EditorEvent("flush", editorRef.current, { data: undefined }),
+        );
 
-        push(event.detail.cmd, options?.batchId);
+        return history.getState().find((block) => block.id === id) ?? null;
       },
 
-      remove(block, options) {
+      push(action, data) {
         if (!editorRef.current) return;
 
-        const event = new EditorEvent("edit", editorRef.current, {
-          cmd: {
-            type: "remove",
-            block,
-            selectionBefore: options?.selectionBefore,
-            selectionAfter: options?.selectionAfter,
-          },
-          batchId: options?.batchId ?? batchRef.current?.batchId,
-          data: options?.data,
+        const event = new EditorEvent("push", editorRef.current, {
+          action,
+          data,
         });
-        bus.dispatchTypedEvent("edit", event);
+        bus.dispatchTypedEvent("push", event);
+
         if (event.defaultPrevented) return;
 
-        push(event.detail.cmd, options?.batchId);
-      },
-
-      split(left, right, options) {
-        if (!editorRef.current) return;
-
-        const event = new EditorEvent("edit", editorRef.current, {
-          cmd: {
-            type: "split",
-            left,
-            right,
-            selectionBefore: options?.selectionBefore,
-            selectionAfter: options?.selectionAfter,
-          },
-          batchId: options?.batchId ?? batchRef.current?.batchId,
-          data: options?.data,
-        });
-        bus.dispatchTypedEvent("edit", event);
-        if (event.defaultPrevented) return;
-
-        push(event.detail.cmd, options?.batchId);
+        history.push(event.detail.action);
       },
 
       commit(data) {
         if (!editorRef.current) return;
-
-        flush();
 
         const snapshot = history.snapshot();
 

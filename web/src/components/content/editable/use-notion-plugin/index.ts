@@ -34,7 +34,7 @@ export const useNotionPlugin = (
       else if (options.logging == "verbose")
         console.info(event.eventType, event.detail, event.editor);
       else if (
-        (!EditorEvent.narrow("edit", event) || !event.detail.batchId) &&
+        !EditorEvent.narrow("flush", event) &&
         !EditorEvent.narrow("postcommit", event)
       )
         console.info(event.eventType, event.detail, event.editor);

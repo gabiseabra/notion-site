@@ -43,12 +43,15 @@ export const useRegExpTransformPlugin =
       if (!newBlock) return;
 
       const data = new useRegExpTransformPlugin.EventData();
-      editor.flush(data);
-      editor.update(newBlock, {
+      editor.push(
+        {
+          type: "update",
+          block: newBlock,
+          selectionBefore: selection,
+          selectionAfter: { start: 0, end: 0 },
+        },
         data,
-        selectionBefore: selection,
-        selectionAfter: { start: 0, end: 0 },
-      });
+      );
       editor.commit(data);
     },
   });

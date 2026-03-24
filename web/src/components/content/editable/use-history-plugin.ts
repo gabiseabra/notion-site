@@ -51,7 +51,7 @@ export const useHistoryPlugin = (): AnyContentEditorPlugin => (editor) => {
 
       if (!isMod) return;
 
-      if (isUndo(e) && editor.peek(block.id) && editor.history.undo(true)) {
+      if (isUndo(e) && editor.history.undo(true) && editor.peek(block.id)) {
         editor.history.undo();
         editor.commit(new useHistoryPlugin.EventData("undo"));
 
@@ -59,7 +59,7 @@ export const useHistoryPlugin = (): AnyContentEditorPlugin => (editor) => {
         return;
       }
 
-      if (isRedo(e) && editor.peek(block.id) && editor.history.redo(true)) {
+      if (isRedo(e) && editor.history.redo(true) && editor.peek(block.id)) {
         editor.history.redo();
         editor.commit(new useHistoryPlugin.EventData("redo"));
 

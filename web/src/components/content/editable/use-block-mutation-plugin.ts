@@ -61,18 +61,25 @@ export const useBlockMutationPlugin =
           currentBlock,
         );
 
-        editor.flush(data);
         // merge any text on the tail of this block into the previous block
-        editor.remove(currentBlock, {
+        editor.push(
+          {
+            type: "apply",
+            actions: [
+              {
+                type: "remove",
+                block: currentBlock,
+                selectionBefore,
+              },
+              {
+                type: "update",
+                block: mergedBlock,
+                selectionAfter,
+              },
+            ],
+          },
           data,
-          batchId: "merge",
-        });
-        editor.update(mergedBlock, {
-          data,
-          batchId: "merge",
-          selectionAfter,
-          selectionBefore,
-        });
+        );
 
         editor.commit(data);
 
@@ -98,9 +105,9 @@ export const useBlockMutationPlugin =
           deleteRange,
         );
 
-        editor.flush(data);
-        editor.split(splitBlocks.left, splitBlocks.right, {
-          data,
+        editor.push({
+          type: "split",
+          ...splitBlocks,
           selectionBefore,
           selectionAfter: { start: 0, end: 0 },
         });

@@ -1,26 +1,22 @@
 import { EmptyObject } from "@notion-site/common/types/object.js";
 import { TypedEventTarget } from "typescript-event-target";
-import { EditorActionCmd } from "./editor-history.js";
-import { AnyBlock, ContentEditor, ID } from "./types.js";
+import { EditorAction } from "./editor-history.js";
+import { AnyBlock, ContentEditor } from "./types.js";
 
 type EditorEventMap<TBlock extends AnyBlock> = {
   /**
-   * Command will be pushed to history.
-   * @cancellable
+   * Notify plugins to save changes to history.
    */
-  edit: {
-    cmd: EditorActionCmd<TBlock>;
-    batchId?: ID;
+  flush: {
     /** Data provided from the plugin that triggers it. You have to parse it */
     data: unknown;
   };
   /**
-   * Batch will be saved to history.
+   * Command will be pushed to history.
    * @cancellable
    */
-  flush: {
-    batchId: ID;
-    commands: EditorActionCmd<TBlock>[];
+  push: {
+    action: EditorAction<TBlock>;
     /** Data provided from the plugin that triggers it. You have to parse it */
     data: unknown;
   };

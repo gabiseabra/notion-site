@@ -32,7 +32,7 @@ export type EditorBatch<TBlock extends AnyBlock> = {
 export interface ContentEditor<TBlock extends AnyBlock> {
   /**
    * Last committed state. Updated after `commit()`.
-   * May be stale if edits were made since last commit — check `isDirty`.
+   * May be stale if history has advanced since the last commit.
    */
   readonly blocks: TBlock[];
   /**
@@ -42,10 +42,10 @@ export interface ContentEditor<TBlock extends AnyBlock> {
   readonly revision: number;
 
   /**
-   * Manages state of uncommitted changes.
-   * Manipulating history directly e.g. by calling `editor.history.undo` / `redo` ,
-   * does not flush pending changes, so if you have any, they will be overwritten.
-   * Make sure to flush by calling `peek` before doing it.
+   * Manages undo/redo state.
+   * Manipulating history directly e.g. by calling `editor.history.undo` / `redo`
+   * does not flush changesets, so any pending changeset actions will be overwritten.
+   * Call `peek` first to trigger a flush before manipulating history.
    */
   readonly history: IHistory<EditorAction<TBlock>, TBlock[]>;
 
@@ -55,24 +55,7 @@ export interface ContentEditor<TBlock extends AnyBlock> {
    */
   readonly bus: EditorEventTarget<TBlock>;
 
-  // Batch stuff
-
-  /**
-   * If the editor is in batch, save pending changes to history and end the
-   * batch.
-   * @returns true if there was an effect.
-   */
-  flush(data?: unknown): boolean;
-
-  inBatch(exceptId?: ID): boolean;
-
   // Methods to read from state
-
-  /**
-   * If the editor is batching, get the latest data by block id and don't
-   * commit. Otherwise returns the comitted data for the block id.
-   */
-  peek(id: TBlock["id"]): TBlock | null;
 
   /**
    * Get the DOM element registered for a block. Returns `null` if the block
@@ -80,23 +63,17 @@ export interface ContentEditor<TBlock extends AnyBlock> {
    */
   ref(id: TBlock["id"]): HTMLElement | null;
 
-  // Methods to update the state
+  /**
+   * Dispatches a flush event (prompting changesets to commit their pending actions
+   * to history) and returns the latest history state for the given block id.
+   * Use instead of `blocks` when you need up-to-date state mid-edit.
+   */
+  peek(id: TBlock["id"]): TBlock | null;
 
   /**
-   * Replace a block's data. Dispatches an `edit` event (can be cancelled).
+   * Push action to history. Records a undo/redo-able event.
    */
-  update(block: TBlock, options?: ActionOptions): void;
-
-  /**
-   * Remove a block from state. Dispatches an `edit` event (can be cancelled).
-   */
-  remove(block: TBlock, options?: ActionOptions): void;
-
-  /**
-   * Update the block on the left and insert the block on the right next to it.
-   * Dispatches an `edit` event (can be cancelled).
-   */
-  split(left: TBlock, right: TBlock, options?: ActionOptions): void;
+  push(action: EditorAction<TBlock>, data?: unknown): void;
 
   /**
    * Sync React state with history.

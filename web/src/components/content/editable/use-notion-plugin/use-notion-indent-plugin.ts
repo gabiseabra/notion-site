@@ -73,24 +73,31 @@ export const useNotionIndentPlugin =
           if (parent) {
             const data = "notion-indent-plugin";
 
-            editor.flush(data);
-            editor.update(
-              { ...(editor.peek(block.id) ?? block), parent },
+            editor.push(
               {
-                data,
-                batchId: "shift",
-                selectionBefore: selection,
-                selectionAfter: selection,
+                type: "apply",
+                actions: [
+                  {
+                    type: "update",
+                    block: { ...(editor.peek(block.id) ?? block), parent },
+                    selectionBefore: selection,
+                    selectionAfter: selection,
+                  },
+                  ...editor.blocks.flatMap((b) => {
+                    if (
+                      b.parent.type === "block_id" &&
+                      b.parent.block_id === block.id
+                    ) {
+                      return [
+                        { type: "update", block: { ...b, parent } },
+                      ] as const;
+                    }
+                    return [];
+                  }),
+                ],
               },
+              data,
             );
-            editor.blocks.forEach((b) => {
-              if (
-                b.parent.type === "block_id" &&
-                b.parent.block_id === block.id
-              ) {
-                editor.update({ ...b, parent }, { data, batchId: "shift" });
-              }
-            });
             editor.commit(data);
           }
 
@@ -108,22 +115,33 @@ export const useNotionIndentPlugin =
           const data = "notion-indent-plugin";
           const ix = editor.blocks.findIndex((b) => b.id === block.id);
 
-          editor.flush(data);
-          editor.update(
-            { ...(editor.peek(block.id) ?? block), parent: newParent },
-            {
-              data,
-              batchId: "unshift",
-              selectionBefore: selection,
-              selectionAfter: selection,
-            },
-          );
-          editor.blocks.slice(ix + 1).forEach((b) => {
-            if (!Notion.Block.parentEquals(block.parent, b.parent)) return;
-            editor.update(
-              { ...b, parent: { type: "block_id", block_id: block.id } },
-              { data, batchId: "unshift" },
-            );
+          editor.push({
+            type: "apply",
+            actions: [
+              {
+                type: "update",
+                block: {
+                  ...(editor.peek(block.id) ?? block),
+                  parent: newParent,
+                },
+                selectionBefore: selection,
+                selectionAfter: selection,
+              },
+
+              ...editor.blocks.slice(ix + 1).flatMap((b) => {
+                if (!Notion.Block.parentEquals(block.parent, b.parent))
+                  return [];
+                return [
+                  {
+                    type: "update",
+                    block: {
+                      ...b,
+                      parent: { type: "block_id", block_id: block.id },
+                    },
+                  },
+                ] as const;
+              }),
+            ],
           });
           editor.commit(data);
 

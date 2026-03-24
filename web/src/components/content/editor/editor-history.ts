@@ -11,6 +11,12 @@ import { AnyBlock } from "./types.js";
  */
 export type EditorActionCmd<TBlock extends AnyBlock> =
   | {
+      type: "touch";
+      block: { id: TBlock["id"] };
+      selectionBefore?: SelectionRange;
+      selectionAfter?: SelectionRange;
+    }
+  | {
       type: "update";
       block: TBlock;
       selectionBefore?: SelectionRange;
@@ -30,11 +36,13 @@ export type EditorActionCmd<TBlock extends AnyBlock> =
       selectionAfter?: SelectionRange;
     };
 
+interface EditorActionBatch<TBlock extends AnyBlock> {
+  type: "apply";
+  actions: NonEmpty<EditorActionCmd<TBlock>>;
+}
+
 export type EditorAction<TBlock extends AnyBlock> =
-  | {
-      type: "apply";
-      actions: NonEmpty<EditorActionCmd<TBlock>>;
-    }
+  | EditorActionBatch<TBlock>
   | EditorActionCmd<TBlock>;
 
 export const EditorAction = {
@@ -117,6 +125,8 @@ function applyAction<TBlock extends AnyBlock>(
   cmd: EditorAction<TBlock>,
 ): TBlock[] {
   switch (cmd.type) {
+    case "touch":
+      return blocks;
     case "update":
       return blocks.map((b) => (b.id === cmd.block.id ? cmd.block : b));
     case "remove":

@@ -1,7 +1,7 @@
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { SpliceRange } from "../../../utils/splice-range.js";
 import { AnyBlock } from "../editor/types.js";
-import { usePendingChanges } from "../editor/use-pending-changes";
+import { useDebouncedEditorChangeset } from "../editor/use-editor-changeset.js";
 import { createEventListenerPlugin } from "./create-event-listener-plugin.js";
 import { ContentEditorPlugin } from "./types.js";
 
@@ -25,71 +25,41 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   ) => TBlock;
 }): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
-    const pendingChanges = usePendingChanges({
-      editor,
-      debounceMs,
-    });
+    const changeset = useDebouncedEditorChangeset(editor, debounceMs);
 
     return (block) => (e) => {
-      try {
-        if (!(e.target instanceof HTMLElement)) return;
+      if (!(e.target instanceof HTMLElement)) return;
 
-        const currentBlock = editor.peek(block.id);
-        const actualSelection = SelectionRange.read(e.target);
+      const currentBlock = changeset.peek(block.id);
+      const actualSelection = SelectionRange.read(e.target);
 
-        if (!actualSelection || !currentBlock) return;
+      if (!actualSelection || !currentBlock) return;
 
-        const pending = pendingChanges.begin({
-          block: currentBlock,
-          data: new useInlineMutationPlugin.FlushData(),
-          selectionBefore: actualSelection,
-          selectionAfter: actualSelection,
-        });
+      const selectionBefore = changeset.selectionAfter ?? actualSelection;
+      const spliceRange = SpliceRange.fromInputEvent(
+        e,
+        e.target.textContent ?? "",
+        selectionBefore,
+      );
 
-        const spliceRange = SpliceRange.fromInputEvent(
-          e,
-          e.target.textContent ?? "",
-          pending.selectionAfter,
-        );
+      if (!spliceRange) return;
 
-        if (!spliceRange) return;
-
-        // skip newline if multiline is disabled
-        if (spliceRange.insert === "\n" && !multiLine) {
-          e.preventDefault();
-          return;
-        }
-
-        pendingChanges.update({
-          block: splice(
-            currentBlock,
-            spliceRange.offset,
-            spliceRange.deleteCount,
-            spliceRange.insert,
-          ),
-          data: new useInlineMutationPlugin.SpliceData(
-            currentBlock,
-            spliceRange.offset,
-            spliceRange.deleteCount,
-            spliceRange.insert,
-          ),
-          selectionAfter: SpliceRange.toSelectionRange(spliceRange, 1),
-        });
-      } finally {
-        pendingChanges.schedule();
+      // skip newline if multiline is disabled
+      if (spliceRange.insert === "\n" && !multiLine) {
+        e.preventDefault();
+        return;
       }
+
+      changeset.push({
+        type: "update",
+        block: splice(
+          currentBlock,
+          spliceRange.offset,
+          spliceRange.deleteCount,
+          spliceRange.insert,
+        ),
+        selectionBefore,
+        selectionAfter: SpliceRange.toSelectionRange(spliceRange, 1),
+      });
     };
   });
-
-useInlineMutationPlugin.SpliceData = class InlineMutationSplice<
-  TBlock extends AnyBlock,
-> {
-  constructor(
-    public block: TBlock,
-    public offset: number,
-    public deleteCount: number,
-    public insert: string,
-  ) {}
-};
-
-useInlineMutationPlugin.FlushData = class InlineMutationFlush {};

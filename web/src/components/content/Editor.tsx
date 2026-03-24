@@ -64,7 +64,9 @@ export const Editor = memo(function ContentEditor({
               onEditorChange={(block) => {
                 const target = EditorTarget.read(editor);
                 const selection = target && EditorTarget.extractRange(target);
-                editor.update(block, {
+                editor.push({
+                  type: "update",
+                  block,
                   selectionAfter:
                     selection?.id === block.id
                       ? selection

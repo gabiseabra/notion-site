@@ -33,7 +33,9 @@ export const ExecCommand =
       currentBlock && command({ block: currentBlock, data, editor });
 
     if (newBlock) {
-      editor.update(newBlock, {
+      editor.push({
+        type: "update",
+        block: newBlock,
         selectionBefore: selection,
         selectionAfter: selection,
       });
