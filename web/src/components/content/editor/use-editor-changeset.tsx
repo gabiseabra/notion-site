@@ -31,43 +31,39 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
     };
   }, []);
 
-  const flush = useCallback(
-    (data?: unknown) => {
-      const action = extract();
-      const { batchId } = changesetRef.current;
+  const flush = useCallback(() => {
+    const action = extract();
+    const { batchId } = changesetRef.current;
 
-      if (!action) return false;
+    if (!action) return false;
 
-      discard();
+    discard();
 
-      const id = EditorAction.id(action, 1);
-      const blockEl = editor.ref(id);
-      const selection = blockEl && SelectionRange.read(blockEl);
-      const selectionAfter = EditorAction.selectionAfter(action);
-      editor.flush(new useEditorChangeset.FlushData(batchId, data));
+    const id = EditorAction.id(action, 1);
+    const blockEl = editor.ref(id);
+    const selection = blockEl && SelectionRange.read(blockEl);
+    const selectionAfter = EditorAction.selectionAfter(action);
 
-      editor.push(action, data);
+    const data = new useEditorChangeset.FlushData(batchId);
 
-      if (
-        selection &&
-        (selection.start !== selectionAfter?.start ||
-          selection.end !== selectionAfter?.end)
-      ) {
-        editor.push(
-          {
-            type: "focus",
-            block: { id },
-            selectionBefore: selectionAfter ?? selection,
-            selectionAfter: selection,
-          },
-          data,
-        );
-      }
+    editor.push({ ...action, data });
 
-      return true;
-    },
-    [editor, extract, discard],
-  );
+    if (
+      selection &&
+      (selection.start !== selectionAfter?.start ||
+        selection.end !== selectionAfter?.end)
+    ) {
+      editor.push({
+        data,
+        type: "focus",
+        block: { id },
+        selectionBefore: selectionAfter ?? selection,
+        selectionAfter: selection,
+      });
+    }
+
+    return true;
+  }, [editor, extract, discard]);
 
   const push = useCallback(
     (action: EditorActionCmd<TBlock>) => {
@@ -91,19 +87,16 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
 
   const peek = useCallback(
     (id: TBlock["id"]): TBlock | null => {
-      const action = extract();
-      const currentId = action && EditorAction.id(action, 1);
+      editor.flush(
+        new useEditorChangeset.FlushData(changesetRef.current.batchId),
+      );
 
-      if (!currentId || currentId === id) {
-        return (
-          applyActions(editor.blocks, ...changesetRef.current.actions).find(
-            (b) => b.id === id,
-          ) ?? null
-        );
-      }
-
-      flush();
-      return editor.peek(id);
+      return (
+        applyActions(
+          editor.history.snapshot().state,
+          ...changesetRef.current.actions,
+        ).find((b) => b.id === id) ?? null
+      );
     },
     [editor, extract, flush],
   );
@@ -145,11 +138,8 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
   );
 }
 
-useEditorChangeset.FlushData = class EditorChangesetFlush {
-  constructor(
-    public batchId: number,
-    public data?: unknown,
-  ) {}
+useEditorChangeset.FlushData = class EditorChangesetFlushData {
+  constructor(public batchId: number) {}
 };
 
 export function useDebouncedEditorChangeset<TBlock extends AnyBlock>(

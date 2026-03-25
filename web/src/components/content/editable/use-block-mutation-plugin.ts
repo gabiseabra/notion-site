@@ -4,6 +4,7 @@ import { ContentEditorPlugin } from "./types.js";
 
 export type BlockMutationPluginOptions<TBlock> = {
   merge(left: TBlock, right: TBlock): TBlock | null;
+
   split(
     block: TBlock,
     offset: number,
@@ -12,6 +13,8 @@ export type BlockMutationPluginOptions<TBlock> = {
     left: TBlock;
     right: TBlock;
   } | null;
+
+  previous?: (block: TBlock, blocks: TBlock[]) => TBlock | null;
 };
 
 /**
@@ -26,6 +29,10 @@ export const useBlockMutationPlugin =
   <TBlock extends AnyBlock>({
     merge,
     split,
+    previous = (block, blocks) => {
+      const index = blocks.findIndex((b) => b.id === block.id);
+      return blocks[index - 1] ?? null;
+    },
   }: BlockMutationPluginOptions<TBlock>): ContentEditorPlugin<TBlock> =>
   (editor) =>
   (block) => ({
@@ -40,8 +47,7 @@ export const useBlockMutationPlugin =
           // or the block only contains nbsp (is empty)
           e.currentTarget.textContent === String.fromCharCode(160))
       ) {
-        const index = editor.blocks.findIndex((b) => b.id === block.id);
-        const prevBlock = editor.blocks[index - 1];
+        const prevBlock = previous(block, editor.blocks);
         const prevElement = prevBlock && editor.ref(prevBlock.id);
         const currentBlock = editor.peek(block.id);
 
@@ -62,24 +68,22 @@ export const useBlockMutationPlugin =
         );
 
         // merge any text on the tail of this block into the previous block
-        editor.push(
-          {
-            type: "apply",
-            actions: [
-              {
-                type: "remove",
-                block: currentBlock,
-                selectionBefore,
-              },
-              {
-                type: "update",
-                block: mergedBlock,
-                selectionAfter,
-              },
-            ],
-          },
+        editor.push({
           data,
-        );
+          type: "apply",
+          actions: [
+            {
+              type: "remove",
+              block: currentBlock,
+              selectionBefore,
+            },
+            {
+              type: "update",
+              block: mergedBlock,
+              selectionAfter,
+            },
+          ],
+        });
 
         editor.commit(data);
 
@@ -106,6 +110,7 @@ export const useBlockMutationPlugin =
         );
 
         editor.push({
+          data,
           type: "split",
           ...splitBlocks,
           selectionBefore,

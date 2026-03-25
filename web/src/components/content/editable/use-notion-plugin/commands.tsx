@@ -83,22 +83,20 @@ export const downgradeBlock =
   ({ editor }) => {
     const data = "delete-block-command";
 
-    editor.push(
-      {
-        type: "update",
-        block: Notion.Block.mapRichText(
-          Notion.WIP.create({
-            type: "paragraph",
-            parent: block.parent,
-            id: block.id,
-          }),
-          () => Notion.Block.extractRichText(block),
-        ),
-        selectionBefore: { start: 0, end: 0 },
-        selectionAfter: { start: 0, end: 0 },
-      },
+    editor.push({
       data,
-    );
+      type: "update",
+      block: Notion.Block.mapRichText(
+        Notion.WIP.create({
+          type: "paragraph",
+          parent: block.parent,
+          id: block.id,
+        }),
+        () => Notion.Block.extractRichText(block),
+      ),
+      selectionBefore: { start: 0, end: 0 },
+      selectionAfter: { start: 0, end: 0 },
+    });
     editor.commit(data);
   };
 
@@ -116,21 +114,19 @@ export const updateBlock =
           }
         : selection;
 
-    editor.push(
-      {
-        type: "update",
-        block,
-        selectionAfter:
-          selectionRange?.id === block.id
-            ? selectionRange
-            : {
-                start: 0,
-                end: 0,
-                id: block.id,
-              },
-        selectionBefore: selectionRange ?? undefined,
-      },
+    editor.push({
       data,
-    );
+      type: "update",
+      block,
+      selectionAfter:
+        selectionRange?.id === block.id
+          ? selectionRange
+          : {
+              start: 0,
+              end: 0,
+              id: block.id,
+            },
+      selectionBefore: selectionRange ?? undefined,
+    });
     editor.commit(data);
   };

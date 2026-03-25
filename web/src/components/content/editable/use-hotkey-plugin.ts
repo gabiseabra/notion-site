@@ -79,15 +79,13 @@ export const useHotkeyPlugin =
       if (nextBlock) {
         const data = new useHotkeyPlugin.EventData(block, key);
 
-        editor.push(
-          {
-            type: "update",
-            block: nextBlock,
-            selectionBefore: selection,
-            selectionAfter: selection,
-          },
+        editor.push({
           data,
-        );
+          type: "update",
+          block: nextBlock,
+          selectionBefore: selection,
+          selectionAfter: selection,
+        });
         editor.commit(data);
 
         e.preventDefault();

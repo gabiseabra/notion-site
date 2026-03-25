@@ -18,12 +18,18 @@ export const useAutoCommitPlugin =
       if (options?.debounceMs === false) return;
       if (commitTimeoutRef.current) clearTimeout(commitTimeoutRef.current);
       commitTimeoutRef.current = window.setTimeout(() => {
+        const data = new useAutoCommitPlugin.EventData();
+
+        editor.flush(data);
+
         if (editor.history.position <= editor.revision) return;
 
         const target = EditorTarget.read(editor);
         const selection = target && EditorTarget.extractRange(target);
 
         if (selection) {
+          // if the current selection is known, restore it after update.
+          // this overrides the selection restoration behaviour of the history plugin.
           editor.bus.addEventListener(
             "postcommit",
             () => {
@@ -34,7 +40,7 @@ export const useAutoCommitPlugin =
           );
         }
 
-        editor.commit(new useAutoCommitPlugin.EventData());
+        editor.commit(data);
       }, options?.debounceMs);
     };
 

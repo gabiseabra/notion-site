@@ -51,13 +51,15 @@ export interface ContentEditor<TBlock extends AnyBlock> {
   /**
    * Returns the latest history state for the given block id.
    * Use instead of `blocks` when you need up-to-date state mid-edit.
+   * @param id - The id of the block that u want to get.
+   * @param dryRun - skip flush. only return latest data from history (optional).
    */
-  peek(id: TBlock["id"]): TBlock | null;
+  peek(id: TBlock["id"], dryRun?: boolean): TBlock | null;
 
   /**
    * Push action to history. Records a undo/redo-able event.
    */
-  push(action: EditorAction<TBlock>, data?: unknown): void;
+  push(action: EditorAction<TBlock> & { data?: unknown }): void;
 
   /**
    * Sync React state with history.

@@ -26,22 +26,20 @@ export const useNotionBackspacePlugin: ContentEditorPlugin<Notion.Block> =
         return;
 
       const data = `use-notion-backspace-plugin`;
-      editor.push(
-        {
-          type: "update",
-          block: Notion.Block.mapRichText(
-            Notion.WIP.create({
-              type: "paragraph",
-              id: block.id,
-              parent: block.parent,
-            }),
-            () => Notion.Block.extractRichText(editor.peek(block.id) ?? block),
-          ),
-          selectionBefore: selection,
-          selectionAfter: selection,
-        },
+      editor.push({
         data,
-      );
+        type: "update",
+        block: Notion.Block.mapRichText(
+          Notion.WIP.create({
+            type: "paragraph",
+            id: block.id,
+            parent: block.parent,
+          }),
+          () => Notion.Block.extractRichText(editor.peek(block.id) ?? block),
+        ),
+        selectionBefore: selection,
+        selectionAfter: selection,
+      });
       editor.commit(data);
 
       e.preventDefault();

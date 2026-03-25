@@ -63,14 +63,18 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
         );
       },
 
-      peek(id) {
+      peek(id, dryRun) {
         if (!editorRef.current) return null;
+
+        if (!dryRun) this.flush();
 
         return history.getState().find((block) => block.id === id) ?? null;
       },
 
-      push(action, data) {
+      push({ data, ...action }) {
         if (!editorRef.current) return;
+
+        this.flush(data);
 
         const event = new EditorEvent("push", editorRef.current, {
           action,

@@ -69,8 +69,8 @@ describe("useLoggerPlugin", () => {
       });
       editorRef.current?.commit();
     }, [
+      expect.objectContaining({ eventType: "flush" }),
       expect.objectContaining({ eventType: "push" }),
-      // expect.objectContaining({ eventType: "flush" }),
       expect.objectContaining({ eventType: "commit" }),
       expect.objectContaining({ eventType: "postcommit" }),
     ]);

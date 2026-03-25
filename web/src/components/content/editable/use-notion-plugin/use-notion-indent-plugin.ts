@@ -73,31 +73,29 @@ export const useNotionIndentPlugin =
           if (parent) {
             const data = "notion-indent-plugin";
 
-            editor.push(
-              {
-                type: "apply",
-                actions: [
-                  {
-                    type: "update",
-                    block: { ...(editor.peek(block.id) ?? block), parent },
-                    selectionBefore: selection,
-                    selectionAfter: selection,
-                  },
-                  ...editor.blocks.flatMap((b) => {
-                    if (
-                      b.parent.type === "block_id" &&
-                      b.parent.block_id === block.id
-                    ) {
-                      return [
-                        { type: "update", block: { ...b, parent } },
-                      ] as const;
-                    }
-                    return [];
-                  }),
-                ],
-              },
+            editor.push({
               data,
-            );
+              type: "apply",
+              actions: [
+                {
+                  type: "update",
+                  block: { ...(editor.peek(block.id) ?? block), parent },
+                  selectionBefore: selection,
+                  selectionAfter: selection,
+                },
+                ...editor.blocks.flatMap((b) => {
+                  if (
+                    b.parent.type === "block_id" &&
+                    b.parent.block_id === block.id
+                  ) {
+                    return [
+                      { type: "update", block: { ...b, parent } },
+                    ] as const;
+                  }
+                  return [];
+                }),
+              ],
+            });
             editor.commit(data);
           }
 
@@ -116,6 +114,7 @@ export const useNotionIndentPlugin =
           const ix = editor.blocks.findIndex((b) => b.id === block.id);
 
           editor.push({
+            data,
             type: "apply",
             actions: [
               {

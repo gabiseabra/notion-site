@@ -16,7 +16,7 @@ export type EditorChangeset<TBlock extends AnyBlock> = {
   discard(): void;
 
   /** Commits the pending batch to history. */
-  flush(data?: unknown): void;
+  flush(): void;
 
   /** Returns the block including any pending changes. */
   peek(id: TBlock["id"]): TBlock | null;
