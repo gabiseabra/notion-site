@@ -1,6 +1,6 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
-import { memo, Ref, useImperativeHandle } from "react";
-import { renderSlot, Slot } from "../../utils/slot";
+import { memo, ReactNode, Ref, useImperativeHandle } from "react";
+import { Slot } from "../../utils/slot";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
 import { DocumentToolbar } from "./chrome/DocumentToolbar";
@@ -23,8 +23,8 @@ export type EditorProps = {
   options?: NotionPluginOptions;
   disabled?: boolean;
 
-  before?: Slot<Editor>;
-  after?: Slot<Editor>;
+  before?: Slot<Editor, ReactNode>;
+  after?: Slot<Editor, ReactNode>;
 };
 
 export const Editor = memo(function ContentEditor({
@@ -53,7 +53,7 @@ export const Editor = memo(function ContentEditor({
   return (
     <EditorTargetProvider editor={editor}>
       <div>
-        {renderSlot(editor, before)}
+        {Slot.extract(before, editor)}
 
         <RootBlock
           value={editor.blocks}
@@ -82,7 +82,7 @@ export const Editor = memo(function ContentEditor({
           )}
         />
 
-        {renderSlot(editor, after)}
+        {Slot.extract(after, editor)}
       </div>
     </EditorTargetProvider>
   );

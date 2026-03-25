@@ -1,33 +1,107 @@
+import { useRef } from "react";
 import { SelectionRange } from "../../../utils/selection-range.js";
+import { Slot } from "../../../utils/slot";
 import { SpliceRange } from "../../../utils/splice-range.js";
-import { AnyBlock } from "../editor/types.js";
+import { AnyBlock, ContentEditor } from "../editor/types.js";
 import { useDebouncedEditorChangeset } from "../editor/use-editor-changeset.js";
+import { composePlugins } from "./compose-plugins";
 import { createEventListenerPlugin } from "./create-event-listener-plugin.js";
 import { ContentEditorPlugin } from "./types.js";
 
-/**
- * Plugin that handles text input, preserving rich_text formatting.
- *
- * Uses native `beforeinput` to get inputType (React's synthetic event lacks it).
- */
 export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   multiLine,
   debounceMs = 200,
   splice,
+  change,
+  batchingDisabled = (id, editor) =>
+    editor.ref(id) instanceof HTMLInputElement ||
+    editor.ref(id) instanceof HTMLTextAreaElement,
 }: {
+  batchingDisabled?: DisabledSlot<TBlock>;
   multiLine?: boolean;
   debounceMs?: number | false;
-  splice: (
-    block: TBlock,
-    offset: number,
-    deleteCount: number,
-    insert: string,
-  ) => TBlock;
+  splice: Splice<TBlock>;
+  change: Change<TBlock>;
+}) =>
+  composePlugins<TBlock>(
+    useBatchedInlineMutationPlugin({
+      multiLine,
+      debounceMs,
+      splice,
+      disabled: batchingDisabled,
+    }),
+    useSyncInlineMutationPlugin({
+      multiLine,
+      change,
+      disabled: (id, editor) => !Slot.extract(batchingDisabled, id, editor),
+    }),
+  );
+
+useInlineMutationPlugin.ChangeData = class InlineMutationChangeData {};
+
+export const useSyncInlineMutationPlugin =
+  <TBlock extends AnyBlock>({
+    disabled,
+    multiLine,
+    change,
+  }: {
+    disabled?: DisabledSlot<TBlock>;
+    multiLine?: boolean;
+    change: Change<TBlock>;
+  }): ContentEditorPlugin<TBlock> =>
+  (editor) => {
+    const selectionBeforeRef = useRef<SelectionRange>(null);
+
+    return (block) => ({
+      onBeforeInput(event) {
+        selectionBeforeRef.current = SelectionRange.read(event.currentTarget);
+      },
+      onChange(event) {
+        console.log("change", SelectionRange.read(event.currentTarget));
+        if (Slot.extract(disabled, block.id, editor)) return;
+        if (
+          event.currentTarget instanceof HTMLInputElement ||
+          event.currentTarget instanceof HTMLTextAreaElement
+        ) {
+          const data = new useInlineMutationPlugin.ChangeData();
+          editor.push({
+            data,
+            type: "update",
+            block: change(block, event.currentTarget.value),
+            selectionBefore: selectionBeforeRef.current ?? undefined,
+            selectionAfter:
+              SelectionRange.read(event.currentTarget) ?? undefined,
+          });
+          editor.commit(data);
+        }
+      },
+    });
+  };
+
+/**
+ * Plugin that handles text input by handling the native `beforeinput` in batched mode.
+ *
+ * This is appropriate for contenteditable elements,
+ * where commits causes the whole inline stack to be thrashed,
+ * and the element to lose selection.
+ * For this reason, inline edits need to be batched.
+ */
+export const useBatchedInlineMutationPlugin = <TBlock extends AnyBlock>({
+  disabled,
+  multiLine,
+  debounceMs = 200,
+  splice,
+}: {
+  disabled?: DisabledSlot<TBlock>;
+  multiLine?: boolean;
+  debounceMs?: number | false;
+  splice: Splice<TBlock>;
 }): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
     const changeset = useDebouncedEditorChangeset(editor, debounceMs);
 
     return (block) => (e) => {
+      if (Slot.extract(disabled, block.id, editor)) return;
       if (!(e.target instanceof HTMLElement)) return;
 
       const currentBlock = changeset.peek(block.id);
@@ -63,3 +137,18 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
       });
     };
   });
+
+export type Splice<TBlock> = (
+  block: TBlock,
+  offset: number,
+  deleteCount: number,
+  insert: string,
+) => TBlock;
+
+export type Change<TBlock> = (block: TBlock, insert: string) => TBlock;
+
+type DisabledSlot<TBlock extends AnyBlock> = Slot<
+  TBlock["id"],
+  boolean,
+  [ContentEditor<TBlock>]
+>;

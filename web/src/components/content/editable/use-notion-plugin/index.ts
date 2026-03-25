@@ -46,11 +46,12 @@ export const useNotionPlugin = (
     useInlineMutationPlugin({
       multiLine: options.multiLine,
       splice(block, ...params) {
-        if (!Notion.Block.isRichText(block)) return block;
-        return Notion.Block.map(block, (node) => ({
-          ...node,
-          rich_text: Notion.RTF.splice(node.rich_text, ...params),
-        }));
+        return Notion.Block.mapRichText(block, (rich_text) =>
+          Notion.RTF.splice(rich_text, ...params),
+        );
+      },
+      change(block, text) {
+        return Notion.Block.mapRichText(block, () => [Notion.RTF.text(text)]);
       },
     }),
     useNotionBackspacePlugin,
