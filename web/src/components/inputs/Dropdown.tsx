@@ -1,7 +1,17 @@
 import { MaybeReadonly } from "@notion-site/common/types/readonly.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
-import { Fragment, Key, ReactNode, useMemo, useRef, useState } from "react";
+import {
+  CSSProperties,
+  Fragment,
+  Key,
+  ReactNode,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useDocumentEventListener } from "../../hooks/use-document-event-listener";
 import { useResizeObserver } from "../../hooks/use-resize-observer.js";
+import { EmptyState } from "../feedback/EmptyState";
 import { Col, Row, RowProps } from "../layout/FlexBox.js";
 import { Popover, PopoverProps } from "../overlays/Popover.js";
 import styles from "./Dropdown.module.scss";
@@ -18,9 +28,14 @@ export type DropdownProps<Option extends DropdownOption> = {
   placements?: PopoverProps["placements"];
 
   children?: ReactNode;
+  emptyState?: ReactNode;
 
   options: MaybeReadonly<Option[]>;
   renderOption: (option: Option) => ReactNode;
+
+  contentProps?: {
+    style?: CSSProperties;
+  };
 };
 
 export function Dropdown<Option extends DropdownOption>({
@@ -33,9 +48,12 @@ export function Dropdown<Option extends DropdownOption>({
   placements = ["bottom"],
 
   children,
+  emptyState = <EmptyState size="s" title="No results" />,
 
   options,
   renderOption,
+
+  contentProps,
 }: DropdownProps<Option>) {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -54,10 +72,19 @@ export function Dropdown<Option extends DropdownOption>({
       elevation={elevation}
       placements={placements}
       content={
-        <Col gap={0} style={{ width }}>
-          {options.map((option) => (
-            <Fragment key={option.id}>{renderOption(option)}</Fragment>
-          ))}
+        <Col
+          gap={0}
+          style={{
+            width,
+            borderRadius: `var(--popover-radius)`,
+            ...contentProps?.style,
+          }}
+        >
+          {options.length === 0
+            ? emptyState
+            : options.map((option) => (
+                <Fragment key={option.id}>{renderOption(option)}</Fragment>
+              ))}
         </Col>
       }
     >
@@ -73,7 +100,7 @@ type DropdownOptionProps = {
   disabled?: boolean;
 } & RowProps;
 
-export function DropdownOption({
+Dropdown.Option = function DropdownOption({
   id,
   active,
   focused,
@@ -97,7 +124,67 @@ export function DropdownOption({
       {...props}
     />
   );
-}
+};
+
+type DropdownNavigatorProps<TOption extends DropdownOption> = {
+  dropdown: Dropdown<TOption>;
+  disabled?: boolean;
+  onBlur?: () => void;
+  onFocusChange?: (id: TOption["id"]) => void;
+  contains?: (element: Element) => boolean;
+  children: ReactNode;
+};
+
+Dropdown.Navigator = function DropdownNavigator<
+  TOption extends DropdownOption,
+>({
+  dropdown,
+  disabled,
+  onBlur,
+  onFocusChange,
+  contains,
+  children,
+}: DropdownNavigatorProps<TOption>) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  // reset on focus out
+  useDocumentEventListener("focusin", () => {
+    if (disabled) return;
+
+    const wrapper = wrapperRef.current;
+    const target = document.activeElement;
+    if (
+      wrapper &&
+      target &&
+      !(wrapper.contains(target) || !contains || contains(target))
+    ) {
+      dropdown.reset();
+      onBlur?.();
+    }
+  });
+
+  return (
+    <Row
+      ref={wrapperRef}
+      onKeyDown={(e) => {
+        if (disabled) return;
+
+        const direction = (() => {
+          if (e.key === "ArrowDown") return 1;
+          if (e.key === "ArrowUp") return -1;
+        })();
+        const option = direction && Dropdown.rotate(dropdown, direction);
+
+        if (option) {
+          dropdown.setFocusedId(option.id);
+          onFocusChange?.(option.id);
+          e.preventDefault();
+        }
+      }}
+    >
+      {children}
+    </Row>
+  );
+};
 
 /// Dropdown controller stuff
 

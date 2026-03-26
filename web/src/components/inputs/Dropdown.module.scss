@@ -3,12 +3,12 @@
   display: flex;
   flex-direction: row;
   gap: var(--space);
+  box-sizing: border-box;
 
   border: none;
   background: transparent;
 
   padding: var(--space);
-  min-width: 120px;
 
   text-align: start;
   font-size: 0.85em;
@@ -17,7 +17,7 @@
   &:focus,
   &.focused {
     z-index: 1;
-    outline: 1.5px solid currentColor;
+    box-shadow: inset 0 0 0 1.5px currentColor;
   }
 
   &.active {

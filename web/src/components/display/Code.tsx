@@ -69,18 +69,24 @@ Code.LanguageBadge = function CodeLanguageBadge({
   language,
   left,
   right,
+  children,
 }: {
-  language: string;
+  language?: string;
   left?: ReactNode;
   right?: ReactNode;
+  children?: ReactNode;
 }) {
   return (
     <span className={styles.language}>
-      {left}
+      {left && <span className={styles.languageLeft}>{left}</span>}
 
-      {language}
+      {children ? (
+        children
+      ) : language ? (
+        <span className={styles.languageText}>{language}</span>
+      ) : null}
 
-      {right}
+      {right && <span className={styles.languageRight}>{right}</span>}
     </span>
   );
 };

@@ -16,6 +16,7 @@ export type InputProps = {
   type: HTMLInputTypeAttribute;
   label: string;
   hiddenLabel?: boolean;
+  variant?: "default" | "transparent";
   size?: "s" | "m" | "l";
   elevation?: 0 | 0.5 | 1;
   className?: string;
@@ -40,6 +41,7 @@ export function Input({
 
   label,
   hiddenLabel,
+  variant = "default",
   size = "m",
   elevation = 0,
   className,
@@ -65,6 +67,7 @@ export function Input({
         className,
         styles["input-wrapper"],
         styles[`size-${size}`],
+        styles[`variant-${variant}`],
         disabled && styles["disabled"],
         {
           [0]: "",

@@ -8,16 +8,10 @@ import {
   FaParagraph,
 } from "react-icons/fa";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
-import { useDocumentEventListener } from "../../../../hooks/use-document-event-listener.js";
 import { IconControl } from "../../../display/Icon.js";
 import { Span } from "../../../display/Text.js";
-import {
-  Dropdown,
-  DropdownOption,
-  useDropdown,
-} from "../../../inputs/Dropdown.js";
+import { Dropdown, useDropdown } from "../../../inputs/Dropdown.js";
 import { Input } from "../../../inputs/Input.js";
-import { Row } from "../../../layout/FlexBox.js";
 import { IsolationFrame } from "../../../overlays/IsolationFrame.js";
 
 const options = [
@@ -69,7 +63,6 @@ export function BlockTypeControl({
   value?: Notion.Block.BlockType;
   onChange: (color: Notion.Block.BlockType) => void;
 }) {
-  const wrapperRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<IsolationFrame>(null);
   const selectedOption = value && options.find((option) => option.id === value);
 
@@ -85,35 +78,15 @@ export function BlockTypeControl({
     dropdown.reset();
   }, [value]);
 
-  // reset on focus out
-  useDocumentEventListener("focusin", () => {
-    const wrapper = wrapperRef.current;
-    const iframeDoc = frameRef.current?.iframe?.contentDocument;
-    const target = document.activeElement;
-    if (
-      wrapper &&
-      iframeDoc &&
-      target &&
-      !(wrapper.contains(target) || iframeDoc.contains(target))
-    )
-      dropdown.reset();
-  });
-
   return (
-    <Row
-      ref={wrapperRef}
-      onKeyDown={(e) => {
-        const direction = (() => {
-          if (e.key === "ArrowDown") return 1;
-          if (e.key === "ArrowUp") return -1;
-        })();
-        const option = direction && Dropdown.rotate(dropdown, direction);
-
-        if (option) {
-          dropdown.setFocusedId(option.id);
-          document.getElementById(`block-type--${option.id}`)?.focus();
-          e.preventDefault();
-        }
+    <Dropdown.Navigator
+      dropdown={dropdown}
+      contains={(target) =>
+        !!frameRef.current?.iframe?.contentDocument?.contains(target)
+      }
+      onFocusChange={(id) => {
+        document.getElementById(`block-type--${id}`)?.scrollIntoView();
+        document.getElementById(`block-type--${id}`)?.focus();
       }}
     >
       <Dropdown
@@ -121,7 +94,7 @@ export function BlockTypeControl({
         onClose={() => dropdown.reset()}
         options={dropdown.visibleOptions}
         renderOption={(option) => (
-          <DropdownOption
+          <Dropdown.Option
             id={`block-type--${option.id}`}
             active={option.id === value}
             focused={dropdown.focusedId === option.id}
@@ -139,7 +112,7 @@ export function BlockTypeControl({
             </IconControl>
 
             <Span size="body">{option.title}</Span>
-          </DropdownOption>
+          </Dropdown.Option>
         )}
       >
         <IsolationFrame ref={frameRef} resize="y" style={{ width: 160 }}>
@@ -163,6 +136,6 @@ export function BlockTypeControl({
           />
         </IsolationFrame>
       </Dropdown>
-    </Row>
+    </Dropdown.Navigator>
   );
 }

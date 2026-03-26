@@ -1,15 +1,9 @@
-import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import type { Block as NotionBlock } from "@notion-site/common/utils/notion/block.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
-import Prism from "prismjs";
-import "prismjs/components/prism-javascript";
-import "prismjs/components/prism-jsx";
-import "prismjs/components/prism-markup";
-import "prismjs/components/prism-scss";
-import "prismjs/components/prism-tsx";
-import "prismjs/components/prism-typescript";
 import { Ref } from "react";
+import { highlightCode, mapLanguage } from "../../utils/code";
 import { Code } from "../display/Code.js";
+import { LanguageDropdown } from "../inputs/LanguageDropdown";
 import { CodeEditor } from "./CodeEditor";
 import { InlineEditor } from "./InlineEditor.js";
 import { useTextIndentPlugin } from "./editable/use-text-plugin/use-text-indent-plugin";
@@ -27,18 +21,28 @@ export function CodeBlock({
   editable?: boolean;
   onEditorChange?: (block: NotionBlock<"code">) => void;
 }) {
-  const code = Notion.RTF.getContent(block.code.rich_text);
   const language = block.code.language;
+  const code = Notion.RTF.getContent(block.code.rich_text);
   const prismLanguage = mapLanguage(block.code.language);
 
   return (
     <Code.Wrapper
       indent={indent}
       badge={
-        <Code.LanguageBadge
-          language={language}
-          right={<Code.CopyButton code={code} />}
-        />
+        <Code.LanguageBadge>
+          <LanguageDropdown
+            value={language}
+            onChange={(language) =>
+              onEditorChange?.({
+                ...block,
+                code: {
+                  ...block.code,
+                  language,
+                },
+              })
+            }
+          />
+        </Code.LanguageBadge>
       }
     >
       {editable ? (
@@ -46,9 +50,7 @@ export function CodeBlock({
           id={block.id}
           placeholder="Type some code…"
           readOnly={!editable}
-          highlight={(code) =>
-            Prism.highlight(code, Prism.languages[prismLanguage], prismLanguage)
-          }
+          highlight={highlightCode(language)}
           language={prismLanguage}
           code={code}
           onChange={(code) =>
@@ -88,15 +90,4 @@ export function CodeBlock({
       )}
     </Code.Wrapper>
   );
-}
-
-function mapLanguage(language: zNotion.blocks.language) {
-  switch (language) {
-    case "plain text":
-      return "none";
-    case "typescript":
-      return "tsx";
-    default:
-      return language;
-  }
 }

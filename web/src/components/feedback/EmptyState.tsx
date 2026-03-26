@@ -1,14 +1,36 @@
 import { Text } from "../display/Text.js";
 import { Col } from "../layout/FlexBox.js";
 
-export function EmptyState({ title }: { title: string }) {
+export function EmptyState({
+  title,
+  size,
+}: {
+  title: string;
+  size: "l" | "m" | "s";
+}) {
   return (
-    <Col mx={4} my={2} style={{ display: "block", textAlign: "center" }}>
-      <Text as="p" size="h2">
-        ¯\_(ツ)_/¯
-      </Text>
+    <Col
+      mx={{ l: 4, m: 2.5, s: 1 }[size]}
+      my={{ l: 2, m: 1, s: 0 }[size]}
+      style={{ display: "block", textAlign: "center" }}
+    >
+      {size !== "s" && (
+        <Text as="p" size={({ l: "h2", m: "h3" } as const)[size]}>
+          ¯\_(ツ)_/¯
+        </Text>
+      )}
 
-      <Text as="p" color="muted">
+      <Text
+        as="p"
+        color="muted"
+        style={{
+          fontSize: {
+            l: "1em",
+            m: ".85em",
+            s: ".75em",
+          }[size],
+        }}
+      >
         {title}
       </Text>
     </Col>

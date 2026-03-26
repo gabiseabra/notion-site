@@ -84,3 +84,12 @@
   font-size: 0.75em;
   font-weight: bold;
 }
+
+.variant-transparent .input {
+  background: transparent;
+  padding: 0;
+  border: 0;
+  &:focus-within {
+    outline: none;
+  }
+}

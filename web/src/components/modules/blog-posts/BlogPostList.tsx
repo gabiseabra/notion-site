@@ -13,7 +13,7 @@ export function BlogPostList({ items }: { items: BlogPost[] }) {
       items={items}
       getItemKey={(blogPost) => blogPost.id}
       onClick={(blogPost) => navigate(blogPost.url)}
-      emptyState={<EmptyState title="No blog posts found" />}
+      emptyState={<EmptyState size="l" title="No blog posts found" />}
       render={(blogPost) => (
         <Col p={2}>
           <BlogPostHeader
