@@ -12,38 +12,46 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   multiLine,
   debounceMs = 200,
   splice,
-  batchingDisabled = (id, editor) =>
-    editor.ref(id) instanceof HTMLInputElement ||
-    editor.ref(id) instanceof HTMLTextAreaElement,
+  update = (b) => b,
 }: {
-  batchingDisabled?: DisabledSlot<TBlock>;
   multiLine?: boolean;
   debounceMs?: number | false;
   splice: Splice<TBlock>;
-}) =>
-  composePlugins<TBlock>(
-    useBatchedInlineMutationPlugin({
+  /** If present, prefer reacting to onChange event when the target is a input
+   * or textarea element */
+  update?: Update<TBlock>;
+}) => {
+  const method = (id: TBlock["id"], editor: ContentEditor<TBlock>) =>
+    !!update &&
+    (editor.ref(id) instanceof HTMLInputElement ||
+      editor.ref(id) instanceof HTMLTextAreaElement)
+      ? ("update" as const)
+      : ("splice" as const);
+
+  return composePlugins<TBlock>(
+    useSpliceInlineMutationPlugin({
       multiLine,
       debounceMs,
       splice,
-      disabled: batchingDisabled,
+      disabled: Slot.map(method, (method) => method !== "splice"),
     }),
-    useSyncInlineMutationPlugin({
+    useUpdateInlineMutationPlugin({
       multiLine,
-      splice,
-      disabled: (id, editor) => !Slot.extract(batchingDisabled, id, editor),
+      update,
+      disabled: Slot.map(method, (method) => method !== "update"),
     }),
   );
+};
 
-export const useSyncInlineMutationPlugin =
+export const useUpdateInlineMutationPlugin =
   <TBlock extends AnyBlock>({
     disabled,
     multiLine,
-    splice,
+    update,
   }: {
     disabled?: DisabledSlot<TBlock>;
     multiLine?: boolean;
-    splice: Splice<TBlock>;
+    update: Update<TBlock>;
   }): ContentEditorPlugin<TBlock> =>
   (editor) => {
     const selectionBeforeRef = useRef<SelectionRange>(null);
@@ -53,52 +61,30 @@ export const useSyncInlineMutationPlugin =
         selectionBeforeRef.current = SelectionRange.read(event.currentTarget);
       },
       onInput(event) {
-        if (Slot.extract(disabled, block.id, editor)) return;
         if (
+          Slot.extract(disabled, block.id, editor) ||
           !(
             event.currentTarget instanceof HTMLInputElement ||
             event.currentTarget instanceof HTMLTextAreaElement
-          )
+          ) ||
+          (!multiLine &&
+            (event.nativeEvent.inputType === "insertParagraph" ||
+              event.nativeEvent.inputType === "insertNewLine"))
         )
           return;
 
-        const currentBlock = editor.peek(block.id);
-        const selectionBefore = selectionBeforeRef.current ?? undefined;
-
-        if (!selectionBefore || !currentBlock) return;
-
-        const spliceRange = SpliceRange.fromInputEvent(
-          event.nativeEvent,
-          event.currentTarget.value,
-          selectionBefore,
-        );
-
-        if (!spliceRange) return;
-
-        // skip newline if multiline is disabled
-        if (spliceRange.insert === "\n" && !multiLine) {
-          event.preventDefault();
-          return;
-        }
-
-        const data = new useSyncInlineMutationPlugin.ChangeData();
         editor.push({
-          data,
+          data: new useUpdateInlineMutationPlugin.ChangeData(),
           type: "update",
-          block: splice(
-            currentBlock,
-            spliceRange.offset,
-            spliceRange.deleteCount,
-            spliceRange.insert,
-          ),
-          selectionBefore,
-          selectionAfter: SpliceRange.toSelectionRange(spliceRange, 1),
+          block: update(block, event.currentTarget.value),
+          selectionBefore: selectionBeforeRef.current ?? undefined,
+          selectionAfter: SelectionRange.read(event.currentTarget) ?? undefined,
         });
       },
     });
   };
 
-useSyncInlineMutationPlugin.ChangeData = class SyncInlineMutationChangeData {};
+useUpdateInlineMutationPlugin.ChangeData = class SyncInlineMutationChangeData {};
 
 /**
  * Plugin that handles text input by handling the native `beforeinput` in batched mode.
@@ -108,7 +94,7 @@ useSyncInlineMutationPlugin.ChangeData = class SyncInlineMutationChangeData {};
  * and the element to lose selection.
  * For this reason, inline edits need to be batched.
  */
-export const useBatchedInlineMutationPlugin = <TBlock extends AnyBlock>({
+export const useSpliceInlineMutationPlugin = <TBlock extends AnyBlock>({
   disabled,
   multiLine,
   debounceMs = 200,
@@ -166,6 +152,8 @@ export type Splice<TBlock> = (
   deleteCount: number,
   insert: string,
 ) => TBlock;
+
+export type Update<TBlock> = (block: TBlock, value: string) => TBlock;
 
 type DisabledSlot<TBlock extends AnyBlock> = Slot<
   boolean,

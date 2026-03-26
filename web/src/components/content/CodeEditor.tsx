@@ -20,7 +20,10 @@ export type CodeEditorProps = {
 };
 
 const useCodePlugin = composePlugins(
-  useTextPlugin({ autoCommit: true }),
+  useTextPlugin({
+    multiLine: true,
+    autoCommit: true,
+  }),
   useTextIndentPlugin(),
 );
 

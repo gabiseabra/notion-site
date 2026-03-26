@@ -68,5 +68,6 @@ export const useTextPlugin =
       useInlineMutationPlugin({
         multiLine,
         splice: TextBlock.splice,
+        update: ({ id }, value) => ({ id, value }),
       }),
     )(editor);

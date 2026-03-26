@@ -18,9 +18,10 @@ export const useAutoCommitPlugin =
     const commitTimeoutRef = useRef<number>(null);
 
     const scheduleCommit = () => {
-      if (typeof options?.debounceMs === "undefined") return;
+      if (options?.disabled) return;
       if (commitTimeoutRef.current) clearTimeout(commitTimeoutRef.current);
-      commitTimeoutRef.current = window.setTimeout(() => {
+
+      const task = () => {
         const data = new useAutoCommitPlugin.EventData();
 
         editor.flush(data);
@@ -44,22 +45,16 @@ export const useAutoCommitPlugin =
         }
 
         editor.commit(data);
-      }, options?.debounceMs);
+      };
+
+      if (typeof options?.debounceMs === "number")
+        commitTimeoutRef.current = window.setTimeout(task, options.debounceMs);
+      else queueMicrotask(task);
     };
 
     return () => ({
-      onKeyUp() {
-        if (
-          !options?.disabled &&
-          typeof options?.debounceMs === "undefined" &&
-          editor.history.position > editor.revision
-        )
-          editor.commit();
-      },
-
       onInput() {
-        if (!options?.disabled && typeof options?.debounceMs === "number")
-          scheduleCommit();
+        scheduleCommit();
       },
     });
   };
