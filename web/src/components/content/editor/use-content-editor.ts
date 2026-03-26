@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { ContentEditorPlugin } from "../editable/types.js";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
 import { EditorHistory } from "./editor-history.js";
@@ -25,6 +25,8 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   onPostCommit?: (blocks: TBlock[]) => void;
   forwardRef?: (id: TBlock["id"], element: HTMLElement | null) => void;
 }) {
+  const id = useId();
+
   const isReadyRef = useRef(false);
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
   const history = useMemo(() => new EditorHistory(initialValue), []);
@@ -47,6 +49,8 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   const editorRef = useRef<ContentEditor<TBlock>>(null);
   const editor = useMemo<ContentEditor<TBlock>>(
     () => ({
+      id,
+
       blocks: snapshot.state,
       revision: snapshot.position,
       history,
