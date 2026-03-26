@@ -101,7 +101,7 @@ export function BlockTypeControl({
             onClick={() => onChange(option.id)}
             onFocus={() => dropdown.setFocusedId(option.id)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === "Space") {
+              if (e.key === "Enter" || e.key === " ") {
                 onChange(option.id);
                 e.preventDefault();
               }

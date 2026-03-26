@@ -56,11 +56,15 @@ export function LanguageDropdown({
             focused={dropdown.focusedId === option.id}
             py={0.15}
             style={{ fontSize: "1em" }}
-            onClick={() => onChange(option.id)}
+            onClick={() => {
+              onChange(option.id);
+              dropdown.reset();
+            }}
             onFocus={() => dropdown.setFocusedId(option.id)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === "Space") {
+              if (e.key === "Enter" || e.key === " ") {
                 onChange(option.id);
+                dropdown.reset();
                 e.preventDefault();
               }
             }}
