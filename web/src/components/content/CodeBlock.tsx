@@ -12,6 +12,7 @@ import { Ref } from "react";
 import { Code } from "../display/Code.js";
 import { CodeEditor } from "./CodeEditor";
 import { InlineEditor } from "./InlineEditor.js";
+import { useTextIndentPlugin } from "./editable/use-text-plugin/use-text-indent-plugin";
 
 export function CodeBlock({
   // ref,
@@ -61,7 +62,10 @@ export function CodeBlock({
           }
         />
       ) : (
-        <Code code={code} language={prismLanguage} />
+        <Code
+          code={useTextIndentPlugin.normalize(code)}
+          language={prismLanguage}
+        />
       )}
 
       {block.code.caption.length > 0 && (

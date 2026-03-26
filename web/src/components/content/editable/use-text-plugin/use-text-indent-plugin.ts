@@ -121,6 +121,18 @@ export const useTextIndentPlugin =
     },
   });
 
+useTextIndentPlugin.normalize = function normalizeIndent(
+  text: string,
+  { tabCharacter }: { tabCharacter: string } = { tabCharacter: "  " },
+) {
+  return text
+    .split("\n")
+    .map((line) =>
+      line.replace(/^(\s+)/, (spaces) => spaces.replace(/\t/, tabCharacter)),
+    )
+    .join("\n");
+};
+
 function* getLines(text: string, { start, end }: SelectionRange) {
   let selection: SelectionRange | undefined = undefined;
 
