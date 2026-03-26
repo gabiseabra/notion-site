@@ -12,7 +12,6 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   multiLine,
   debounceMs = 200,
   splice,
-  change,
   batchingDisabled = (id, editor) =>
     editor.ref(id) instanceof HTMLInputElement ||
     editor.ref(id) instanceof HTMLTextAreaElement,
@@ -21,7 +20,6 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   multiLine?: boolean;
   debounceMs?: number | false;
   splice: Splice<TBlock>;
-  change: Change<TBlock>;
 }) =>
   composePlugins<TBlock>(
     useBatchedInlineMutationPlugin({
@@ -32,7 +30,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
     }),
     useSyncInlineMutationPlugin({
       multiLine,
-      change,
+      splice,
       disabled: (id, editor) => !Slot.extract(batchingDisabled, id, editor),
     }),
   );
@@ -41,11 +39,11 @@ export const useSyncInlineMutationPlugin =
   <TBlock extends AnyBlock>({
     disabled,
     multiLine,
-    change,
+    splice,
   }: {
     disabled?: DisabledSlot<TBlock>;
     multiLine?: boolean;
-    change: Change<TBlock>;
+    splice: Splice<TBlock>;
   }): ContentEditorPlugin<TBlock> =>
   (editor) => {
     const selectionBeforeRef = useRef<SelectionRange>(null);
@@ -64,11 +62,21 @@ export const useSyncInlineMutationPlugin =
         )
           return;
 
-        if (
-          (event.nativeEvent.inputType === "insertLineBreak" ||
-            event.nativeEvent.inputType === "insertParagraph") &&
-          !multiLine
-        ) {
+        const currentBlock = editor.peek(block.id);
+        const selectionBefore = selectionBeforeRef.current ?? undefined;
+
+        if (!selectionBefore || !currentBlock) return;
+
+        const spliceRange = SpliceRange.fromInputEvent(
+          event.nativeEvent,
+          event.currentTarget.value,
+          selectionBefore,
+        );
+
+        if (!spliceRange) return;
+
+        // skip newline if multiline is disabled
+        if (spliceRange.insert === "\n" && !multiLine) {
           event.preventDefault();
           return;
         }
@@ -77,9 +85,14 @@ export const useSyncInlineMutationPlugin =
         editor.push({
           data,
           type: "update",
-          block: change(block, event.currentTarget.value),
-          selectionBefore: selectionBeforeRef.current ?? undefined,
-          selectionAfter: SelectionRange.read(event.currentTarget) ?? undefined,
+          block: splice(
+            currentBlock,
+            spliceRange.offset,
+            spliceRange.deleteCount,
+            spliceRange.insert,
+          ),
+          selectionBefore,
+          selectionAfter: SpliceRange.toSelectionRange(spliceRange, 1),
         });
       },
     });
@@ -153,8 +166,6 @@ export type Splice<TBlock> = (
   deleteCount: number,
   insert: string,
 ) => TBlock;
-
-export type Change<TBlock> = (block: TBlock, insert: string) => TBlock;
 
 type DisabledSlot<TBlock extends AnyBlock> = Slot<
   boolean,

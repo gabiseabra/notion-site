@@ -52,9 +52,6 @@ export const useNotionPlugin = (
           Notion.RTF.splice(rich_text, ...params),
         );
       },
-      change(block, text) {
-        return Notion.Block.mapRichText(block, () => [Notion.RTF.text(text)]);
-      },
     }),
     useNotionBackspacePlugin,
     useNotionIndentPlugin({}),
