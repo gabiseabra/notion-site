@@ -40,7 +40,7 @@ export function showError(error: unknown) {
   const details = JSON.stringify(
     error,
     (prop, value) => {
-      if (value instanceof HTMLElement) {
+      if (typeof HTMLElement !== "undefined" && value instanceof HTMLElement) {
         // todo: render htlm element
         return value.tagName;
       }
