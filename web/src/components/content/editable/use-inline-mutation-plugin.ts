@@ -8,6 +8,15 @@ import { composePlugins } from "./compose-plugins";
 import { createEventListenerPlugin } from "./create-event-listener-plugin.js";
 import { ContentEditorPlugin } from "./types.js";
 
+/**
+ * Plugin that handles text input for both contenteditable and input/textarea elements.
+ *
+ * Dispatches to one of two strategies based on the element type:
+ * - `useUpdateInlineMutationPlugin` — for `<input>` and `<textarea>` elements,
+ *   when an `update` function is provided.
+ * - `useSpliceInlineMutationPlugin` — for contenteditable elements (or when no
+ *   `update` function is provided).
+ */
 export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   multiLine,
   debounceMs = 200,
@@ -43,6 +52,12 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   );
 };
 
+/**
+ * Plugin that handles text input for `<input>` and `<textarea>` elements.
+ *
+ * Reacts to the `onInput` event and replaces the block's content with the
+ * element's full current value via the `update` callback.
+ */
 export const useUpdateInlineMutationPlugin =
   <TBlock extends AnyBlock>({
     disabled,
@@ -87,7 +102,7 @@ export const useUpdateInlineMutationPlugin =
 useUpdateInlineMutationPlugin.ChangeData = class SyncInlineMutationChangeData {};
 
 /**
- * Plugin that handles text input by handling the native `beforeinput` in batched mode.
+ * Plugin that handles text input via the native `beforeinput` in batched mode.
  *
  * This is appropriate for contenteditable elements,
  * where commits causes the whole inline stack to be thrashed,
@@ -146,6 +161,7 @@ export const useSpliceInlineMutationPlugin = <TBlock extends AnyBlock>({
     };
   });
 
+/** Applies a partial text mutation to a block by offset, delete count, and inserted string. */
 export type Splice<TBlock> = (
   block: TBlock,
   offset: number,
@@ -153,6 +169,7 @@ export type Splice<TBlock> = (
   insert: string,
 ) => TBlock;
 
+/** Replaces a block's content with a new full string value. */
 export type Update<TBlock> = (block: TBlock, value: string) => TBlock;
 
 type DisabledSlot<TBlock extends AnyBlock> = Slot<
