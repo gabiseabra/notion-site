@@ -1,4 +1,4 @@
-import { memo, Ref, useImperativeHandle } from "react";
+import { memo, Ref, useImperativeHandle, useRef } from "react";
 import * as css from "../../css/index.js";
 import { Code } from "../display/Code";
 import { composePlugins } from "./editable/compose-plugins";
@@ -33,6 +33,7 @@ export const CodeEditor = memo(function CodeEditor({
   onChange,
   ...props
 }: CodeEditorProps) {
+  const preRef = useRef<HTMLPreElement>(null);
   const { editor, editable } = useContentEditor({
     initialValue: [TextBlock.create(id, initialValue)],
     plugin: useCodePlugin,
@@ -51,12 +52,14 @@ export const CodeEditor = memo(function CodeEditor({
       }}
     >
       <Code
+        ref={preRef}
         language={language}
         code={code}
         highlight={highlight}
         aria-hidden="true"
         style={{
           margin: 0,
+          overflow: "hidden",
         }}
       />
 
@@ -70,6 +73,10 @@ export const CodeEditor = memo(function CodeEditor({
         className={Code.className(language)}
         {...editable(TextBlock.create(id, code))}
         {...props}
+        onScroll={(event) => {
+          if (!preRef.current) return;
+          preRef.current.scrollLeft = event.currentTarget.scrollLeft;
+        }}
         style={{
           margin: 1,
           border: 0,
@@ -82,7 +89,9 @@ export const CodeEditor = memo(function CodeEditor({
           width: "100%",
           resize: "none",
           color: "inherit",
-          overflow: "hidden",
+          overflowY: "hidden",
+          overflowX: "auto",
+          pointerEvents: "all",
           MozOsxFontSmoothing: "grayscale",
           ...(!code
             ? {}

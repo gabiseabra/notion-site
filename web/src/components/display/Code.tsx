@@ -14,6 +14,7 @@ export function Code({
   className,
   ...props
 }: {
+  ref?: Ref<HTMLPreElement>;
   code: string;
   highlight?: (code: string) => string;
   language: string;
