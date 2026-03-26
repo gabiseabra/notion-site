@@ -1,7 +1,9 @@
 import { memo, Ref, useImperativeHandle } from "react";
 import * as css from "../../css/index.js";
 import { Code } from "../display/Code";
+import { composePlugins } from "./editable/compose-plugins";
 import { TextBlock, useTextPlugin } from "./editable/use-text-plugin";
+import { useTextIndentPlugin } from "./editable/use-text-plugin/use-text-indent-plugin";
 import { ContentEditor } from "./editor/types";
 import { useContentEditor } from "./editor/use-content-editor";
 
@@ -17,6 +19,11 @@ export type CodeEditorProps = {
   placeholder?: string;
 };
 
+const useCodePlugin = composePlugins(
+  useTextPlugin({ autoCommit: true }),
+  useTextIndentPlugin(),
+);
+
 export const CodeEditor = memo(function CodeEditor({
   id,
   ref,
@@ -28,7 +35,7 @@ export const CodeEditor = memo(function CodeEditor({
 }: CodeEditorProps) {
   const { editor, editable } = useContentEditor({
     initialValue: [TextBlock.create(id, initialValue)],
-    plugin: useTextPlugin(),
+    plugin: useCodePlugin,
     onCommit: (blocks) => onChange?.(TextBlock.extract(blocks)),
   });
 

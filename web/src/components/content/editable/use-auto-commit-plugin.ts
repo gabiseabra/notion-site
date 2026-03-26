@@ -10,12 +10,15 @@ import { AnyContentEditorPlugin } from "./types.js";
  * is still dirty when the debounce timer fires.
  */
 export const useAutoCommitPlugin =
-  (options?: { debounceMs?: number | false }): AnyContentEditorPlugin =>
+  (options?: {
+    disabled?: boolean;
+    debounceMs?: number;
+  }): AnyContentEditorPlugin =>
   (editor) => {
     const commitTimeoutRef = useRef<number>(null);
 
     const scheduleCommit = () => {
-      if (options?.debounceMs === false) return;
+      if (typeof options?.debounceMs === "undefined") return;
       if (commitTimeoutRef.current) clearTimeout(commitTimeoutRef.current);
       commitTimeoutRef.current = window.setTimeout(() => {
         const data = new useAutoCommitPlugin.EventData();
@@ -44,11 +47,19 @@ export const useAutoCommitPlugin =
       }, options?.debounceMs);
     };
 
-    if (options?.debounceMs === false) return () => ({});
-
     return () => ({
+      onKeyUp() {
+        if (
+          !options?.disabled &&
+          typeof options?.debounceMs === "undefined" &&
+          editor.history.position > editor.revision
+        )
+          editor.commit();
+      },
+
       onInput() {
-        scheduleCommit();
+        if (!options?.disabled && typeof options?.debounceMs === "number")
+          scheduleCommit();
       },
     });
   };

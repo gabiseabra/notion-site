@@ -18,7 +18,7 @@ import { useNotionPrefixPlugin } from "./use-notion-prefix-plugin.js";
 export type NotionPluginOptions = {
   multiLine?: boolean;
   logging?: boolean | "verbose";
-  autoCommit?: number | false;
+  autoCommit?: number | boolean;
 };
 
 export const useNotionPlugin = (
@@ -40,7 +40,9 @@ export const useNotionPlugin = (
         console.info(event.eventType, event.detail, event.editor);
     }),
     useAutoCommitPlugin({
-      debounceMs: options.autoCommit,
+      disabled: options.autoCommit === false,
+      debounceMs:
+        typeof options.autoCommit === "number" ? options.autoCommit : undefined,
     }),
     useHistoryPlugin(),
     useInlineMutationPlugin({

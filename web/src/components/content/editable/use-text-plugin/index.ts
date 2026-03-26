@@ -30,18 +30,25 @@ export const TextBlock = {
   },
 };
 
-export type TextPluginOptions = { autoCommit?: number };
+export type TextPluginOptions = {
+  multiLine?: boolean;
+  autoCommit?: number | boolean;
+};
 
 /**
  * ContentEditor plugin stack for plain text blocks.
  */
 export const useTextPlugin =
-  ({ autoCommit = 600 }: TextPluginOptions = {}) =>
+  ({ multiLine = true, autoCommit = 600 }: TextPluginOptions = {}) =>
   (editor: ContentEditor<TextBlock>) =>
     composePlugins<TextBlock>(
-      useAutoCommitPlugin({ debounceMs: autoCommit }),
+      useAutoCommitPlugin({
+        disabled: autoCommit === false,
+        debounceMs: typeof autoCommit === "number" ? autoCommit : undefined,
+      }),
       useHistoryPlugin(),
       useInlineMutationPlugin({
+        multiLine,
         splice: TextBlock.splice,
         change: ({ id }, value) => ({ id, value }),
       }),
