@@ -16,12 +16,14 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   onReady,
   onCommit,
   onPostCommit,
+  forwardRef,
 }: {
   initialValue: TBlock[];
   plugin: ContentEditorPlugin<TBlock, TDetail>;
   onReady?: () => void;
   onCommit?: (blocks: TBlock[]) => void;
   onPostCommit?: (blocks: TBlock[]) => void;
+  forwardRef?: (id: TBlock["id"], element: HTMLElement | null) => void;
 }) {
   const isReadyRef = useRef(false);
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
@@ -136,6 +138,7 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
       ...editable(block),
       ref(element: HTMLElement | null) {
         blocksRef.current.set(block.id, element);
+        forwardRef?.(block.id, element);
       },
     }),
   };
