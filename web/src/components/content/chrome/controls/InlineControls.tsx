@@ -26,8 +26,7 @@ export function InlineControls({
   ColorControl: ColorControl;
   LinkControl: LinkControl;
 }) {
-  const { selection, text, disabled, readOnly, execCommand } =
-    useToolbarControls(editor);
+  const { selection, text, disabled, readOnly } = useToolbarControls(editor);
 
   const annotations =
     text && selection && selection.type === "range"
@@ -44,7 +43,7 @@ export function InlineControls({
         disabled={disabled}
         readOnly={readOnly}
         value={annotations}
-        onChange={pipe(toggleAnnotations, execCommand)}
+        onChange={pipe(toggleAnnotations, editor.exec)}
       />
 
       <Divider direction="y" mx={1} />
@@ -55,7 +54,7 @@ export function InlineControls({
         disabled={disabled}
         readOnly={readOnly}
         value={annotations?.color}
-        onChange={pipe((color) => ({ color }), toggleAnnotations, execCommand)}
+        onChange={pipe((color) => ({ color }), toggleAnnotations, editor.exec)}
       />
 
       <LinkControl
@@ -64,8 +63,8 @@ export function InlineControls({
         disabled={disabled}
         readOnly={readOnly}
         value={link}
-        onChange={pipe(setLink, execCommand)}
-        onOpen={() => execCommand(focusOnLink)}
+        onChange={pipe(setLink, editor.exec)}
+        onOpen={() => editor.exec(focusOnLink)}
       />
     </Row>
   );

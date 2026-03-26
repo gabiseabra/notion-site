@@ -23,8 +23,8 @@ export type EditorProps = {
   options?: NotionPluginOptions;
   disabled?: boolean;
 
-  before?: Slot<Editor, ReactNode>;
-  after?: Slot<Editor, ReactNode>;
+  before?: Slot<ReactNode, Editor>;
+  after?: Slot<ReactNode, Editor>;
 };
 
 export const Editor = memo(function ContentEditor({

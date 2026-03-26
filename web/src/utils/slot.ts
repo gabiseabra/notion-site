@@ -1,10 +1,10 @@
-export type Slot<S, T, Args extends unknown[] = []> =
+export type Slot<T, S = void, Args extends unknown[] = []> =
   | T
   | ((value: S, ...args: Args) => T);
 
 export const Slot = {
-  extract<S, T, Args extends unknown[] = []>(
-    slot: Slot<S, T, Args>,
+  extract<T, S = void, Args extends unknown[] = []>(
+    slot: Slot<T, S, Args>,
     value: S,
     ...args: Args
   ) {

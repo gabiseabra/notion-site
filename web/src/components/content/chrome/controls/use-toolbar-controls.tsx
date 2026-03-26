@@ -2,7 +2,6 @@ import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { SelectionRange } from "../../../../utils/selection-range.js";
 import { Editor } from "../../Editor.js";
-import { ExecCommand } from "../../editor/editor-command.js";
 import { useEditorTarget } from "../../editor/use-editor-target.js";
 
 export function useToolbarControls(editor: Editor) {
@@ -21,6 +20,5 @@ export function useToolbarControls(editor: Editor) {
     text,
     disabled,
     readOnly,
-    execCommand: target ? ExecCommand(editor, target) : () => {},
   };
 }

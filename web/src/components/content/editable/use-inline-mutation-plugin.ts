@@ -157,7 +157,7 @@ export type Splice<TBlock> = (
 export type Change<TBlock> = (block: TBlock, insert: string) => TBlock;
 
 type DisabledSlot<TBlock extends AnyBlock> = Slot<
-  TBlock["id"],
   boolean,
+  TBlock["id"],
   [ContentEditor<TBlock>]
 >;

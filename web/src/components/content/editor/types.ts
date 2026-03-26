@@ -1,4 +1,5 @@
 import { IHistory } from "@notion-site/common/utils/history.js";
+import { EditorCommand } from "./editor-command";
 import type { EditorEventTarget } from "./editor-event.js";
 import { EditorAction } from "./editor-history.js";
 
@@ -65,4 +66,6 @@ export interface ContentEditor<TBlock extends AnyBlock> {
    * Sync React state with history.
    */
   commit(data?: unknown): void;
+
+  exec(cmd: EditorCommand<TBlock>, id?: TBlock["id"]): void;
 }

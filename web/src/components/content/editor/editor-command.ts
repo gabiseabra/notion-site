@@ -1,3 +1,4 @@
+import { Slot } from "../../../utils/slot";
 import { EditorTarget } from "./editor-target";
 import { AnyBlock, ContentEditor } from "./types.js";
 
@@ -18,7 +19,7 @@ export type ExecCommand<
 export const ExecCommand =
   <TBlock extends AnyBlock, TData>(
     editor: ContentEditor<TBlock>,
-    data: TData,
+    data: Slot<TData>,
     block?: TBlock,
   ) =>
   (command: EditorCommand<TBlock, TData>) => {
@@ -30,7 +31,12 @@ export const ExecCommand =
         : { start: 0, end: 0 };
     const currentBlock = block ?? (target && editor.peek(target.id));
     const newBlock =
-      currentBlock && command({ block: currentBlock, data, editor });
+      currentBlock &&
+      command({
+        block: currentBlock,
+        data: Slot.extract(data, undefined),
+        editor,
+      });
 
     if (newBlock) {
       editor.push({

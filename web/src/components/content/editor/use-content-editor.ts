@@ -1,7 +1,9 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { ContentEditorPlugin } from "../editable/types.js";
+import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
 import { EditorHistory } from "./editor-history.js";
+import { EditorTarget } from "./editor-target";
 import { AnyBlock, ContentEditor } from "./types.js";
 
 /**
@@ -111,6 +113,16 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
           position: event.detail.revision,
         });
         onCommitRef.current?.(event.detail.blocks);
+      },
+
+      exec(cmd, id) {
+        if (!editorRef.current) return;
+        const target = EditorTarget.read(editorRef.current);
+        const block = id ? snapshot.state.find((b) => b.id === id) : undefined;
+
+        if (!target || (id && !block)) return;
+
+        return ExecCommand(editorRef.current, target, block)(cmd);
       },
     }),
     [bus, history, snapshot],

@@ -21,7 +21,7 @@ export function DocumentToolbar({
   style,
   ...props
 }: { editor: Editor } & Omit<RowProps, "children">) {
-  const { block, execCommand, disabled, readOnly } = useToolbarControls(editor);
+  const { block, disabled, readOnly } = useToolbarControls(editor);
 
   return (
     <Row
@@ -35,7 +35,7 @@ export function DocumentToolbar({
         disabled={disabled}
         readOnly={readOnly}
         value={block?.type}
-        onChange={pipe(setBlockType, execCommand)}
+        onChange={pipe(setBlockType, editor.exec)}
       />
 
       <Divider direction="y" mx={1} />
