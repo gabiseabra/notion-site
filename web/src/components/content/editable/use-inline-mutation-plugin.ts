@@ -37,8 +37,6 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
     }),
   );
 
-useInlineMutationPlugin.ChangeData = class InlineMutationChangeData {};
-
 export const useSyncInlineMutationPlugin =
   <TBlock extends AnyBlock>({
     disabled,
@@ -56,27 +54,38 @@ export const useSyncInlineMutationPlugin =
       onBeforeInput(event) {
         selectionBeforeRef.current = SelectionRange.read(event.currentTarget);
       },
-      onChange(event) {
-        console.log("change", SelectionRange.read(event.currentTarget));
+      onInput(event) {
         if (Slot.extract(disabled, block.id, editor)) return;
         if (
-          event.currentTarget instanceof HTMLInputElement ||
-          event.currentTarget instanceof HTMLTextAreaElement
+          !(
+            event.currentTarget instanceof HTMLInputElement ||
+            event.currentTarget instanceof HTMLTextAreaElement
+          )
+        )
+          return;
+
+        if (
+          (event.nativeEvent.inputType === "insertLineBreak" ||
+            event.nativeEvent.inputType === "insertParagraph") &&
+          !multiLine
         ) {
-          const data = new useInlineMutationPlugin.ChangeData();
-          editor.push({
-            data,
-            type: "update",
-            block: change(block, event.currentTarget.value),
-            selectionBefore: selectionBeforeRef.current ?? undefined,
-            selectionAfter:
-              SelectionRange.read(event.currentTarget) ?? undefined,
-          });
-          editor.commit(data);
+          event.preventDefault();
+          return;
         }
+
+        const data = new useSyncInlineMutationPlugin.ChangeData();
+        editor.push({
+          data,
+          type: "update",
+          block: change(block, event.currentTarget.value),
+          selectionBefore: selectionBeforeRef.current ?? undefined,
+          selectionAfter: SelectionRange.read(event.currentTarget) ?? undefined,
+        });
       },
     });
   };
+
+useSyncInlineMutationPlugin.ChangeData = class SyncInlineMutationChangeData {};
 
 /**
  * Plugin that handles text input by handling the native `beforeinput` in batched mode.
