@@ -1,3 +1,4 @@
+import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { memo, Ref, useImperativeHandle, useRef } from "react";
 import * as css from "../../css/index.js";
 import { Code } from "../display/Code";
@@ -10,8 +11,7 @@ import { useContentEditor } from "./editor/use-content-editor";
 export type CodeEditorProps = {
   id: string;
   ref?: Ref<ContentEditor<TextBlock>>;
-  highlight: (code: string) => string;
-  language: string;
+  language: zNotion.blocks.language;
   code: string;
   onChange?: (code: string) => void;
   disabled?: boolean;
@@ -30,7 +30,6 @@ const useCodePlugin = composePlugins(
 export const CodeEditor = memo(function CodeEditor({
   id,
   ref,
-  highlight,
   language,
   code: initialValue,
   onChange,
@@ -58,7 +57,6 @@ export const CodeEditor = memo(function CodeEditor({
         ref={preRef}
         language={language}
         code={code}
-        highlight={highlight}
         aria-hidden="true"
         style={{
           margin: 0,

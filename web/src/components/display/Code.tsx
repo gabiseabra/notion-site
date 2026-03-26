@@ -1,7 +1,9 @@
+import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { HTMLAttributes, ReactNode, Ref } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import * as css from "../../css/index.js";
+import { highlightCode, mapLanguage, showLanguage } from "../../utils/code";
 import { CopyButton } from "../inputs/CopyButton.js";
 import { Platform } from "../layout/Platform.js";
 import styles from "./Code.module.scss";
@@ -9,15 +11,13 @@ import { IconControl } from "./Icon.js";
 
 export function Code({
   code,
-  highlight,
   language,
   className,
   ...props
 }: {
   ref?: Ref<HTMLPreElement>;
   code: string;
-  highlight?: (code: string) => string;
-  language: string;
+  language: zNotion.blocks.language;
 } & Omit<HTMLAttributes<HTMLElement>, "children" | "dangerouslySetInnerHTML">) {
   return (
     <pre
@@ -28,16 +28,16 @@ export function Code({
     >
       <code
         className={`language-${language}`}
-        {...(highlight
-          ? { dangerouslySetInnerHTML: { __html: highlight(code) + "<br />" } }
-          : { children: code })}
+        dangerouslySetInnerHTML={{
+          __html: highlightCode(language)(code) + "<br />",
+        }}
       />
     </pre>
   );
 }
 
-Code.className = (language: string) =>
-  [styles.code, "prism", `language-${language}`].join(" ");
+Code.className = (language: zNotion.blocks.language) =>
+  [styles.code, "prism", `language-${mapLanguage(language)}`].join(" ");
 
 Code.Wrapper = function CodeWrapper({
   ref,
@@ -71,7 +71,7 @@ Code.LanguageBadge = function CodeLanguageBadge({
   right,
   children,
 }: {
-  language?: string;
+  language?: zNotion.blocks.language;
   left?: ReactNode;
   right?: ReactNode;
   children?: ReactNode;
@@ -83,7 +83,7 @@ Code.LanguageBadge = function CodeLanguageBadge({
       {children ? (
         children
       ) : language ? (
-        <span className={styles.languageText}>{language}</span>
+        <span className={styles.languageText}>{showLanguage(language)}</span>
       ) : null}
 
       {right && <span className={styles.languageRight}>{right}</span>}

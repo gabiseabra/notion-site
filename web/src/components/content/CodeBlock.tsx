@@ -1,7 +1,6 @@
 import type { Block as NotionBlock } from "@notion-site/common/utils/notion/block.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { Ref } from "react";
-import { highlightCode, mapLanguage } from "../../utils/code";
 import { Code } from "../display/Code.js";
 import { LanguageDropdown } from "../inputs/LanguageDropdown";
 import { CodeEditor } from "./CodeEditor";
@@ -23,26 +22,32 @@ export function CodeBlock({
 }) {
   const language = block.code.language;
   const code = Notion.RTF.getContent(block.code.rich_text);
-  const prismLanguage = mapLanguage(block.code.language);
 
   return (
     <Code.Wrapper
       indent={indent}
       badge={
-        <Code.LanguageBadge>
-          <LanguageDropdown
-            value={language}
-            onChange={(language) =>
-              onEditorChange?.({
-                ...block,
-                code: {
-                  ...block.code,
-                  language,
-                },
-              })
-            }
+        editable ? (
+          <Code.LanguageBadge>
+            <LanguageDropdown
+              value={language}
+              onChange={(language) =>
+                onEditorChange?.({
+                  ...block,
+                  code: {
+                    ...block.code,
+                    language,
+                  },
+                })
+              }
+            />
+          </Code.LanguageBadge>
+        ) : (
+          <Code.LanguageBadge
+            language={language}
+            right={<Code.CopyButton code={code} />}
           />
-        </Code.LanguageBadge>
+        )
       }
     >
       {editable ? (
@@ -50,8 +55,7 @@ export function CodeBlock({
           id={block.id}
           placeholder="Type some code…"
           readOnly={!editable}
-          highlight={highlightCode(language)}
-          language={prismLanguage}
+          language={language}
           code={code}
           onChange={(code) =>
             onEditorChange?.({
@@ -64,10 +68,7 @@ export function CodeBlock({
           }
         />
       ) : (
-        <Code
-          code={useTextIndentPlugin.normalize(code)}
-          language={prismLanguage}
-        />
+        <Code code={useTextIndentPlugin.normalize(code)} language={language} />
       )}
 
       {block.code.caption.length > 0 && (

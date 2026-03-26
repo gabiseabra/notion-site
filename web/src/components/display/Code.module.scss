@@ -45,12 +45,31 @@
 
 .languageText {
   padding: calc(var(--space) * 0.25);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:first-child {
+    padding-left: var(--space);
+  }
+  &:last-child {
+    padding-right: var(--space);
+  }
 }
 
 .languageLeft {
   padding-left: var(--space);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .languageRight {
   padding-right: var(--space);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
