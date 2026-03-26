@@ -8,12 +8,12 @@ import {
   NotionPluginOptions,
   useNotionPlugin,
 } from "./editable/use-notion-plugin/index.js";
-import { ContentEditor as TContentEditor } from "./editor/types.js";
+import { ContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
 
 export type InlineEditorProps = {
   id: string;
-  ref?: Ref<TContentEditor<Notion.Block> | null>;
+  ref?: Ref<ContentEditor<Notion.Block> | null>;
   value: Notion.RichText;
   onChange: (block: Notion.RichText) => void;
   options?: Omit<NotionPluginOptions, "multiline">;

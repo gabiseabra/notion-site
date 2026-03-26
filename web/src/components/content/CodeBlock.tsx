@@ -9,14 +9,12 @@ import "prismjs/components/prism-scss";
 import "prismjs/components/prism-tsx";
 import "prismjs/components/prism-typescript";
 import { Ref } from "react";
-import { default as CodeEditor, defaultStyles } from "react-simple-code-editor";
-import * as css from "../../css/index.js";
-import { useHTMLElementRef } from "../../hooks/use-html-element-ref";
 import { Code } from "../display/Code.js";
+import { CodeEditor } from "./CodeEditor";
 import { InlineEditor } from "./InlineEditor.js";
 
 export function CodeBlock({
-  ref,
+  // ref,
   block,
   indent = 0,
   editable,
@@ -28,14 +26,12 @@ export function CodeBlock({
   editable?: boolean;
   onEditorChange?: (block: NotionBlock<"code">) => void;
 }) {
-  const proxyRef = useHTMLElementRef<HTMLDivElement>(ref);
   const code = Notion.RTF.getContent(block.code.rich_text);
   const language = block.code.language;
   const prismLanguage = mapLanguage(block.code.language);
 
   return (
     <Code.Wrapper
-      ref={proxyRef}
       indent={indent}
       badge={
         <Code.LanguageBadge
@@ -48,29 +44,13 @@ export function CodeBlock({
         <CodeEditor
           id={block.id}
           placeholder="Type some code…"
-          value={code}
           readOnly={!editable}
           highlight={(code) =>
             Prism.highlight(code, Prism.languages[prismLanguage], prismLanguage)
           }
-          styles={{
-            editor: {
-              margin: 0,
-            },
-            container: {
-              marginBlock: css.space(1),
-            },
-            textarea: {
-              margin: 1,
-              border: 0,
-              background: "none",
-              boxSizing: "border-box",
-              ...defaultStyles.textarea,
-            },
-          }}
-          textareaClassName={Code.className(prismLanguage)}
-          preClassName={Code.className(prismLanguage)}
-          onValueChange={(code) =>
+          language={prismLanguage}
+          code={code}
+          onChange={(code) =>
             onEditorChange?.({
               ...block,
               code: {

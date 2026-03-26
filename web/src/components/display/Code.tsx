@@ -1,4 +1,5 @@
-import { ReactNode, Ref } from "react";
+import { isTruthy } from "@notion-site/common/utils/guards.js";
+import { HTMLAttributes, ReactNode, Ref } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import * as css from "../../css/index.js";
 import { CopyButton } from "../inputs/CopyButton.js";
@@ -6,12 +7,29 @@ import { Platform } from "../layout/Platform.js";
 import styles from "./Code.module.scss";
 import { IconControl } from "./Icon.js";
 
-export function Code({ code, language }: { code: string; language: string }) {
+export function Code({
+  code,
+  highlight,
+  language,
+  className,
+  ...props
+}: {
+  code: string;
+  highlight?: (code: string) => string;
+  language: string;
+} & Omit<HTMLAttributes<HTMLElement>, "children" | "dangerouslySetInnerHTML">) {
   return (
-    <pre className={Code.className(language)}>
+    <pre
+      className={[Code.className(language), className]
+        .filter(isTruthy)
+        .join(" ")}
+      {...props}
+    >
       <code
         className={`language-${language}`}
-        dangerouslySetInnerHTML={{ __html: code }}
+        {...(highlight
+          ? { dangerouslySetInnerHTML: { __html: highlight(code) + "<br />" } }
+          : { children: code })}
       />
     </pre>
   );
