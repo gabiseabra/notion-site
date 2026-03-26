@@ -12,7 +12,7 @@ export type CodeEditorProps = {
   id: string;
   ref?: Ref<ContentEditor<TextBlock>>;
   language: zNotion.blocks.language;
-  code: string;
+  value: string;
   onChange?: (code: string) => void;
   disabled?: boolean;
   readOnly?: boolean;
@@ -31,8 +31,10 @@ export const CodeEditor = memo(function CodeEditor({
   id,
   ref,
   language,
-  code: initialValue,
+  value: initialValue,
   onChange,
+  readOnly,
+  disabled,
   ...props
 }: CodeEditorProps) {
   const preRef = useRef<HTMLPreElement>(null);
@@ -57,51 +59,59 @@ export const CodeEditor = memo(function CodeEditor({
         ref={preRef}
         language={language}
         code={code}
-        aria-hidden="true"
-        style={{
-          margin: 0,
-          overflow: "hidden",
-        }}
+        disabled={disabled}
+        {...(readOnly
+          ? {
+              ["aria-hidden"]: "true",
+              style: {
+                margin: 0,
+                overflow: "hidden",
+              },
+            }
+          : {})}
       />
 
-      <textarea
-        value={code}
-        autoCapitalize="off"
-        autoComplete="off"
-        autoCorrect="off"
-        spellCheck={false}
-        data-gramm={false}
-        className={Code.className(language)}
-        {...editable(TextBlock.create(id, code))}
-        {...props}
-        onScroll={(event) => {
-          if (!preRef.current) return;
-          preRef.current.scrollLeft = event.currentTarget.scrollLeft;
-        }}
-        style={{
-          margin: 1,
-          border: 0,
-          background: "none",
-          boxSizing: "border-box",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          height: "100%",
-          width: "100%",
-          resize: "none",
-          color: "inherit",
-          overflowY: "hidden",
-          overflowX: "auto",
-          pointerEvents: "all",
-          MozOsxFontSmoothing: "grayscale",
-          ...(!code
-            ? {}
-            : {
-                WebkitFontSmoothing: "antialiased",
-                WebkitTextFillColor: "transparent",
-              }),
-        }}
-      />
+      {!readOnly && (
+        <textarea
+          value={code}
+          autoCapitalize="off"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          data-gramm={false}
+          disabled={disabled}
+          className={Code.className(language)}
+          {...editable(TextBlock.create(id, code))}
+          {...props}
+          onScroll={(event) => {
+            if (!preRef.current) return;
+            preRef.current.scrollLeft = event.currentTarget.scrollLeft;
+          }}
+          style={{
+            margin: 1,
+            border: 0,
+            background: "none",
+            boxSizing: "border-box",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            height: "100%",
+            width: "100%",
+            resize: "none",
+            color: "inherit",
+            overflowY: "hidden",
+            overflowX: "auto",
+            pointerEvents: "all",
+            MozOsxFontSmoothing: "grayscale",
+            ...(!code
+              ? {}
+              : {
+                  WebkitFontSmoothing: "antialiased",
+                  WebkitTextFillColor: "transparent",
+                }),
+          }}
+        />
+      )}
     </div>
   );
 });

@@ -12,7 +12,13 @@ import { SwatchColorControl } from "./controls/ColorControl.js";
 import { InlineControls } from "./controls/InlineControls.js";
 import { PreviewLinkControl } from "./controls/LinkControl.js";
 
-export function FloatingToolbar({ editor }: { editor: Editor }) {
+export function FloatingToolbar({
+  editor,
+  disabled,
+}: {
+  editor: Editor;
+  disabled?: boolean;
+}) {
   const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
 
   const updateSelectionRect = useRafThrottledCallback(() => {
@@ -69,6 +75,7 @@ export function FloatingToolbar({ editor }: { editor: Editor }) {
           style={{ userSelect: "none" }}
         >
           <InlineControls
+            disabled={disabled}
             editor={editor}
             Overlay={PortalOverlay}
             ColorControl={SwatchColorControl}

@@ -16,18 +16,26 @@ import { useToolbarControls } from "./use-toolbar-controls.js";
 
 export function InlineControls({
   editor,
+  disabled: componentDisabled,
 
   Overlay,
   ...controls
 }: {
   editor: Editor;
+  disabled?: boolean;
 
   Overlay: AnchoredOverlay;
   ColorControl: ColorControl;
   LinkControl: LinkControl;
 }) {
-  const { selection, text, disabled, readOnly } = useToolbarControls(editor);
+  const {
+    selection,
+    text,
+    readOnly,
+    disabled: toolbarDisabled,
+  } = useToolbarControls(editor);
 
+  const disabled = componentDisabled || toolbarDisabled;
   const annotations =
     text && selection && selection.type === "range"
       ? Notion.RTF.getAnnotations(text, selection.start, selection.end)

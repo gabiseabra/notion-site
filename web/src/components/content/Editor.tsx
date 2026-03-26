@@ -9,7 +9,6 @@ import {
   NotionPluginOptions,
   useNotionPlugin,
 } from "./editable/use-notion-plugin/index.js";
-import { EditorTarget } from "./editor/editor-target.js";
 import { ContentEditor } from "./editor/types.js";
 import { useContentEditor } from "./editor/use-content-editor.js";
 import { EditorTargetProvider } from "./editor/use-editor-target.js";
@@ -22,6 +21,7 @@ export type EditorProps = {
   onChange: (block: Notion.Block[]) => void;
   options?: NotionPluginOptions;
   disabled?: boolean;
+  readOnly?: boolean;
 
   before?: Slot<ReactNode, Editor>;
   after?: Slot<ReactNode, Editor>;
@@ -33,11 +33,17 @@ export const Editor = memo(function ContentEditor({
   onChange,
   options,
   disabled,
+  readOnly,
 
   before = (editor) => (
     <>
-      <FloatingToolbar editor={editor} />
-      <DocumentToolbar mb={4} editor={editor} />
+      {!disabled && !readOnly && (
+        <FloatingToolbar editor={editor} disabled={disabled} />
+      )}
+
+      {!readOnly && (
+        <DocumentToolbar mb={4} editor={editor} disabled={disabled} />
+      )}
     </>
   ),
   after,
@@ -60,21 +66,9 @@ export const Editor = memo(function ContentEditor({
           render={(children, block) => (
             <Block
               value={block}
-              editable={!disabled}
-              onEditorChange={(block) => {
-                const target = EditorTarget.read(editor);
-                const selection = target && EditorTarget.extractRange(target);
-                editor.push({
-                  type: "update",
-                  block,
-                  selectionAfter:
-                    selection?.id === block.id
-                      ? selection
-                      : { start: 0, end: 0 },
-                  selectionBefore: selection ?? undefined,
-                });
-                editor.commit();
-              }}
+              disabled={disabled}
+              readOnly={readOnly}
+              editor={editor}
               {...editable(block)}
             >
               {children}

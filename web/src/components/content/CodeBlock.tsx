@@ -1,24 +1,30 @@
 import type { Block as NotionBlock } from "@notion-site/common/utils/notion/block.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
-import { Ref } from "react";
+import { pipe } from "ts-functional-pipe";
 import { Code } from "../display/Code.js";
 import { LanguageDropdown } from "../inputs/LanguageDropdown";
 import { CodeEditor } from "./CodeEditor";
-import { InlineEditor } from "./InlineEditor.js";
+import {
+  updateCode,
+  updateCodeCaption,
+  updateCodeLanguage,
+} from "./editable/use-notion-plugin/commands";
 import { useTextIndentPlugin } from "./editable/use-text-plugin/use-text-indent-plugin";
+import { Editor } from "./Editor";
+import { InlineEditor } from "./InlineEditor.js";
 
 export function CodeBlock({
-  // ref,
   block,
   indent = 0,
-  editable,
-  onEditorChange,
+  editor,
+  disabled,
+  readOnly = !editor,
 }: {
-  ref?: Ref<HTMLElement>;
   block: NotionBlock<"code">;
   indent?: number;
-  editable?: boolean;
-  onEditorChange?: (block: NotionBlock<"code">) => void;
+  editor?: Editor;
+  disabled?: boolean;
+  readOnly?: boolean;
 }) {
   const language = block.code.language;
   const code = Notion.RTF.getContent(block.code.rich_text);
@@ -27,19 +33,12 @@ export function CodeBlock({
     <Code.Wrapper
       indent={indent}
       badge={
-        editable ? (
+        !readOnly && editor ? (
           <Code.LanguageBadge>
             <LanguageDropdown
+              disabled={disabled}
               value={language}
-              onChange={(language) =>
-                onEditorChange?.({
-                  ...block,
-                  code: {
-                    ...block.code,
-                    language,
-                  },
-                })
-              }
+              onChange={pipe(updateCodeLanguage, editor.exec)}
             />
           </Code.LanguageBadge>
         ) : (
@@ -50,22 +49,14 @@ export function CodeBlock({
         )
       }
     >
-      {editable ? (
+      {!readOnly && editor ? (
         <CodeEditor
           id={block.id}
           placeholder="Type some code…"
-          readOnly={!editable}
+          disabled={disabled}
           language={language}
-          code={code}
-          onChange={(code) =>
-            onEditorChange?.({
-              ...block,
-              code: {
-                ...block.code,
-                rich_text: [Notion.RTF.text(code)],
-              },
-            })
-          }
+          value={code}
+          onChange={pipe(updateCode, editor.exec)}
         />
       ) : (
         <Code code={useTextIndentPlugin.normalize(code)} language={language} />
@@ -77,16 +68,9 @@ export function CodeBlock({
           as="p"
           m={0}
           value={block.code.caption}
-          disabled={!editable}
-          onChange={(rich_text) =>
-            onEditorChange?.({
-              ...block,
-              code: {
-                ...block.code,
-                rich_text,
-              },
-            })
-          }
+          disabled={disabled}
+          readOnly={readOnly}
+          onChange={editor && pipe(updateCodeCaption, editor.exec)}
         />
       )}
     </Code.Wrapper>

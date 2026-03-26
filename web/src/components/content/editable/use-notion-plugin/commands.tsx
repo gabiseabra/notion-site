@@ -1,3 +1,4 @@
+import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { SelectionRange } from "../../../../utils/selection-range.js";
 import { EditorCommand } from "../../editor/editor-command";
@@ -129,4 +130,56 @@ export const updateBlock =
       selectionBefore: selectionRange ?? undefined,
     });
     editor.commit(data);
+  };
+
+export const toggleToDo =
+  (checked?: boolean): EditorCommand<Notion.Block> =>
+  ({ block }) => {
+    if (block.type !== "to_do") return;
+    return {
+      ...block,
+      to_do: {
+        ...block.to_do,
+        checked: checked ?? !block.to_do.checked,
+      },
+    };
+  };
+
+export const updateCode =
+  (code: string): EditorCommand<Notion.Block> =>
+  ({ block }) => {
+    if (block.type !== "code") return;
+    return {
+      ...block,
+      code: {
+        ...block.code,
+        rich_text: [Notion.RTF.text(code)],
+      },
+    };
+  };
+
+export const updateCodeLanguage =
+  (language: zNotion.blocks.language): EditorCommand<Notion.Block> =>
+  ({ block }) => {
+    if (block.type !== "code") return;
+    return {
+      ...block,
+      code: {
+        ...block.code,
+        language,
+      },
+    };
+  };
+
+export const updateCodeCaption =
+  (caption: Notion.RichText): EditorCommand<Notion.Block> =>
+  ({ block }) => {
+    if (block.type !== "code") return;
+    return {
+      ...block,
+      code: {
+        ...block.code,
+        caption,
+      },
+    };
   };

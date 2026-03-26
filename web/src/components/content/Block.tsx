@@ -1,6 +1,7 @@
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { createContext, ReactNode, useContext } from "react";
+import { pipe } from "ts-functional-pipe";
 import { match } from "ts-pattern";
 import * as css from "../../css/index.js";
 import { Accordion } from "../display/Accordion.js";
@@ -10,14 +11,17 @@ import { Span, Text } from "../display/Text.js";
 import { Checkbox } from "../inputs/Checkbox.js";
 import { LinkToPage } from "../navigation/LinkToPage.js";
 import { CodeBlock } from "./CodeBlock.js";
-import { RichText, RichTextProps } from "./RichText.js";
 import { ContentEditableProps } from "./editable/types.js";
+import { toggleToDo } from "./editable/use-notion-plugin/commands";
+import { Editor } from "./Editor";
+import { RichText, RichTextProps } from "./RichText.js";
 
 type BlockProps = {
   value: Notion.Block;
   indent?: number;
-  editable?: boolean;
-  onEditorChange?: (block: Notion.Block) => void;
+  editor?: Editor;
+  disabled?: boolean;
+  readOnly?: boolean;
   inline?: Partial<RichTextProps>;
   children?: ReactNode;
 } & ContentEditableProps;
@@ -29,8 +33,9 @@ type BlockProps = {
 export function Block({
   value,
   indent,
-  editable,
-  onEditorChange,
+  editor,
+  disabled,
+  readOnly,
   inline: inlineProps,
   children,
   ...editableProps
@@ -39,17 +44,21 @@ export function Block({
   indent ??= indentCtx;
 
   const contentProps = (rich_text: Notion.RichText) =>
-    editable
+    !readOnly && editor
       ? {
           indent,
-          tabIndex: 1,
-          contentEditable: "plaintext-only" as const,
-          suppressContentEditableWarning: true,
-          translate: "no" as const,
           dangerouslySetInnerHTML: {
             __html: richTextToHTML(rich_text),
           },
-          ...editableProps,
+          ...(disabled
+            ? { disabled }
+            : {
+                tabIndex: 1,
+                contentEditable: "plaintext-only" as const,
+                suppressContentEditableWarning: true,
+                translate: "no" as const,
+                ...editableProps,
+              }),
         }
       : {
           indent,
@@ -65,7 +74,6 @@ export function Block({
               as="p"
               color={block.paragraph.color}
               {...contentProps(block.paragraph.rich_text)}
-              {...editableProps}
             />
 
             <IndentationLevel.Provider value={indent + 1}>
@@ -79,7 +87,6 @@ export function Block({
               as="p"
               color={block.bulleted_list_item.color}
               {...contentProps(block.bulleted_list_item.rich_text)}
-              {...editableProps}
             />
 
             {children}
@@ -91,7 +98,6 @@ export function Block({
               as="p"
               color={block.numbered_list_item.color}
               {...contentProps(block.numbered_list_item.rich_text)}
-              {...editableProps}
             />
 
             {children}
@@ -101,17 +107,8 @@ export function Block({
           <>
             <Checkbox
               checked={block.to_do.checked}
-              onToggleChecked={(checked) =>
-                onEditorChange?.({
-                  ...block,
-                  to_do: {
-                    ...block.to_do,
-                    checked,
-                  },
-                })
-              }
+              onToggleChecked={editor && pipe(toggleToDo, editor.exec)}
               {...contentProps(block.to_do.rich_text)}
-              {...editableProps}
             />
 
             <IndentationLevel.Provider value={indent + 1}>
@@ -125,7 +122,6 @@ export function Block({
               as="h2"
               color={block.heading_1.color}
               {...contentProps(block.heading_1.rich_text)}
-              {...editableProps}
             />
 
             <IndentationLevel.Provider value={indent + 1}>
@@ -139,7 +135,6 @@ export function Block({
               as="h3"
               color={block.heading_2.color}
               {...contentProps(block.heading_2.rich_text)}
-              {...editableProps}
             />
 
             <IndentationLevel.Provider value={indent + 1}>
@@ -153,7 +148,6 @@ export function Block({
               as="h4"
               color={block.heading_3.color}
               {...contentProps(block.heading_3.rich_text)}
-              {...editableProps}
             />
 
             <IndentationLevel.Provider value={indent + 1}>
@@ -167,7 +161,6 @@ export function Block({
               as="blockquote"
               color={block.quote.color}
               {...contentProps(block.quote.rich_text)}
-              {...editableProps}
             />
 
             <IndentationLevel.Provider value={indent + 1}>
@@ -230,8 +223,9 @@ export function Block({
             <CodeBlock
               block={block}
               indent={indent}
-              onEditorChange={onEditorChange}
-              editable={editable}
+              editor={editor}
+              disabled={disabled}
+              readOnly={readOnly}
             />
 
             <IndentationLevel.Provider value={indent + 1}>
@@ -257,7 +251,6 @@ export function Block({
                 as="p"
                 color={block.toggle.color}
                 {...contentProps(block.toggle.rich_text)}
-                {...editableProps}
               />
             }
           >

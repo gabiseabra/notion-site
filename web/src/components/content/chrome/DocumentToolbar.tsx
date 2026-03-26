@@ -18,10 +18,17 @@ import { useToolbarControls } from "./controls/use-toolbar-controls.js";
 export function DocumentToolbar({
   editor,
   className = "",
+  disabled: componentDisabled,
   style,
   ...props
-}: { editor: Editor } & Omit<RowProps, "children">) {
-  const { block, disabled, readOnly } = useToolbarControls(editor);
+}: { editor: Editor; disabled?: boolean } & Omit<RowProps, "children">) {
+  const {
+    block,
+    readOnly,
+    disabled: toolbarDisabled,
+  } = useToolbarControls(editor);
+
+  const disabled = componentDisabled || toolbarDisabled;
 
   return (
     <Row
@@ -41,6 +48,7 @@ export function DocumentToolbar({
       <Divider direction="y" mx={1} />
 
       <InlineControls
+        disabled={disabled}
         editor={editor}
         Overlay={ToolbarPopover}
         ColorControl={MenuColorControl}

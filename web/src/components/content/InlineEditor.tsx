@@ -15,9 +15,10 @@ export type InlineEditorProps = {
   id: string;
   ref?: Ref<ContentEditor<Notion.Block> | null>;
   value: Notion.RichText;
-  onChange: (block: Notion.RichText) => void;
+  onChange?: (block: Notion.RichText) => void;
   options?: Omit<NotionPluginOptions, "multiline">;
   disabled?: boolean;
+  readOnly?: boolean;
 } & Omit<TextProps, "children" | "onChange">;
 
 export const InlineEditor = memo(function InlineEditor({
@@ -27,13 +28,14 @@ export const InlineEditor = memo(function InlineEditor({
   onChange,
   options,
   disabled,
+  readOnly,
   ...props
 }: InlineEditorProps) {
   const { editor, editable } = useContentEditor({
     initialValue: [p(id, ...initialValue)],
     plugin: useNotionPlugin(options),
     onCommit: (blocks) =>
-      onChange(blocks.flatMap(Notion.Block.extractRichText)),
+      onChange?.(blocks.flatMap(Notion.Block.extractRichText)),
   });
 
   useImperativeHandle(ref, () => editor, [editor]);
@@ -42,11 +44,12 @@ export const InlineEditor = memo(function InlineEditor({
 
   return (
     <Text
-      {...(disabled
+      {...(readOnly
         ? {
             children: <RichText value={rich_text} />,
           }
         : {
+            disabled,
             tabIndex: 1,
             contentEditable: "plaintext-only" as const,
             suppressContentEditableWarning: true,

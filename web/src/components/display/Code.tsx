@@ -18,6 +18,7 @@ export function Code({
   ref?: Ref<HTMLPreElement>;
   code: string;
   language: zNotion.blocks.language;
+  disabled?: boolean;
 } & Omit<HTMLAttributes<HTMLElement>, "children" | "dangerouslySetInnerHTML">) {
   return (
     <pre
