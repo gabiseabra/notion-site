@@ -37,7 +37,7 @@ export const useAutoCommitPlugin =
           editor.bus.addEventListener(
             "postcommit",
             () => {
-              const element = editor.ref(target.id);
+              const { element } = editor.ref(target.id);
               if (element) SelectionRange.apply(element, selection);
             },
             { once: true },

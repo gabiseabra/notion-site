@@ -1,11 +1,13 @@
 import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 import { omit } from "@notion-site/common/utils/object.js";
-import { ComponentPropsWithoutRef, HTMLAttributes } from "react";
+import { ComponentPropsWithoutRef, HTMLAttributes, Ref } from "react";
 import * as css from "../../css/index.js";
+import { useHTMLElementRef } from "../../hooks/use-html-element-ref";
 import styles from "./Text.module.scss";
 
 export type TextProps = {
+  ref?: Ref<HTMLElement>;
   as: TextTag;
   size?: TextSize;
   color?: TextColor;
@@ -31,6 +33,7 @@ type TextSize = "caption" | "body" | "h1" | "h2" | "h3" | "h4";
  * @direction block
  */
 export function Text({
+  ref,
   as: Tag,
   size,
   color,
@@ -40,8 +43,10 @@ export function Text({
   style = {},
   ...props
 }: TextProps) {
+  const _ref = useHTMLElementRef(ref);
   return (
     <Tag
+      ref={_ref}
       className={[
         styles.text,
         indent && styles[`indent-${{ 1: 1, 2: 2, 3: 3, 4: 4 }[indent] ?? 0}`],

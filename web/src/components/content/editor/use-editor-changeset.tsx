@@ -40,7 +40,7 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
     discard();
 
     const id = EditorAction.id(action, 1);
-    const blockEl = editor.ref(id);
+    const blockEl = editor.ref(id).element;
     const selection = blockEl && SelectionRange.read(blockEl);
     const selectionAfter = EditorAction.selectionAfter(action);
 

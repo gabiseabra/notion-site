@@ -19,7 +19,7 @@ export type InlineEditorProps = {
   options?: Omit<NotionPluginOptions, "multiline">;
   disabled?: boolean;
   readOnly?: boolean;
-} & Omit<TextProps, "children" | "onChange">;
+} & Omit<TextProps, "ref" | "children" | "onChange">;
 
 export const InlineEditor = memo(function InlineEditor({
   id,
@@ -44,6 +44,7 @@ export const InlineEditor = memo(function InlineEditor({
 
   return (
     <Text
+      ref={editor.register(id)}
       {...(readOnly
         ? {
             children: <RichText value={rich_text} />,

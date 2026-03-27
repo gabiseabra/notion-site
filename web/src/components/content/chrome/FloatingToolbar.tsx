@@ -7,6 +7,7 @@ import { useVisualViewportEventListener } from "../../../hooks/use-visual-viewpo
 import { AnchoredOverlayProps } from "../../overlays/Overlay.js";
 import { Popover } from "../../overlays/Popover.js";
 import { Editor } from "../Editor.js";
+import { BlockRef } from "../editor/types";
 import styles from "./FloatingMenu.module.scss";
 import { SwatchColorControl } from "./controls/ColorControl.js";
 import { InlineControls } from "./controls/InlineControls.js";
@@ -32,7 +33,9 @@ export function FloatingToolbar({
       selectionRect.height &&
       selectionRect.width &&
       editor.blocks.some((block) =>
-        editor.ref(block.id)?.contains(range.startContainer),
+        BlockRef.flat(editor.ref(block.id)).some((element) =>
+          element.contains(range.startContainer),
+        ),
       )
     ) {
       setSelectionRect(selectionRect);

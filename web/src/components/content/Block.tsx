@@ -1,6 +1,6 @@
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, Ref, useContext } from "react";
 import { pipe } from "ts-functional-pipe";
 import { match } from "ts-pattern";
 import * as css from "../../css/index.js";
@@ -17,6 +17,7 @@ import { Editor } from "./Editor";
 import { RichText, RichTextProps } from "./RichText.js";
 
 type BlockProps = {
+  ref?: Ref<HTMLElement>;
   value: Notion.Block;
   indent?: number;
   editor?: Editor;
@@ -31,6 +32,7 @@ type BlockProps = {
  * @direction block
  */
 export function Block({
+  ref,
   value,
   indent,
   editor,
@@ -46,6 +48,7 @@ export function Block({
   const contentProps = (rich_text: Notion.RichText) =>
     !readOnly && editor
       ? {
+          ref,
           indent,
           dangerouslySetInnerHTML: {
             __html: richTextToHTML(rich_text),
@@ -61,6 +64,7 @@ export function Block({
               }),
         }
       : {
+          ref,
           indent,
           children: <RichText value={rich_text} {...inlineProps} />,
         };
@@ -171,7 +175,7 @@ export function Block({
         .with({ type: "divider" }, () => (
           <>
             <div style={{ marginLeft: css.indent(indent) }}>
-              <hr {...editableProps} />
+              <hr ref={ref as Ref<HTMLHRElement>} {...editableProps} />
             </div>
 
             <IndentationLevel.Provider value={indent + 1}>

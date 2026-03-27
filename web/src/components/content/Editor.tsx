@@ -65,6 +65,7 @@ export const Editor = memo(function ContentEditor({
           value={editor.blocks}
           render={(children, block) => (
             <Block
+              ref={editor.register(block.id)}
               value={block}
               disabled={disabled}
               readOnly={readOnly}

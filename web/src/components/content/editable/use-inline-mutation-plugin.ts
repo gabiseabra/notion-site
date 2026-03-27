@@ -32,8 +32,8 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
 }) => {
   const method = (id: TBlock["id"], editor: ContentEditor<TBlock>) =>
     !!update &&
-    (editor.ref(id) instanceof HTMLInputElement ||
-      editor.ref(id) instanceof HTMLTextAreaElement)
+    (editor.ref(id).element instanceof HTMLInputElement ||
+      editor.ref(id).element instanceof HTMLTextAreaElement)
       ? ("update" as const)
       : ("splice" as const);
 

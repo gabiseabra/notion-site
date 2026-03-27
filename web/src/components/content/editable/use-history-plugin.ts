@@ -21,7 +21,7 @@ export const useHistoryPlugin = (): AnyContentEditorPlugin => (editor) => {
 
     const id = EditorAction.id(cmd, direction);
     const selection = EditorAction.selection(cmd, direction);
-    const element = editor.ref(id);
+    const { element } = editor.ref(id);
     const currentSelection = element && SelectionRange.read(element);
 
     if (!selection) {

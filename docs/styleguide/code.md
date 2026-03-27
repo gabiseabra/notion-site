@@ -126,7 +126,7 @@ signal the logic should be extracted into its own function.
 // Good - IIFE for simple cases
 const selection =
   (() => {
-    const element = editor.ref(block.id);
+    const { element } = editor.ref(block.id);
     return element && getSelectionRange(element);
   })() ?? undefined;
 

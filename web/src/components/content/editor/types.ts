@@ -1,3 +1,4 @@
+import { isNonNullable } from "@notion-site/common/utils/guards.js";
 import { IHistory } from "@notion-site/common/utils/history.js";
 import { EditorCommand } from "./editor-command";
 import type { EditorEventTarget } from "./editor-event.js";
@@ -7,10 +8,26 @@ export type ID = string | number | symbol;
 
 export type AnyBlock = { id: ID };
 
+export type BlockRef = {
+  element: HTMLElement | null;
+  children: Map<ID, HTMLElement | null>;
+};
+
+export const BlockRef = {
+  flat(ref: BlockRef): HTMLElement[] {
+    return [
+      ref.element,
+      ...Array.from(ref.children.entries()).flatMap(([, element]) => element),
+    ].filter(isNonNullable);
+  },
+};
+
 /**
  * Shared state passed to plugins in their editor setup phase.
  */
 export interface ContentEditor<TBlock extends AnyBlock> {
+  readonly id: string;
+
   /**
    * Last committed state. Updated after `commit()`.
    * May be stale if history has advanced since the last commit.
@@ -42,7 +59,11 @@ export interface ContentEditor<TBlock extends AnyBlock> {
    * Get the DOM element registered for a block. Returns `null` if the block
    * hasn't mounted yet or was removed.
    */
-  ref(id: TBlock["id"]): HTMLElement | null;
+  ref(id: TBlock["id"]): BlockRef;
+  register(
+    id: TBlock["id"],
+    childId?: ID,
+  ): (element: HTMLElement | null) => void;
 
   /**
    * Notifies other plugins to flush pending changes immediatelly! ! !

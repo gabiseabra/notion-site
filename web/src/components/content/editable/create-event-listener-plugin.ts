@@ -19,7 +19,7 @@ export function createEventListenerPlugin<
     useEffect(() => {
       const blocks = editor.blocks
         .map((block) => {
-          const element = editor.ref(block.id);
+          const { element } = editor.ref(block.id);
           return element && block ? { element, block } : null;
         })
         .filter(isNonNullable);

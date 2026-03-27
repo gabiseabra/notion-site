@@ -4,7 +4,7 @@ import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
 import { EditorHistory } from "./editor-history.js";
 import { EditorTarget } from "./editor-target";
-import { AnyBlock, ContentEditor } from "./types.js";
+import { AnyBlock, BlockRef, ContentEditor } from "./types.js";
 
 /**
  * Creates shared state & controller for the editor plugins.
@@ -18,14 +18,12 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   onReady,
   onCommit,
   onPostCommit,
-  forwardRef,
 }: {
   initialValue: TBlock[];
   plugin: ContentEditorPlugin<TBlock, TDetail>;
   onReady?: () => void;
   onCommit?: (blocks: TBlock[]) => void;
   onPostCommit?: (blocks: TBlock[]) => void;
-  forwardRef?: (id: TBlock["id"], element: HTMLElement | null) => void;
 }) {
   const id = useId();
 
@@ -33,7 +31,7 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
   const history = useMemo(() => new EditorHistory(initialValue), []);
   const [snapshot, setSnapshot] = useState(() => history.snapshot());
-  const blocksRef = useRef<Map<TBlock["id"], HTMLElement | null>>(new Map());
+  const blocksRef = useRef<Map<TBlock["id"], BlockRef>>(new Map());
 
   /** Callback refs */
 
@@ -59,7 +57,29 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
       bus,
 
       ref(id) {
-        return blocksRef.current.get(id) ?? null;
+        let ref = blocksRef.current.get(id);
+
+        if (!ref) {
+          ref ??= {
+            children: new Map(),
+            element: null,
+          };
+          blocksRef.current.set(id, ref);
+        }
+
+        return ref;
+      },
+
+      register(id, childId) {
+        return (element: HTMLElement | null) => {
+          if (typeof childId === "undefined") {
+            this.ref(id).element = element;
+          } else if (element) {
+            this.ref(id).children.set(childId, element);
+          } else {
+            this.ref(id).children.delete(childId);
+          }
+        };
       },
 
       flush(data?: unknown) {
@@ -150,12 +170,6 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
 
   return {
     editor,
-    editable: (block: TBlock) => ({
-      ...editable(block),
-      ref(element: HTMLElement | null) {
-        blocksRef.current.set(block.id, element);
-        forwardRef?.(block.id, element);
-      },
-    }),
+    editable,
   };
 }

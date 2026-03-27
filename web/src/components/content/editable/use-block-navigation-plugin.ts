@@ -20,9 +20,9 @@ export const useBlockNavigationPlugin: AnyContentEditorPlugin =
 
       const currentIndex = editor.blocks.findIndex((b) => b.id === block.id);
       const prevBlock = editor.blocks[currentIndex - 1];
-      const prevElement = prevBlock && editor.ref(prevBlock.id);
+      const prevElement = prevBlock && editor.ref(prevBlock.id).element;
       const nextBlock = editor.blocks[currentIndex + 1];
-      const nextElement = nextBlock && editor.ref(nextBlock.id);
+      const nextElement = nextBlock && editor.ref(nextBlock.id).element;
 
       switch (e.key) {
         case "ArrowLeft":

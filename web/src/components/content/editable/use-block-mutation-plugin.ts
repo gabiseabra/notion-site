@@ -48,7 +48,7 @@ export const useBlockMutationPlugin =
           e.currentTarget.textContent === String.fromCharCode(160))
       ) {
         const prevBlock = previous(block, editor.blocks);
-        const prevElement = prevBlock && editor.ref(prevBlock.id);
+        const prevElement = prevBlock && editor.ref(prevBlock.id).element;
         const currentBlock = editor.peek(block.id);
 
         if (!prevBlock || !prevElement || !currentBlock) return;
