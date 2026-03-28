@@ -93,9 +93,10 @@ export class History<Act, State> implements IHistory<Act, State> {
    * Creates a view of this history with a different state and action type.
    * State is projected and actions are translated when pushed. The mapped
    * history's bus fires the same events as the base.
+   * @experimental
    */
   static map<A, S, B, T>(
-    base: History<A, S>,
+    base: IHistory<A, S>,
     mapState: (s: S) => T,
     mapAction: (a: B) => A,
   ): IHistory<B, T> {

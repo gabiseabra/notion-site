@@ -33,3 +33,13 @@ export function omitUndefined<T>(object: Partial<T>): Partial<T> {
 export function keys<T extends GenericObject>(object: T): (keyof T)[] {
   return Object.keys(object);
 }
+
+export function equals<T extends GenericObject>(
+  a: T,
+  b: T,
+  eq: (a: T[keyof T], b: T[keyof T]) => boolean = (a, b) => a === b,
+): boolean {
+  const keysA = Object.keys(a) as (keyof T)[];
+  if (keysA.length !== Object.keys(b).length) return false;
+  return keysA.every((key) => key in b && eq(a[key], b[key]));
+}

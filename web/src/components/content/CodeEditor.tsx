@@ -1,4 +1,5 @@
 import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { memo, Ref, useImperativeHandle, useRef } from "react";
 import * as css from "../../css/index.js";
 import { Code } from "../display/Code";
@@ -13,6 +14,7 @@ export type CodeEditorProps = {
   ref?: Ref<ContentEditor<TextBlock>>;
   language: zNotion.blocks.language;
   value: string;
+  editor?: ContentEditor<Notion.Block>;
   onChange?: (code: string) => void;
   disabled?: boolean;
   readOnly?: boolean;
