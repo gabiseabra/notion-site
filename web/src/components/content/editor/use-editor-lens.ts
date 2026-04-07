@@ -1,32 +1,91 @@
 import { History } from "@notion-site/common/utils/history.js";
 import { Lens } from "@notion-site/common/utils/lens.js";
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
-import { useEffect, useMemo, useRef } from "react";
-import { ContentEditorPlugin } from "../editable/types";
+import { useMemo, useRef } from "react";
+import { useEventListener } from "../../../hooks/use-event-listener";
 import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event";
 import { applyActions, EditorAction } from "./editor-history";
 import { EditorTarget } from "./editor-target";
 import { AnyBlock, ContentEditor } from "./types";
 
+/**
+ * Creates a derived `ContentEditor<TBlock>` that provides a scoped view into
+ * a single block of a parent editor, using a `Lens` to project `TBlock[]`
+ * from a `TParent`.
+ *
+ * ## State
+ * - `blocks` — `lens.get` applied to the parent block matched by `id`.
+ *   Empty if the parent block is not found.
+ * - `revision` — Same as the parent's. No independent revision counter.
+ * - `id` — Composite `{parentId,parent.id}`.
+ *
+ * ## History
+ * Exposes a mapped view of the parent's history. There is no independent history.
+ * - **Reads** (`snapshot`, `position`, `direction`, `undo`, `redo`) delegate to
+ *   the parent history, with state projected through the lens.
+ * - **Writes** (`push`) lift the child action through the lens and push it to
+ *   the parent history.
+ * - If the parent block is no longer found when lifting, the action degrades
+ *   to a no-op `"focus"`.
+ *
+ * ## Event bus
+ * The child has its own `EditorEventTarget`.
+ * - **Downward:** `ready` and `postcommit` from the parent are forwarded to
+ *   the child's bus.
+ * - **Upward:** `flush` and `push` are dispatched on the child's bus first,
+ *   then forwarded to the parent.
+ *
+ * ## push
+ * 1. Flushes the child bus (settles pending changes from child plugins).
+ * 2. Dispatches a `push` event on the child bus. Child plugins may
+ *    `preventDefault` to cancel, or mutate `event.detail.action` before
+ *    it propagates.
+ * 3. If not prevented: lifts the (possibly modified) child action through
+ *    the lens into a parent `"update"` action, and calls `parent.push` —
+ *    triggering the parent's own push lifecycle.
+ *
+ * ## flush
+ * Dispatches `flush` on the child bus, then forwards to the parent.
+ *
+ * ## peek
+ * Returns the latest state for a child block by id.
+ *
+ * ## commit
+ * Delegates to the parent. The child shares the parent's history, so there
+ * is no child-level state to commit.
+ *
+ * ## exec
+ * Fully local to the child editor. Reads the target and block from the
+ * child's own state.
+ *
+ * ## DOM refs
+ * - `ref(id)` returns the DOM element registered for a child block.
+ * - `register(id)` returns a ref callback to register a child block's DOM
+ *   element, scoped under the parent block.
+ *
+ * @param id - The id of the parent block to focus on.
+ * @param editor - The parent `ContentEditor`.
+ * @param lens - A `Lens<TParent, TBlock[]>` that extracts/injects child
+ *   blocks from/into the parent block.
+ */
 export function useEditorLens<
-  TBlock extends AnyBlock,
   TParent extends AnyBlock,
-  TDetail,
+  TBlock extends AnyBlock,
 >({
   id: parentId,
   editor: parent,
-  plugin,
   lens,
 }: {
   id: TParent["id"];
   editor: ContentEditor<TParent>;
-  plugin: ContentEditorPlugin<TBlock, TDetail>;
   lens: Lens<TParent, TBlock[]>;
 }) {
-  const isReadyRef = useRef(false);
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
   const editorRef = useRef<ContentEditor<TBlock>>(null);
+
+  const lensRef = useRef(lens);
+  lensRef.current = lens;
 
   /** Translates a child action into a parent action via the lens. */
   const liftAction = (
@@ -34,10 +93,13 @@ export function useEditorLens<
     parentBlock: TParent,
   ): EditorAction<TParent> => {
     const flatCmds = EditorAction.flat(NonEmpty.create(childAction));
-    const newChildBlocks = applyActions(lens.get(parentBlock), ...flatCmds);
+    const newChildBlocks = applyActions(
+      lensRef.current.get(parentBlock),
+      ...flatCmds,
+    );
     return {
       type: "update",
-      block: lens.set(parentBlock, newChildBlocks),
+      block: lensRef.current.set(parentBlock, newChildBlocks),
       selectionBefore: EditorAction.selectionBefore(childAction),
       selectionAfter: EditorAction.selectionAfter(childAction),
     };
@@ -49,7 +111,7 @@ export function useEditorLens<
 
       blocks: (() => {
         const block = parent.blocks.find((b) => b.id === parentId);
-        return block ? lens.get(block) : [];
+        return block ? lensRef.current.get(block) : [];
       })(),
       revision: parent.revision,
 
@@ -57,7 +119,7 @@ export function useEditorLens<
         parent.history,
         (parentBlocks) => {
           const block = parentBlocks.find((b) => b.id === parentId);
-          return block ? lens.get(block) : [];
+          return block ? lensRef.current.get(block) : [];
         },
         (childAction): EditorAction<TParent> => {
           const parentBlock = parent.history
@@ -99,7 +161,7 @@ export function useEditorLens<
           );
         const block = parent.peek(parentId, dryRun);
         if (!block) return null;
-        return lens.get(block).find((b) => b.id === id) ?? null;
+        return lensRef.current.get(block).find((b) => b.id === id) ?? null;
       },
 
       push({ data, ...action }) {
@@ -121,7 +183,7 @@ export function useEditorLens<
         const parentBlock = parent.peek(parentId, true);
         if (!parentBlock) return;
 
-        parent.push({ data, ...liftAction(action, parentBlock) });
+        parent.push({ data, ...liftAction(event.detail.action, parentBlock) });
       },
 
       commit(data) {
@@ -138,21 +200,23 @@ export function useEditorLens<
         return ExecCommand(editorRef.current, target, block)(cmd);
       },
     }),
-    [parentId, parent, bus, lens],
+    [parentId, parent, bus],
   );
   editorRef.current = editor;
 
-  const editable = plugin(editor);
-
   // notify event listeners
-  useEffect(() => {
-    const event = !isReadyRef.current
-      ? new EditorEvent("ready", editor, {})
-      : new EditorEvent("postcommit", editor, {});
+  useEventListener(parent.bus, "ready", (event) =>
+    editor.bus.dispatchTypedEvent(
+      event.eventType,
+      new EditorEvent("ready", editor, {}),
+    ),
+  );
+  useEventListener(parent.bus, "postcommit", (event) =>
+    editor.bus.dispatchTypedEvent(
+      event.eventType,
+      new EditorEvent("postcommit", editor, {}),
+    ),
+  );
 
-    editor.bus.dispatchTypedEvent(event.eventType, event);
-    isReadyRef.current = true;
-  }, [editor]);
-
-  return { editor, editable };
+  return editor;
 }
