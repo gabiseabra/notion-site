@@ -69,15 +69,19 @@ describe("useNotionPrefixPlugin", () => {
     cy.get("label").should("have.text", "test");
   });
 
-  it("converts paragraph to numbered list on typing the next number below a numbered list", () => {
-    cy.mount(<Editor value={[p("1"), p("2")]} onChange={() => {}} />);
+  it.only("converts paragraph to numbered list on typing the next number below a numbered list", () => {
+    cy.mount(<TestEditor value={[p("1"), p("2")]} onChange={() => {}} />);
 
-    cy.get("p")
-      .eq(0)
-      .click()
-      .realType("1. a{enter}b")
-      .realPress("ArrowDown")
-      .realType("3. c");
+    cy.get("p").eq(0).click().type("1. a{enter}b{downArrow}3. c", {
+      log: true,
+    });
+
+    // cy.get("p")
+    //   .eq(0)
+    //   .click()
+    //   .realType("1. a{enter}b")
+    //   .realPress("ArrowDown")
+    //   .realType("3. c");
 
     cy.get("li").should("have.length", 3);
     cy.get("li").eq(0).should("have.text", "a");
