@@ -2,6 +2,7 @@ import { zNotion } from "../../dto/notion/schema/index.js";
 import { hasPropertyValue } from "../guards.js";
 import * as _BlockTree from "./block-tree.js";
 import * as _Block from "./block.js";
+import * as _Lens from "./lens.js";
 import * as _RTF from "./rich-text.js";
 import * as _WIP from "./wip.js";
 
@@ -16,6 +17,7 @@ export namespace Notion {
   // module-style access
   export import BlockTree = _BlockTree;
   export import Block = _Block;
+  export import Lens = _Lens;
   export import RTF = _RTF;
   export import WIP = _WIP;
 
