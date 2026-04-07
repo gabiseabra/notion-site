@@ -5,6 +5,13 @@ export type Lens<S, A> = {
 };
 
 export const Lens = {
+  from<S, K extends keyof S>(key: K, s: S): Lens<S[K], S> {
+    return {
+      get: (a) => ({ ...s, [key]: a }),
+      set: (_, s) => s[key],
+    };
+  },
+
   /** Focus on a single property of an object. */
   prop<S, K extends keyof S>(key: K): Lens<S, S[K]> {
     return {

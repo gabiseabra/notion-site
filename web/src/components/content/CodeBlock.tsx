@@ -2,16 +2,16 @@ import { WithRequired } from "@notion-site/common/types/object.js";
 import { Lens } from "@notion-site/common/utils/lens.js";
 import type { Block as NotionBlock } from "@notion-site/common/utils/notion/block.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
+import { Prism } from "@notion-site/common/utils/prism.js";
 import { pipe } from "ts-functional-pipe";
 import { Code } from "../display/Code.js";
 import { Text } from "../display/Text";
 import { LanguageDropdown } from "../inputs/LanguageDropdown";
 import { CodeEditor } from "./CodeEditor";
 import { updateCodeLanguage } from "./editable/use-notion-plugin/commands";
-import { TextBlock } from "./editable/use-text-plugin";
 import { useTextIndentPlugin } from "./editable/use-text-plugin/use-text-indent-plugin";
 import { Editor } from "./Editor";
-import { useEditorLens } from "./editor/use-editor-lens";
+import { useEditorPrism } from "./editor/use-editor-prism";
 import { RichText } from "./RichText";
 
 type CodeBlockProps = {
@@ -38,13 +38,13 @@ function EditableCodeBlock({
 }: WithRequired<Omit<CodeBlockProps, "readOnly">, "editor">) {
   const language = block.code.language;
 
-  const codeEditor = useEditorLens<Notion.Block, TextBlock>({
+  const codeEditor = useEditorPrism({
     id: block.id,
     editor,
-    lens: Lens.compose(Notion.Lens.code, {
-      get: (code) => [{ id: "code", value: code }],
-      set: (_code, blocks) => blocks.map((c) => c.value).join(""),
-    }),
+    prism: Prism.compose(
+      Notion.Lens.code,
+      Lens.from("value", { id: "code", value: "" }),
+    ),
   });
 
   return (
