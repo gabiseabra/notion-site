@@ -1,5 +1,5 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
-import { memo, ReactNode, Ref, useImperativeHandle } from "react";
+import { memo, ReactNode } from "react";
 import { Slot } from "../../utils/slot";
 import { Block } from "./Block.js";
 import { RootBlock } from "./RootBlock.js";
@@ -10,16 +10,14 @@ import {
   useNotionPlugin,
 } from "./editable/use-notion-plugin/index.js";
 import { ContentEditor } from "./editor/types.js";
-import { useContentEditor } from "./editor/use-content-editor.js";
 import { EditorTargetProvider } from "./editor/use-editor-target.js";
 
 export type Editor = ContentEditor<Notion.Block>;
 
 export type EditorProps = {
-  ref?: Ref<ContentEditor<Notion.Block> | null>;
-  value: Notion.Block[];
-  onChange: (block: Notion.Block[]) => void;
+  editor: Editor;
   options?: NotionPluginOptions;
+
   disabled?: boolean;
   readOnly?: boolean;
 
@@ -28,10 +26,9 @@ export type EditorProps = {
 };
 
 export const Editor = memo(function ContentEditor({
-  ref,
-  value: initialValue,
-  onChange,
+  editor,
   options,
+
   disabled,
   readOnly,
 
@@ -48,13 +45,7 @@ export const Editor = memo(function ContentEditor({
   ),
   after,
 }: EditorProps) {
-  const { editor, editable } = useContentEditor({
-    initialValue,
-    plugin: useNotionPlugin(options),
-    onCommit: onChange,
-  });
-
-  useImperativeHandle(ref, () => editor, [editor]);
+  const editable = useNotionPlugin(options)(editor);
 
   return (
     <EditorTargetProvider editor={editor}>

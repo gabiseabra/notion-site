@@ -1,13 +1,29 @@
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { Editor } from "../Editor.js";
+import { useContentEditor } from "../editor/use-content-editor";
+
+function TestEditor({
+  value,
+  onChange,
+}: {
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  return <Editor editor={editor} options={{ autoCommit: 200 }} />;
+}
 
 describe("useAutoCommitPlugin", () => {
   it("preserves focus when auto-commit fires while another block is active", () => {
     cy.mount(
-      <Editor
+      <TestEditor
         value={[p("a", span("Hello")), p("b", span("World"))]}
         onChange={() => {}}
-        options={{ autoCommit: 200 }}
       />,
     );
 

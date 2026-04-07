@@ -1,9 +1,28 @@
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p } from "@notion-site/common/utils/notion/wip.js";
 import { Editor } from "../../Editor.js";
+import { useContentEditor } from "../../editor/use-content-editor";
+
+function TestEditor({
+  value,
+  onChange,
+}: {
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  return (
+    <Editor editor={editor} options={{ autoCommit: 200, multiLine: true }} />
+  );
+}
 
 describe("useNotionPrefixPlugin", () => {
   it("converts paragraph to heading_1 on typing '# '", () => {
-    cy.mount(<Editor value={[p("a")]} onChange={() => {}} />);
+    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("# test");
 
@@ -11,7 +30,7 @@ describe("useNotionPrefixPlugin", () => {
   });
 
   it("converts paragraph to heading_2 on typing '## '", () => {
-    cy.mount(<Editor value={[p("a")]} onChange={() => {}} />);
+    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("## test");
 
@@ -19,7 +38,7 @@ describe("useNotionPrefixPlugin", () => {
   });
 
   it("converts paragraph to heading_3 on typing '### '", () => {
-    cy.mount(<Editor value={[p("a")]} onChange={() => {}} />);
+    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("### test");
 
@@ -27,7 +46,7 @@ describe("useNotionPrefixPlugin", () => {
   });
 
   it("converts paragraph to bulleted list on typing '- '", () => {
-    cy.mount(<Editor value={[p("a")]} onChange={() => {}} />);
+    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("- test");
 
@@ -35,7 +54,7 @@ describe("useNotionPrefixPlugin", () => {
   });
 
   it("converts paragraph to numbered list on typing '1. '", () => {
-    cy.mount(<Editor value={[p("a")]} onChange={() => {}} />);
+    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("1. test");
 
@@ -43,7 +62,7 @@ describe("useNotionPrefixPlugin", () => {
   });
 
   it("converts paragraph to numbered list on typing 'n. '", () => {
-    cy.mount(<Editor value={[p("a")]} onChange={() => {}} />);
+    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("123. test");
 
@@ -52,7 +71,7 @@ describe("useNotionPrefixPlugin", () => {
   });
 
   it("converts paragraph to unchecked to-do on typing '[ ] '", () => {
-    cy.mount(<Editor value={[p("a")]} onChange={() => {}} />);
+    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("[ ] test");
 
@@ -61,7 +80,7 @@ describe("useNotionPrefixPlugin", () => {
   });
 
   it("converts paragraph to checked to-do on typing '[x] '", () => {
-    cy.mount(<Editor value={[p("a")]} onChange={() => {}} />);
+    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("[x] test");
 

@@ -1,21 +1,16 @@
 import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
-import { Notion } from "@notion-site/common/utils/notion/index.js";
-import { memo, Ref, useImperativeHandle, useRef } from "react";
+import { memo, useRef } from "react";
 import * as css from "../../css/index.js";
 import { Code } from "../display/Code";
 import { composePlugins } from "./editable/compose-plugins";
 import { TextBlock, useTextPlugin } from "./editable/use-text-plugin";
 import { useTextIndentPlugin } from "./editable/use-text-plugin/use-text-indent-plugin";
 import { ContentEditor } from "./editor/types";
-import { useContentEditor } from "./editor/use-content-editor";
 
 export type CodeEditorProps = {
   id: string;
-  ref?: Ref<ContentEditor<TextBlock>>;
   language: zNotion.blocks.language;
-  value: string;
-  editor?: ContentEditor<Notion.Block>;
-  onChange?: (code: string) => void;
+  editor: ContentEditor<TextBlock>;
   disabled?: boolean;
   readOnly?: boolean;
   placeholder?: string;
@@ -31,24 +26,16 @@ const useCodePlugin = composePlugins(
 
 export const CodeEditor = memo(function CodeEditor({
   id,
-  ref,
   language,
-  value: initialValue,
-  onChange,
+  editor,
   readOnly,
   disabled,
   ...props
 }: CodeEditorProps) {
   const preRef = useRef<HTMLPreElement>(null);
-  const { editor, editable } = useContentEditor({
-    initialValue: [TextBlock.create(id, initialValue)],
-    plugin: useCodePlugin,
-    onCommit: (blocks) => onChange?.(TextBlock.extract(blocks)),
-  });
+  const editable = useCodePlugin(editor);
 
   const code = TextBlock.extract(editor.blocks);
-
-  useImperativeHandle(ref, () => editor, [editor]);
 
   return (
     <div

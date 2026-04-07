@@ -1,12 +1,29 @@
 /**
  * @jest-environment jsdom
  */
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { fireEvent, render } from "@testing-library/react";
 import { act } from "react";
 import { inputEvent } from "../../../test-utils/input-event.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { Editor } from "../Editor.js";
+import { useContentEditor } from "../editor/use-content-editor";
+
+function TestEditor({
+  value,
+  onChange,
+}: {
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  return <Editor editor={editor} />;
+}
 
 describe("useHistoryPlugin", () => {
   beforeEach(() => {
@@ -20,7 +37,7 @@ describe("useHistoryPlugin", () => {
 
   it("undoes on Cmd+Z", async () => {
     const { container } = render(
-      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
     );
 
     const el = container.querySelector("p")!;
@@ -41,7 +58,7 @@ describe("useHistoryPlugin", () => {
 
   it("redoes on Cmd+Shift+Z", async () => {
     const { container } = render(
-      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
     );
 
     const el = container.querySelector("p")!;
@@ -62,7 +79,7 @@ describe("useHistoryPlugin", () => {
 
   it("redoes on Cmd+Y", async () => {
     const { container } = render(
-      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
     );
 
     const el = container.querySelector("p")!;
@@ -83,7 +100,7 @@ describe("useHistoryPlugin", () => {
 
   it("does nothing when no command in history", () => {
     const { container } = render(
-      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
     );
 
     const el = container.querySelector("p")!;
@@ -96,7 +113,7 @@ describe("useHistoryPlugin", () => {
 
   it("restores selection before undo", async () => {
     const { container } = render(
-      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
     );
 
     const el = container.querySelector("p")!;
@@ -115,7 +132,7 @@ describe("useHistoryPlugin", () => {
 
   it("restores selection after redo", async () => {
     const { container } = render(
-      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
     );
 
     const el = container.querySelector("p")!;

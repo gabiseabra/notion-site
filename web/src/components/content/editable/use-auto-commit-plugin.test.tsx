@@ -1,12 +1,29 @@
 /**
  * @jest-environment jsdom
  */
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { render } from "@testing-library/react";
 import { act } from "react";
 import { inputEvent } from "../../../test-utils/input-event.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { Editor } from "../Editor.js";
+import { useContentEditor } from "../editor/use-content-editor";
+
+function TestEditor({
+  value,
+  onChange,
+}: {
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  return <Editor editor={editor} options={{ autoCommit: 200 }} />;
+}
 
 describe("useAutoCommitPlugin", () => {
   beforeEach(() => {
@@ -22,11 +39,7 @@ describe("useAutoCommitPlugin", () => {
     const onChange = jest.fn();
 
     const { container } = render(
-      <Editor
-        value={[p("a", span("Hello"))]}
-        onChange={onChange}
-        options={{ autoCommit: 200 }}
-      />,
+      <TestEditor value={[p("a", span("Hello"))]} onChange={onChange} />,
     );
 
     const el = container.querySelector("p")!;

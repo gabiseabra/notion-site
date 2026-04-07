@@ -5,10 +5,32 @@ import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { render } from "@testing-library/react";
-import { act, RefObject } from "react";
+import { act, Ref, RefObject, useImperativeHandle } from "react";
 import { inputEvent } from "../../../test-utils/input-event.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { Editor } from "../Editor.js";
+import { useContentEditor } from "../editor/use-content-editor";
+
+function TestEditor({
+  ref,
+  value,
+  onChange,
+  multiLine,
+}: {
+  ref: Ref<Editor>;
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+  multiLine?: boolean;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  useImperativeHandle(ref, () => editor, [editor]);
+
+  return <Editor editor={editor} options={{ autoCommit: 200, multiLine }} />;
+}
 
 describe("useInlineMutationPlugin", () => {
   beforeEach(() => {
@@ -26,7 +48,7 @@ describe("useInlineMutationPlugin", () => {
     };
 
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[p("420", span("hey"))]}
         onChange={() => {}}
@@ -55,7 +77,7 @@ describe("useInlineMutationPlugin", () => {
     };
 
     const { container } = render(
-      <Editor ref={editorRef} value={[p("a")]} onChange={() => {}} />,
+      <TestEditor ref={editorRef} value={[p("a")]} onChange={() => {}} />,
     );
 
     const el = container.querySelector("p")!;
@@ -78,7 +100,7 @@ describe("useInlineMutationPlugin", () => {
     };
 
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[p("a", span("Hello"))]}
         onChange={() => {}}

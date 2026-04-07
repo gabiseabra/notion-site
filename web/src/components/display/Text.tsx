@@ -12,6 +12,7 @@ export type TextProps = {
   size?: TextSize;
   color?: TextColor;
   indent?: number;
+  disabled?: boolean;
 } & css.MarginProps &
   css.PaddingProps &
   HTMLAttributes<HTMLElement>;

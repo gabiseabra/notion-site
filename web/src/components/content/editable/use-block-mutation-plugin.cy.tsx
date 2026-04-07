@@ -1,11 +1,30 @@
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { Editor } from "../Editor.js";
+import { useContentEditor } from "../editor/use-content-editor";
+
+function TestEditor({
+  value,
+  onChange,
+}: {
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  return (
+    <Editor editor={editor} options={{ autoCommit: 200, multiLine: true }} />
+  );
+}
 
 describe("useBlockMutationPlugin", () => {
   it("merges with previous block on backspace at start of block", () => {
     cy.mount(
-      <Editor
+      <TestEditor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,
@@ -19,7 +38,7 @@ describe("useBlockMutationPlugin", () => {
 
   it("does nothing on backspace at start of first block", () => {
     cy.mount(
-      <Editor
+      <TestEditor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,
@@ -34,7 +53,10 @@ describe("useBlockMutationPlugin", () => {
 
   it("deletes empty block on backspace", () => {
     cy.mount(
-      <Editor value={[p("a", span("First")), p("b")]} onChange={() => {}} />,
+      <TestEditor
+        value={[p("a", span("First")), p("b")]}
+        onChange={() => {}}
+      />,
     );
 
     cy.get("p").eq(1).click().type("{backspace}").should("not.exist");
@@ -45,7 +67,7 @@ describe("useBlockMutationPlugin", () => {
 
   it("splits block at caret position on Enter in middle of text", () => {
     cy.mount(
-      <Editor value={[p("a", span("HelloWorld"))]} onChange={() => {}} />,
+      <TestEditor value={[p("a", span("HelloWorld"))]} onChange={() => {}} />,
     );
 
     cy.get("p").click().type("{moveToStart}");
@@ -60,7 +82,9 @@ describe("useBlockMutationPlugin", () => {
   });
 
   it("creates empty block above on Enter at start of block", () => {
-    cy.mount(<Editor value={[p("a", span("Hello"))]} onChange={() => {}} />);
+    cy.mount(
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     cy.get("p").click().type("{moveToStart}{enter}");
 
@@ -70,7 +94,9 @@ describe("useBlockMutationPlugin", () => {
   });
 
   it("creates empty block below on Enter at end of block", () => {
-    cy.mount(<Editor value={[p("a", span("Hello"))]} onChange={() => {}} />);
+    cy.mount(
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     cy.get("p").click().type("{end}{enter}");
 
@@ -80,7 +106,9 @@ describe("useBlockMutationPlugin", () => {
   });
 
   it("does not split on Shift+Enter", () => {
-    cy.mount(<Editor value={[p("a", span("Hello"))]} onChange={() => {}} />);
+    cy.mount(
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     cy.get("p").click().type("{end}{shift}{enter}");
 
@@ -88,7 +116,9 @@ describe("useBlockMutationPlugin", () => {
   });
 
   it("focuses the new block after Enter split", () => {
-    cy.mount(<Editor value={[p("a", span("Hello"))]} onChange={() => {}} />);
+    cy.mount(
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     cy.get("p").click().type("{end}{enter}");
 
@@ -97,7 +127,7 @@ describe("useBlockMutationPlugin", () => {
 
   it("focuses the previous block after merge", () => {
     cy.mount(
-      <Editor
+      <TestEditor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,
@@ -114,7 +144,7 @@ describe("useBlockMutationPlugin", () => {
 
   it("places caret at merge boundary after merge", () => {
     cy.mount(
-      <Editor
+      <TestEditor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,

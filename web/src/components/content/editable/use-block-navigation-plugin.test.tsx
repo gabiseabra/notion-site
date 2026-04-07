@@ -1,15 +1,32 @@
 /**
  * @jest-environment jsdom
  */
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { fireEvent, render } from "@testing-library/react";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { Editor } from "../Editor.js";
+import { useContentEditor } from "../editor/use-content-editor";
+
+function TestEditor({
+  value,
+  onChange,
+}: {
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  return <Editor editor={editor} />;
+}
 
 describe("useBlockNavigationPlugin", () => {
   it("moves caret to next block on ArrowRight at end", () => {
     const { container } = render(
-      <Editor
+      <TestEditor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,
@@ -35,7 +52,7 @@ describe("useBlockNavigationPlugin", () => {
 
   it("moves caret to previous block on ArrowLeft at start", () => {
     const { container } = render(
-      <Editor
+      <TestEditor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,

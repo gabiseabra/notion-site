@@ -1,9 +1,28 @@
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { ol, span, todo, ul } from "@notion-site/common/utils/notion/wip.js";
 import { Editor } from "../../Editor.js";
+import { useContentEditor } from "../../editor/use-content-editor";
+
+function TestEditor({
+  value,
+  onChange,
+}: {
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  return <Editor editor={editor} options={{ autoCommit: 200 }} />;
+}
 
 describe("useNotionBackspacePlugin", () => {
   it("converts bulleted list item to paragraph on Backspace at start", () => {
-    cy.mount(<Editor value={[ul("a", span("Hello"))]} onChange={() => {}} />);
+    cy.mount(
+      <TestEditor value={[ul("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     cy.get("li p").click().type("{moveToStart}{backspace}");
 
@@ -12,7 +31,9 @@ describe("useNotionBackspacePlugin", () => {
   });
 
   it("converts numbered list item to paragraph on Backspace at start", () => {
-    cy.mount(<Editor value={[ol("a", span("Hello"))]} onChange={() => {}} />);
+    cy.mount(
+      <TestEditor value={[ol("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     cy.get("li p").click().type("{moveToStart}{backspace}");
 
@@ -21,7 +42,9 @@ describe("useNotionBackspacePlugin", () => {
   });
 
   it("converts to-do to paragraph on Backspace at start", () => {
-    cy.mount(<Editor value={[todo("a", span("Hello"))]} onChange={() => {}} />);
+    cy.mount(
+      <TestEditor value={[todo("a", span("Hello"))]} onChange={() => {}} />,
+    );
 
     cy.get("label p").click().type("{moveToStart}{backspace}");
 
@@ -31,7 +54,7 @@ describe("useNotionBackspacePlugin", () => {
 
   it("splits numbered list into two lists when middle item is converted to paragraph", () => {
     cy.mount(
-      <Editor
+      <TestEditor
         value={[
           ol("a", span("First")),
           ol("b", span("Second")),

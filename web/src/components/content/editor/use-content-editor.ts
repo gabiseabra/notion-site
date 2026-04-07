@@ -1,5 +1,4 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { ContentEditorPlugin } from "../editable/types.js";
 import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
 import { EditorHistory } from "./editor-history.js";
@@ -8,19 +7,14 @@ import { AnyBlock, BlockRef, ContentEditor } from "./types.js";
 
 /**
  * Creates shared state & controller for the editor plugins.
- *
- * @typeParam TEventMap - Map of event types. Must be explicitly provided when
- * using plugins that emit events.
  */
-export function useContentEditor<TBlock extends AnyBlock, TDetail>({
+export function useContentEditor<TBlock extends AnyBlock>({
   initialValue,
-  plugin,
   onReady,
   onCommit,
   onPostCommit,
 }: {
   initialValue: TBlock[];
-  plugin: ContentEditorPlugin<TBlock, TDetail>;
   onReady?: () => void;
   onCommit?: (blocks: TBlock[]) => void;
   onPostCommit?: (blocks: TBlock[]) => void;
@@ -149,27 +143,21 @@ export function useContentEditor<TBlock extends AnyBlock, TDetail>({
   );
   editorRef.current = editor;
 
-  // run plugins' hook phase
-  const editable = plugin(editor);
-
   // notify event listeners
   useEffect(() => {
     const event = !isReadyRef.current
       ? new EditorEvent("ready", editor, {})
       : new EditorEvent("postcommit", editor, {});
 
-    if (isReadyRef.current) {
+    editor.bus.dispatchTypedEvent(event.eventType, event);
+    isReadyRef.current = true;
+
+    if (event.eventType === "postcommit") {
       onPostCommitRef.current?.(editor.blocks);
     } else {
       onReadyRef.current?.();
     }
+  }, [editor]);
 
-    editor.bus.dispatchTypedEvent(event.eventType, event);
-    isReadyRef.current = true;
-  }, [history, editor]);
-
-  return {
-    editor,
-    editable,
-  };
+  return editor;
 }

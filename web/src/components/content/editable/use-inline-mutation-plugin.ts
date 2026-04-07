@@ -19,11 +19,15 @@ import { ContentEditorPlugin } from "./types.js";
  */
 export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
   multiLine,
+  isNewLine = (event) =>
+    event.inputType === "insertLineBreak" ||
+    (!multiLine && event.inputType === "insertParagraph"),
   debounceMs = 200,
   splice,
   update = (b) => b,
 }: {
   multiLine?: boolean;
+  isNewLine?: (event: globalThis.InputEvent) => boolean;
   debounceMs?: number | false;
   splice: Splice<TBlock>;
   /** If present, prefer reacting to onChange event when the target is a input
@@ -39,13 +43,12 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
 
   return composePlugins<TBlock>(
     useSpliceInlineMutationPlugin({
-      multiLine,
-      debounceMs,
+      isNewLine,
       splice,
+      debounceMs,
       disabled: Slot.map(method, (method) => method !== "splice"),
     }),
     useUpdateInlineMutationPlugin({
-      multiLine,
       update,
       disabled: Slot.map(method, (method) => method !== "update"),
     }),
@@ -61,11 +64,9 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
 export const useUpdateInlineMutationPlugin =
   <TBlock extends AnyBlock>({
     disabled,
-    multiLine,
     update,
   }: {
     disabled?: DisabledSlot<TBlock>;
-    multiLine?: boolean;
     update: Update<TBlock>;
   }): ContentEditorPlugin<TBlock> =>
   (editor) => {
@@ -81,10 +82,7 @@ export const useUpdateInlineMutationPlugin =
           !(
             event.currentTarget instanceof HTMLInputElement ||
             event.currentTarget instanceof HTMLTextAreaElement
-          ) ||
-          (!multiLine &&
-            (event.nativeEvent.inputType === "insertParagraph" ||
-              event.nativeEvent.inputType === "insertNewLine"))
+          )
         )
           return;
 
@@ -111,13 +109,13 @@ useUpdateInlineMutationPlugin.ChangeData = class SyncInlineMutationChangeData {}
  */
 export const useSpliceInlineMutationPlugin = <TBlock extends AnyBlock>({
   disabled,
-  multiLine,
   debounceMs = 200,
+  isNewLine,
   splice,
 }: {
   disabled?: DisabledSlot<TBlock>;
-  multiLine?: boolean;
   debounceMs?: number | false;
+  isNewLine: (event: globalThis.InputEvent) => boolean;
   splice: Splice<TBlock>;
 }): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
@@ -141,8 +139,7 @@ export const useSpliceInlineMutationPlugin = <TBlock extends AnyBlock>({
 
       if (!spliceRange) return;
 
-      // skip newline if multiline is disabled
-      if (spliceRange.insert === "\n" && !multiLine) {
+      if (spliceRange.insert === "\n" && !isNewLine(e)) {
         e.preventDefault();
         return;
       }

@@ -1,27 +1,37 @@
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { Editor } from "../Editor.js";
+import { useContentEditor } from "../editor/use-content-editor";
 
-const options = {
-  autoCommit: 200,
-  multiLine: true,
-};
+function TestEditor({
+  value,
+  onChange,
+  multiLine,
+}: {
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+  multiLine?: boolean;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  return <Editor editor={editor} options={{ autoCommit: 200, multiLine }} />;
+}
 
 describe("useInlineMutationPlugin", () => {
   it("types some text and saves", () => {
     const onChange = cy.stub().as("onChange");
 
     cy.mount(
-      <Editor
-        value={[p("a", span("Hello"))]}
-        onChange={onChange}
-        options={options}
-      />,
+      <TestEditor value={[p("a", span("Hello"))]} onChange={onChange} />,
     );
 
     cy.get("p").click().type("{end} World").should("have.text", "Hello World");
 
-    cy.wait(options.autoCommit);
+    cy.wait(200);
 
     cy.get("@onChange").should("have.been.called");
 
@@ -29,7 +39,7 @@ describe("useInlineMutationPlugin", () => {
   });
 
   it("inserts newline into the palceholder span", () => {
-    cy.mount(<Editor value={[p("a")]} onChange={() => {}} options={options} />);
+    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p")
       .click()
@@ -38,18 +48,14 @@ describe("useInlineMutationPlugin", () => {
       .type("{shift}{enter}");
     cy.get("p span").should("have.text", "\n\n\n");
 
-    cy.wait(options.autoCommit);
+    cy.wait(200);
 
     cy.get("p").should("have.text", "\n\n\n");
   });
 
   it("inserts newline at the end of a rich-text span", () => {
     cy.mount(
-      <Editor
-        value={[p("a", span("Hello"))]}
-        onChange={() => {}}
-        options={options}
-      />,
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
     );
 
     cy.get("p")
@@ -57,36 +63,17 @@ describe("useInlineMutationPlugin", () => {
       .type("{end}{shift}{enter}more")
       .should("have.text", "Hello\nmore");
 
-    cy.wait(options.autoCommit);
+    cy.wait(200);
 
     cy.get("p").should("have.text", "Hello\nmore");
   });
 
-  it("prevents Shift+Enter newline when multiline is disabled", () => {
-    cy.mount(
-      <Editor
-        value={[p("a", span("Hello"))]}
-        onChange={() => {}}
-        options={{ ...options, multiLine: false }}
-      />,
-    );
-
-    cy.get("p")
-      .click()
-      .type("{end}{shift}{enter}")
-      .should("have.text", "Hello");
-
-    cy.wait(options.autoCommit);
-
-    cy.get("p").should("have.text", "Hello");
-  });
-
   it("handles type characters then backspace some", () => {
-    cy.mount(<Editor value={[p("a")]} onChange={() => {}} options={options} />);
+    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("Hello World").should("have.text", "Hello World");
 
-    cy.wait(options.autoCommit);
+    cy.wait(200);
 
     cy.get("p")
       .type("{backspace}{backspace}{backspace}{backspace}{backspace}")
@@ -95,11 +82,7 @@ describe("useInlineMutationPlugin", () => {
 
   it("selects text then types to replace it", () => {
     cy.mount(
-      <Editor
-        value={[p("a", span("Hello World"))]}
-        onChange={() => {}}
-        options={options}
-      />,
+      <TestEditor value={[p("a", span("Hello World"))]} onChange={() => {}} />,
     );
 
     cy.get("p")
@@ -110,11 +93,7 @@ describe("useInlineMutationPlugin", () => {
 
   it("selects text then deletes it", () => {
     cy.mount(
-      <Editor
-        value={[p("a", span("Hello World"))]}
-        onChange={() => {}}
-        options={options}
-      />,
+      <TestEditor value={[p("a", span("Hello World"))]} onChange={() => {}} />,
     );
 
     cy.get("p").click().type("{selectAll}{del}").should("have.text", "");
@@ -122,11 +101,7 @@ describe("useInlineMutationPlugin", () => {
 
   it("inserts text via execCommand (simulates paste)", () => {
     cy.mount(
-      <Editor
-        value={[p("a", span("Before "))]}
-        onChange={() => {}}
-        options={options}
-      />,
+      <TestEditor value={[p("a", span("Before "))]} onChange={() => {}} />,
     );
 
     cy.get("p").click().type("{end}");
@@ -140,10 +115,10 @@ describe("useInlineMutationPlugin", () => {
 
   it("flushes pending changes before block split", () => {
     cy.mount(
-      <Editor
+      <TestEditor
+        multiLine
         value={[p("a", span("Initial"))]}
         onChange={() => {}}
-        options={options}
       />,
     );
 
@@ -157,11 +132,7 @@ describe("useInlineMutationPlugin", () => {
 
   it("keeps current selection after inline flush", () => {
     cy.mount(
-      <Editor
-        value={[p("a", span("Line 1"))]}
-        onChange={() => {}}
-        options={options}
-      />,
+      <TestEditor value={[p("a", span("Line 1"))]} onChange={() => {}} />,
     );
 
     cy.get("p")
@@ -169,7 +140,7 @@ describe("useInlineMutationPlugin", () => {
       .type("{moveToEnd}{shift}{enter}Line 2")
       .type("{moveToEnd}!{uparrow}{home}");
 
-    cy.wait(options.autoCommit);
+    cy.wait(200);
 
     cy.get("p").then(([p]) => {
       expect(SelectionRange.read(p)).to.deep.equal({ start: 0, end: 0 });

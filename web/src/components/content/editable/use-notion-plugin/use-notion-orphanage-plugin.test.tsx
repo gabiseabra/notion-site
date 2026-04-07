@@ -4,21 +4,41 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { render } from "@testing-library/react";
-import { RefObject } from "react";
+import { Ref, RefObject, useImperativeHandle } from "react";
 import { inputEvent } from "../../../../test-utils/input-event.js";
 import { SelectionRange } from "../../../../utils/selection-range.js";
 import { Editor } from "../../Editor.js";
+import { useContentEditor } from "../../editor/use-content-editor";
 
 const child = (id: string, parentId: string, ...text: Notion.RichText) => ({
   ...p(id, ...text),
   parent: { type: "block_id" as const, block_id: parentId },
 });
 
+function TestEditor({
+  ref,
+  value,
+  onChange,
+}: {
+  ref?: Ref<Editor>;
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  useImperativeHandle(ref, () => editor, [editor]);
+
+  return <Editor editor={editor} />;
+}
+
 describe("useNotionOrphanagePlugin", () => {
   it("re-parents children of deleted block to deleted block's parent on merge", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[
           p("a", span("A")),
@@ -44,7 +64,7 @@ describe("useNotionOrphanagePlugin", () => {
   it("re-parents children of original block to the new block on split", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[p("a", span("HelloWorld")), child("b", "a", span("B"))]}
         onChange={() => {}}

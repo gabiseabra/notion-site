@@ -20,9 +20,8 @@ type TestEditorProps = {
 };
 
 function TestEditor({ ref, value: initialValue }: TestEditorProps) {
-  const { editor } = useContentEditor({
+  const editor = useContentEditor({
     initialValue,
-    plugin: () => () => ({}),
   });
 
   useImperativeHandle(ref, () => editor, [editor]);
@@ -36,12 +35,11 @@ describe("useContentEditor", () => {
       const onReady = jest.fn();
 
       const ReadyProbe = () => {
-        const { editor } = useContentEditor({
+        const editor = useContentEditor({
           initialValue: [
             { id: "a", text: "Hello" },
             { id: "b", text: "World" },
           ],
-          plugin: () => () => ({}),
         });
 
         useLayoutEffect(() => {
@@ -94,55 +92,53 @@ describe("useContentEditor", () => {
     });
   });
 
-  describe("peek semantics", () => {
-    it("returns pending history state from peek before commit", () => {
-      const editorRef: RefObject<ContentEditor<TestBlock> | null> = {
-        current: null,
-      };
+  it("returns pending history state from peek before commit", () => {
+    const editorRef: RefObject<ContentEditor<TestBlock> | null> = {
+      current: null,
+    };
 
-      render(
-        <TestEditor
-          ref={editorRef}
-          value={[
-            { id: "a", text: "Hello" },
-            { id: "b", text: "World" },
-          ]}
-        />,
-      );
+    render(
+      <TestEditor
+        ref={editorRef}
+        value={[
+          { id: "a", text: "Hello" },
+          { id: "b", text: "World" },
+        ]}
+      />,
+    );
 
-      expect(editorRef.current).toBeTruthy();
+    expect(editorRef.current).toBeTruthy();
 
-      act(() => {
-        editorRef.current?.push({
-          type: "update",
-          block: { id: "a", text: "Updated" },
-        });
+    act(() => {
+      editorRef.current?.push({
+        type: "update",
+        block: { id: "a", text: "Updated" },
       });
-
-      expect(editorRef.current?.blocks[0]?.text).toBe("Hello");
-      expect(editorRef.current?.peek("a")?.text).toBe("Updated");
     });
 
-    it("returns committed state from peek when history is unchanged", () => {
-      const editorRef: RefObject<ContentEditor<TestBlock> | null> = {
-        current: null,
-      };
+    expect(editorRef.current?.blocks[0]?.text).toBe("Hello");
+    expect(editorRef.current?.peek("a")?.text).toBe("Updated");
+  });
 
-      render(
-        <TestEditor
-          ref={editorRef}
-          value={[
-            { id: "a", text: "Hello" },
-            { id: "b", text: "World" },
-          ]}
-        />,
-      );
+  it("returns committed state from peek when history is unchanged", () => {
+    const editorRef: RefObject<ContentEditor<TestBlock> | null> = {
+      current: null,
+    };
 
-      expect(editorRef.current).toBeTruthy();
+    render(
+      <TestEditor
+        ref={editorRef}
+        value={[
+          { id: "a", text: "Hello" },
+          { id: "b", text: "World" },
+        ]}
+      />,
+    );
 
-      expect(editorRef.current?.peek("a")?.text).toBe(
-        editorRef.current?.blocks[0]?.text,
-      );
-    });
+    expect(editorRef.current).toBeTruthy();
+
+    expect(editorRef.current?.peek("a")?.text).toBe(
+      editorRef.current?.blocks[0]?.text,
+    );
   });
 });

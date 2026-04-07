@@ -4,21 +4,41 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { fireEvent, render } from "@testing-library/react";
-import { RefObject } from "react";
+import { Ref, RefObject, useImperativeHandle } from "react";
 import { inputEvent } from "../../../../test-utils/input-event.js";
 import { SelectionRange } from "../../../../utils/selection-range.js";
 import { Editor } from "../../Editor.js";
+import { useContentEditor } from "../../editor/use-content-editor";
 
 const child = (id: string, parentId: string, ...text: Notion.RichText) => ({
   ...p(id, ...text),
   parent: { type: "block_id" as const, block_id: parentId },
 });
 
+function TestEditor({
+  ref,
+  value,
+  onChange,
+}: {
+  ref?: Ref<Editor>;
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  useImperativeHandle(ref, () => editor, [editor]);
+
+  return <Editor editor={editor} />;
+}
+
 describe("useNotionIndentPlugin", () => {
   it("indents block under previous sibling on Tab", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[p("a", span("A")), p("b", span("B"))]}
         onChange={() => {}}
@@ -39,7 +59,7 @@ describe("useNotionIndentPlugin", () => {
   it("makes direct children siblings of the indented block on Tab (not children of it)", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[
           p("a", span("A")),
@@ -67,7 +87,7 @@ describe("useNotionIndentPlugin", () => {
   it("does not re-parent grandchildren on Tab", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[
           p("a", span("A")),
@@ -96,7 +116,7 @@ describe("useNotionIndentPlugin", () => {
   it("does nothing on Tab when block has no previous sibling", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[p("a", span("A"))]}
         onChange={() => {}}
@@ -117,7 +137,7 @@ describe("useNotionIndentPlugin", () => {
   it("indents an already-nested block under its previous sibling on Tab", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[
           p("x", span("X")),
@@ -143,7 +163,7 @@ describe("useNotionIndentPlugin", () => {
   it("re-parents all direct children to the new parent on Tab", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[
           p("x", span("X")),
@@ -175,7 +195,7 @@ describe("useNotionIndentPlugin", () => {
   it("unindents block to page level on Backspace at start", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[p("a", span("A")), child("b", "a", span("B"))]}
         onChange={() => {}}
@@ -196,7 +216,7 @@ describe("useNotionIndentPlugin", () => {
   it("unindents deeply nested block to grandparent on Backspace at start", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[
           p("a", span("A")),
@@ -221,7 +241,7 @@ describe("useNotionIndentPlugin", () => {
   it("keeps children with the block when unindenting (children are not left behind)", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[
           p("a", span("A")),
@@ -249,7 +269,7 @@ describe("useNotionIndentPlugin", () => {
   it("keeps children with a deeply nested block when unindenting", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[
           p("a", span("A")),
@@ -278,7 +298,7 @@ describe("useNotionIndentPlugin", () => {
   it("preserves block order when unindenting a nested block with children", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[
           p("a", span("A")),
@@ -307,7 +327,7 @@ describe("useNotionIndentPlugin", () => {
   it("re-parents following siblings to the unindented block on Backspace at start", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[
           p("a", span("A")),
@@ -342,7 +362,7 @@ describe("useNotionIndentPlugin", () => {
   it("unindents block without affecting its siblings on Backspace at start", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[
           p("x", span("X")),
@@ -371,7 +391,7 @@ describe("useNotionIndentPlugin", () => {
   it("does nothing on Backspace at start when block is at page level", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(
-      <Editor
+      <TestEditor
         ref={editorRef}
         value={[p("a", span("A"))]}
         onChange={() => {}}
@@ -391,7 +411,7 @@ describe("useNotionIndentPlugin", () => {
 
   it("restores cursor to position 0 on the block after unindenting", () => {
     const { container } = render(
-      <Editor
+      <TestEditor
         value={[
           p("a", span("A")),
           child("b", "a", span("B")),
@@ -412,7 +432,7 @@ describe("useNotionIndentPlugin", () => {
 
   it("restores cursor to its original position after indenting", () => {
     const { container } = render(
-      <Editor
+      <TestEditor
         value={[
           p("a", span("A")),
           p("b", span("BB")),

@@ -2,6 +2,7 @@ import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { a, p, span } from "@notion-site/common/utils/notion/wip.js";
 import { useLocalStorage } from "usehooks-ts";
 import { Editor } from "../components/content/Editor.js";
+import { useContentEditor } from "../components/content/editor/use-content-editor";
 import { Favicon } from "../components/display/Favicon.js";
 import { Icon } from "../components/display/Icon.js";
 import { Text } from "../components/display/Text.js";
@@ -44,9 +45,12 @@ export function Component() {
     ),
   ]);
 
-  const onChange = (blocks: Notion.Block[]) => {
-    setBlocks(blocks);
-  };
+  const editor = useContentEditor({
+    initialValue: blocks,
+    onCommit: setBlocks,
+  });
+
+  window.editor = editor;
 
   return (
     <div>
@@ -60,13 +64,7 @@ export function Component() {
         &nbsp;Content Editor Demo
       </Text>
 
-      <Editor
-        ref={(editor) => {
-          window.editor = editor ?? undefined;
-        }}
-        value={blocks}
-        onChange={onChange}
-      />
+      <Editor editor={editor} />
     </div>
   );
 }

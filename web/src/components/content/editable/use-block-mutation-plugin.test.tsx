@@ -1,16 +1,33 @@
 /**
  * @jest-environment jsdom
  */
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
 import { render } from "@testing-library/react";
 import { inputEvent } from "../../../test-utils/input-event.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { Editor } from "../Editor.js";
+import { useContentEditor } from "../editor/use-content-editor";
+
+function TestEditor({
+  value,
+  onChange,
+}: {
+  value: Notion.Block[];
+  onChange: (block: Notion.Block[]) => void;
+}) {
+  const editor = useContentEditor({
+    initialValue: value,
+    onCommit: onChange,
+  });
+
+  return <Editor editor={editor} />;
+}
 
 describe("useBlockMutationPlugin", () => {
   it("merges with previous block on Backspace at start", () => {
     const { container } = render(
-      <Editor
+      <TestEditor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,
@@ -30,7 +47,7 @@ describe("useBlockMutationPlugin", () => {
 
   it("does nothing on Backspace at start of first block", () => {
     const { container } = render(
-      <Editor
+      <TestEditor
         value={[p("a", span("First")), p("b", span("Second"))]}
         onChange={() => {}}
       />,
@@ -51,7 +68,7 @@ describe("useBlockMutationPlugin", () => {
 
   it("splits block on Enter at caret position", () => {
     const { container } = render(
-      <Editor value={[p("a", span("HelloWorld"))]} onChange={() => {}} />,
+      <TestEditor value={[p("a", span("HelloWorld"))]} onChange={() => {}} />,
     );
 
     const el = container.querySelector("p")!;
@@ -68,7 +85,7 @@ describe("useBlockMutationPlugin", () => {
 
   it("does not split on Shift+Enter", () => {
     const { container } = render(
-      <Editor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
     );
 
     const el = container.querySelector("p")!;

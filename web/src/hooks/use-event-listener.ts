@@ -1,5 +1,5 @@
 import { hash } from "@notion-site/common/utils/hash.js";
-import { RefObject, useEffect, useRef } from "react";
+import { RefObject, useLayoutEffect, useRef } from "react";
 import { TypedEventTarget } from "typescript-event-target";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,7 +29,7 @@ export function useEventListener<
   const listenerRef = useRef(listener);
   listenerRef.current = listener;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!element) return;
     const f: typeof listener = (e) => listenerRef.current(e);
     if (element instanceof HTMLElement) {

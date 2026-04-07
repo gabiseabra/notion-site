@@ -19,10 +19,11 @@ function TestEditor({
   value: TestBlock[];
   log: (event: EditorEvent<TestBlock>) => void;
 }) {
-  const { editor, editable } = useContentEditor({
+  const editor = useContentEditor({
     initialValue,
-    plugin: useLoggerPlugin(log),
   });
+
+  const editable = useLoggerPlugin(log)(editor);
 
   useImperativeHandle(ref, () => editor, [editor]);
 
