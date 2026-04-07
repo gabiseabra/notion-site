@@ -1,5 +1,6 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { p, span } from "@notion-site/common/utils/notion/wip.js";
+import { SelectionRange } from "../../../utils/selection-range";
 import { Editor } from "../Editor.js";
 import { useContentEditor } from "../editor/use-content-editor";
 
@@ -36,5 +37,27 @@ describe("useAutoCommitPlugin", () => {
     cy.wait(202);
 
     cy.get("p").eq(0).should("have.focus");
+  });
+
+  it("preserves selection on auto-commit", () => {
+    cy.mount(
+      <TestEditor
+        value={[p("a", span("Hello")), p("b", span("World"))]}
+        onChange={() => {}}
+      />,
+    );
+
+    cy.get("p").eq(0).click().type("{leftArrow}{leftArrow}{leftArrow}y");
+    cy.wait(202);
+
+    cy.get("p")
+      .eq(0)
+      .should("have.text", "Heyllo")
+      .then(([p]) => {
+        expect(SelectionRange.read(p)).to.deep.equal({
+          start: 3,
+          end: 3,
+        });
+      });
   });
 });
