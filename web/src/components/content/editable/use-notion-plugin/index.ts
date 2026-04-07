@@ -1,6 +1,5 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import * as env from "../../../../env.js";
-import { EditorEvent } from "../../editor/editor-event.js";
 import { composePlugins } from "../compose-plugins.js";
 import { useAutoCommitPlugin } from "../use-auto-commit-plugin.js";
 import { useBlockMutationPlugin } from "../use-block-mutation-plugin.js";
@@ -8,7 +7,7 @@ import { useBlockNavigationPlugin } from "../use-block-navigation-plugin.js";
 import { useHistoryPlugin } from "../use-history-plugin.js";
 import { useHotkeyPlugin } from "../use-hotkey-plugin.js";
 import { useInlineMutationPlugin } from "../use-inline-mutation-plugin.js";
-import { useLoggerPlugin } from "../use-logger-plugin.js";
+import { createLogger, useLoggerPlugin } from "../use-logger-plugin.js";
 import { toggleAnnotations } from "./commands.js";
 import { useNotionBackspacePlugin } from "./use-notion-backspace-plugin.js";
 import { useNotionIndentPlugin } from "./use-notion-indent-plugin.js";
@@ -21,32 +20,20 @@ export type NotionPluginOptions = {
   autoCommit?: number | boolean;
 };
 
-export const useNotionPlugin = (
-  options: NotionPluginOptions = {
-    multiLine: true,
-    logging: env.DEV,
-    autoCommit: 600,
-  },
-) =>
+export const useNotionPlugin = ({
+  multiLine = true,
+  autoCommit = 600,
+  logging = env.DEV,
+}: NotionPluginOptions = {}) =>
   composePlugins<Notion.Block>(
-    useLoggerPlugin((event) => {
-      if (!options.logging) return;
-      else if (options.logging == "verbose")
-        console.info(event.eventType, event.detail, event.editor);
-      else if (
-        !EditorEvent.narrow("flush", event) &&
-        !EditorEvent.narrow("postcommit", event)
-      )
-        console.info(event.eventType, event.detail, event.editor);
-    }),
+    useLoggerPlugin(createLogger(logging)),
     useAutoCommitPlugin({
-      disabled: options.autoCommit === false,
-      debounceMs:
-        typeof options.autoCommit === "number" ? options.autoCommit : undefined,
+      disabled: autoCommit === false,
+      debounceMs: typeof autoCommit === "number" ? autoCommit : undefined,
     }),
     useHistoryPlugin(),
     useInlineMutationPlugin({
-      multiLine: options.multiLine,
+      multiLine: multiLine,
       splice(block, ...params) {
         return Notion.Block.mapRichText(block, (rich_text) =>
           Notion.RTF.splice(rich_text, ...params),
@@ -59,7 +46,7 @@ export const useNotionPlugin = (
     useBlockMutationPlugin({
       merge(left, right) {
         if (
-          !options.multiLine ||
+          !multiLine ||
           !Notion.Block.isRichText(left) ||
           !Notion.Block.isRichText(right)
         )
@@ -74,7 +61,7 @@ export const useNotionPlugin = (
         }));
       },
       split(block, offset, deleteRange) {
-        if (!options.multiLine || !Notion.Block.isRichText(block)) return null;
+        if (!multiLine || !Notion.Block.isRichText(block)) return null;
 
         return Notion.Block.split(block, offset, deleteRange);
       },

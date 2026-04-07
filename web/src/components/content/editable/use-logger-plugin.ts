@@ -19,3 +19,16 @@ export const useLoggerPlugin =
 
     return () => ({});
   };
+
+export const createLogger =
+  (logging?: boolean | "verbose") =>
+  <TBlock extends AnyBlock>(event: EditorEvent<TBlock>) => {
+    if (!logging) return;
+    else if (logging == "verbose")
+      console.info(event.eventType, event.detail, event.editor);
+    else if (
+      !EditorEvent.narrow("flush", event) &&
+      !EditorEvent.narrow("postcommit", event)
+    )
+      console.info(event.eventType, event.detail, event.editor);
+  };

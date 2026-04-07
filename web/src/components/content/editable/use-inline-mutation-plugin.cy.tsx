@@ -7,7 +7,7 @@ import { useContentEditor } from "../editor/use-content-editor";
 function TestEditor({
   value,
   onChange,
-  multiLine,
+  multiLine = false,
 }: {
   value: Notion.Block[];
   onChange: (block: Notion.Block[]) => void;
