@@ -14,63 +14,72 @@ import { AnyContentEditorPlugin } from "./types.js";
  * | `Ctrl+Shift+Z` | `Cmd+Shift+Z`: Redo
  * | `Ctrl+Y` | `Cmd+Y`: Redo (alternative)
  */
-export const useHistoryPlugin = (): AnyContentEditorPlugin => (editor) => {
-  useEventListener(editor.bus, "postcommit", () => {
-    const direction = editor.history.direction;
-    const cmd = editor.history.action;
-    if (!cmd) return;
+export const useHistoryPlugin =
+  (options?: {
+    restore?: "postcommit" | "commit" | false;
+  }): AnyContentEditorPlugin =>
+  (editor) => {
+    const restoreEvent = !options?.restore ? "ready" : options.restore;
 
-    const id = EditorAction.id(cmd, direction);
-    const selection = EditorAction.selection(cmd, direction);
-    const { element } = editor.ref(id);
-    const currentSelection = element && SelectionRange.read(element);
+    useEventListener(editor.bus, restoreEvent, ({ editor }) => {
+      if (!options?.restore) return;
 
-    if (!selection) {
-      console.warn("Failed to restore selection after commit.", {
-        id,
-        cmd,
-        direction,
-        revision: editor.revision,
-        selection,
-        currentSelection,
-      });
-      return;
-    }
+      const direction = editor.history.direction;
+      const cmd = editor.history.action;
 
-    if (
-      !element ||
-      (selection.start === currentSelection?.start &&
-        selection.end === currentSelection?.end)
-    )
-      return;
+      if (!cmd) return;
 
-    SelectionRange.apply(element, selection);
-  });
+      const id = EditorAction.id(cmd, direction);
+      const selection = EditorAction.selection(cmd, direction);
+      const { element } = editor.ref(id);
+      const currentSelection = element && SelectionRange.read(element);
 
-  return (block) => ({
-    onKeyDown(e) {
-      const isMod = e.ctrlKey || e.metaKey;
-
-      if (!isMod) return;
-
-      if (isUndo(e) && editor.history.undo(true) && editor.peek(block.id)) {
-        editor.history.undo();
-        editor.commit(new useHistoryPlugin.EventData("undo"));
-
-        e.preventDefault();
+      if (!selection) {
+        console.warn(`Failed to restore selection on ${restoreEvent}.`, {
+          id,
+          cmd,
+          direction,
+          revision: editor.revision,
+          selection,
+          currentSelection,
+        });
         return;
       }
 
-      if (isRedo(e) && editor.history.redo(true) && editor.peek(block.id)) {
-        editor.history.redo();
-        editor.commit(new useHistoryPlugin.EventData("redo"));
-
-        e.preventDefault();
+      if (
+        !element ||
+        (selection.start === currentSelection?.start &&
+          selection.end === currentSelection?.end)
+      )
         return;
-      }
-    },
-  });
-};
+
+      SelectionRange.apply(element, selection);
+    });
+
+    return (block) => ({
+      onKeyDown(e) {
+        const isMod = e.ctrlKey || e.metaKey;
+
+        if (!isMod) return;
+
+        if (isUndo(e) && editor.history.undo(true) && editor.peek(block.id)) {
+          editor.history.undo();
+          editor.commit(new useHistoryPlugin.EventData("undo"));
+
+          e.preventDefault();
+          return;
+        }
+
+        if (isRedo(e) && editor.history.redo(true) && editor.peek(block.id)) {
+          editor.history.redo();
+          editor.commit(new useHistoryPlugin.EventData("redo"));
+
+          e.preventDefault();
+          return;
+        }
+      },
+    });
+  };
 
 const isUndo = (e: KeyboardEvent) => e.key === "z" && !e.shiftKey;
 const isRedo = (e: KeyboardEvent) =>

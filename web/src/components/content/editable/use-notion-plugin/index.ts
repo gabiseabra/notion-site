@@ -23,7 +23,7 @@ export type NotionPluginOptions = {
 export const useNotionPlugin = ({
   inline = false,
   autoCommit = 600,
-  logging = env.DEV,
+  logging = env.DEV && "verbose",
 }: NotionPluginOptions = {}) =>
   composePlugins<Notion.Block>(
     useLoggerPlugin(createLogger(logging)),
@@ -31,7 +31,7 @@ export const useNotionPlugin = ({
       disabled: autoCommit === false,
       debounceMs: typeof autoCommit === "number" ? autoCommit : undefined,
     }),
-    useHistoryPlugin(),
+    useHistoryPlugin({ restore: "postcommit" }),
     useInlineMutationPlugin({
       // disable processing Enter to let block split handle it
       disabled: ({ event }) => !inline && event.inputType === "insertParagraph",
