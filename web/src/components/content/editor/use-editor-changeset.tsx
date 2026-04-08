@@ -142,7 +142,7 @@ useEditorChangeset.FlushData = class EditorChangesetFlushData {
   constructor(public batchId: number) {}
 };
 
-export function useDebouncedEditorChangeset<TBlock extends AnyBlock>(
+export function useLazyEditorChangeset<TBlock extends AnyBlock>(
   editor: ContentEditor<TBlock>,
   debounceMs: number | false,
 ) {

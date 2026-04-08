@@ -3,7 +3,7 @@ import { SelectionRange } from "../../../utils/selection-range.js";
 import { Slot } from "../../../utils/slot";
 import { SpliceRange } from "../../../utils/splice-range.js";
 import { AnyBlock, ContentEditor } from "../editor/types.js";
-import { useDebouncedEditorChangeset } from "../editor/use-editor-changeset.js";
+import { useLazyEditorChangeset } from "../editor/use-editor-changeset.js";
 import { composePlugins } from "./compose-plugins";
 import { createEventListenerPlugin } from "./create-event-listener-plugin.js";
 import { ContentEditorPlugin } from "./types.js";
@@ -41,12 +41,12 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
         : "splice") !== method;
 
   return composePlugins<TBlock>(
-    useSpliceInlineMutationPlugin({
+    useLazyInlineMutationPlugin({
       splice,
       debounceMs,
       disabled: Slot.some([isMethodDisabled("splice"), disabled]),
     }),
-    useUpdateInlineMutationPlugin({
+    useControlledlineMutationPlugin({
       update,
       disabled: Slot.some([isMethodDisabled("update"), disabled]),
     }),
@@ -59,13 +59,15 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
  * Reacts to the `onInput` event and replaces the block's content with the
  * element's full current value via the `update` callback.
  */
-export const useUpdateInlineMutationPlugin =
+export const useControlledlineMutationPlugin =
   <TBlock extends AnyBlock>({
     disabled,
     update,
+    autoCommit = true,
   }: {
     disabled?: DisabledSlot<TBlock>;
     update: Update<TBlock>;
+    autoCommit?: boolean;
   }): ContentEditorPlugin<TBlock> =>
   (editor) => {
     const selectionBeforeRef = useRef<SelectionRange>(null);
@@ -85,7 +87,7 @@ export const useUpdateInlineMutationPlugin =
           return;
 
         editor.push({
-          data: new useUpdateInlineMutationPlugin.ChangeData(),
+          data: new useControlledlineMutationPlugin.ChangeData(),
           type: "update",
           block: update(
             block,
@@ -97,11 +99,13 @@ export const useUpdateInlineMutationPlugin =
           selectionBefore: selectionBeforeRef.current ?? undefined,
           selectionAfter: SelectionRange.read(event.currentTarget) ?? undefined,
         });
+
+        if (autoCommit) editor.commit();
       },
     });
   };
 
-useUpdateInlineMutationPlugin.ChangeData = class UpdateInlineMutationPluginChangeData {};
+useControlledlineMutationPlugin.ChangeData = class ControlledInlineMutationPluginChangeData {};
 
 /**
  * Plugin that handles text input via the native `beforeinput` in batched mode.
@@ -111,7 +115,7 @@ useUpdateInlineMutationPlugin.ChangeData = class UpdateInlineMutationPluginChang
  * and the element to lose selection.
  * For this reason, inline edits need to be batched.
  */
-export const useSpliceInlineMutationPlugin = <TBlock extends AnyBlock>({
+export const useLazyInlineMutationPlugin = <TBlock extends AnyBlock>({
   disabled,
   debounceMs = 200,
   splice,
@@ -121,7 +125,7 @@ export const useSpliceInlineMutationPlugin = <TBlock extends AnyBlock>({
   splice: Splice<TBlock>;
 }): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
-    const changeset = useDebouncedEditorChangeset(editor, debounceMs);
+    const changeset = useLazyEditorChangeset(editor, debounceMs);
 
     return (block) => (event) => {
       if (Slot.extract(disabled, { id: block.id, editor, event })) return;
