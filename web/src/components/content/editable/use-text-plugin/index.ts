@@ -1,6 +1,5 @@
 import * as env from "../../../../env.js";
 import { SpliceRange } from "../../../../utils/splice-range.js";
-import { ContentEditor } from "../../editor/types.js";
 import { composePlugins } from "../compose-plugins.js";
 import { useAutoCommitPlugin } from "../use-auto-commit-plugin.js";
 import { useHistoryPlugin } from "../use-history-plugin.js";
@@ -40,18 +39,19 @@ export type TextPluginOptions = {
 /**
  * ContentEditor plugin stack for plain text blocks.
  */
-export const useTextPlugin =
-  ({ autoCommit = true, logging = env.DEV }: TextPluginOptions = {}) =>
-  (editor: ContentEditor<TextBlock>) =>
-    composePlugins<TextBlock>(
-      useLoggerPlugin(createLogger(logging)),
-      useAutoCommitPlugin({
-        disabled: autoCommit === false,
-        debounceMs: typeof autoCommit === "number" ? autoCommit : undefined,
-      }),
-      useHistoryPlugin(),
-      useInlineMutationPlugin({
-        splice: TextBlock.splice,
-        update: ({ id }, value) => ({ id, value }),
-      }),
-    )(editor);
+export const useTextPlugin = ({
+  autoCommit = true,
+  logging = env.DEV,
+}: TextPluginOptions = {}) =>
+  composePlugins<TextBlock>(
+    useLoggerPlugin(createLogger(logging)),
+    useAutoCommitPlugin({
+      disabled: autoCommit === false,
+      debounceMs: typeof autoCommit === "number" ? autoCommit : undefined,
+    }),
+    useHistoryPlugin(),
+    useInlineMutationPlugin({
+      splice: TextBlock.splice,
+      update: ({ id }, value) => ({ id, value }),
+    }),
+  );
