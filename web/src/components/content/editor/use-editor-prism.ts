@@ -1,5 +1,5 @@
-import { Iso } from "@notion-site/common/utils/iso.js";
-import { Prism } from "@notion-site/common/utils/prism.js";
+import { Iso } from "@notion-site/common/utils/optics/iso.js";
+import { Prism } from "@notion-site/common/utils/optics/prism.js";
 import { AnyBlock, ContentEditor } from "./types";
 import { useEditorLens } from "./use-editor-lens";
 

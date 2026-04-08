@@ -1,8 +1,8 @@
 import { WithRequired } from "@notion-site/common/types/object.js";
-import { Lens } from "@notion-site/common/utils/lens.js";
 import type { Block as NotionBlock } from "@notion-site/common/utils/notion/block.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
-import { Prism } from "@notion-site/common/utils/prism.js";
+import { Lens } from "@notion-site/common/utils/optics/lens.js";
+import { Prism } from "@notion-site/common/utils/optics/prism.js";
 import { pipe } from "ts-functional-pipe";
 import { Code } from "../display/Code.js";
 import { Text } from "../display/Text";

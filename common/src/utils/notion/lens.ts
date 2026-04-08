@@ -1,4 +1,4 @@
-import { Prism } from "../prism.js";
+import { Prism } from "../optics/prism.js";
 import { Block } from "./block.js";
 import * as RTF from "./rich-text.js";
 

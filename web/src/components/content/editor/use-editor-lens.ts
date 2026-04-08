@@ -1,6 +1,6 @@
 import { History } from "@notion-site/common/utils/history.js";
-import { Lens } from "@notion-site/common/utils/lens.js";
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
+import { Lens } from "@notion-site/common/utils/optics/lens.js";
 import { useMemo, useRef } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener";
 import { ExecCommand } from "./editor-command";

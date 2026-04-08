@@ -1,4 +1,4 @@
-import { Traversal } from "@notion-site/common/utils/traversal.js";
+import { Traversal } from "@notion-site/common/utils/optics/traversal.js";
 import { AnyBlock, ContentEditor } from "./types";
 import { useEditorLens } from "./use-editor-lens";
 
