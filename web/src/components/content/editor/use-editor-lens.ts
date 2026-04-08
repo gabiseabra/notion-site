@@ -1,4 +1,3 @@
-import { History } from "@notion-site/common/utils/history.js";
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { Lens } from "@notion-site/common/utils/optics/lens.js";
 import { useMemo, useRef } from "react";
@@ -116,20 +115,21 @@ export function useEditorLens<
       })(),
       revision: parent.revision,
 
-      history: History.map(
-        parent.history,
-        (parentBlocks) => {
-          const block = parentBlocks.find((b) => b.id === parentId);
-          return block ? lensRef.current.get(block) : [];
+      history: {
+        action: null,
+        get position() {
+          return parent.history.position;
         },
-        (childAction): EditorAction<TParent> => {
-          const parentBlock = parent.history
-            .snapshot()
-            .state.find((b) => b.id === parentId);
-          if (!parentBlock) return { type: "focus", block: { id: parentId } };
-          return liftAction(childAction, parentBlock);
+        get direction() {
+          return parent.history.direction;
         },
-      ),
+        undo(dryRun) {
+          parent.history.undo(dryRun);
+        },
+        redo(dryRun) {
+          parent.history.redo(dryRun);
+        },
+      },
 
       bus,
 

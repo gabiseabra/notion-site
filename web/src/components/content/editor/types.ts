@@ -1,5 +1,5 @@
 import { isNonNullable } from "@notion-site/common/utils/guards.js";
-import { IHistory } from "@notion-site/common/utils/history.js";
+import { ReadOnlyHistory } from "@notion-site/common/utils/history.js";
 import { EditorCommand } from "./editor-command";
 import type { EditorEventTarget } from "./editor-event.js";
 import { EditorAction } from "./editor-history.js";
@@ -45,7 +45,10 @@ export interface ContentEditor<TBlock extends AnyBlock> {
    * does not flush changesets, so any pending changeset actions will be overwritten.
    * Call `peek` first to trigger a flush before manipulating history.
    */
-  readonly history: IHistory<EditorAction<TBlock>, TBlock[]>;
+  readonly history: ReadOnlyHistory<EditorAction<TBlock>> & {
+    undo(dryRun?: boolean): void;
+    redo(dryRun?: boolean): void;
+  };
 
   /**
    * Emits lifecycle events.

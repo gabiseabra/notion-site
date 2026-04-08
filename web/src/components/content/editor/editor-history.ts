@@ -1,4 +1,7 @@
-import { hasNonNullableProperty } from "@notion-site/common/utils/guards.js";
+import {
+  hasNonNullableProperty,
+  isNonNullable,
+} from "@notion-site/common/utils/guards.js";
 import { History } from "@notion-site/common/utils/history.js";
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { match } from "ts-pattern";
@@ -108,6 +111,37 @@ export const EditorAction = {
     if (cmd.type !== "apply") return cmd.selectionAfter;
     return cmd.actions.filter(hasNonNullableProperty("selectionAfter")).pop()
       ?.selectionAfter;
+  },
+
+  preview<A extends AnyBlock, B extends AnyBlock>(
+    action: EditorAction<A>,
+    prism: { get: (s: A) => B | undefined },
+  ): EditorAction<B> | undefined {
+    switch (action.type) {
+      case "focus":
+        return undefined;
+      case "apply": {
+        const actions = action.actions
+          .flatMap((cmd) => {
+            const b = EditorAction.preview(cmd, prism);
+            return typeof b === "undefined" ? [] : EditorAction.flat([b]);
+          })
+          .filter(isNonNullable);
+
+        return NonEmpty.isNonEmpty(actions)
+          ? { ...action, actions }
+          : undefined;
+      }
+      case "split": {
+        const left = prism.get(action.left);
+        const right = prism.get(action.right);
+        return left && right ? { ...action, left, right } : undefined;
+      }
+      default: {
+        const block = prism.get(action.block);
+        return block ? { ...action, block } : undefined;
+      }
+    }
   },
 };
 

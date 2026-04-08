@@ -1,14 +1,10 @@
-export interface IHistory<Act, State> {
+export interface ReadOnlyHistory<Act> {
   readonly action: Act | null;
   readonly position: number;
   readonly direction: 1 | -1;
-  snapshot(): { state: State; position: number };
-  push(cmd: Act): void;
-  undo(dryRun?: boolean): boolean;
-  redo(dryRun?: boolean): boolean;
 }
 
-export class History<Act, State> implements IHistory<Act, State> {
+export class History<Act, State> implements ReadOnlyHistory<Act> {
   readonly actions: Act[] = [];
   private currentPosition = 0;
   private lastPosition = 0;
@@ -87,43 +83,5 @@ export class History<Act, State> implements IHistory<Act, State> {
     h.snapshots = new Map(base.snapshots);
 
     return h;
-  }
-
-  /**
-   * Creates a view of this history with a different state and action type.
-   * State is projected and actions are translated when pushed. The mapped
-   * history's bus fires the same events as the base.
-   * @experimental
-   */
-  static map<A, S, B, T>(
-    base: IHistory<A, S>,
-    mapState: (s: S) => T,
-    mapAction: (a: B) => A,
-  ): IHistory<B, T> {
-    return {
-      action: null,
-      get position() {
-        return base.position;
-      },
-      get direction() {
-        return base.direction;
-      },
-      snapshot() {
-        const snapshot = base.snapshot();
-        return {
-          state: mapState(snapshot.state),
-          position: snapshot.position,
-        };
-      },
-      push(b) {
-        base.push(mapAction(b));
-      },
-      undo(dryRun) {
-        return base.undo(dryRun);
-      },
-      redo(dryRun) {
-        return base.redo(dryRun);
-      },
-    };
   }
 }
