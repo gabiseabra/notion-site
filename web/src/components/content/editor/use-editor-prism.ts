@@ -1,4 +1,4 @@
-import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
+import { Iso } from "@notion-site/common/utils/iso.js";
 import { Prism } from "@notion-site/common/utils/prism.js";
 import { AnyBlock, ContentEditor } from "./types";
 import { useEditorLens } from "./use-editor-lens";
@@ -10,12 +10,15 @@ export function useEditorPrism<
   id,
   editor,
   prism,
-  join = ([block]) => block,
+  iso = {
+    view: (block) => [block],
+    review: ([block]) => block,
+  },
 }: {
   id: TParent["id"];
   editor: ContentEditor<TParent>;
   prism: Prism<TParent, TBlock>;
-  join?: (blocks: NonEmpty<TBlock>) => TBlock;
+  iso?: Iso<TBlock, TBlock[]>;
 }) {
   return useEditorLens({
     id,
@@ -23,12 +26,10 @@ export function useEditorPrism<
     lens: {
       get: (parent) => {
         const a = prism.get(parent);
-        return a !== undefined ? [a] : [];
+        return typeof a !== "undefined" ? iso.view(a) : [];
       },
       set: (parent, blocks) => {
-        return NonEmpty.isNonEmpty(blocks)
-          ? prism.set(parent, join(blocks))
-          : parent;
+        return prism.set(parent, iso.review(blocks));
       },
     },
   });
