@@ -1,5 +1,6 @@
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { Lens } from "@notion-site/common/utils/optics/lens.js";
+import { Prism } from "@notion-site/common/utils/optics/prism.js";
 import { useMemo, useRef } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener";
 import { ExecCommand } from "./editor-command";
@@ -75,10 +76,12 @@ export function useEditorLens<
   id: parentId,
   editor: parent,
   lens,
+  prism,
 }: {
   id: TParent["id"];
   editor: ContentEditor<TParent>;
   lens: Lens<TParent, TBlock[]>;
+  prism?: Prism<TParent, TBlock>;
 }) {
   // const isReadyRef = useRef(false);
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
@@ -116,7 +119,14 @@ export function useEditorLens<
       revision: parent.revision,
 
       history: {
-        action: null,
+        get action() {
+          return (
+            (prism &&
+              parent.history.action &&
+              EditorAction.preview(parent.history.action, prism)) ??
+            null
+          );
+        },
         get position() {
           return parent.history.position;
         },

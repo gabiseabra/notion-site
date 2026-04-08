@@ -23,6 +23,7 @@ export function useEditorPrism<
   return useEditorLens({
     id,
     editor,
+    prism,
     lens: {
       get: (parent) => {
         const a = prism.get(parent);
