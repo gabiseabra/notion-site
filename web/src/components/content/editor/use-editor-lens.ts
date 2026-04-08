@@ -98,6 +98,14 @@ export function useEditorLens<
     childAction: EditorAction<TBlock>,
     parentBlock: TParent,
   ): EditorAction<TParent> => {
+    if (childAction.type === "focus") {
+      return {
+        type: "focus",
+        block: { id: parentId },
+        selectionBefore: childAction.selectionBefore,
+        selectionAfter: childAction.selectionAfter,
+      };
+    }
     const flatCmds = EditorAction.flat(NonEmpty.create(childAction));
     const newChildBlocks = applyActions(
       lensRef.current.get(parentBlock),

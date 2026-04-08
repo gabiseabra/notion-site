@@ -14,12 +14,6 @@ import { AnyBlock } from "./types.js";
  */
 export type EditorActionCmd<TBlock extends AnyBlock> =
   | {
-      type: "focus";
-      block: { id: TBlock["id"] };
-      selectionBefore?: SelectionRange;
-      selectionAfter?: SelectionRange;
-    }
-  | {
       type: "update";
       block: TBlock;
       selectionBefore?: SelectionRange;
@@ -46,7 +40,13 @@ interface EditorActionBatch<TBlock extends AnyBlock> {
 
 export type EditorAction<TBlock extends AnyBlock> =
   | EditorActionBatch<TBlock>
-  | EditorActionCmd<TBlock>;
+  | EditorActionCmd<TBlock>
+  | {
+      type: "focus";
+      block: { id: TBlock["id"] };
+      selectionBefore?: SelectionRange;
+      selectionAfter?: SelectionRange;
+    };
 
 export const EditorAction = {
   /**
@@ -81,11 +81,15 @@ export const EditorAction = {
 
   flat<TBlock extends AnyBlock>([cmd, ...cmds]: NonEmpty<
     EditorAction<TBlock>
-  >): NonEmpty<EditorActionCmd<TBlock>> {
-    return NonEmpty.merge(
-      cmd.type === "apply" ? EditorAction.flat(cmd.actions) : ([cmd] as const),
-      NonEmpty.isNonEmpty(cmds) ? EditorAction.flat(cmds) : [],
-    );
+  >): EditorActionCmd<TBlock>[] {
+    return [
+      ...(cmd.type === "apply"
+        ? EditorAction.flat(cmd.actions)
+        : cmd.type === "focus"
+          ? []
+          : [cmd]),
+      ...(NonEmpty.isNonEmpty(cmds) ? EditorAction.flat(cmds) : []),
+    ];
   },
 
   /** @deprecated */
@@ -119,7 +123,7 @@ export const EditorAction = {
   ): EditorAction<B> | undefined {
     switch (action.type) {
       case "focus":
-        return undefined;
+        return action;
       case "apply": {
         const actions = action.actions
           .flatMap((cmd) => {
