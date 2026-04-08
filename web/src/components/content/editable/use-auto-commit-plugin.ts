@@ -47,9 +47,7 @@ export const useAutoCommitPlugin =
         editor.commit(data);
       };
 
-      if (typeof options?.debounceMs === "number")
-        commitTimeoutRef.current = window.setTimeout(task, options.debounceMs);
-      else queueMicrotask(task);
+      commitTimeoutRef.current = window.setTimeout(task, options?.debounceMs);
     };
 
     return () => ({
