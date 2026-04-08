@@ -101,7 +101,7 @@ export const useUpdateInlineMutationPlugin =
     });
   };
 
-useUpdateInlineMutationPlugin.ChangeData = class SyncInlineMutationChangeData {};
+useUpdateInlineMutationPlugin.ChangeData = class UpdateInlineMutationPluginChangeData {};
 
 /**
  * Plugin that handles text input via the native `beforeinput` in batched mode.
