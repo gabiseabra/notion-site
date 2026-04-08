@@ -42,7 +42,7 @@ export const useTextPlugin = ({
 }: TextPluginOptions = {}) =>
   composePlugins<TextBlock>(
     useLoggerPlugin(createLogger(logging)),
-    useHistoryPlugin({ restore: "commit" }),
+    useHistoryPlugin(),
     useInlineMutationPlugin({
       debounceMs: false,
       splice: TextBlock.splice,

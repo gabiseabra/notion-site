@@ -39,7 +39,7 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
 
     discard();
 
-    const id = EditorAction.id(action, 1);
+    const { id } = EditorAction.targetAfter(action);
     const blockEl = editor.ref(id).element;
     const selection = blockEl && SelectionRange.read(blockEl);
     const selectionAfter = EditorAction.selectionAfter(action);
@@ -67,7 +67,7 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
 
   const push = useCallback(
     (action: EditorActionCmd<TBlock>) => {
-      const id = EditorAction.id(action, 1);
+      const { id } = EditorAction.targetAfter(action);
 
       if (!id) return;
 

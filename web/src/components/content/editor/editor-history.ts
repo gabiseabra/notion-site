@@ -4,9 +4,8 @@ import {
 } from "@notion-site/common/utils/guards.js";
 import { History } from "@notion-site/common/utils/history.js";
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
-import { match } from "ts-pattern";
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { AnyBlock } from "./types.js";
+import { AnyBlock, ID } from "./types.js";
 
 /**
  * Commands for history tracking. Each command can be applied forward
@@ -16,6 +15,7 @@ export type EditorActionCmd<TBlock extends AnyBlock> =
   | {
       type: "update";
       block: TBlock;
+      childId?: ID;
       selectionBefore?: SelectionRange;
       selectionAfter?: SelectionRange;
     }
@@ -44,41 +44,12 @@ export type EditorAction<TBlock extends AnyBlock> =
   | {
       type: "focus";
       block: { id: TBlock["id"] };
+      childId?: ID;
       selectionBefore?: SelectionRange;
       selectionAfter?: SelectionRange;
     };
 
 export const EditorAction = {
-  /**
-   * Get the target block id of the selection going in the given direction
-   * @note selection will be restored on history events in the following order:
-   * - undo: first non-empty { selectionBefore, block: { id } }
-   * - redo: last non-empty { selectionAfter, block: { id } }
-   */
-  id<TBlock extends AnyBlock>(
-    cmd: EditorAction<TBlock>,
-    direction: 1 | -1,
-  ): TBlock["id"] {
-    return match(cmd)
-      .with({ type: "apply" }, (cmd) =>
-        EditorAction.id(
-          direction === 1
-            ? ([...cmd.actions]
-                .reverse()
-                .find(hasNonNullableProperty("selectionAfter")) ??
-                cmd.actions[cmd.actions.length - 1])
-            : (cmd.actions.find(hasNonNullableProperty("selectionBefore")) ??
-                cmd.actions[0]),
-          direction,
-        ),
-      )
-      .with(
-        { type: "split" },
-        (cmd) => cmd[direction === -1 ? "left" : "right"].id,
-      )
-      .otherwise((cmd) => cmd.block.id);
-  },
-
   flat<TBlock extends AnyBlock>([cmd, ...cmds]: NonEmpty<
     EditorAction<TBlock>
   >): EditorActionCmd<TBlock>[] {
@@ -92,13 +63,44 @@ export const EditorAction = {
     ];
   },
 
-  /** @deprecated */
-  selection<TBlock extends AnyBlock>(
+  targetBefore<TBlock extends AnyBlock>(
     cmd: EditorAction<TBlock>,
-    direction: 1 | -1,
-  ): SelectionRange | undefined {
-    if (direction === -1) return EditorAction.selectionBefore(cmd);
-    else return EditorAction.selectionAfter(cmd);
+  ): { id: TBlock["id"]; childId?: ID } {
+    switch (cmd.type) {
+      case "apply":
+        return EditorAction.targetBefore(
+          cmd.actions.find(hasNonNullableProperty("selectionBefore")) ??
+            cmd.actions[0],
+        );
+      case "split":
+        return { id: cmd.left.id };
+      case "update":
+      case "focus":
+        return { id: cmd.block.id, childId: cmd.childId };
+      default:
+        return { id: cmd.block.id };
+    }
+  },
+
+  targetAfter<TBlock extends AnyBlock>(
+    cmd: EditorAction<TBlock>,
+  ): { id: TBlock["id"]; childId?: ID } {
+    switch (cmd.type) {
+      case "apply":
+        return EditorAction.targetBefore(
+          [...cmd.actions]
+            .reverse()
+            .find(hasNonNullableProperty("selectionAfter")) ??
+            cmd.actions[cmd.actions.length - 1],
+        );
+      case "split":
+        return { id: cmd.right.id };
+      case "update":
+      case "focus":
+        return { id: cmd.block.id, childId: cmd.childId };
+      default:
+        return { id: cmd.block.id };
+    }
   },
 
   selectionBefore<TBlock extends AnyBlock>(

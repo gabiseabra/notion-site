@@ -15,27 +15,31 @@ import { AnyContentEditorPlugin } from "./types.js";
  * | `Ctrl+Y` | `Cmd+Y`: Redo (alternative)
  */
 export const useHistoryPlugin =
-  (options?: {
-    restore?: "postcommit" | "commit" | false;
-  }): AnyContentEditorPlugin =>
+  (options?: { restoreDisabled?: boolean }): AnyContentEditorPlugin =>
   (editor) => {
-    const restoreEvent = !options?.restore ? "ready" : options.restore;
-
-    useEventListener(editor.bus, restoreEvent, ({ editor }) => {
-      if (!options?.restore) return;
+    useEventListener(editor.bus, "postcommit", ({ editor }) => {
+      if (options?.restoreDisabled) return;
 
       const direction = editor.history.direction;
       const cmd = editor.history.action;
 
       if (!cmd) return;
 
-      const id = EditorAction.id(cmd, direction);
-      const selection = EditorAction.selection(cmd, direction);
+      const { id, childId } =
+        direction === 1
+          ? EditorAction.targetAfter(cmd)
+          : EditorAction.targetBefore(cmd);
+      const selection =
+        direction === 1
+          ? EditorAction.selectionAfter(cmd)
+          : EditorAction.selectionBefore(cmd);
       const { element } = editor.ref(id);
       const currentSelection = element && SelectionRange.read(element);
 
+      if (childId) return;
+
       if (!selection) {
-        console.warn(`Failed to restore selection on ${restoreEvent}.`, {
+        console.warn(`Failed to restore selection on postcommit.`, {
           id,
           cmd,
           direction,

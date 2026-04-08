@@ -102,6 +102,7 @@ export function useEditorLens<
       return {
         type: "focus",
         block: { id: parentId },
+        childId: childAction.block.id,
         selectionBefore: childAction.selectionBefore,
         selectionAfter: childAction.selectionAfter,
       };
@@ -114,6 +115,7 @@ export function useEditorLens<
     return {
       type: "update",
       block: lensRef.current.set(parentBlock, newChildBlocks),
+      childId: EditorAction.targetAfter(childAction).id,
       selectionBefore: EditorAction.selectionBefore(childAction),
       selectionAfter: EditorAction.selectionAfter(childAction),
     };
@@ -131,12 +133,31 @@ export function useEditorLens<
 
       history: {
         get action() {
-          return (
+          const parentAction = parent.history.action;
+          const action =
             (prismRef.current &&
-              parent.history.action &&
-              EditorAction.preview(parent.history.action, prismRef.current)) ??
-            null
-          );
+              parentAction &&
+              EditorAction.preview(parentAction, prismRef.current)) ??
+            null;
+          const { id, childId } = parentAction
+            ? EditorAction.targetAfter(parentAction)
+            : {};
+
+          if (
+            !parentAction ||
+            !action ||
+            !childId ||
+            id !== parentId ||
+            !editorRef.current?.blocks.some((b) => b.id === childId)
+          ) {
+            return null;
+          }
+
+          if (action.type === "focus" || action.type === "update") {
+            delete action.childId;
+          }
+
+          return action;
         },
         get position() {
           return parent.history.position;

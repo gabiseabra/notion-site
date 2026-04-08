@@ -31,7 +31,7 @@ export const useNotionPlugin = ({
       disabled: autoCommit === false,
       debounceMs: typeof autoCommit === "number" ? autoCommit : undefined,
     }),
-    useHistoryPlugin({ restore: "postcommit" }),
+    useHistoryPlugin(),
     useInlineMutationPlugin({
       // disable processing Enter to let block split handle it
       disabled: ({ event }) => !inline && event.inputType === "insertParagraph",
