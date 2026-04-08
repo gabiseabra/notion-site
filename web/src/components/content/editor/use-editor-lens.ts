@@ -188,6 +188,17 @@ export function useEditorLens<
       },
 
       commit(data) {
+        if (!editorRef.current) return;
+
+        const event = new EditorEvent("commit", editorRef.current, {
+          blocks: editorRef.current.blocks,
+          revision: editorRef.current.revision,
+          data,
+        });
+        bus.dispatchTypedEvent("commit", event);
+
+        if (event.defaultPrevented) return;
+
         parent.commit(data);
       },
 
