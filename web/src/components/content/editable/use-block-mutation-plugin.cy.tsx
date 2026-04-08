@@ -16,9 +16,7 @@ function TestEditor({
     onCommit: onChange,
   });
 
-  return (
-    <Editor editor={editor} options={{ autoCommit: 200, multiLine: true }} />
-  );
+  return <Editor editor={editor} options={{ autoCommit: 200 }} />;
 }
 
 describe("useBlockMutationPlugin", () => {

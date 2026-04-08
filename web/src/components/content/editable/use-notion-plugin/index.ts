@@ -15,13 +15,13 @@ import { useNotionOrphanagePlugin } from "./use-notion-orphanage-plugin.js";
 import { useNotionPrefixPlugin } from "./use-notion-prefix-plugin.js";
 
 export type NotionPluginOptions = {
-  multiLine?: boolean;
+  inline?: boolean;
   logging?: boolean | "verbose";
   autoCommit?: number | boolean;
 };
 
 export const useNotionPlugin = ({
-  multiLine = true,
+  inline = false,
   autoCommit = 600,
   logging = env.DEV,
 }: NotionPluginOptions = {}) =>
@@ -33,7 +33,9 @@ export const useNotionPlugin = ({
     }),
     useHistoryPlugin(),
     useInlineMutationPlugin({
-      multiLine: multiLine,
+      // disable processing Enter to let block split handle it
+      disabled: (_id, _editor, event) =>
+        !inline && event.inputType === "insertParagraph",
       splice(block, ...params) {
         return Notion.Block.mapRichText(block, (rich_text) =>
           Notion.RTF.splice(rich_text, ...params),
@@ -46,7 +48,7 @@ export const useNotionPlugin = ({
     useBlockMutationPlugin({
       merge(left, right) {
         if (
-          !multiLine ||
+          inline ||
           !Notion.Block.isRichText(left) ||
           !Notion.Block.isRichText(right)
         )
@@ -61,7 +63,7 @@ export const useNotionPlugin = ({
         }));
       },
       split(block, offset, deleteRange) {
-        if (!multiLine || !Notion.Block.isRichText(block)) return null;
+        if (inline || !Notion.Block.isRichText(block)) return null;
 
         return Notion.Block.split(block, offset, deleteRange);
       },

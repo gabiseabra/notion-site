@@ -15,12 +15,10 @@ function TestEditor({
   ref,
   value,
   onChange,
-  multiLine,
 }: {
   ref: Ref<Editor>;
   value: Notion.Block[];
   onChange: (block: Notion.Block[]) => void;
-  multiLine?: boolean;
 }) {
   const editor = useContentEditor({
     initialValue: value,
@@ -29,7 +27,7 @@ function TestEditor({
 
   useImperativeHandle(ref, () => editor, [editor]);
 
-  return <Editor editor={editor} options={{ autoCommit: 200, multiLine }} />;
+  return <Editor editor={editor} options={{ autoCommit: 200, inline: true }} />;
 }
 
 describe("useInlineMutationPlugin", () => {

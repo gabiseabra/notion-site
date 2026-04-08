@@ -33,7 +33,6 @@ export const TextBlock = {
 };
 
 export type TextPluginOptions = {
-  inline?: boolean;
   autoCommit?: number | boolean;
   logging?: boolean | "verbose";
 };
@@ -42,11 +41,7 @@ export type TextPluginOptions = {
  * ContentEditor plugin stack for plain text blocks.
  */
 export const useTextPlugin =
-  ({
-    inline = true,
-    autoCommit = true,
-    logging = env.DEV,
-  }: TextPluginOptions = {}) =>
+  ({ autoCommit = true, logging = env.DEV }: TextPluginOptions = {}) =>
   (editor: ContentEditor<TextBlock>) =>
     composePlugins<TextBlock>(
       useLoggerPlugin(createLogger(logging)),
@@ -56,7 +51,6 @@ export const useTextPlugin =
       }),
       useHistoryPlugin(),
       useInlineMutationPlugin({
-        multiLine: !inline,
         splice: TextBlock.splice,
         update: ({ id }, value) => ({ id, value }),
       }),

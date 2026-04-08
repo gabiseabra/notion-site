@@ -18,39 +18,37 @@ import { ContentEditorPlugin } from "./types.js";
  *   `update` function is provided).
  */
 export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
-  multiLine,
-  isNewLine = (event) =>
-    event.inputType === "insertLineBreak" ||
-    (!multiLine && event.inputType === "insertParagraph"),
   debounceMs = 200,
   splice,
   update = (b) => b,
+  disabled = () => false,
 }: {
-  multiLine?: boolean;
-  isNewLine?: (event: globalThis.InputEvent) => boolean;
   debounceMs?: number | false;
   splice: Splice<TBlock>;
   /** If present, prefer reacting to onChange event when the target is a input
    * or textarea element */
   update?: Update<TBlock>;
+  /** Disable event handlers. */
+  disabled?: DisabledSlot<TBlock>;
 }) => {
-  const method = (id: TBlock["id"], editor: ContentEditor<TBlock>) =>
-    !!update &&
-    (editor.ref(id).element instanceof HTMLInputElement ||
-      editor.ref(id).element instanceof HTMLTextAreaElement)
-      ? ("update" as const)
-      : ("splice" as const);
+  const isMethodDisabled =
+    (method: "update" | "splice"): DisabledSlot<TBlock> =>
+    (id, editor) =>
+      !!update &&
+      (editor.ref(id).element instanceof HTMLInputElement ||
+      editor.ref(id).element instanceof HTMLTextAreaElement
+        ? "update"
+        : "splice") !== method;
 
   return composePlugins<TBlock>(
     useSpliceInlineMutationPlugin({
-      isNewLine,
       splice,
       debounceMs,
-      disabled: Slot.map(method, (method) => method !== "splice"),
+      disabled: Slot.some([isMethodDisabled("splice"), disabled]),
     }),
     useUpdateInlineMutationPlugin({
       update,
-      disabled: Slot.map(method, (method) => method !== "update"),
+      disabled: Slot.some([isMethodDisabled("update"), disabled]),
     }),
   );
 };
@@ -77,19 +75,18 @@ export const useUpdateInlineMutationPlugin =
         selectionBeforeRef.current = SelectionRange.read(event.currentTarget);
       },
       onInput(event) {
-        if (
-          Slot.extract(disabled, block.id, editor) ||
-          !(
-            event.currentTarget instanceof HTMLInputElement ||
-            event.currentTarget instanceof HTMLTextAreaElement
-          )
-        )
-          return;
+        if (Slot.extract(disabled, block.id, editor, event.nativeEvent)) return;
 
         editor.push({
           data: new useUpdateInlineMutationPlugin.ChangeData(),
           type: "update",
-          block: update(block, event.currentTarget.value),
+          block: update(
+            block,
+            event.currentTarget instanceof HTMLInputElement ||
+              event.currentTarget instanceof HTMLTextAreaElement
+              ? event.currentTarget.value
+              : (event.currentTarget.textContent ?? ""),
+          ),
           selectionBefore: selectionBeforeRef.current ?? undefined,
           selectionAfter: SelectionRange.read(event.currentTarget) ?? undefined,
         });
@@ -110,19 +107,17 @@ useUpdateInlineMutationPlugin.ChangeData = class SyncInlineMutationChangeData {}
 export const useSpliceInlineMutationPlugin = <TBlock extends AnyBlock>({
   disabled,
   debounceMs = 200,
-  isNewLine,
   splice,
 }: {
   disabled?: DisabledSlot<TBlock>;
   debounceMs?: number | false;
-  isNewLine: (event: globalThis.InputEvent) => boolean;
   splice: Splice<TBlock>;
 }): ContentEditorPlugin<TBlock> =>
   createEventListenerPlugin("beforeinput", (editor) => {
     const changeset = useDebouncedEditorChangeset(editor, debounceMs);
 
     return (block) => (e) => {
-      if (Slot.extract(disabled, block.id, editor)) return;
+      if (Slot.extract(disabled, block.id, editor, e)) return;
       if (!(e.target instanceof HTMLElement)) return;
 
       const currentBlock = changeset.peek(block.id);
@@ -138,11 +133,6 @@ export const useSpliceInlineMutationPlugin = <TBlock extends AnyBlock>({
       );
 
       if (!spliceRange) return;
-
-      if (spliceRange.insert === "\n" && !isNewLine(e)) {
-        e.preventDefault();
-        return;
-      }
 
       changeset.push({
         type: "update",
@@ -172,5 +162,5 @@ export type Update<TBlock> = (block: TBlock, value: string) => TBlock;
 type DisabledSlot<TBlock extends AnyBlock> = Slot<
   boolean,
   TBlock["id"],
-  [ContentEditor<TBlock>]
+  [ContentEditor<TBlock>, InputEvent]
 >;

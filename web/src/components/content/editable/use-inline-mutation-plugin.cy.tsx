@@ -7,18 +7,18 @@ import { useContentEditor } from "../editor/use-content-editor";
 function TestEditor({
   value,
   onChange,
-  multiLine = false,
+  inline,
 }: {
   value: Notion.Block[];
   onChange: (block: Notion.Block[]) => void;
-  multiLine?: boolean;
+  inline: boolean;
 }) {
   const editor = useContentEditor({
     initialValue: value,
     onCommit: onChange,
   });
 
-  return <Editor editor={editor} options={{ autoCommit: 200, multiLine }} />;
+  return <Editor editor={editor} options={{ autoCommit: 200, inline }} />;
 }
 
 describe("useInlineMutationPlugin", () => {
@@ -26,7 +26,7 @@ describe("useInlineMutationPlugin", () => {
     const onChange = cy.stub().as("onChange");
 
     cy.mount(
-      <TestEditor value={[p("a", span("Hello"))]} onChange={onChange} />,
+      <TestEditor inline value={[p("a", span("Hello"))]} onChange={onChange} />,
     );
 
     cy.get("p").click().type("{end} World").should("have.text", "Hello World");
@@ -39,7 +39,7 @@ describe("useInlineMutationPlugin", () => {
   });
 
   it("inserts newline into the palceholder span", () => {
-    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
+    cy.mount(<TestEditor inline value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p")
       .click()
@@ -55,7 +55,7 @@ describe("useInlineMutationPlugin", () => {
 
   it("inserts newline at the end of a rich-text span", () => {
     cy.mount(
-      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+      <TestEditor inline value={[p("a", span("Hello"))]} onChange={() => {}} />,
     );
 
     cy.get("p")
@@ -69,7 +69,7 @@ describe("useInlineMutationPlugin", () => {
   });
 
   it("handles type characters then backspace some", () => {
-    cy.mount(<TestEditor value={[p("a")]} onChange={() => {}} />);
+    cy.mount(<TestEditor inline value={[p("a")]} onChange={() => {}} />);
 
     cy.get("p").click().type("Hello World").should("have.text", "Hello World");
 
@@ -82,7 +82,11 @@ describe("useInlineMutationPlugin", () => {
 
   it("selects text then types to replace it", () => {
     cy.mount(
-      <TestEditor value={[p("a", span("Hello World"))]} onChange={() => {}} />,
+      <TestEditor
+        inline
+        value={[p("a", span("Hello World"))]}
+        onChange={() => {}}
+      />,
     );
 
     cy.get("p")
@@ -93,7 +97,11 @@ describe("useInlineMutationPlugin", () => {
 
   it("selects text then deletes it", () => {
     cy.mount(
-      <TestEditor value={[p("a", span("Hello World"))]} onChange={() => {}} />,
+      <TestEditor
+        inline
+        value={[p("a", span("Hello World"))]}
+        onChange={() => {}}
+      />,
     );
 
     cy.get("p").click().type("{selectAll}{del}").should("have.text", "");
@@ -101,7 +109,11 @@ describe("useInlineMutationPlugin", () => {
 
   it("inserts text via execCommand (simulates paste)", () => {
     cy.mount(
-      <TestEditor value={[p("a", span("Before "))]} onChange={() => {}} />,
+      <TestEditor
+        inline
+        value={[p("a", span("Before "))]}
+        onChange={() => {}}
+      />,
     );
 
     cy.get("p").click().type("{end}");
@@ -116,7 +128,7 @@ describe("useInlineMutationPlugin", () => {
   it("flushes pending changes before block split", () => {
     cy.mount(
       <TestEditor
-        multiLine
+        inline={false}
         value={[p("a", span("Initial"))]}
         onChange={() => {}}
       />,
@@ -132,7 +144,11 @@ describe("useInlineMutationPlugin", () => {
 
   it("keeps current selection after inline flush", () => {
     cy.mount(
-      <TestEditor value={[p("a", span("Line 1"))]} onChange={() => {}} />,
+      <TestEditor
+        inline
+        value={[p("a", span("Line 1"))]}
+        onChange={() => {}}
+      />,
     );
 
     cy.get("p")
