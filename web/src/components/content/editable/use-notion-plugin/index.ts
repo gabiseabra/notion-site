@@ -34,8 +34,7 @@ export const useNotionPlugin = ({
     useHistoryPlugin(),
     useInlineMutationPlugin({
       // disable processing Enter to let block split handle it
-      disabled: (_id, _editor, event) =>
-        !inline && event.inputType === "insertParagraph",
+      disabled: ({ event }) => !inline && event.inputType === "insertParagraph",
       splice(block, ...params) {
         return Notion.Block.mapRichText(block, (rich_text) =>
           Notion.RTF.splice(rich_text, ...params),

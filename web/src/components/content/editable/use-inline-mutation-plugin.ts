@@ -33,7 +33,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
 }) => {
   const isMethodDisabled =
     (method: "update" | "splice"): DisabledSlot<TBlock> =>
-    (id, editor) =>
+    ({ id, editor }) =>
       !!update &&
       (editor.ref(id).element instanceof HTMLInputElement ||
       editor.ref(id).element instanceof HTMLTextAreaElement
@@ -75,7 +75,14 @@ export const useUpdateInlineMutationPlugin =
         selectionBeforeRef.current = SelectionRange.read(event.currentTarget);
       },
       onInput(event) {
-        if (Slot.extract(disabled, block.id, editor, event.nativeEvent)) return;
+        if (
+          Slot.extract(disabled, {
+            id: block.id,
+            editor,
+            event: event.nativeEvent,
+          })
+        )
+          return;
 
         editor.push({
           data: new useUpdateInlineMutationPlugin.ChangeData(),
@@ -116,19 +123,19 @@ export const useSpliceInlineMutationPlugin = <TBlock extends AnyBlock>({
   createEventListenerPlugin("beforeinput", (editor) => {
     const changeset = useDebouncedEditorChangeset(editor, debounceMs);
 
-    return (block) => (e) => {
-      if (Slot.extract(disabled, block.id, editor, e)) return;
-      if (!(e.target instanceof HTMLElement)) return;
+    return (block) => (event) => {
+      if (Slot.extract(disabled, { id: block.id, editor, event })) return;
+      if (!(event.target instanceof HTMLElement)) return;
 
       const currentBlock = changeset.peek(block.id);
-      const actualSelection = SelectionRange.read(e.target);
+      const actualSelection = SelectionRange.read(event.target);
 
       if (!actualSelection || !currentBlock) return;
 
       const selectionBefore = changeset.selectionAfter ?? actualSelection;
       const spliceRange = SpliceRange.fromInputEvent(
-        e,
-        e.target.textContent ?? "",
+        event,
+        event.target.textContent ?? "",
         selectionBefore,
       );
 
@@ -161,6 +168,9 @@ export type Update<TBlock> = (block: TBlock, value: string) => TBlock;
 
 type DisabledSlot<TBlock extends AnyBlock> = Slot<
   boolean,
-  TBlock["id"],
-  [ContentEditor<TBlock>, InputEvent]
+  {
+    id: TBlock["id"];
+    editor: ContentEditor<TBlock>;
+    event: InputEvent;
+  }
 >;

@@ -1,47 +1,30 @@
 import { isTruthy } from "@notion-site/common/utils/guards.js";
 
-export type Slot<T, S = void, Args extends unknown[] = []> =
-  | T
-  | ((value: S, ...args: Args) => T);
+export type Slot<T, S = void> = T | ((value: S) => T);
 
 export const Slot = {
-  extract<T, S, Args extends unknown[]>(
-    slot: Slot<T, S, Args>,
-    value: S,
-    ...args: Args
-  ) {
-    if (slot instanceof Function) return slot(value, ...args);
+  extract<T, S>(slot: Slot<T, S>, value: S) {
+    if (slot instanceof Function) return slot(value);
     return slot;
   },
 
-  map<A, B, S, Args extends unknown[]>(
-    slot: Slot<A, S, Args>,
-    f: (a: A, ...args: Args) => B,
-  ): Slot<B, S, Args> {
-    return (s, ...args) => f(Slot.extract(slot, s, ...args), ...args);
+  map<A, B, S>(slot: Slot<A, S>, f: (a: A) => B): Slot<B, S> {
+    return (s) => f(Slot.extract(slot, s));
   },
 
-  compose<A, B, S, Args extends unknown[]>(
-    first: Slot<A, S, Args>,
-    second: Slot<B, A, Args>,
-  ): Slot<B, S, Args> {
-    return (s, ...args) =>
-      Slot.extract(second, Slot.extract(first, s, ...args), ...args);
+  compose<A, B, S>(first: Slot<A, S>, second: Slot<B, A>): Slot<B, S> {
+    return (s) => Slot.extract(second, Slot.extract(first, s));
   },
 
-  join<A, S, Args extends unknown[]>(
-    slots: Slot<A, S, Args>[],
-    f: (as: A[]) => A,
-  ): Slot<A, S, Args> {
-    return (s, ...args) =>
-      f(slots.map((slot) => Slot.extract(slot, s, ...args)));
+  join<A, S>(slots: Slot<A, S>[], f: (as: A[]) => A): Slot<A, S> {
+    return (s) => f(slots.map((slot) => Slot.extract(slot, s)));
   },
 
-  every<S, Args extends unknown[]>(slots: Slot<boolean, S, Args>[]) {
+  every<S>(slots: Slot<boolean, S>[]) {
     return Slot.join(slots, (as) => as.every(isTruthy));
   },
 
-  some<S, Args extends unknown[]>(slots: Slot<boolean, S, Args>[]) {
+  some<S>(slots: Slot<boolean, S>[]) {
     return Slot.join(slots, (as) => as.some(isTruthy));
   },
 };
