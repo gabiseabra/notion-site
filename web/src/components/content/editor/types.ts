@@ -45,7 +45,7 @@ export interface ContentEditor<TBlock extends AnyBlock> {
    * does not flush changesets, so any pending changeset actions will be overwritten.
    * Call `peek` first to trigger a flush before manipulating history.
    */
-  readonly history: ReadOnlyHistory<EditorAction<TBlock>> & {
+  readonly history: ReadOnlyHistory<EditorAction<TBlock>, TBlock[]> & {
     undo(dryRun?: boolean): void;
     redo(dryRun?: boolean): void;
   };

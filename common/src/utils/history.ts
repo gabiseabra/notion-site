@@ -1,10 +1,11 @@
-export interface ReadOnlyHistory<Act> {
+export interface ReadOnlyHistory<Act, State> {
   readonly action: Act | null;
   readonly position: number;
   readonly direction: 1 | -1;
+  getState(): State;
 }
 
-export class History<Act, State> implements ReadOnlyHistory<Act> {
+export class History<Act, State> implements ReadOnlyHistory<Act, State> {
   readonly actions: Act[] = [];
   private currentPosition = 0;
   private lastPosition = 0;

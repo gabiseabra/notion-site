@@ -93,7 +93,7 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
 
       return (
         applyActions(
-          editor.history.snapshot().state,
+          editor.history.getState(),
           ...changesetRef.current.actions,
         ).find((b) => b.id === id) ?? null
       );

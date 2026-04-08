@@ -90,6 +90,9 @@ export function useEditorLens<
   const lensRef = useRef(lens);
   lensRef.current = lens;
 
+  const prismRef = useRef(prism);
+  prismRef.current = prism;
+
   /** Translates a child action into a parent action via the lens. */
   const liftAction = (
     childAction: EditorAction<TBlock>,
@@ -121,9 +124,9 @@ export function useEditorLens<
       history: {
         get action() {
           return (
-            (prism &&
+            (prismRef.current &&
               parent.history.action &&
-              EditorAction.preview(parent.history.action, prism)) ??
+              EditorAction.preview(parent.history.action, prismRef.current)) ??
             null
           );
         },
@@ -132,6 +135,12 @@ export function useEditorLens<
         },
         get direction() {
           return parent.history.direction;
+        },
+        getState() {
+          const block = parent.history
+            .getState()
+            .find((b) => b.id === parentId);
+          return block ? lensRef.current.get(block) : [];
         },
         undo(dryRun) {
           parent.history.undo(dryRun);
