@@ -81,6 +81,7 @@ export function useEditorLens<
   editor: ContentEditor<TParent>;
   lens: Lens<TParent, TBlock[]>;
 }) {
+  // const isReadyRef = useRef(false);
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
   const editorRef = useRef<ContentEditor<TBlock>>(null);
 
@@ -206,17 +207,30 @@ export function useEditorLens<
 
   // notify event listeners
   useEventListener(parent.bus, "ready", (event) =>
-    editor.bus.dispatchTypedEvent(
-      event.eventType,
-      new EditorEvent("ready", editor, {}),
+    queueMicrotask(() =>
+      editor.bus.dispatchTypedEvent(
+        event.eventType,
+        new EditorEvent("ready", editor, {}),
+      ),
     ),
   );
   useEventListener(parent.bus, "postcommit", (event) =>
-    editor.bus.dispatchTypedEvent(
-      event.eventType,
-      new EditorEvent("postcommit", editor, {}),
+    queueMicrotask(() =>
+      editor.bus.dispatchTypedEvent(
+        event.eventType,
+        new EditorEvent("postcommit", editor, {}),
+      ),
     ),
   );
+
+  // useEffect(() => {
+  //   const event = !isReadyRef.current
+  //     ? new EditorEvent("ready", editor, {})
+  //     : new EditorEvent("postcommit", editor, {});
+
+  //   editor.bus.dispatchTypedEvent(event.eventType, event);
+  //   isReadyRef.current = true;
+  // }, [editor]);
 
   return editor;
 }
