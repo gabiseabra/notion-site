@@ -16,12 +16,7 @@ export type CodeEditorProps = {
   placeholder?: string;
 };
 
-const useCodePlugin = composePlugins(
-  useTextPlugin({
-    autoCommit: true,
-  }),
-  useTextIndentPlugin(),
-);
+const useCodePlugin = composePlugins(useTextPlugin(), useTextIndentPlugin());
 
 export const CodeEditor = memo(function CodeEditor({
   id,
