@@ -1,4 +1,6 @@
+import { runGenerator } from "@notion-site/common/utils/generator.js";
 import { TextBlock } from ".";
+import { getLines } from "../../../../utils/code";
 import { SelectionRange } from "../../../../utils/selection-range";
 import { SpliceRange } from "../../../../utils/splice-range";
 import { ContentEditorPlugin } from "../types";
@@ -120,52 +122,3 @@ export const useTextIndentPlugin =
       editor.commit();
     },
   });
-
-useTextIndentPlugin.normalize = function normalizeIndent(
-  text: string,
-  { tabCharacter }: { tabCharacter: string } = { tabCharacter: "  " },
-) {
-  return text
-    .split("\n")
-    .map((line) =>
-      line.replace(/^(\s+)/, (spaces) => spaces.replace(/\t/, tabCharacter)),
-    )
-    .join("\n");
-};
-
-function* getLines(text: string, { start, end }: SelectionRange) {
-  let selection: SelectionRange | undefined = undefined;
-
-  for (const line of text.split("\n")) {
-    const range: SelectionRange = {
-      start: selection?.end ?? 0,
-      end: (selection?.end ?? 0) + line.length + 1,
-    };
-
-    if (range.start > end) break;
-    if (range.end < start) continue;
-
-    selection ??= {
-      start: range.start,
-      end: range.end,
-    };
-    selection.end = range.end;
-
-    yield line;
-  }
-
-  return selection ?? { start, end };
-}
-
-function runGenerator<T, TReturn>(
-  gen: Generator<T, TReturn>,
-): { values: T[]; result: TReturn } {
-  const values: T[] = [];
-  while (true) {
-    const { value, done } = gen.next();
-    if (done) {
-      return { values, result: value };
-    }
-    values.push(value);
-  }
-}

@@ -12,6 +12,7 @@ import "prismjs/components/prism-scss";
 import "prismjs/components/prism-tsx";
 import "prismjs/components/prism-typescript";
 import "prismjs/components/prism-yaml";
+import { SelectionRange } from "./selection-range";
 
 export const highlightCode =
   (language: zNotion.blocks.language) => (code: string) => {
@@ -38,6 +39,42 @@ export function showLanguage(language: zNotion.blocks.language) {
     LanguageOptions.find((option) => option.id === language)?.title ??
     sentenceCase(language)
   );
+}
+
+export function normalizeIndent(
+  text: string,
+  { tabCharacter }: { tabCharacter: string },
+) {
+  return text
+    .split("\n")
+    .map((line) =>
+      line.replace(/^(\s+)/, (spaces) => spaces.replace(/\t/, tabCharacter)),
+    )
+    .join("\n");
+}
+
+export function* getLines(text: string, { start, end }: SelectionRange) {
+  let selection: SelectionRange | undefined = undefined;
+
+  for (const line of text.split("\n")) {
+    const range: SelectionRange = {
+      start: selection?.end ?? 0,
+      end: (selection?.end ?? 0) + line.length + 1,
+    };
+
+    if (range.start > end) break;
+    if (range.end < start) continue;
+
+    selection ??= {
+      start: range.start,
+      end: range.end,
+    };
+    selection.end = range.end;
+
+    yield line;
+  }
+
+  return selection ?? { start, end };
 }
 
 export const LanguageOptions = [

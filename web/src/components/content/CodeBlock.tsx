@@ -4,12 +4,12 @@ import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { Lens } from "@notion-site/common/utils/optics/lens.js";
 import { Prism } from "@notion-site/common/utils/optics/prism.js";
 import { pipe } from "ts-functional-pipe";
+import { normalizeIndent } from "../../utils/code";
 import { Code } from "../display/Code.js";
 import { Text } from "../display/Text";
 import { LanguageDropdown } from "../inputs/LanguageDropdown";
 import { CodeEditor } from "./CodeEditor";
 import { updateCodeLanguage } from "./editable/use-notion-plugin/commands";
-import { useTextIndentPlugin } from "./editable/use-text-plugin/use-text-indent-plugin";
 import { Editor } from "./Editor";
 import { useEditorPrism } from "./editor/use-editor-prism";
 import { RichText } from "./RichText";
@@ -89,7 +89,10 @@ function ReadOnlyCodeBlock({
         />
       }
     >
-      <Code code={useTextIndentPlugin.normalize(code)} language={language} />
+      <Code
+        code={normalizeIndent(code, { tabCharacter: "  " })}
+        language={language}
+      />
 
       {block.code.caption.length > 0 && (
         <Text as="p" m={0} disabled={disabled}>
