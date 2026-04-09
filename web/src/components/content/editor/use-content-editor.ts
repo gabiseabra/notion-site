@@ -134,7 +134,7 @@ export function useContentEditor<TBlock extends AnyBlock>({
         const target = EditorTarget.read(editorRef.current);
         const block = id ? snapshot.state.find((b) => b.id === id) : undefined;
 
-        if (!target || (id && !block)) return;
+        if (id && !block) return;
 
         return ExecCommand(editorRef.current, target, block)(cmd);
       },

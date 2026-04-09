@@ -1,3 +1,4 @@
+import { curry } from "@notion-site/common/utils/fp.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { createContext, ReactNode, Ref, useContext } from "react";
@@ -111,7 +112,9 @@ export function Block({
           <>
             <Checkbox
               checked={block.to_do.checked}
-              onToggleChecked={editor && pipe(toggleToDo, editor.exec)}
+              onToggleChecked={
+                editor && pipe(toggleToDo, curry(editor.exec)(block.id))
+              }
               {...contentProps(block.to_do.rich_text)}
             />
 

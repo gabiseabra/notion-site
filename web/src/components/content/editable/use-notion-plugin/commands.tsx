@@ -17,7 +17,7 @@ export const isAnnotated =
 export const toggleAnnotations =
   (annotations: Partial<Notion.RTF.Annotations>): EditorCommand<Notion.Block> =>
   ({ block, data: selection }) =>
-    selection.type === "range"
+    selection?.type === "range"
       ? Notion.Block.toggleAnnotations(
           block,
           annotations,
@@ -29,7 +29,7 @@ export const toggleAnnotations =
 export const setLink =
   (link: Notion.RTF.Link): EditorCommand<Notion.Block> =>
   ({ block, data: selection }) =>
-    selection.type === "range"
+    selection?.type === "range"
       ? Notion.Block.mapRichText(block, (rich_text) =>
           Notion.RTF.setLink(rich_text, link, selection.start, selection.end),
         )
@@ -40,7 +40,7 @@ export const focusOnLink: EditorCommand<Notion.Block> = ({
   data: selection,
 }) => {
   const selectionRange =
-    selection.type === "range"
+    selection?.type === "range"
       ? selection
       : {
           start: 0,

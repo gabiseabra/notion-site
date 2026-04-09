@@ -1,10 +1,10 @@
 import { Slot } from "../../../utils/slot";
 import { EditorTarget } from "./editor-target";
-import { AnyBlock, ContentEditor } from "./types.js";
+import { AnyBlock, ContentEditor, ID } from "./types.js";
 
 export type EditorCommand<
   TBlock extends AnyBlock,
-  TData = EditorTarget<TBlock>,
+  TData = EditorTarget<TBlock> | null,
 > = (ctx: {
   block: TBlock;
   data: TData;
@@ -21,6 +21,7 @@ export const ExecCommand =
     editor: ContentEditor<TBlock>,
     data: Slot<TData>,
     block?: TBlock,
+    childId?: ID,
   ) =>
   (command: EditorCommand<TBlock, TData>) => {
     const target = EditorTarget.read(editor);
@@ -39,11 +40,14 @@ export const ExecCommand =
       });
 
     if (newBlock) {
+      const isFocused =
+        target && target.id === newBlock.id && childId === childId;
+
       editor.push({
         type: "update",
         block: newBlock,
-        selectionBefore: selection,
-        selectionAfter: selection,
+        selectionBefore: isFocused ? selection : undefined,
+        selectionAfter: isFocused ? selection : undefined,
       });
       editor.commit();
     }
