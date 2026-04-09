@@ -1,4 +1,5 @@
 import { WithRequired } from "@notion-site/common/types/object.js";
+import { isNonNullable } from "@notion-site/common/utils/guards.js";
 import type { Block as NotionBlock } from "@notion-site/common/utils/notion/block.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { Lens } from "@notion-site/common/utils/optics/lens.js";
@@ -10,8 +11,9 @@ import { Text } from "../display/Text";
 import { LanguageDropdown } from "../inputs/LanguageDropdown";
 import { CodeEditor } from "./CodeEditor";
 import { updateCodeLanguage } from "./editable/use-notion-plugin/commands";
+import { TextBlock } from "./editable/use-text-plugin";
 import { Editor } from "./Editor";
-import { useEditorPrism } from "./editor/use-editor-prism";
+import { useEditorLens } from "./editor/use-editor-lens";
 import { RichText } from "./RichText";
 
 type CodeBlockProps = {
@@ -38,12 +40,18 @@ function EditableCodeBlock({
 }: WithRequired<Omit<CodeBlockProps, "readOnly">, "editor">) {
   const language = block.code.language;
 
-  const codeEditor = useEditorPrism({
+  const codeEditor = useEditorLens({
     id: block.id,
     editor,
-    prism: Prism.compose(
-      Notion.Lens.code,
-      Lens.from("value", { id: "code", value: "" }),
+    lens: Lens.compose(
+      Prism.compose(
+        Notion.Lens.code,
+        Lens.from("value", { id: "code", value: "" }),
+      ) as Lens<NotionBlock, TextBlock | undefined>,
+      {
+        get: (block) => [block].filter(isNonNullable),
+        set: (_, [block]) => block,
+      },
     ),
   });
 

@@ -119,9 +119,9 @@ export const EditorAction = {
       ?.selectionAfter;
   },
 
-  preview<A extends AnyBlock, B extends AnyBlock>(
+  map<A extends AnyBlock, B extends AnyBlock>(
     action: EditorAction<A>,
-    prism: { get: (s: A) => B | undefined },
+    f: (s: A) => B,
   ): EditorAction<B> | undefined {
     switch (action.type) {
       case "focus":
@@ -129,7 +129,7 @@ export const EditorAction = {
       case "apply": {
         const actions = action.actions
           .flatMap((cmd) => {
-            const b = EditorAction.preview(cmd, prism);
+            const b = EditorAction.map(cmd, f);
             return typeof b === "undefined" ? [] : EditorAction.flat([b]);
           })
           .filter(isNonNullable);
@@ -139,12 +139,12 @@ export const EditorAction = {
           : undefined;
       }
       case "split": {
-        const left = prism.get(action.left);
-        const right = prism.get(action.right);
+        const left = f(action.left);
+        const right = f(action.right);
         return left && right ? { ...action, left, right } : undefined;
       }
       default: {
-        const block = prism.get(action.block);
+        const block = f(action.block);
         return block ? { ...action, block } : undefined;
       }
     }
