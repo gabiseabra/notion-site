@@ -124,14 +124,7 @@ export function useEditorLens<
       bus,
 
       ref(id) {
-        return {
-          element: parent.ref(parentId).children.get(id) ?? null,
-          children: new Map(),
-        };
-      },
-
-      register(id) {
-        return parent.register(parentId, id);
+        return parent.ref(parentId, id);
       },
 
       exec(cmd, id) {

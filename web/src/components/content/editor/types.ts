@@ -11,7 +11,7 @@ export type AnyBlock = { id: ID };
 
 export type BlockRef = {
   element: HTMLElement | null;
-  children: Map<ID, HTMLElement | null>;
+  children: Map<ID, HTMLElement>;
 };
 
 export const BlockRef = {
@@ -62,11 +62,12 @@ export interface ContentEditor<
    * Get the DOM element registered for a block. Returns `null` if the block
    * hasn't mounted yet or was removed.
    */
-  ref(id: TBlock["id"]): BlockRef;
-  register(
+  ref(
     id: TBlock["id"],
     childId?: ID,
-  ): (element: HTMLElement | null) => void;
+  ): BlockRef & {
+    (element: HTMLElement | null): void;
+  };
 
   /**
    * Runs a command against a block. If `id` is given, targets that block;

@@ -35,7 +35,7 @@ function TestEditor({
           contentEditable={"plaintext-only"}
           suppressContentEditableWarning={true}
           tabIndex={0}
-          ref={editor.register(block.id)}
+          ref={editor.ref(block.id)}
           {...editable(block)}
         >
           {block.content}

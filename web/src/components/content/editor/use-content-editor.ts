@@ -3,7 +3,7 @@ import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
 import { EditorAction, EditorHistory } from "./editor-history.js";
 import { EditorTarget } from "./editor-target";
-import { AnyBlock, BlockRef, ContentEditor } from "./types.js";
+import { AnyBlock, BlockRef, ContentEditor, ID } from "./types.js";
 
 /**
  * Creates shared state & controller for the editor plugins.
@@ -50,30 +50,39 @@ export function useContentEditor<TBlock extends AnyBlock>({
       history,
       bus,
 
-      ref(id) {
+      ref(id, childId) {
+        const emptyMap: Map<ID, HTMLElement> = new Map();
         let ref = blocksRef.current.get(id);
 
         if (!ref) {
           ref ??= {
-            children: new Map(),
+            children: emptyMap,
             element: null,
           };
           blocksRef.current.set(id, ref);
         }
 
-        return ref;
-      },
-
-      register(id, childId) {
-        return (element: HTMLElement | null) => {
-          if (typeof childId === "undefined") {
-            this.ref(id).element = element;
-          } else if (element) {
-            this.ref(id).children.set(childId, element);
-          } else {
-            this.ref(id).children.delete(childId);
-          }
-        };
+        return Object.assign(
+          (element: HTMLElement | null) => {
+            if (typeof childId === "undefined") {
+              ref.element = element;
+            } else if (element) {
+              ref.children.set(childId, element);
+            } else {
+              ref.children.delete(childId);
+            }
+          },
+          {
+            get element() {
+              if (typeof childId === "undefined") return ref.element;
+              return ref.children.get(childId) ?? null;
+            },
+            get children() {
+              if (typeof childId === "undefined") return ref.children;
+              return emptyMap;
+            },
+          },
+        );
       },
 
       exec(cmd, id) {

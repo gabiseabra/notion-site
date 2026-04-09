@@ -56,7 +56,7 @@ export const CodeEditor = memo(function CodeEditor({
 
       {!readOnly && (
         <textarea
-          ref={editor.register(id)}
+          ref={editor.ref(id)}
           value={code}
           autoCapitalize="off"
           autoComplete="off"
