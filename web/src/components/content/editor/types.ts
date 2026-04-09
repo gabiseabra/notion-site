@@ -46,8 +46,8 @@ export interface ContentEditor<TBlock extends AnyBlock> {
    * Call `peek` first to trigger a flush before manipulating history.
    */
   readonly history: ReadOnlyHistory<EditorAction<TBlock>, TBlock[]> & {
-    undo(dryRun?: boolean): void;
-    redo(dryRun?: boolean): void;
+    undo(dryRun?: boolean): boolean;
+    redo(dryRun?: boolean): boolean;
   };
 
   /**

@@ -80,6 +80,7 @@ function apply(element: HTMLElement, selection: SelectionRange) {
     isElementWithTag(element, "input") ||
     isElementWithTag(element, "textarea")
   ) {
+    element.focus();
     element.setSelectionRange(selection.start, selection.end);
     return;
   }

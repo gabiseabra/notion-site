@@ -42,30 +42,24 @@ export const useHistoryEventsPlugin =
 
       if (!isMod) return;
 
-      if (
-        !options?.undoDisabled &&
-        isUndo(e) &&
-        editor.history.undo(true) &&
-        editor.peek(block.id)
-      ) {
-        editor.history.undo();
-        editor.commit(new useHistoryEventsPlugin.EventData("undo"));
-
+      if (!options?.undoDisabled && isUndo(e)) {
         e.preventDefault();
-        return;
+
+        if (editor.history.undo(true) && editor.peek(block.id)) {
+          editor.history.undo();
+          editor.commit(new useHistoryEventsPlugin.EventData("undo"));
+          return;
+        }
       }
 
-      if (
-        !options?.redoDisabled &&
-        isRedo(e) &&
-        editor.history.redo(true) &&
-        editor.peek(block.id)
-      ) {
-        editor.history.redo();
-        editor.commit(new useHistoryEventsPlugin.EventData("redo"));
-
+      if (!options?.redoDisabled && isRedo(e)) {
         e.preventDefault();
-        return;
+
+        if (editor.history.redo(true) && editor.peek(block.id)) {
+          editor.history.redo();
+          editor.commit(new useHistoryEventsPlugin.EventData("redo"));
+          return;
+        }
       }
     },
   });
@@ -118,7 +112,8 @@ export const useHistoryRestorationPlugin =
 
       if (
         !element ||
-        (selection.start === currentSelection?.start &&
+        (element === document.activeElement &&
+          selection.start === currentSelection?.start &&
           selection.end === currentSelection?.end)
       )
         return;

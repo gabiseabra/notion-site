@@ -172,10 +172,10 @@ export function useEditorLens<
           return block ? lensRef.current.get(block) : [];
         },
         undo(dryRun) {
-          parent.history.undo(dryRun);
+          return parent.history.undo(dryRun);
         },
         redo(dryRun) {
-          parent.history.redo(dryRun);
+          return parent.history.redo(dryRun);
         },
       },
 
