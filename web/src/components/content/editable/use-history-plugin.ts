@@ -98,20 +98,9 @@ export const useHistoryRestorationPlugin =
 
       if (childId && !options?.global) return;
 
-      if (!selection) {
-        console.warn(`Failed to restore selection on postcommit.`, {
-          id,
-          cmd,
-          direction,
-          revision: editor.revision,
-          selection,
-          currentSelection,
-        });
-        return;
-      }
-
       if (
         !element ||
+        !selection ||
         (element === document.activeElement &&
           selection.start === currentSelection?.start &&
           selection.end === currentSelection?.end)
