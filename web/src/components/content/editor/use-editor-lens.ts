@@ -1,7 +1,6 @@
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { Lens } from "@notion-site/common/utils/optics/lens.js";
-import { useMemo, useRef } from "react";
-import { useEventListener } from "../../../hooks/use-event-listener";
+import { useEffect, useMemo, useRef } from "react";
 import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event";
 import { applyActions, EditorAction } from "./editor-history";
@@ -67,7 +66,7 @@ export function useEditorLens<
 
   const editor = useMemo<ContentEditor<TBlock>>(
     () => ({
-      id: `{${String(parentId)},${parent.id}}`,
+      id: `{${parent.id},${String(parentId)}}`,
 
       blocks: (() => {
         const block = parent.blocks.find((b) => b.id === parentId);
@@ -208,31 +207,15 @@ export function useEditorLens<
   editorRef.current = editor;
 
   // notify event listeners
-  useEventListener(parent.bus, "ready", (event) =>
-    queueMicrotask(() =>
-      editor.bus.dispatchTypedEvent(
-        event.eventType,
-        new EditorEvent("ready", editor, {}),
-      ),
-    ),
-  );
-  useEventListener(parent.bus, "postcommit", (event) =>
-    queueMicrotask(() =>
-      editor.bus.dispatchTypedEvent(
-        event.eventType,
-        new EditorEvent("postcommit", editor, {}),
-      ),
-    ),
-  );
+  const isReadyRef = useRef(false);
+  useEffect(() => {
+    const event = !isReadyRef.current
+      ? new EditorEvent("ready", editor, {})
+      : new EditorEvent("postcommit", editor, {});
 
-  // useEffect(() => {
-  //   const event = !isReadyRef.current
-  //     ? new EditorEvent("ready", editor, {})
-  //     : new EditorEvent("postcommit", editor, {});
-
-  //   editor.bus.dispatchTypedEvent(event.eventType, event);
-  //   isReadyRef.current = true;
-  // }, [editor]);
+    editor.bus.dispatchTypedEvent(event.eventType, event);
+    isReadyRef.current = true;
+  }, [editor]);
 
   return editor;
 }

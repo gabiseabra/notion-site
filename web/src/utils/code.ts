@@ -54,27 +54,21 @@ export function normalizeIndent(
 }
 
 export function* getLines(text: string, { start, end }: SelectionRange) {
-  let selection: SelectionRange | undefined = undefined;
+  const selection: SelectionRange = { start: 0, end: 0 };
 
   for (const line of text.split("\n")) {
-    const range: SelectionRange = {
-      start: selection?.end ?? 0,
-      end: (selection?.end ?? 0) + line.length + 1,
-    };
+    selection.end += line.length + 1;
 
-    if (range.start > end) break;
-    if (range.end < start) continue;
+    if (selection.end < start) {
+      selection.start += line.length + 1;
+    } else {
+      yield line;
+    }
 
-    selection ??= {
-      start: range.start,
-      end: range.end,
-    };
-    selection.end = range.end;
-
-    yield line;
+    if (selection.end >= end) break;
   }
 
-  return selection ?? { start, end };
+  return selection;
 }
 
 export const LanguageOptions = [
