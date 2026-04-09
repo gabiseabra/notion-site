@@ -12,9 +12,9 @@ import { ContentEditorPlugin } from "./types.js";
  * Plugin that handles text input for both contenteditable and input/textarea elements.
  *
  * Dispatches to one of two strategies based on the element type:
- * - `useUpdateInlineMutationPlugin` — for `<input>` and `<textarea>` elements,
+ * - `useControlledInlineMutationPlugin` — for `<input>` and `<textarea>` elements,
  *   when an `update` function is provided.
- * - `useSpliceInlineMutationPlugin` — for contenteditable elements (or when no
+ * - `useLazyInlineMutationPlugin` — for contenteditable elements (or when no
  *   `update` function is provided).
  */
 export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
