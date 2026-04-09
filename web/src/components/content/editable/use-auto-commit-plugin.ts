@@ -26,7 +26,7 @@ export const useAutoCommitPlugin =
 
         editor.flush(data);
 
-        if (editor.history.position <= editor.revision) return;
+        if (!editor.hasUnsavedChanges) return;
 
         const target = EditorTarget.read(editor);
         const selection = target && EditorTarget.extractRange(target);

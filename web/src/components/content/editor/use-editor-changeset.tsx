@@ -31,56 +31,58 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
     };
   }, []);
 
-  const flush = useCallback(() => {
-    const action = extract();
-    const { batchId } = changesetRef.current;
+  const flush = useCallback(
+    (_data?: unknown) => {
+      const action = extract();
+      const { batchId } = changesetRef.current;
 
-    if (!action) return false;
+      if (!action) return false;
 
-    discard();
+      discard();
 
-    const { id } = EditorAction.targetAfter(action);
-    const blockEl = editor.ref(id).element;
-    const selection = blockEl && SelectionRange.read(blockEl);
-    const selectionAfter = EditorAction.selectionAfter(action);
+      const { id } = EditorAction.targetAfter(action);
+      const blockEl = editor.ref(id).element;
+      const selection = blockEl && SelectionRange.read(blockEl);
+      const selectionAfter = EditorAction.selectionAfter(action);
 
-    const data = new useEditorChangeset.FlushData(batchId);
+      const data = new useEditorChangeset.FlushData(batchId, _data);
 
-    editor.push({ ...action, data });
+      editor.push({ ...action, data });
 
-    if (
-      selection &&
-      (selection.start !== selectionAfter?.start ||
-        selection.end !== selectionAfter?.end)
-    ) {
-      editor.push({
-        data,
-        type: "focus",
-        block: { id },
-        selectionBefore: selectionAfter ?? selection,
-        selectionAfter: selection,
-      });
-    }
+      if (
+        selection &&
+        (selection.start !== selectionAfter?.start ||
+          selection.end !== selectionAfter?.end)
+      ) {
+        editor.push({
+          data,
+          type: "focus",
+          block: { id },
+          selectionBefore: selectionAfter ?? selection,
+          selectionAfter: selection,
+        });
+      }
 
-    return true;
-  }, [editor, extract, discard]);
+      return true;
+    },
+    [editor, extract, discard],
+  );
 
   const push = useCallback(
-    (action: EditorActionCmd<TBlock>) => {
-      const { id } = EditorAction.targetAfter(action);
-
-      if (!id) return;
-
+    (_action: EditorAction<TBlock>) => {
       const pendingAction = extract();
+      const actions = EditorAction.flat([_action]);
 
-      action.selectionBefore ??=
-        EditorAction.selectionBefore(action) ??
+      if (!NonEmpty.isNonEmpty(actions)) return;
+
+      actions[actions.length - 1].selectionBefore ??=
+        EditorAction.selectionBefore({ type: "apply", actions }) ??
         (pendingAction && EditorAction.selectionAfter(pendingAction)) ??
         (editor.history.action
           ? EditorAction.selectionAfter(editor.history.action)
           : undefined);
 
-      changesetRef.current.actions.push(action);
+      changesetRef.current.actions.push(...actions);
     },
     [extract, flush],
   );
@@ -114,7 +116,6 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
 
   return useMemo(
     () => ({
-      extract,
       discard,
       flush,
       push,
@@ -133,13 +134,20 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
         if (!action) return null;
         return EditorAction.selectionAfter(action) ?? null;
       },
+
+      get hasUnsavedChanges() {
+        return extract() !== null;
+      },
     }),
     [editor, extract, discard, flush, push, peek],
   );
 }
 
 useEditorChangeset.FlushData = class EditorChangesetFlushData {
-  constructor(public batchId: number) {}
+  constructor(
+    public batchId: number,
+    public data?: unknown,
+  ) {}
 };
 
 export function useLazyEditorChangeset<TBlock extends AnyBlock>(

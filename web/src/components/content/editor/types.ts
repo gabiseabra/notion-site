@@ -1,5 +1,6 @@
 import { isNonNullable } from "@notion-site/common/utils/guards.js";
 import { ReadOnlyHistory } from "@notion-site/common/utils/history.js";
+import { EditorChangeset } from "./editor-changeset";
 import { EditorCommand } from "./editor-command";
 import type { EditorEventTarget } from "./editor-event.js";
 import { EditorAction } from "./editor-history.js";
@@ -25,7 +26,9 @@ export const BlockRef = {
 /**
  * Shared state passed to plugins in their editor setup phase.
  */
-export interface ContentEditor<TBlock extends AnyBlock> {
+export interface ContentEditor<
+  TBlock extends AnyBlock,
+> extends EditorChangeset<TBlock> {
   readonly id: string;
 
   /**
@@ -40,8 +43,7 @@ export interface ContentEditor<TBlock extends AnyBlock> {
   readonly revision: number;
 
   /**
-   * Manages undo/redo state.
-   * Manipulating history directly e.g. by calling `editor.history.undo` / `redo`
+   * @note Manipulating history directly e.g. by calling `editor.history.undo` / `redo`
    * does not flush changesets, so any pending changeset actions will be overwritten.
    * Call `peek` first to trigger a flush before manipulating history.
    */
@@ -56,8 +58,6 @@ export interface ContentEditor<TBlock extends AnyBlock> {
    */
   readonly bus: EditorEventTarget<TBlock>;
 
-  // Methods to read from state
-
   /**
    * Get the DOM element registered for a block. Returns `null` if the block
    * hasn't mounted yet or was removed.
@@ -69,27 +69,14 @@ export interface ContentEditor<TBlock extends AnyBlock> {
   ): (element: HTMLElement | null) => void;
 
   /**
-   * Notifies other plugins to flush pending changes immediatelly! ! !
+   * Runs a command against a block. If `id` is given, targets that block;
+   * otherwise targets the currently focused block.
    */
-  flush(data?: unknown): void;
+  exec(cmd: EditorCommand<TBlock>, id?: TBlock["id"]): void;
 
   /**
-   * Returns the latest history state for the given block id.
-   * Use instead of `blocks` when you need up-to-date state mid-edit.
-   * @param id - The id of the block that u want to get.
-   * @param dryRun - skip flush. only return latest data from history (optional).
-   */
-  peek(id: TBlock["id"], dryRun?: boolean): TBlock | null;
-
-  /**
-   * Push action to history. Records a undo/redo-able event.
-   */
-  push(action: EditorAction<TBlock> & { data?: unknown }): void;
-
-  /**
-   * Sync React state with history.
+   * Finalizes the pending changeset by saving the latest changes to the state.
+   * Lives on the editor rather than the changeset because it owns the state.
    */
   commit(data?: unknown): void;
-
-  exec(cmd: EditorCommand<TBlock>, id?: TBlock["id"]): void;
 }

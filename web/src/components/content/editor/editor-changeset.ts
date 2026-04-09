@@ -1,28 +1,39 @@
 import { SelectionRange } from "../../../utils/selection-range";
-import { EditorAction, EditorActionCmd } from "./editor-history";
+import { EditorAction } from "./editor-history";
 import { AnyBlock } from "./types";
 
 export type EditorChangeset<TBlock extends AnyBlock> = {
-  /** Selection before the first action in the pending batch. `null` if empty. */
+  /**
+   * Selection before the first action in the pending batch.
+   * `null` if empty.
+   */
   readonly selectionBefore: SelectionRange | null;
-  /** Selection after the last action in the pending batch. `null` if empty. */
+  /**
+   * Selection after the last action in the pending batch.
+   * `null` if empty.
+   */
   readonly selectionAfter: SelectionRange | null;
 
-  /** Returns the pending batch as an `apply` action, or `null` if empty.
-   * Does not clear the batch. */
-  extract(): EditorAction<TBlock> | null;
+  readonly hasUnsavedChanges: boolean;
 
-  /** Clears the pending batch without committing it to history. */
-  discard(): void;
+  /**
+   * Clears the pending batch.
+   */
+  discard(data?: unknown): void;
 
-  /** Commits the pending batch to history. */
-  flush(): void;
+  /**
+   * Notifies other plugins to flush pending changes immediatelly! ! !
+   */
+  flush(data?: unknown): void;
 
-  /** Returns the block including any pending changes. */
-  peek(id: TBlock["id"]): TBlock | null;
+  /**
+   * Returns the block by id including any pending changes.
+   * @note this calls flush internally.
+   */
+  peek(id: TBlock["id"], flushData?: unknown): TBlock | null;
 
   /** Appends an action to the pending batch. `selectionBefore` is inferred from
    * the pending batch's `selectionAfter` or the last committed history action if not
    * already set on the action. */
-  push(action: EditorActionCmd<TBlock>): void;
+  push(action: EditorAction<TBlock> & { data?: unknown }): void;
 };

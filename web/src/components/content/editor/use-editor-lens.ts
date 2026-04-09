@@ -134,6 +134,20 @@ export function useEditorLens<
         return parent.register(parentId, id);
       },
 
+      exec(cmd, id) {
+        if (!editorRef.current) return;
+        const target = EditorTarget.read(editorRef.current);
+        const block = id
+          ? editorRef.current.blocks.find((b) => b.id === id)
+          : undefined;
+        if (!target || (id && !block)) return;
+        return ExecCommand(editorRef.current, target, block)(cmd);
+      },
+
+      discard(data) {
+        parent.discard(data);
+      },
+
       flush(data) {
         if (!editorRef.current) return;
         bus.dispatchTypedEvent(
@@ -192,14 +206,16 @@ export function useEditorLens<
         parent.commit(data);
       },
 
-      exec(cmd, id) {
-        if (!editorRef.current) return;
-        const target = EditorTarget.read(editorRef.current);
-        const block = id
-          ? editorRef.current.blocks.find((b) => b.id === id)
-          : undefined;
-        if (!target || (id && !block)) return;
-        return ExecCommand(editorRef.current, target, block)(cmd);
+      get selectionBefore() {
+        return parent.selectionBefore;
+      },
+
+      get selectionAfter() {
+        return parent.selectionAfter;
+      },
+
+      get hasUnsavedChanges() {
+        return parent.hasUnsavedChanges;
       },
     }),
     [parentId, parent, bus],

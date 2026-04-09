@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
-import { EditorHistory } from "./editor-history.js";
+import { EditorAction, EditorHistory } from "./editor-history.js";
 import { EditorTarget } from "./editor-target";
 import { AnyBlock, BlockRef, ContentEditor } from "./types.js";
 
@@ -76,6 +76,23 @@ export function useContentEditor<TBlock extends AnyBlock>({
         };
       },
 
+      exec(cmd, id) {
+        if (!editorRef.current) return;
+        const target = EditorTarget.read(editorRef.current);
+        const block = id ? snapshot.state.find((b) => b.id === id) : undefined;
+
+        if (id && !block) return;
+
+        return ExecCommand(editorRef.current, target, block)(cmd);
+      },
+
+      /** EditorChangeset implementation */
+
+      discard(data) {
+        this.flush(data);
+        while (history.position > snapshot.position) history.undo();
+      },
+
       flush(data?: unknown) {
         if (!editorRef.current) return;
 
@@ -85,10 +102,8 @@ export function useContentEditor<TBlock extends AnyBlock>({
         );
       },
 
-      peek(id, dryRun) {
-        if (!editorRef.current) return null;
-
-        if (!dryRun) this.flush();
+      peek(id, data) {
+        this.flush(data);
 
         return history.getState().find((block) => block.id === id) ?? null;
       },
@@ -120,6 +135,7 @@ export function useContentEditor<TBlock extends AnyBlock>({
           data: data,
         });
         bus.dispatchTypedEvent("commit", event);
+
         if (event.defaultPrevented) return;
 
         setSnapshot({
@@ -129,14 +145,22 @@ export function useContentEditor<TBlock extends AnyBlock>({
         onCommitRef.current?.(event.detail.blocks);
       },
 
-      exec(cmd, id) {
-        if (!editorRef.current) return;
-        const target = EditorTarget.read(editorRef.current);
-        const block = id ? snapshot.state.find((b) => b.id === id) : undefined;
+      get selectionBefore() {
+        return (
+          history.action &&
+          (EditorAction.selectionBefore(history.action) ?? null)
+        );
+      },
 
-        if (id && !block) return;
+      get selectionAfter() {
+        return (
+          history.action &&
+          (EditorAction.selectionAfter(history.action) ?? null)
+        );
+      },
 
-        return ExecCommand(editorRef.current, target, block)(cmd);
+      get hasUnsavedChanges() {
+        return history.position > snapshot.position;
       },
     }),
     [bus, history, snapshot],

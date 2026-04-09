@@ -3,7 +3,7 @@ import { TypedEventTarget } from "typescript-event-target";
 import { EditorAction } from "./editor-history.js";
 import { AnyBlock, ContentEditor } from "./types.js";
 
-type EditorEventMap<TBlock extends AnyBlock> = {
+export type EditorEventMap<TBlock extends AnyBlock> = {
   /**
    * Notify plugins to save changes to history.
    */
