@@ -5,8 +5,10 @@ import { EditorAction } from "../editor/editor-history.js";
 import { AnyContentEditorPlugin } from "./types.js";
 
 /**
- * Plugin that handles undo/redo keyboard shortcuts and restores the default
- * selection inferred from history metadata.
+ * Plugin that handles undo/redo keyboard shortcuts (on keydown) and restores
+ * the default selection inferred from history metadata.
+ * @note events and and selection restoration are scoped to the editor's managed
+ *       blocks.
  *
  * | Key | Behavior |
  * |-----|----------|
@@ -15,10 +17,15 @@ import { AnyContentEditorPlugin } from "./types.js";
  * | `Ctrl+Y` | `Cmd+Y`: Redo (alternative)
  */
 export const useHistoryPlugin =
-  (options?: { restoreDisabled?: boolean }): AnyContentEditorPlugin =>
+  (options?: {
+    disabled?: boolean;
+    restoreDisabled?: boolean;
+    undoDisabled?: boolean;
+    redoDisabled?: boolean;
+  }): AnyContentEditorPlugin =>
   (editor) => {
     useEventListener(editor.bus, "postcommit", ({ editor }) => {
-      if (options?.restoreDisabled) return;
+      if (options?.restoreDisabled || options?.disabled) return;
 
       const direction = editor.history.direction;
       const cmd = editor.history.action;
@@ -66,7 +73,12 @@ export const useHistoryPlugin =
 
         if (!isMod) return;
 
-        if (isUndo(e) && editor.history.undo(true) && editor.peek(block.id)) {
+        if (
+          !(options?.undoDisabled || options?.disabled) &&
+          isUndo(e) &&
+          editor.history.undo(true) &&
+          editor.peek(block.id)
+        ) {
           editor.history.undo();
           editor.commit(new useHistoryPlugin.EventData("undo"));
 
@@ -74,7 +86,12 @@ export const useHistoryPlugin =
           return;
         }
 
-        if (isRedo(e) && editor.history.redo(true) && editor.peek(block.id)) {
+        if (
+          !(options?.redoDisabled || options?.disabled) &&
+          isRedo(e) &&
+          editor.history.redo(true) &&
+          editor.peek(block.id)
+        ) {
           editor.history.redo();
           editor.commit(new useHistoryPlugin.EventData("redo"));
 
