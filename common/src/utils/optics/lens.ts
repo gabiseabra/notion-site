@@ -1,3 +1,5 @@
+import { Prism } from "./prism";
+
 /** Focuses on a part `A` of a larger structure `S`. */
 export type Lens<S, A> = {
   get: (s: S) => A;
@@ -25,6 +27,18 @@ export const Lens = {
     return {
       get: (s) => inner.get(outer.get(s)),
       set: (s, b) => outer.set(s, inner.set(outer.get(s), b)),
+    };
+  },
+
+  /** Compose a prism with a lens: focus on `B` inside `A` inside `S`. */
+  composePrism<S, A, B>(lens: Lens<S, A>, prism: Prism<A, B>): Prism<S, B> {
+    return {
+      get: (s) => {
+        return prism.get(lens.get(s));
+      },
+      set: (s, b) => {
+        return lens.set(s, prism.set(lens.get(s), b));
+      },
     };
   },
 

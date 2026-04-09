@@ -1,8 +1,9 @@
+import type { Lens } from "./lens";
+
 /** Focuses on a part `A` of a larger structure `S` that may not exist. */
 export type Prism<S, A> = {
   get: (s: S) => A | undefined;
   set: (s: S, a: A) => S;
-  // review: (a: A) => S;
 };
 
 export const Prism = {
@@ -11,7 +12,6 @@ export const Prism = {
     return {
       get: (s) => (guard(s) ? s : undefined),
       set: (_, a) => a,
-      // review: (a) => a,
     };
   },
 
@@ -27,6 +27,20 @@ export const Prism = {
         return a !== undefined ? outer.set(s, inner.set(a, b)) : s;
       },
       // review: (b) => outer.review(inner.review(b)),
+    };
+  },
+
+  /** Compose a prism with a lens: focus on `B` inside `A` inside `S`. */
+  composeLens<S, A, B>(prism: Prism<S, A>, lens: Lens<A, B>): Prism<S, B> {
+    return {
+      get: (s) => {
+        const a = prism.get(s);
+        return a !== undefined ? lens.get(a) : undefined;
+      },
+      set: (s, b) => {
+        const a = prism.get(s);
+        return a !== undefined ? prism.set(s, lens.set(a, b)) : s;
+      },
     };
   },
 
