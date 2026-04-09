@@ -23,7 +23,7 @@ export type NotionPluginOptions = {
 export const useNotionPlugin = ({
   inline = false,
   autoCommit = 600,
-  logging = env.DEV && "verbose",
+  logging = env.DEV,
 }: NotionPluginOptions = {}) =>
   composePlugins<Notion.Block>(
     useLoggerPlugin(createLogger(logging)),

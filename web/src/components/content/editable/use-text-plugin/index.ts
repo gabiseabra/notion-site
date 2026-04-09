@@ -37,9 +37,7 @@ export type TextPluginOptions = {
 /**
  * ContentEditor plugin stack for plain text blocks.
  */
-export const useTextPlugin = ({
-  logging = env.DEV && "verbose",
-}: TextPluginOptions = {}) =>
+export const useTextPlugin = ({ logging = env.DEV }: TextPluginOptions = {}) =>
   composePlugins<TextBlock>(
     useLoggerPlugin(createLogger(logging)),
     useHistoryPlugin(),
