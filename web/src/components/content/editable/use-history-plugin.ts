@@ -2,30 +2,87 @@ import { KeyboardEvent } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { EditorAction } from "../editor/editor-history.js";
+import { composePlugins } from "./compose-plugins";
 import { AnyContentEditorPlugin } from "./types.js";
 
-/**
- * Plugin that handles undo/redo keyboard shortcuts (on keydown) and restores
- * the default selection inferred from history metadata.
- * @note events and and selection restoration are scoped to the editor's managed
- *       blocks.
- *
- * | Key | Behavior |
- * |-----|----------|
- * | `Ctrl+Z` | `Cmd+Z`: Undo
- * | `Ctrl+Shift+Z` | `Cmd+Shift+Z`: Redo
- * | `Ctrl+Y` | `Cmd+Y`: Redo (alternative)
- */
-export const useHistoryPlugin =
+/** Composed plugin that combines history restoration and undo/redo keyboard events. */
+export const useHistoryPlugin = (options?: {
+  /** When enabled, restores selection for child editors in addition to the main editor. */
+  global?: boolean;
+  disabled?: boolean;
+  restoreDisabled?: boolean;
+  undoDisabled?: boolean;
+  redoDisabled?: boolean;
+}): AnyContentEditorPlugin =>
+  composePlugins(
+    useHistoryRestorationPlugin({
+      global: options?.global,
+      disabled: options?.restoreDisabled || options?.disabled,
+    }),
+    useHistoryEventsPlugin({
+      disabled: options?.disabled,
+      undoDisabled: options?.undoDisabled,
+      redoDisabled: options?.redoDisabled,
+    }),
+  );
+
+/** Plugin that handles undo (Cmd/Ctrl+Z) and redo (Cmd/Ctrl+Shift+Z or Cmd/Ctrl+Y) keyboard events. */
+export const useHistoryEventsPlugin =
   (options?: {
     disabled?: boolean;
-    restoreDisabled?: boolean;
     undoDisabled?: boolean;
     redoDisabled?: boolean;
   }): AnyContentEditorPlugin =>
+  (editor) =>
+  (block) => ({
+    onKeyDown(e) {
+      if (options?.disabled) return;
+
+      const isMod = e.ctrlKey || e.metaKey;
+
+      if (!isMod) return;
+
+      if (
+        !options?.undoDisabled &&
+        isUndo(e) &&
+        editor.history.undo(true) &&
+        editor.peek(block.id)
+      ) {
+        editor.history.undo();
+        editor.commit(new useHistoryEventsPlugin.EventData("undo"));
+
+        e.preventDefault();
+        return;
+      }
+
+      if (
+        !options?.redoDisabled &&
+        isRedo(e) &&
+        editor.history.redo(true) &&
+        editor.peek(block.id)
+      ) {
+        editor.history.redo();
+        editor.commit(new useHistoryEventsPlugin.EventData("redo"));
+
+        e.preventDefault();
+        return;
+      }
+    },
+  });
+
+useHistoryEventsPlugin.EventData = class HistoryEventData {
+  constructor(public action: "undo" | "redo") {}
+};
+
+/** Plugin that restores cursor selection to the correct position after an undo or redo. */
+export const useHistoryRestorationPlugin =
+  (options?: {
+    global?: boolean;
+    disabled?: boolean;
+  }): AnyContentEditorPlugin =>
   (editor) => {
     useEventListener(editor.bus, "postcommit", ({ editor }) => {
-      if (options?.restoreDisabled || options?.disabled) return;
+      if (options?.disabled) return;
 
       const direction = editor.history.direction;
       const cmd = editor.history.action;
@@ -40,10 +97,12 @@ export const useHistoryPlugin =
         direction === 1
           ? EditorAction.selectionAfter(cmd)
           : EditorAction.selectionBefore(cmd);
-      const { element } = editor.ref(id);
+      const element = childId
+        ? editor.ref(id).children.get(childId)
+        : editor.ref(id).element;
       const currentSelection = element && SelectionRange.read(element);
 
-      if (childId) return;
+      if (childId && !options?.global) return;
 
       if (!selection) {
         console.warn(`Failed to restore selection on postcommit.`, {
@@ -67,45 +126,11 @@ export const useHistoryPlugin =
       SelectionRange.apply(element, selection);
     });
 
-    return (block) => ({
-      onKeyDown(e) {
-        const isMod = e.ctrlKey || e.metaKey;
-
-        if (!isMod) return;
-
-        if (
-          !(options?.undoDisabled || options?.disabled) &&
-          isUndo(e) &&
-          editor.history.undo(true) &&
-          editor.peek(block.id)
-        ) {
-          editor.history.undo();
-          editor.commit(new useHistoryPlugin.EventData("undo"));
-
-          e.preventDefault();
-          return;
-        }
-
-        if (
-          !(options?.redoDisabled || options?.disabled) &&
-          isRedo(e) &&
-          editor.history.redo(true) &&
-          editor.peek(block.id)
-        ) {
-          editor.history.redo();
-          editor.commit(new useHistoryPlugin.EventData("redo"));
-
-          e.preventDefault();
-          return;
-        }
-      },
-    });
+    return () => ({});
   };
+
+/** Utilities */
 
 const isUndo = (e: KeyboardEvent) => e.key === "z" && !e.shiftKey;
 const isRedo = (e: KeyboardEvent) =>
   (e.key === "z" && e.shiftKey) || e.key === "y";
-
-useHistoryPlugin.EventData = class HistoryEventData {
-  constructor(public action: "undo" | "redo") {}
-};
