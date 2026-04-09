@@ -55,7 +55,7 @@ export class EditorEvent<
   static narrow<
     E extends keyof EditorEventMap<TBlock>,
     TBlock extends AnyBlock,
-  >(eventType: E, event: EditorEvent<TBlock>): event is EditorEvent<TBlock, E> {
+  >(event: EditorEvent<TBlock>, eventType: E): event is EditorEvent<TBlock, E> {
     return event.eventType === eventType;
   }
 }
