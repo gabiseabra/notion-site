@@ -159,7 +159,7 @@ function handleNewLine(
     block: {
       id,
       value: SpliceRange.apply(value, {
-        offset: selection.start + 1,
+        offset: selection.start,
         deleteCount: 0,
         insert: tabCharacter.repeat(tabSize),
       }),
