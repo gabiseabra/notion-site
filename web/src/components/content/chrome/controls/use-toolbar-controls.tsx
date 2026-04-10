@@ -12,7 +12,7 @@ export function useToolbarControls(editor: Editor) {
 
   const disabled = !target;
   const readOnly =
-    !target || target.type == "focus" || SelectionRange.isCollapsed(target);
+    !target || !!target.childId || SelectionRange.isCollapsed(target);
 
   return {
     selection: target,

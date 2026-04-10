@@ -28,8 +28,7 @@ export const useAutoCommitPlugin =
 
         if (!editor.hasUnsavedChanges) return;
 
-        const target = EditorTarget.read(editor);
-        const selection = target && EditorTarget.extractRange(target);
+        const selection = EditorTarget.read(editor);
 
         if (selection) {
           // if the current selection is known, restore it after update.
@@ -37,7 +36,7 @@ export const useAutoCommitPlugin =
           editor.bus.addEventListener(
             "postcommit",
             () => {
-              const { element } = editor.ref(target.id);
+              const { element } = editor.ref(selection.id);
               if (element) SelectionRange.apply(element, selection);
             },
             { once: true },

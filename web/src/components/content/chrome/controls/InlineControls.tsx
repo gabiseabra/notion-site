@@ -37,11 +37,11 @@ export function InlineControls({
 
   const disabled = componentDisabled || toolbarDisabled;
   const annotations =
-    text && selection && selection.type === "range"
+    text && selection
       ? Notion.RTF.getAnnotations(text, selection.start, selection.end)
       : undefined;
   const link =
-    text && selection && selection.type === "range"
+    text && selection
       ? Notion.RTF.getLink(text, selection.start, selection.end)
       : undefined;
 

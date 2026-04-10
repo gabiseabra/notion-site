@@ -58,8 +58,7 @@ export const useHotkeyPlugin =
   (block) => ({
     onKeyDown(e) {
       const key = toHotkey(e.nativeEvent);
-      const target = EditorTarget.read(editor);
-      const selection = target && EditorTarget.extractRange(target);
+      const selection = EditorTarget.read(editor);
 
       if (
         !selection ||
@@ -72,7 +71,7 @@ export const useHotkeyPlugin =
       const currentBlock = editor.peek(block.id) ?? block;
       const nextBlock = hotkey.command({
         block: currentBlock,
-        data: target,
+        data: selection,
         editor,
       });
 

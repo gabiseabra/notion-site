@@ -24,13 +24,8 @@ export const ExecCommand =
     childId?: ID,
   ) =>
   (command: EditorCommand<TBlock, TData>) => {
-    const target = EditorTarget.read(editor);
-    const selection = !target
-      ? undefined
-      : EditorTarget.isRange(target)
-        ? target
-        : { start: 0, end: 0 };
-    const currentBlock = block ?? (target && editor.peek(target.id));
+    const selection = EditorTarget.read(editor);
+    const currentBlock = block ?? (selection && editor.peek(selection.id));
     const newBlock =
       currentBlock &&
       command({
@@ -41,7 +36,7 @@ export const ExecCommand =
 
     if (newBlock) {
       const isFocused =
-        target && target.id === newBlock.id && childId === childId;
+        selection && selection.id === newBlock.id && childId === childId;
 
       editor.push({
         type: "update",
