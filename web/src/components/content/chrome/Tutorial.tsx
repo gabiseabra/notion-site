@@ -224,7 +224,7 @@ const Steps = {
         <Link to="https://github.com/gabiseabra/notion-site">
           github@gabiseabra/notion-site
         </Link>
-        .{"\n"}2. Mandando um email para
+        .{"\n"}2. Mandando um email para{" "}
         <Link to="mailto:hey@gabiseabra.dev">hey@gabiseabra.dev</Link>. .{"\n"}
         3. Entrando em contato de qualquer forma mais prática.
       </Text>
