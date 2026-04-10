@@ -50,12 +50,14 @@ export type EditorAction<TBlock extends AnyBlock> =
     };
 
 export const EditorAction = {
-  flat<TBlock extends AnyBlock>([cmd, ...cmds]: NonEmpty<
-    EditorAction<TBlock>
-  >): EditorActionCmd<TBlock>[] {
+  flat<TBlock extends AnyBlock>(
+    allCmds: EditorAction<TBlock>[],
+  ): EditorActionCmd<TBlock>[] {
+    if (!NonEmpty.isNonEmpty(allCmds)) return [];
+    const [cmd, ...cmds] = allCmds;
     return [
       ...(cmd.type === "apply"
-        ? EditorAction.flat(cmd.actions)
+        ? cmd.actions
         : cmd.type === "focus"
           ? []
           : [cmd]),
@@ -149,6 +151,32 @@ export const EditorAction = {
       }
     }
   },
+
+  apply<TBlock extends AnyBlock>(
+    cmd: EditorAction<TBlock>,
+    blocks: TBlock[],
+  ): TBlock[] {
+    switch (cmd.type) {
+      case "focus":
+        return blocks;
+      case "update":
+        return blocks.map((b) => (b.id === cmd.block.id ? cmd.block : b));
+      case "remove":
+        return blocks.filter((b) => b.id !== cmd.block.id);
+      case "split": {
+        const index = blocks.findIndex((b) => b.id === cmd.left.id);
+        if (index === -1) return blocks;
+        const result = [...blocks];
+        result.splice(index, 1, cmd.left, cmd.right);
+        return result;
+      }
+      case "apply":
+        return cmd.actions.reduce(
+          (acc, cmd) => EditorAction.apply(cmd, acc),
+          blocks,
+        );
+    }
+  },
 };
 
 export class EditorHistory<TBlock extends AnyBlock> extends History<
@@ -156,30 +184,7 @@ export class EditorHistory<TBlock extends AnyBlock> extends History<
   TBlock[]
 > {
   constructor(initialValue: TBlock[]) {
-    super(initialValue, (blocks, cmd) => applyAction(blocks, cmd));
-  }
-}
-
-function applyAction<TBlock extends AnyBlock>(
-  blocks: TBlock[],
-  cmd: EditorAction<TBlock>,
-): TBlock[] {
-  switch (cmd.type) {
-    case "focus":
-      return blocks;
-    case "update":
-      return blocks.map((b) => (b.id === cmd.block.id ? cmd.block : b));
-    case "remove":
-      return blocks.filter((b) => b.id !== cmd.block.id);
-    case "split": {
-      const index = blocks.findIndex((b) => b.id === cmd.left.id);
-      if (index === -1) return blocks;
-      const result = [...blocks];
-      result.splice(index, 1, cmd.left, cmd.right);
-      return result;
-    }
-    case "apply":
-      return cmd.actions.reduce(applyAction, blocks);
+    super(initialValue, (blocks, cmd) => EditorAction.apply(cmd, blocks));
   }
 }
 
@@ -188,5 +193,5 @@ export function applyActions<TBlock extends AnyBlock>(
   ...commands: EditorActionCmd<TBlock>[]
 ) {
   if (!NonEmpty.isNonEmpty(commands)) return blocks;
-  return applyAction(blocks, { type: "apply", actions: commands });
+  return EditorAction.apply({ type: "apply", actions: commands }, blocks);
 }

@@ -3,7 +3,7 @@ import { Lens } from "@notion-site/common/utils/optics/lens.js";
 import { useEffect, useMemo, useRef } from "react";
 import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event";
-import { applyActions, EditorAction } from "./editor-history";
+import { EditorAction } from "./editor-history";
 import { EditorTarget } from "./editor-target";
 import { AnyBlock, ContentEditor } from "./types";
 
@@ -41,27 +41,42 @@ export function useEditorLens<
     childAction: EditorAction<TBlock>,
     parentBlock: TParent,
   ): EditorAction<TParent> => {
-    if (childAction.type === "focus") {
-      return {
-        type: "focus",
-        block: { id: parentId },
-        childId: childAction.block.id,
-        selectionBefore: childAction.selectionBefore,
-        selectionAfter: childAction.selectionAfter,
-      };
+    switch (childAction.type) {
+      case "focus":
+        return {
+          type: "focus",
+          block: { id: parentId },
+          childId: childAction.block.id,
+          selectionBefore: childAction.selectionBefore,
+          selectionAfter: childAction.selectionAfter,
+        };
+      default: {
+        const actions = EditorAction.flat([childAction]);
+
+        if (!NonEmpty.isNonEmpty(actions))
+          return {
+            type: "focus",
+            block: { id: parentId },
+            childId: EditorAction.targetAfter(childAction).id,
+            selectionBefore: EditorAction.selectionBefore(childAction),
+            selectionAfter: EditorAction.selectionAfter(childAction),
+          };
+
+        return {
+          type: "update",
+          block: lensRef.current.set(
+            parentBlock,
+            EditorAction.apply(
+              { type: "apply", actions },
+              lensRef.current.get(parentBlock),
+            ),
+          ),
+          childId: EditorAction.targetAfter(childAction).id,
+          selectionBefore: EditorAction.selectionBefore(childAction),
+          selectionAfter: EditorAction.selectionAfter(childAction),
+        };
+      }
     }
-    const flatCmds = EditorAction.flat(NonEmpty.create(childAction));
-    const newChildBlocks = applyActions(
-      lensRef.current.get(parentBlock),
-      ...flatCmds,
-    );
-    return {
-      type: "update",
-      block: lensRef.current.set(parentBlock, newChildBlocks),
-      childId: EditorAction.targetAfter(childAction).id,
-      selectionBefore: EditorAction.selectionBefore(childAction),
-      selectionAfter: EditorAction.selectionAfter(childAction),
-    };
   };
 
   const editor = useMemo<ContentEditor<TBlock>>(
