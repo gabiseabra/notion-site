@@ -4,7 +4,7 @@ import { RefObject, useEffect, useRef } from "react";
  * Runs `onResize` when `target` changes size, noop if ResizeObserver is unavailable.
  */
 export function useResizeObserver(
-  elementOrRef: Element | RefObject<Element | null>,
+  elementOrRef: Element | RefObject<Element | null> | null,
   onResize: () => void,
   options?: ResizeObserverOptions,
 ) {
@@ -13,7 +13,7 @@ export function useResizeObserver(
 
   useEffect(() => {
     const element =
-      elementOrRef instanceof Element ? elementOrRef : elementOrRef.current;
+      elementOrRef instanceof Element ? elementOrRef : elementOrRef?.current;
 
     if (!element) {
       if (elementOrRef)

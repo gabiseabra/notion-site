@@ -32,6 +32,7 @@ export function DocumentToolbar({
 
   return (
     <Row
+      id="document-toolbar"
       gap={0}
       alignY="center"
       className={[className, styles["document-toolbar"]].join(" ")}

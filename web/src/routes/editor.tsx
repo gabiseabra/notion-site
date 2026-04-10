@@ -1,6 +1,7 @@
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { a, p, span } from "@notion-site/common/utils/notion/wip.js";
 import { useLocalStorage } from "usehooks-ts";
+import { Tutorial } from "../components/content/chrome/Tutorial";
 import { Editor } from "../components/content/Editor.js";
 import { useContentEditor } from "../components/content/editor/use-content-editor";
 import { Favicon } from "../components/display/Favicon.js";
@@ -17,18 +18,25 @@ declare global {
 }
 
 export function Component() {
+  const [tutorialDismissed, setTutorialDismissed] = useLocalStorage(
+    "editor-tutorial-dismissed",
+    false,
+  );
+  const tutorialOpen =
+    !tutorialDismissed && window.matchMedia("(min-width: 500px)").matches;
+
   const [blocks, setBlocks] = useLocalStorage<Notion.Block[]>("editor", [
     p(
-      "1",
+      "a",
       span("Hi 👋, welcome to my "),
       span("awesome ", { bold: true, color: "pink" }),
       span("content ", { italic: true, color: "blue_background" }),
       span("editor ", { underline: true, color: "purple" }),
       span("demo!", { code: true }),
     ),
-    p("2", span("Here is an almost blank canvas for you to start.")),
+    p("b", span("Here is an almost blank canvas for you to start.")),
     p(
-      "3",
+      "c",
       span("Write something! ! !", {
         bold: true,
         underline: true,
@@ -37,7 +45,7 @@ export function Component() {
       span(" Your changes will be saved to localstorage for the next session."),
     ),
     p(
-      "5",
+      "d",
       a(
         "Let me know if you find a bug.",
         "https://github.com/gabiseabra/notion-site/issues",
@@ -64,7 +72,19 @@ export function Component() {
         &nbsp;Content Editor Demo
       </Text>
 
-      <Editor editor={editor} />
+      <Editor
+        editor={editor}
+        after={
+          tutorialOpen && (
+            <Tutorial
+              editor={editor}
+              onClose={() => {
+                setTutorialDismissed(true);
+              }}
+            />
+          )
+        }
+      />
     </div>
   );
 }

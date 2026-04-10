@@ -191,3 +191,9 @@ h4[disabled] {
 pre[disabled] {
   filter: grayscale(0.6);
 }
+
+[contenteditable]:focus {
+  outline-color: var(--color-primary);
+  outline-offset: 4px;
+  outline-width: 2px;
+}

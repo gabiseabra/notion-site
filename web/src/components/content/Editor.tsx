@@ -52,21 +52,23 @@ export const Editor = memo(function ContentEditor({
       <div>
         {Slot.extract(before, editor)}
 
-        <RootBlock
-          value={editor.blocks}
-          render={(children, block) => (
-            <Block
-              ref={editor.ref(block.id)}
-              value={block}
-              disabled={disabled}
-              readOnly={readOnly}
-              editor={editor}
-              {...editable(block)}
-            >
-              {children}
-            </Block>
-          )}
-        />
+        <div id="editor-blocks">
+          <RootBlock
+            value={editor.blocks}
+            render={(children, block) => (
+              <Block
+                ref={editor.ref(block.id)}
+                value={block}
+                disabled={disabled}
+                readOnly={readOnly}
+                editor={editor}
+                {...editable(block)}
+              >
+                {children}
+              </Block>
+            )}
+          />
+        </div>
 
         {Slot.extract(after, editor)}
       </div>

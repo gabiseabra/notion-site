@@ -1,6 +1,10 @@
 @use "../../css/mixins/text" as text;
 @use "../../css/mixins/color" as color;
 
+.text {
+  white-space: pre-wrap;
+}
+
 .italic {
   font-style: italic;
 }
@@ -23,7 +27,7 @@
 
 .code {
   color: var(--color-highlight) !important;
-  background: var(--bg-gray);
+  background: var(--bg-to);
   font-family: var(--font-monospace);
   font-size: 0.95em;
 }

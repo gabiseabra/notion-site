@@ -52,33 +52,38 @@ export function useContentEditor<TBlock extends AnyBlock>({
 
       ref(id, childId) {
         const emptyMap: Map<ID, HTMLElement> = new Map();
-        let ref = blocksRef.current.get(id);
 
-        if (!ref) {
-          ref ??= {
-            children: emptyMap,
-            element: null,
-          };
-          blocksRef.current.set(id, ref);
+        function get() {
+          let ref = blocksRef.current.get(id);
+
+          if (!ref) {
+            ref ??= {
+              children: emptyMap,
+              element: null,
+            };
+            blocksRef.current.set(id, ref);
+          }
+
+          return ref;
         }
 
         return Object.assign(
           (element: HTMLElement | null) => {
             if (typeof childId === "undefined") {
-              ref.element = element;
+              get().element = element;
             } else if (element) {
-              ref.children.set(childId, element);
+              get().children.set(childId, element);
             } else {
-              ref.children.delete(childId);
+              get().children.delete(childId);
             }
           },
           {
             get element() {
-              if (typeof childId === "undefined") return ref.element;
-              return ref.children.get(childId) ?? null;
+              if (typeof childId === "undefined") return get().element;
+              return get().children.get(childId) ?? null;
             },
             get children() {
-              if (typeof childId === "undefined") return ref.children;
+              if (typeof childId === "undefined") return get().children;
               return emptyMap;
             },
           },

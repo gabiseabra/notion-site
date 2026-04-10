@@ -2,6 +2,7 @@ import { KeyboardEvent } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener";
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { EditorAction } from "../editor/editor-history.js";
+import { AnyBlock, ContentEditor } from "../editor/types";
 import { composePlugins } from "./compose-plugins";
 import { AnyContentEditorPlugin } from "./types.js";
 
@@ -78,40 +79,47 @@ export const useHistoryRestorationPlugin =
     useEventListener(editor.bus, "postcommit", ({ editor }) => {
       if (options?.disabled) return;
 
-      const direction = editor.history.direction;
-      const cmd = editor.history.action;
-
-      if (!cmd) return;
-
-      const { id, childId } =
-        direction === 1
-          ? EditorAction.targetAfter(cmd)
-          : EditorAction.targetBefore(cmd);
-      const selection =
-        direction === 1
-          ? EditorAction.selectionAfter(cmd)
-          : EditorAction.selectionBefore(cmd);
-      const element = childId
-        ? editor.ref(id).children.get(childId)
-        : editor.ref(id).element;
-      const currentSelection = element && SelectionRange.read(element);
-
-      if (childId && !options?.global) return;
-
-      if (
-        !element ||
-        !selection ||
-        (element === document.activeElement &&
-          selection.start === currentSelection?.start &&
-          selection.end === currentSelection?.end)
-      )
-        return;
-
-      SelectionRange.apply(element, selection);
+      restoreSelection(editor, options);
     });
 
     return () => ({});
   };
+
+export function restoreSelection(
+  editor: ContentEditor<AnyBlock>,
+  options?: { global?: boolean },
+) {
+  const direction = editor.history.direction;
+  const cmd = editor.history.action;
+
+  if (!cmd) return;
+
+  const { id, childId } =
+    direction === 1
+      ? EditorAction.targetAfter(cmd)
+      : EditorAction.targetBefore(cmd);
+  const selection =
+    direction === 1
+      ? EditorAction.selectionAfter(cmd)
+      : EditorAction.selectionBefore(cmd);
+  const element = childId
+    ? editor.ref(id).children.get(childId)
+    : editor.ref(id).element;
+  const currentSelection = element && SelectionRange.read(element);
+
+  if (childId && !options?.global) return;
+
+  if (
+    !element ||
+    !selection ||
+    (element === document.activeElement &&
+      selection.start === currentSelection?.start &&
+      selection.end === currentSelection?.end)
+  )
+    return;
+
+  SelectionRange.apply(element, selection);
+}
 
 /** Utilities */
 

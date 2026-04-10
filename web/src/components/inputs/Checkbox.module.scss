@@ -24,7 +24,7 @@
   width: 1em;
   height: 1em;
   flex: 0 0 auto;
-  background: var(--bg-gray);
+  background: var(--bg-to);
   border-radius: calc(var(--radius) / 2);
   transform: translateY(4px);
   @include shadow.shadow(1, $inset: true);

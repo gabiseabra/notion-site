@@ -1,0 +1,45 @@
+@use "../../../css/mixins/shadow" as shadow;
+@use "../../../css/mixins/layout" as layout;
+
+.tutorial {
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: fixed;
+  background: var(--color-shadow);
+  z-index: 1;
+  backdrop-filter: blur(3px);
+}
+
+.content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: var(--width-content);
+  box-sizing: border-box;
+  margin: layout.$gutter-content auto;
+  padding: calc(var(--space) * 4);
+  background-color: var(--bg-from);
+  border-radius: calc(var(--radius) * 2);
+  @include shadow.shadow(3, 2);
+  @include shadow.border;
+
+  @include layout.fit-content {
+    margin: layout.$gutter-content;
+    max-width: calc(100vw - #{layout.$gutter-content * 2});
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
+}
+
+.close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}

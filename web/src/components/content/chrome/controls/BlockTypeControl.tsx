@@ -79,63 +79,72 @@ export function BlockTypeControl({
   }, [value]);
 
   return (
-    <Dropdown.Navigator
-      dropdown={dropdown}
-      contains={(target) =>
-        !!frameRef.current?.iframe?.contentDocument?.contains(target)
-      }
-      onFocusChange={(id) => {
-        document.getElementById(`block-type--${id}`)?.scrollIntoView();
-        document.getElementById(`block-type--${id}`)?.focus();
+    <div
+      data-id="block-type-control"
+      onClick={(e) => {
+        Dropdown.toggle(dropdown);
+        e.preventDefault();
+        e.stopPropagation();
       }}
     >
-      <Dropdown
-        open={dropdown.open}
-        onClose={() => dropdown.reset()}
-        options={dropdown.visibleOptions}
-        renderOption={(option) => (
-          <Dropdown.Option
-            id={`block-type--${option.id}`}
-            active={option.id === value}
-            focused={dropdown.focusedId === option.id}
-            onClick={() => onChange(option.id)}
-            onFocus={() => dropdown.setFocusedId(option.id)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                onChange(option.id);
-                e.preventDefault();
-              }
-            }}
-          >
-            <IconControl as="span" size="s" color="currentColor">
-              {option.icon}
-            </IconControl>
-
-            <Span size="body">{option.title}</Span>
-          </Dropdown.Option>
-        )}
+      <Dropdown.Navigator
+        dropdown={dropdown}
+        contains={(target) =>
+          !!frameRef.current?.iframe?.contentDocument?.contains(target)
+        }
+        onFocusChange={(id) => {
+          document.getElementById(`block-type--${id}`)?.scrollIntoView();
+          document.getElementById(`block-type--${id}`)?.focus();
+        }}
       >
-        <IsolationFrame ref={frameRef} resize="y" style={{ width: 160 }}>
-          <Input
-            type="text"
-            label="Block type"
-            hiddenLabel
-            size="s"
-            style={{ padding: 2 }}
-            placeholder="Block type"
-            disabled={disabled}
-            readOnly={readOnly}
-            value={dropdown.value ?? selectedOption?.title ?? ""}
-            onChange={dropdown.setValue}
-            onFocus={() => Dropdown.toggle(dropdown)}
-            right={
-              <IconControl as="span" size="m" color="currentColor">
-                {dropdown.open ? <RxCaretDown /> : <RxCaretUp />}
+        <Dropdown
+          open={dropdown.open}
+          onClose={() => dropdown.reset()}
+          options={dropdown.visibleOptions}
+          renderOption={(option) => (
+            <Dropdown.Option
+              id={`block-type--${option.id}`}
+              active={option.id === value}
+              focused={dropdown.focusedId === option.id}
+              onClick={() => onChange(option.id)}
+              onFocus={() => dropdown.setFocusedId(option.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  onChange(option.id);
+                  e.preventDefault();
+                }
+              }}
+            >
+              <IconControl as="span" size="s" color="currentColor">
+                {option.icon}
               </IconControl>
-            }
-          />
-        </IsolationFrame>
-      </Dropdown>
-    </Dropdown.Navigator>
+
+              <Span size="body">{option.title}</Span>
+            </Dropdown.Option>
+          )}
+        >
+          <IsolationFrame ref={frameRef} resize="y" style={{ width: 160 }}>
+            <Input
+              type="text"
+              label="Block type"
+              hiddenLabel
+              size="s"
+              style={{ padding: 2 }}
+              placeholder="Block type"
+              disabled={disabled}
+              readOnly={readOnly}
+              value={dropdown.value ?? selectedOption?.title ?? ""}
+              onChange={dropdown.setValue}
+              onFocus={() => Dropdown.toggle(dropdown)}
+              right={
+                <IconControl as="span" size="m" color="currentColor">
+                  {dropdown.open ? <RxCaretDown /> : <RxCaretUp />}
+                </IconControl>
+              }
+            />
+          </IsolationFrame>
+        </Dropdown>
+      </Dropdown.Navigator>
+    </div>
   );
 }

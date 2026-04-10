@@ -18,11 +18,12 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 
-  transition: background-color 120ms ease,
-  border-color 120ms ease,
-  box-shadow 120ms ease,
-  transform 80ms ease,
-  opacity 120ms ease;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 80ms ease,
+    opacity 120ms ease;
 
   &:focus-visible {
     outline: none;
@@ -58,21 +59,18 @@
   }
 }
 
-.button:disabled {
-  --button-color: var(--color-disabled);
-  --button-bg: var(--bg-gray);
-
-  cursor: not-allowed;
-}
-
 @each $name, $_ in color.$colors-codes {
   @if $name != "default" {
     .#{"color-" + $name} {
       &.variant-solid {
-        --button-color: color-mix(in oklch, var(#{"--bg-" + $name}), white 25%);
-        --button-bg: var(#{"--color-" + $name});
-        --button-border: color-mix(in srgb, var(#{"--color-" + $name}), black 35%);
-        --button-filter: brightness(1.05);
+        --button-color: var(#{"--color-" + $name});
+        --button-bg: var(#{"--bg-" + $name});
+        --button-border: color-mix(
+          in oklch,
+          var(#{"--color-" + $name}),
+          white 35%
+        );
+        --button-filter: brightness(1);
       }
 
       &.variant-plain {
@@ -87,4 +85,12 @@
   --button-bg: var(--bg-to);
   --button-border: color-mix(in oklch, var(--color-text), white 25%);
   --button-filter: brightness(1.015);
+}
+
+.button:disabled {
+  --button-color: var(--color-disabled);
+  --button-border: var(--color-disabled);
+  --button-bg: var(--bg-gray);
+
+  cursor: not-allowed;
 }
