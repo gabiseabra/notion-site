@@ -14,9 +14,22 @@ export type CodeEditorProps = {
   disabled?: boolean;
   readOnly?: boolean;
   placeholder?: string;
+  onDelete?: () => void;
 };
 
-const useCodePlugin = composePlugins(useTextPlugin(), useTextIndentPlugin());
+const useCodePlugin = ({ onDelete }: { onDelete?: () => void }) =>
+  composePlugins(
+    (editor) => (block) => ({
+      onKeyDown(e) {
+        if (e.key === "Backspace" && editor.peek(block.id)?.value === "") {
+          e.preventDefault();
+          onDelete?.();
+        }
+      },
+    }),
+    useTextPlugin(),
+    useTextIndentPlugin(),
+  );
 
 export const CodeEditor = memo(function CodeEditor({
   id,
@@ -24,10 +37,11 @@ export const CodeEditor = memo(function CodeEditor({
   editor,
   readOnly,
   disabled,
+  onDelete,
   ...props
 }: CodeEditorProps) {
   const preRef = useRef<HTMLPreElement>(null);
-  const editable = useCodePlugin(editor);
+  const editable = useCodePlugin({ onDelete })(editor);
 
   const code = TextBlock.extract(editor.blocks);
 

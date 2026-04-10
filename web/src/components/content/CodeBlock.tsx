@@ -74,6 +74,16 @@ function EditableCodeBlock({
         disabled={disabled}
         language={language}
         editor={codeEditor}
+        onDelete={() => {
+          editor.push({
+            type: "remove",
+            block,
+            selectionBefore: { start: 0, end: 0 },
+            // todo handle selection after properly
+            selectionAfter: { start: 0, end: 0 },
+          });
+          editor.commit();
+        }}
       />
     </Code.Wrapper>
   );
