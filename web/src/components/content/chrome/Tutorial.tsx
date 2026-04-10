@@ -28,11 +28,12 @@ export function Tutorial({
   const Step = Steps[step];
 
   return (
-    <div className={styles.tutorial}>
+    <>
       <Body onClose={onClose}>
         <Step editor={editor} setStep={setStep} onClose={onClose} />
       </Body>
-    </div>
+      <div className={styles.shadow} />
+    </>
   );
 }
 
@@ -217,7 +218,7 @@ const Steps = {
       </Row>
 
       <Text as="div">
-        Achou um bug ou quer elogiar o meu super editor de contúdo?
+        Achou um bug ou quer elogiar o meu super editor de conteúdo?
         {"\n"}Você pode me mandar feedback das seguintes formas:
         {"\n"}1. Abrindo uma issue no{" "}
         <Link to="https://github.com/gabiseabra/notion-site">
@@ -288,6 +289,8 @@ function ElementFocus({
           height: elementRect?.height ?? 0,
           top: elementRect?.top ?? -1,
           left: elementRect?.left ?? -1,
+          userSelect: "none",
+          pointerEvents: "none",
         }}
       />
     </Popover>

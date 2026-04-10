@@ -1,7 +1,7 @@
 @use "../../../css/mixins/shadow" as shadow;
 @use "../../../css/mixins/layout" as layout;
 
-.tutorial {
+.shadow {
   width: 100vw;
   height: 100vh;
   top: 0;
@@ -19,6 +19,7 @@
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 5;
   max-width: var(--width-content);
   box-sizing: border-box;
   margin: layout.$gutter-content auto;
