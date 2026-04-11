@@ -133,7 +133,10 @@ export function normalize(rich_text: RichText) {
         replaceTextContent(item, () => ""),
       )
     ) {
-      last.text.content += item.text.content;
+      acc[acc.length - 1] = {
+        ...last,
+        text: { ...last.text, content: last.text.content + item.text.content },
+      };
     } else {
       acc.push(item);
     }
