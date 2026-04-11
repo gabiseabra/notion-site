@@ -161,4 +161,102 @@ describe("useBlockMutationPlugin", () => {
         expect(SelectionRange.read(p)).to.deep.equal({ start: 5, end: 5 });
       });
   });
+
+  it("restores selection on undo after split at end", () => {
+    cy.mount(
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
+
+    cy.get("p").click().type("{end}{enter}");
+
+    cy.get("p").should("have.length", 2);
+    cy.get("p").eq(1).should("have.focus");
+
+    cy.get("p").eq(1).type("{ctrl}z");
+
+    cy.get("p").should("have.length", 1);
+    cy.get("p").should("have.text", "Hello");
+    cy.get("p")
+      .eq(0)
+      .should("have.focus")
+      .then(([p]) => {
+        expect(SelectionRange.read(p)).to.deep.equal({ start: 5, end: 5 });
+      });
+  });
+
+  it("restores selection on redo after split at end", () => {
+    cy.mount(
+      <TestEditor value={[p("a", span("Hello"))]} onChange={() => {}} />,
+    );
+
+    cy.get("p").click().type("{end}{enter}");
+    cy.get("p").should("have.length", 2);
+
+    cy.get("p").eq(1).type("{ctrl}z");
+    cy.get("p").should("have.length", 1);
+
+    cy.get("p").eq(0).type("{ctrl}y");
+
+    cy.get("p").should("have.length", 2);
+    cy.get("p")
+      .eq(1)
+      .should("have.focus")
+      .then(([p]) => {
+        expect(SelectionRange.read(p)).to.deep.equal({ start: 0, end: 0 });
+      });
+  });
+
+  it("restores selection on undo after merge", () => {
+    cy.mount(
+      <TestEditor
+        value={[p("a", span("First")), p("b", span("Second"))]}
+        onChange={() => {}}
+      />,
+    );
+
+    cy.get("p").eq(1).click().type("{moveToStart}{backspace}");
+    cy.get("p")
+      .should("have.length", 1)
+      .then(([p]) => {
+        expect(SelectionRange.read(p)).to.deep.equal({ start: 5, end: 5 });
+      });
+
+    cy.get("p").eq(0).type("{ctrl}z");
+
+    cy.get("p").should("have.length", 2);
+    cy.get("p").eq(0).should("have.text", "First");
+    cy.get("p").eq(1).should("have.text", "Second");
+    cy.get("p")
+      .eq(1)
+      .should("have.focus")
+      .then(([p]) => {
+        expect(SelectionRange.read(p)).to.deep.equal({ start: 0, end: 0 });
+      });
+  });
+
+  it("restores selection on redo after merge", () => {
+    cy.mount(
+      <TestEditor
+        value={[p("a", span("First")), p("b", span("Second"))]}
+        onChange={() => {}}
+      />,
+    );
+
+    cy.get("p").eq(1).click().type("{moveToStart}{backspace}");
+    cy.get("p").should("have.length", 1);
+
+    cy.get("p").eq(0).type("{ctrl}z");
+    cy.get("p").should("have.length", 2);
+
+    cy.get("p").eq(1).type("{ctrl}y");
+
+    cy.get("p").should("have.length", 1);
+    cy.get("p").should("have.text", "FirstSecond");
+    cy.get("p")
+      .eq(0)
+      .should("have.focus")
+      .then(([p]) => {
+        expect(SelectionRange.read(p)).to.deep.equal({ start: 5, end: 5 });
+      });
+  });
 });
