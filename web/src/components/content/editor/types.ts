@@ -1,5 +1,5 @@
-import { isNonNullable } from "@notion-site/common/utils/guards.js";
 import { ReadOnlyHistory } from "@notion-site/common/utils/history.js";
+import { BlockRef } from "./block-ref";
 import { EditorChangeset } from "./editor-changeset";
 import { EditorCommand } from "./editor-command";
 import type { EditorEventTarget } from "./editor-event.js";
@@ -8,20 +8,6 @@ import { EditorHistoryEntry } from "./editor-history.js";
 export type ID = string | number | symbol;
 
 export type AnyBlock = { id: ID };
-
-export type BlockRef = {
-  element: HTMLElement | null;
-  children: Map<ID, HTMLElement>;
-};
-
-export const BlockRef = {
-  entries(ref: BlockRef) {
-    return [
-      ref.element && ([undefined as ID | undefined, ref.element] as const),
-      ...Array.from(ref.children.entries()),
-    ].filter(isNonNullable);
-  },
-};
 
 /**
  * Shared state passed to plugins in their editor setup phase.

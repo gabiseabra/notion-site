@@ -1,9 +1,10 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { BlockRef } from "./block-ref.js";
 import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
 import { EditorAction, EditorHistory } from "./editor-history.js";
 import { EditorTarget } from "./editor-target";
-import { AnyBlock, BlockRef, ContentEditor, ID } from "./types.js";
+import { AnyBlock, ContentEditor, ID } from "./types.js";
 
 /**
  * Creates shared state & controller for the editor plugins.

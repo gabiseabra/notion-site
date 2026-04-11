@@ -1,5 +1,6 @@
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { AnyBlock, BlockRef, ContentEditor, ID } from "./types.js";
+import { BlockRef } from "./block-ref.js";
+import { AnyBlock, ContentEditor, ID } from "./types.js";
 
 export type EditorTarget<TBlock extends AnyBlock> = SelectionRange & {
   id: TBlock["id"];

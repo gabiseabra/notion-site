@@ -7,7 +7,7 @@ import { useVisualViewportEventListener } from "../../../hooks/use-visual-viewpo
 import { AnchoredOverlayProps } from "../../overlays/Overlay.js";
 import { Popover } from "../../overlays/Popover.js";
 import { Editor } from "../Editor.js";
-import { BlockRef } from "../editor/types";
+import { BlockRef } from "../editor/block-ref.js";
 import styles from "./FloatingMenu.module.scss";
 import { SwatchColorControl } from "./controls/ColorControl.js";
 import { InlineControls } from "./controls/InlineControls.js";
