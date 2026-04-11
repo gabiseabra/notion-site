@@ -37,8 +37,8 @@ export const useNotionBackspacePlugin: ContentEditorPlugin<Notion.Block> =
           }),
           () => Notion.Block.extractRichText(editor.peek(block.id) ?? block),
         ),
-        selectionBefore: selection,
-        selectionAfter: selection,
+        targetBefore: { id: block.id, ...selection },
+        targetAfter: { id: block.id, ...selection },
       });
       editor.commit(data);
 

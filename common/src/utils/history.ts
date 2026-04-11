@@ -6,7 +6,7 @@ export interface ReadOnlyHistory<Act, State> {
 }
 
 export class History<Act, State> implements ReadOnlyHistory<Act, State> {
-  readonly actions: Act[] = [];
+  private actions: Act[] = [];
   private currentPosition = 0;
   private lastPosition = 0;
   private snapshots: Map<number, State> = new Map();

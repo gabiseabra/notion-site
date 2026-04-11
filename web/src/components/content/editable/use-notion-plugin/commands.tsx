@@ -91,8 +91,8 @@ export const downgradeBlock =
         }),
         () => Notion.Block.extractRichText(block),
       ),
-      selectionBefore: { start: 0, end: 0 },
-      selectionAfter: { start: 0, end: 0 },
+      targetBefore: { id: block.id, start: 0, end: 0 },
+      targetAfter: { id: block.id, start: 0, end: 0 },
     });
     editor.commit(data);
   };
@@ -114,7 +114,7 @@ export const updateBlock =
       data,
       type: "update",
       block,
-      selectionAfter:
+      targetAfter:
         selectionRange?.id === block.id
           ? selectionRange
           : {
@@ -122,7 +122,7 @@ export const updateBlock =
               end: 0,
               id: block.id,
             },
-      selectionBefore: selectionRange ?? undefined,
+      targetBefore: selectionRange ?? undefined,
     });
     editor.commit(data);
   };

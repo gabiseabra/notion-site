@@ -43,6 +43,14 @@ export function useContentEditor<TBlock extends AnyBlock>({
   const editorRef = useRef<ContentEditor<TBlock>>(null);
   const editor = useMemo<ContentEditor<TBlock>>(
     () => ({
+      get latest() {
+        return history.action;
+      },
+
+      get hasUnsavedChanges() {
+        return history.position > snapshot.position;
+      },
+
       id,
 
       blocks: snapshot.state,
@@ -135,7 +143,18 @@ export function useContentEditor<TBlock extends AnyBlock>({
 
         if (event.defaultPrevented) return;
 
-        history.push(event.detail.action);
+        const [cmd] = EditorAction.flat([action]);
+        const idBefore = cmd.type === "split" ? cmd.left.id : cmd.block.id;
+        const idAfter = cmd.type === "split" ? cmd.right.id : cmd.block.id;
+
+        history.push({
+          ...action,
+          targetBefore:
+            action.targetBefore ??
+            EditorTarget.end(editorRef.current, idBefore),
+          targetAfter:
+            action.targetAfter ?? EditorTarget.end(editorRef.current, idAfter),
+        });
       },
 
       commit(data) {
@@ -157,24 +176,6 @@ export function useContentEditor<TBlock extends AnyBlock>({
           position: event.detail.revision,
         });
         onCommitRef.current?.(event.detail.blocks);
-      },
-
-      get selectionBefore() {
-        return (
-          history.action &&
-          (EditorAction.selectionBefore(history.action) ?? null)
-        );
-      },
-
-      get selectionAfter() {
-        return (
-          history.action &&
-          (EditorAction.selectionAfter(history.action) ?? null)
-        );
-      },
-
-      get hasUnsavedChanges() {
-        return history.position > snapshot.position;
       },
     }),
     [bus, history, snapshot],

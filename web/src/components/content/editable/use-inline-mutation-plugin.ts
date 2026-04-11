@@ -96,8 +96,17 @@ export const useControlledlineMutationPlugin =
               ? event.currentTarget.value
               : (event.currentTarget.textContent ?? ""),
           ),
-          selectionBefore: selectionBeforeRef.current ?? undefined,
-          selectionAfter: SelectionRange.read(event.currentTarget) ?? undefined,
+          targetBefore: {
+            id: block.id,
+            ...(selectionBeforeRef.current ?? { start: 0, end: 0 }),
+          },
+          targetAfter: {
+            id: block.id,
+            ...(SelectionRange.read(event.currentTarget) ?? {
+              start: 0,
+              end: 0,
+            }),
+          },
         });
 
         if (autoCommit) editor.commit();
@@ -136,11 +145,14 @@ export const useLazyInlineMutationPlugin = <TBlock extends AnyBlock>({
 
       if (!actualSelection || !currentBlock) return;
 
-      const selectionBefore = changeset.selectionAfter ?? actualSelection;
+      const targetBefore = changeset.latest?.targetAfter ?? {
+        id: block.id,
+        ...actualSelection,
+      };
       const spliceRange = SpliceRange.fromInputEvent(
         event,
         event.target.textContent ?? "",
-        selectionBefore,
+        targetBefore,
       );
 
       if (!spliceRange) return;
@@ -153,8 +165,11 @@ export const useLazyInlineMutationPlugin = <TBlock extends AnyBlock>({
           spliceRange.deleteCount,
           spliceRange.insert,
         ),
-        selectionBefore,
-        selectionAfter: SpliceRange.toSelectionRange(spliceRange, 1),
+        targetBefore: targetBefore,
+        targetAfter: {
+          id: block.id,
+          ...SpliceRange.toSelectionRange(spliceRange, 1),
+        },
       });
     };
   });

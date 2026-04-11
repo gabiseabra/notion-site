@@ -1,9 +1,8 @@
-import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { Lens } from "@notion-site/common/utils/optics/lens.js";
 import { useEffect, useMemo, useRef } from "react";
 import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event";
-import { EditorAction } from "./editor-history";
+import { EditorAction, EditorHistoryEntry } from "./editor-history";
 import { EditorTarget } from "./editor-target";
 import { AnyBlock, ContentEditor } from "./types";
 
@@ -36,52 +35,54 @@ export function useEditorLens<
   const lensRef = useRef(lens);
   lensRef.current = lens;
 
-  /** Translates a child action into a parent action via the lens. */
+  const getLatest = (
+    parentAction: EditorHistoryEntry<TParent>,
+  ): EditorHistoryEntry<TBlock> | null => {
+    const localBlocks = editorRef.current?.blocks ?? [];
+    const { targetBefore, targetAfter } = parentAction;
+    const { id, childId } =
+      parent.history.direction === 1 ? targetAfter : targetBefore;
+    const block = localBlocks.find((b) => b.id === childId);
+
+    const action =
+      (block && EditorAction.map(parentAction, () => block)) ?? null;
+
+    if (!action || !childId || id !== parentId) {
+      return null;
+    }
+
+    return { ...action, targetBefore, targetAfter };
+  };
+
   const liftAction = (
     childAction: EditorAction<TBlock>,
     parentBlock: TParent,
   ): EditorAction<TParent> => {
-    switch (childAction.type) {
-      case "focus":
-        return {
-          type: "focus",
-          block: { id: parentId },
-          childId: childAction.block.id,
-          selectionBefore: childAction.selectionBefore,
-          selectionAfter: childAction.selectionAfter,
-        };
-      default: {
-        const actions = EditorAction.flat([childAction]);
-
-        if (!NonEmpty.isNonEmpty(actions))
-          return {
-            type: "focus",
-            block: { id: parentId },
-            childId: EditorAction.targetAfter(childAction).id,
-            selectionBefore: EditorAction.selectionBefore(childAction),
-            selectionAfter: EditorAction.selectionAfter(childAction),
-          };
-
-        return {
-          type: "update",
-          block: lensRef.current.set(
-            parentBlock,
-            EditorAction.apply(
-              { type: "apply", actions },
-              lensRef.current.get(parentBlock),
-            ),
-          ),
-          childId: EditorAction.targetAfter(childAction).id,
-          selectionBefore: EditorAction.selectionBefore(childAction),
-          selectionAfter: EditorAction.selectionAfter(childAction),
-        };
-      }
-    }
+    return {
+      type: "update",
+      block: lensRef.current.set(
+        parentBlock,
+        EditorAction.applyCmd(
+          EditorAction.flat([childAction]),
+          lens.get(parentBlock),
+        ),
+      ),
+    };
   };
 
   const editor = useMemo<ContentEditor<TBlock>>(
     () => ({
       id: `{${parent.id},${String(parentId)}}`,
+
+      bus,
+
+      get latest() {
+        return parent.latest && getLatest(parent.latest);
+      },
+
+      get hasUnsavedChanges() {
+        return parent.hasUnsavedChanges;
+      },
 
       blocks: (() => {
         const block = parent.blocks.find((b) => b.id === parentId);
@@ -91,52 +92,32 @@ export function useEditorLens<
 
       history: {
         get action() {
-          const localBlocks = editorRef.current?.blocks ?? [];
-          const parentAction = parent.history.action;
-
-          const { id, childId } = parentAction
-            ? EditorAction.targetAfter(parentAction)
-            : {};
-
-          const block = localBlocks.find((b) => b.id === childId);
-
-          const action =
-            (parentAction &&
-              block &&
-              EditorAction.map(parentAction, () => block)) ??
-            null;
-
-          if (!action || !childId || id !== parentId) {
-            return null;
-          }
-
-          if (action.type === "focus" || action.type === "update") {
-            delete action.childId;
-          }
-
-          return action;
+          return parent.latest && getLatest(parent.latest);
         },
+
         get position() {
           return parent.history.position;
         },
+
         get direction() {
           return parent.history.direction;
         },
+
         getState() {
           const block = parent.history
             .getState()
             .find((b) => b.id === parentId);
           return block ? lensRef.current.get(block) : [];
         },
-        undo(dryRun) {
+
+        undo(dryRun?: boolean) {
           return parent.history.undo(dryRun);
         },
-        redo(dryRun) {
+
+        redo(dryRun?: boolean) {
           return parent.history.redo(dryRun);
         },
       },
-
-      bus,
 
       ref(id) {
         return parent.ref(parentId, id);
@@ -212,18 +193,6 @@ export function useEditorLens<
         if (event.defaultPrevented) return;
 
         parent.commit(data);
-      },
-
-      get selectionBefore() {
-        return parent.selectionBefore;
-      },
-
-      get selectionAfter() {
-        return parent.selectionAfter;
-      },
-
-      get hasUnsavedChanges() {
-        return parent.hasUnsavedChanges;
       },
     }),
     [parentId, parent, bus],

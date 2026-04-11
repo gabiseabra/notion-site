@@ -47,8 +47,8 @@ export const useRegExpTransformPlugin =
         data,
         type: "update",
         block: newBlock,
-        selectionBefore: selection,
-        selectionAfter: { start: 0, end: 0 },
+        targetBefore: { id: block.id, ...selection },
+        targetAfter: { id: block.id, start: 0, end: 0 },
       });
       editor.commit(data);
     },

@@ -82,8 +82,8 @@ export const useHotkeyPlugin =
           data,
           type: "update",
           block: nextBlock,
-          selectionBefore: selection,
-          selectionAfter: selection,
+          targetBefore: selection,
+          targetAfter: selection,
         });
         editor.commit(data);
 

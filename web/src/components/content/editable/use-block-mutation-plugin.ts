@@ -54,7 +54,7 @@ export const useBlockMutationPlugin =
         if (!prevBlock || !prevElement || !currentBlock) return;
 
         const mergedBlock = merge(prevBlock, currentBlock);
-        const selectionAfter = {
+        const tragetAfter = {
           id: prevBlock.id,
           start: SelectionRange.maxOffset(prevElement),
           end: SelectionRange.maxOffset(prevElement),
@@ -75,14 +75,14 @@ export const useBlockMutationPlugin =
             {
               type: "remove",
               block: currentBlock,
-              selectionBefore,
             },
             {
               type: "update",
               block: mergedBlock,
-              selectionAfter,
             },
           ],
+          targetAfter: tragetAfter,
+          targetBefore: { id: block.id, ...selectionBefore },
         });
 
         editor.commit(data);
@@ -113,8 +113,8 @@ export const useBlockMutationPlugin =
           data,
           type: "split",
           ...splitBlocks,
-          selectionBefore,
-          selectionAfter: { start: 0, end: 0 },
+          targetBefore: { id: currentBlock.id, ...selectionBefore },
+          targetAfter: { id: splitBlocks.right.id, start: 0, end: 0 },
         });
         editor.commit(data);
 

@@ -78,9 +78,9 @@ function EditableCodeBlock({
           editor.push({
             type: "remove",
             block,
-            selectionBefore: { start: 0, end: 0 },
+            targetBefore: { id: block.id, childId: "code", start: 0, end: 0 },
             // todo handle selection after properly
-            selectionAfter: { start: 0, end: 0 },
+            targetAfter: { id: block.id, start: 0, end: 0 },
           });
           editor.commit();
         }}

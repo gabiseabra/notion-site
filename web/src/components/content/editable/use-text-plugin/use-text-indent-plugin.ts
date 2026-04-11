@@ -52,8 +52,12 @@ function handleShift(
           insert: tabCharacter,
         }),
       },
-      selectionBefore: selection,
-      selectionAfter: {
+      targetBefore: {
+        id,
+        ...selection,
+      },
+      targetAfter: {
+        id,
         start: selection.start + tabCharacter.length,
         end: selection.end + tabCharacter.length,
       },
@@ -67,8 +71,12 @@ function handleShift(
         id,
         value: value.slice(tabCharacter.length),
       },
-      selectionBefore: selection,
-      selectionAfter: {
+      targetBefore: {
+        id,
+        ...selection,
+      },
+      targetAfter: {
+        id,
         start: selection.start - tabCharacter.length,
         end: selection.end - tabCharacter.length,
       },
@@ -86,8 +94,12 @@ function handleShift(
           selectedLines.values.map((line) => tabCharacter + line).join("\n") +
           value.slice(selectedLines.result.end),
       },
-      selectionBefore: selection,
-      selectionAfter: {
+      targetBefore: {
+        id,
+        ...selection,
+      },
+      targetAfter: {
+        id,
         start: selection.start + tabCharacter.length,
         end: selection.end + tabCharacter.length * selectedLines.values.length,
       },
@@ -113,8 +125,12 @@ function handleShift(
         id,
         value: nextValue,
       },
-      selectionBefore: selection,
-      selectionAfter: {
+      targetBefore: {
+        id,
+        ...selection,
+      },
+      targetAfter: {
+        id,
         start:
           selection.start -
           (selectedLines.values[0]?.startsWith(tabCharacter)
@@ -164,8 +180,12 @@ function handleNewLine(
         insert: tabCharacter.repeat(tabSize),
       }),
     },
-    selectionBefore: selection,
-    selectionAfter: {
+    targetBefore: {
+      id,
+      ...selection,
+    },
+    targetAfter: {
+      id,
       start: selection.start + tabCharacter.length * tabSize,
       end: selection.end + tabCharacter.length * tabSize,
     },

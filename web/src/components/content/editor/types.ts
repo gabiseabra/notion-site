@@ -3,7 +3,7 @@ import { ReadOnlyHistory } from "@notion-site/common/utils/history.js";
 import { EditorChangeset } from "./editor-changeset";
 import { EditorCommand } from "./editor-command";
 import type { EditorEventTarget } from "./editor-event.js";
-import { EditorAction } from "./editor-history.js";
+import { EditorHistoryEntry } from "./editor-history.js";
 
 export type ID = string | number | symbol;
 
@@ -15,10 +15,10 @@ export type BlockRef = {
 };
 
 export const BlockRef = {
-  flat(ref: BlockRef): HTMLElement[] {
+  entries(ref: BlockRef) {
     return [
-      ref.element,
-      ...Array.from(ref.children.entries()).flatMap(([, element]) => element),
+      ref.element && ([undefined as ID | undefined, ref.element] as const),
+      ...Array.from(ref.children.entries()),
     ].filter(isNonNullable);
   },
 };
@@ -47,7 +47,7 @@ export interface ContentEditor<
    * does not flush changesets, so any pending changeset actions will be overwritten.
    * Call `peek` first to trigger a flush before manipulating history.
    */
-  readonly history: ReadOnlyHistory<EditorAction<TBlock>, TBlock[]> & {
+  readonly history: ReadOnlyHistory<EditorHistoryEntry<TBlock>, TBlock[]> & {
     undo(dryRun?: boolean): boolean;
     redo(dryRun?: boolean): boolean;
   };

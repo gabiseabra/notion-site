@@ -33,7 +33,7 @@ export function FloatingToolbar({
       selectionRect.height &&
       selectionRect.width &&
       editor.blocks.some((block) =>
-        BlockRef.flat(editor.ref(block.id)).some((element) =>
+        BlockRef.entries(editor.ref(block.id)).some(([, element]) =>
           element.contains(range.startContainer),
         ),
       )

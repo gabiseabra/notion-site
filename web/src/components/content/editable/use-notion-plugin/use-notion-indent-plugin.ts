@@ -67,6 +67,8 @@ export const useNotionIndentPlugin =
       onKeyDown(e) {
         const selection = SelectionRange.read(e.currentTarget) ?? undefined;
 
+        if (!selection) return;
+
         if (e.key === "Tab" && getIndent(block) < maxDepth) {
           const parent = shift(block);
 
@@ -80,8 +82,6 @@ export const useNotionIndentPlugin =
                 {
                   type: "update",
                   block: { ...(editor.peek(block.id) ?? block), parent },
-                  selectionBefore: selection,
-                  selectionAfter: selection,
                 },
                 ...editor.blocks.flatMap((b) => {
                   if (
@@ -95,6 +95,8 @@ export const useNotionIndentPlugin =
                   return [];
                 }),
               ],
+              targetBefore: { id: block.id, ...selection },
+              targetAfter: { id: block.id, ...selection },
             });
             editor.commit(data);
           }
@@ -123,8 +125,6 @@ export const useNotionIndentPlugin =
                   ...(editor.peek(block.id) ?? block),
                   parent: newParent,
                 },
-                selectionBefore: selection,
-                selectionAfter: selection,
               },
 
               ...editor.blocks.slice(ix + 1).flatMap((b) => {
@@ -141,6 +141,8 @@ export const useNotionIndentPlugin =
                 ] as const;
               }),
             ],
+            targetBefore: { id: block.id, ...selection },
+            targetAfter: { id: block.id, ...selection },
           });
           editor.commit(data);
 

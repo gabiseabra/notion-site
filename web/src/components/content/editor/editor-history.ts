@@ -1,37 +1,17 @@
-import {
-  hasNonNullableProperty,
-  isNonNullable,
-} from "@notion-site/common/utils/guards.js";
+import { isNonNullable } from "@notion-site/common/utils/guards.js";
 import { History } from "@notion-site/common/utils/history.js";
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
-import { SelectionRange } from "../../../utils/selection-range.js";
-import { AnyBlock, ID } from "./types.js";
+import { EditorTarget } from "./editor-target";
+import { AnyBlock } from "./types.js";
 
 /**
  * Commands for history tracking. Each command can be applied forward
  * to reconstruct state from a snapshot.
  */
 export type EditorActionCmd<TBlock extends AnyBlock> =
-  | {
-      type: "update";
-      block: TBlock;
-      childId?: ID;
-      selectionBefore?: SelectionRange;
-      selectionAfter?: SelectionRange;
-    }
-  | {
-      type: "remove";
-      block: TBlock;
-      selectionBefore?: SelectionRange;
-      selectionAfter?: SelectionRange;
-    }
-  | {
-      type: "split";
-      left: TBlock;
-      right: TBlock;
-      selectionBefore?: SelectionRange;
-      selectionAfter?: SelectionRange;
-    };
+  | { type: "update"; block: TBlock }
+  | { type: "remove"; block: TBlock }
+  | { type: "split"; left: TBlock; right: TBlock };
 
 interface EditorActionBatch<TBlock extends AnyBlock> {
   type: "apply";
@@ -40,94 +20,16 @@ interface EditorActionBatch<TBlock extends AnyBlock> {
 
 export type EditorAction<TBlock extends AnyBlock> =
   | EditorActionBatch<TBlock>
-  | EditorActionCmd<TBlock>
-  | {
-      type: "focus";
-      block: { id: TBlock["id"] };
-      childId?: ID;
-      selectionBefore?: SelectionRange;
-      selectionAfter?: SelectionRange;
-    };
+  | EditorActionCmd<TBlock>;
 
 export const EditorAction = {
-  flat<TBlock extends AnyBlock>(
-    allCmds: EditorAction<TBlock>[],
-  ): EditorActionCmd<TBlock>[] {
-    if (!NonEmpty.isNonEmpty(allCmds)) return [];
-    const [cmd, ...cmds] = allCmds;
-    return [
-      ...(cmd.type === "apply"
-        ? cmd.actions
-        : cmd.type === "focus"
-          ? []
-          : [cmd]),
-      ...(NonEmpty.isNonEmpty(cmds) ? EditorAction.flat(cmds) : []),
-    ];
-  },
-
-  targetBefore<TBlock extends AnyBlock>(
-    cmd: EditorAction<TBlock>,
-  ): { id: TBlock["id"]; childId?: ID } {
-    switch (cmd.type) {
-      case "apply":
-        return EditorAction.targetBefore(
-          cmd.actions.find(hasNonNullableProperty("selectionBefore")) ??
-            cmd.actions[0],
-        );
-      case "split":
-        return { id: cmd.left.id };
-      case "update":
-      case "focus":
-        return { id: cmd.block.id, childId: cmd.childId };
-      default:
-        return { id: cmd.block.id };
-    }
-  },
-
-  targetAfter<TBlock extends AnyBlock>(
-    cmd: EditorAction<TBlock>,
-  ): { id: TBlock["id"]; childId?: ID } {
-    switch (cmd.type) {
-      case "apply":
-        return EditorAction.targetBefore(
-          [...cmd.actions]
-            .reverse()
-            .find(hasNonNullableProperty("selectionAfter")) ??
-            cmd.actions[cmd.actions.length - 1],
-        );
-      case "split":
-        return { id: cmd.right.id };
-      case "update":
-      case "focus":
-        return { id: cmd.block.id, childId: cmd.childId };
-      default:
-        return { id: cmd.block.id };
-    }
-  },
-
-  selectionBefore<TBlock extends AnyBlock>(
-    cmd: EditorAction<TBlock>,
-  ): SelectionRange | undefined {
-    if (cmd.type !== "apply") return cmd.selectionBefore;
-    return cmd.actions.filter(hasNonNullableProperty("selectionBefore"))[0]
-      ?.selectionBefore;
-  },
-
-  selectionAfter<TBlock extends AnyBlock>(
-    cmd: EditorAction<TBlock>,
-  ): SelectionRange | undefined {
-    if (cmd.type !== "apply") return cmd.selectionAfter;
-    return cmd.actions.filter(hasNonNullableProperty("selectionAfter")).pop()
-      ?.selectionAfter;
-  },
+  flat,
 
   map<A extends AnyBlock, B extends AnyBlock>(
     action: EditorAction<A>,
     f: (s: A) => B,
   ): EditorAction<B> | undefined {
     switch (action.type) {
-      case "focus":
-        return action;
       case "apply": {
         const actions = action.actions
           .flatMap((cmd) => {
@@ -157,8 +59,8 @@ export const EditorAction = {
     blocks: TBlock[],
   ): TBlock[] {
     switch (cmd.type) {
-      case "focus":
-        return blocks;
+      // case "focus":
+      //   return blocks;
       case "update":
         return blocks.map((b) => (b.id === cmd.block.id ? cmd.block : b));
       case "remove":
@@ -177,21 +79,41 @@ export const EditorAction = {
         );
     }
   },
+
+  applyCmd<TBlock extends AnyBlock>(
+    actions: EditorActionCmd<TBlock>[],
+    blocks: TBlock[],
+  ) {
+    if (!NonEmpty.isNonEmpty(actions)) return blocks;
+    return EditorAction.apply({ type: "apply", actions }, blocks);
+  },
 };
 
+function flat<TBlock extends AnyBlock>(
+  allCmds: NonEmpty<EditorAction<TBlock>>,
+): NonEmpty<EditorActionCmd<TBlock>>;
+function flat<TBlock extends AnyBlock>(
+  allCmds: EditorAction<TBlock>[],
+): EditorActionCmd<TBlock>[] {
+  if (!NonEmpty.isNonEmpty(allCmds)) return [];
+  const [cmd, ...cmds] = allCmds;
+  return [
+    ...(cmd.type === "apply" ? cmd.actions : [cmd]),
+    ...(NonEmpty.isNonEmpty(cmds) ? EditorAction.flat(cmds) : []),
+  ];
+}
+
+export type EditorHistoryEntry<TBlock extends AnyBlock> =
+  EditorAction<TBlock> & {
+    targetAfter: EditorTarget<TBlock>;
+    targetBefore: EditorTarget<TBlock>;
+  };
+
 export class EditorHistory<TBlock extends AnyBlock> extends History<
-  EditorAction<TBlock>,
+  EditorHistoryEntry<TBlock>,
   TBlock[]
 > {
   constructor(initialValue: TBlock[]) {
     super(initialValue, (blocks, cmd) => EditorAction.apply(cmd, blocks));
   }
-}
-
-export function applyActions<TBlock extends AnyBlock>(
-  blocks: TBlock[],
-  ...commands: EditorActionCmd<TBlock>[]
-) {
-  if (!NonEmpty.isNonEmpty(commands)) return blocks;
-  return EditorAction.apply({ type: "apply", actions: commands }, blocks);
 }
