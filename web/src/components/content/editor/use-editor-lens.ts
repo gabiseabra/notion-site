@@ -81,22 +81,6 @@ export function useEditorLens<
     };
   };
 
-  const liftAction = (
-    childAction: EditorAction<TBlock>,
-    parentBlock: TParent,
-  ): EditorAction<TParent> => {
-    return {
-      type: "update",
-      block: lensRef.current.set(
-        parentBlock,
-        EditorAction.applyCmd(
-          EditorAction.flat([childAction]),
-          lens.get(parentBlock),
-        ),
-      ),
-    };
-  };
-
   const editor = useMemo<ContentEditor<TBlock>>(
     () => ({
       id: `{${parent.id},${String(parentId)}}`,
@@ -204,7 +188,31 @@ export function useEditorLens<
         const parentBlock = parent.peek(parentId, true);
         if (!parentBlock) return;
 
-        parent.push({ data, ...liftAction(event.detail.action, parentBlock) });
+        const idBefore = action.targetBefore?.id;
+        const idAfter = action.targetAfter?.id;
+        parent.push({
+          data,
+          type: "update",
+          block: lensRef.current.set(
+            parentBlock,
+            EditorAction.applyCmd(
+              EditorAction.flat([event.detail.action]),
+              lens.get(parentBlock),
+            ),
+          ),
+          targetBefore: {
+            ...(action.targetBefore ??
+              EditorTarget.end(parent, parentId, idBefore)),
+            id: parentId,
+            childId: idBefore,
+          },
+          targetAfter: {
+            ...(action.targetAfter ??
+              EditorTarget.end(parent, parentId, idAfter)),
+            id: parentId,
+            childId: idAfter,
+          },
+        });
       },
 
       commit(data) {
