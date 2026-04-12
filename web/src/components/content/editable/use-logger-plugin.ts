@@ -1,4 +1,4 @@
-import chalk from "chalk";
+import { ANSI } from "@notion-site/common/utils/ansi.js";
 import { useEventListener } from "../../../hooks/use-event-listener.js";
 import { EditorEvent } from "../editor/editor-event.js";
 import { AnyBlock } from "../editor/types.js";
@@ -33,30 +33,19 @@ export const createLogger =
       log(event);
   };
 
-const GREY = "#797b86";
-const LIGHT_GREY = "#f0f0f0";
-const PINK = "#eb3f9b";
-const LIGHT_PINK = "#ffd7f4";
-const PURPLE = "#5850f3";
-const LIGHT_PURPLE = "#e0d7ff";
-
-const grey = chalk.bgHex(LIGHT_GREY).hex(GREY);
-const secondary = chalk.bgHex(LIGHT_PINK).hex(PINK);
-const primary = chalk.bgHex(LIGHT_PURPLE).hex(PURPLE);
-
 const log = (event: EditorEvent<AnyBlock>) => {
   console.groupCollapsed(
     [
-      primary.bold(`[${event.eventType}]`),
+      ANSI.primary(`[${event.eventType}]`),
       "on",
-      grey.italic(event.editor.id),
+      ANSI.gray(`[${event.editor.id}]`),
     ].join(" "),
   );
-  console.info(secondary.bold("data"), event.detail.data);
+  console.info(ANSI.secondary("[data]"), event.detail.data);
   if (EditorEvent.narrow(event, "commit"))
-    console.info(secondary.bold("blocks"), event.detail.blocks);
+    console.info(ANSI.secondary("[blocks]"), event.detail.blocks);
   if (EditorEvent.narrow(event, "push"))
-    console.info(secondary.bold("action"), event.detail.action);
-  console.info(secondary.bold("editor"), event.editor);
+    console.info(ANSI.secondary("[action]"), event.detail.action);
+  console.info(ANSI.secondary("[editor]"), event.editor);
   console.groupEnd();
 };
