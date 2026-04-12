@@ -82,7 +82,7 @@ export function BlockTypeControl({
     <div
       data-id="block-type-control"
       onClick={(e) => {
-        Dropdown.toggle(dropdown);
+        Dropdown.toggle(dropdown, true);
         e.preventDefault();
         e.stopPropagation();
       }}

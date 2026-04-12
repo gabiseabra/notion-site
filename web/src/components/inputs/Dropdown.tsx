@@ -228,8 +228,9 @@ export namespace Dropdown {
 
   export function toggle<Option extends DropdownOption>(
     dropdown: Dropdown<Option>,
+    open = !dropdown.open,
   ) {
-    dropdown.setOpen(!dropdown.open);
+    dropdown.setOpen(open);
   }
 }
 
