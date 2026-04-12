@@ -46,7 +46,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
       debounceMs,
       disabled: Slot.some([isMethodDisabled("splice"), disabled]),
     }),
-    useControlledlineMutationPlugin({
+    useEagerInlineMutationPlugin({
       update,
       disabled: Slot.some([isMethodDisabled("update"), disabled]),
     }),
@@ -59,7 +59,7 @@ export const useInlineMutationPlugin = <TBlock extends AnyBlock>({
  * Reacts to the `onInput` event and replaces the block's content with the
  * element's full current value via the `update` callback.
  */
-export const useControlledlineMutationPlugin =
+export const useEagerInlineMutationPlugin =
   <TBlock extends AnyBlock>({
     disabled,
     update,
@@ -87,7 +87,7 @@ export const useControlledlineMutationPlugin =
           return;
 
         editor.push({
-          data: new useControlledlineMutationPlugin.ChangeData(),
+          data: new useEagerInlineMutationPlugin.ChangeData(),
           type: "update",
           block: update(
             block,
@@ -114,7 +114,7 @@ export const useControlledlineMutationPlugin =
     });
   };
 
-useControlledlineMutationPlugin.ChangeData = class ControlledInlineMutationPluginChangeData {};
+useEagerInlineMutationPlugin.ChangeData = class EagerInlineMutationPluginChangeData {};
 
 /**
  * Plugin that handles text input via the native `beforeinput` in batched mode.
