@@ -2,7 +2,18 @@ import { EditorAction } from "./editor-history";
 import { EditorTarget } from "./editor-target";
 import { AnyBlock } from "./types";
 
-export type EditorChangeset<TBlock extends AnyBlock> = {
+/**
+ * Represents one layer in a stack of pending edits.
+ * Each layer holds changes that have been pushed but not yet flushed downward.
+ * The editor itself is the bottom layer.
+ * `useContentEditor` implements this on top of history (pending = uncommitted history entries);
+ * `useEditorChangeset` implements it on top of the editor (pending = in-memory batch).
+ */
+export interface EditorChangeset<TBlock extends AnyBlock> {
+  /**
+   * Latest action that has been pushed but not yet commited.
+   * `null` if no changes are pending.
+   */
   readonly latest:
     | (EditorAction<TBlock> & {
         targetBefore: EditorTarget<TBlock>;
@@ -10,6 +21,9 @@ export type EditorChangeset<TBlock extends AnyBlock> = {
       })
     | null;
 
+  /**
+   * `true` while there are pending actions yet to be committed.
+   */
   readonly hasUnsavedChanges: boolean;
 
   /**
@@ -18,19 +32,16 @@ export type EditorChangeset<TBlock extends AnyBlock> = {
   discard(data?: unknown): void;
 
   /**
-   * Notifies other plugins to flush pending changes immediatelly! ! !
-   */
-  flush(data?: unknown): void;
-
-  /**
    * Returns the block by id including any pending changes.
-   * @note this calls flush internally.
+   * @note this emits flush internally so other changesets observing the same
+   * editor commit their own pending batches first.
    */
   peek(id: TBlock["id"], flushData?: unknown): TBlock | null;
 
-  /** Appends an action to the pending batch. `targetBefore` is inferred from
-   * the pending batch's `targetAfter` or the last committed history action if not
-   * already set on the action. */
+  /**
+   * Appends an action to the pending batch.
+   * @note `targetBefore` falls back to the `latest.targetAfter`.
+   */
   push(
     action: EditorAction<TBlock> & {
       data?: unknown;
@@ -38,4 +49,4 @@ export type EditorChangeset<TBlock extends AnyBlock> = {
       targetAfter?: EditorTarget<TBlock>;
     },
   ): void;
-};
+}

@@ -1,5 +1,5 @@
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
-import { useCallback, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener";
 import { EditorChangeset } from "./editor-changeset";
 import { EditorAction, EditorActionCmd } from "./editor-history";
@@ -12,23 +12,20 @@ import { AnyBlock, ContentEditor } from "./types";
  */
 export function useEditorChangeset<TBlock extends AnyBlock>(
   editor: ContentEditor<TBlock>,
+  /**
+   * Called on every push with the flat cmds of that push (not the accumulated batch);
+   * The return value is what actually gets appended.
+   * Use it to rewrite or cascade cmds, or as a per-push side-effect hook.
+   */
+  transform: (
+    actions: EditorActionCmd<TBlock>[],
+  ) => EditorActionCmd<TBlock>[] = (as) => as,
 ) {
   const changesetRef = useRef({
     actions: [] as EditorActionCmd<TBlock>[],
     batchId: Math.random(),
     targetBefore: EditorTarget.empty<TBlock>(),
     targetAfter: EditorTarget.empty<TBlock>(),
-  });
-
-  useEventListener(editor.bus, "flush", (event) => {
-    if (
-      !(
-        event.detail.data instanceof useEditorChangeset.FlushData &&
-        event.detail.data.batchId === changesetRef.current.batchId
-      )
-    ) {
-      changeset.flush();
-    }
   });
 
   const changeset = useMemo<EditorChangeset<TBlock>>(
@@ -53,37 +50,6 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
         changesetRef.current.batchId = Math.random();
       },
 
-      flush(data?: unknown) {
-        const { batchId } = changesetRef.current;
-        const action = this.latest;
-
-        if (!action) return;
-
-        this.discard();
-
-        editor.push({
-          ...action,
-          data: new useEditorChangeset.FlushData(batchId, data),
-        });
-
-        // if (
-        //   selection &&
-        //   (selection.start !== action.targetAfter.start ||
-        //     selection.end !== action.targetAfter.end)
-        // ) {
-        // // because the current selection is different than the one that will
-        // // commit. better handle this in auto-commit or smth....
-        //   // @todo why update selection ? ? ?
-        //   // editor.push({
-        //   //   data,
-        //   //   type: "focus",
-        //   //   block: { id },
-        //   //   selectionBefore: selectionAfter ?? selection,
-        //   //   selectionAfter: selection,
-        //   // });
-        // }
-      },
-
       push({ targetAfter, targetBefore, data, ...action }) {
         if (
           targetBefore &&
@@ -95,26 +61,54 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
         changesetRef.current.targetAfter =
           targetAfter ?? changesetRef.current.targetAfter;
 
-        changesetRef.current.actions.push(...EditorAction.flat([action]));
+        changesetRef.current.actions.push(
+          ...transform(EditorAction.flat([action])),
+        );
       },
 
       peek(id) {
-        const { batchId } = changesetRef.current;
+        const { batchId, actions } = changesetRef.current;
 
-        editor.flush(new useEditorChangeset.FlushData(batchId));
+        editor.peek(id, new useEditorChangeset.FlushData(batchId));
 
         return (
-          EditorAction.applyCmd(
-            changesetRef.current.actions,
-            editor.history.getState(),
-          ).find((b) => b.id === id) ?? null
+          EditorAction.applyCmd(actions, editor.history.getState()).find(
+            (b) => b.id === id,
+          ) ?? null
         );
       },
     }),
     [editor],
   );
 
-  return changeset;
+  function flush(data?: unknown) {
+    const { batchId } = changesetRef.current;
+    const action = changeset.latest;
+
+    if (!action) return;
+
+    changeset.discard();
+
+    editor.push({
+      ...action,
+      data: new useEditorChangeset.FlushData(batchId, data),
+    });
+  }
+
+  useEventListener(editor.bus, "flush", (event) => {
+    if (
+      !(
+        event.detail.data instanceof useEditorChangeset.FlushData &&
+        event.detail.data.batchId === changesetRef.current.batchId
+      )
+    ) {
+      flush();
+    }
+  });
+
+  return Object.assign(changeset, {
+    flush,
+  });
 }
 
 useEditorChangeset.FlushData = class EditorChangesetFlushData {
@@ -128,33 +122,18 @@ export function useLazyEditorChangeset<TBlock extends AnyBlock>(
   editor: ContentEditor<TBlock>,
   debounceMs: number | false,
 ) {
-  const changeset = useEditorChangeset(editor);
   const timerRef = useRef<number>(null);
 
-  const schedule = useCallback(() => {
+  const changeset = useEditorChangeset(editor, (as) => {
+    schedule();
+    return as;
+  });
+
+  function schedule() {
     if (debounceMs === false) return;
     if (timerRef.current !== null) window.clearTimeout(timerRef.current);
     timerRef.current = window.setTimeout(() => changeset.flush(), debounceMs);
-  }, [changeset]);
+  }
 
-  return useMemo<EditorChangeset<TBlock>>(
-    () => ({
-      ...changeset,
-
-      get latest() {
-        return changeset.latest;
-      },
-
-      get hasUnsavedChanges() {
-        return changeset.hasUnsavedChanges;
-      },
-
-      push(action) {
-        schedule();
-
-        return changeset.push(action);
-      },
-    }),
-    [changeset],
-  );
+  return changeset;
 }
