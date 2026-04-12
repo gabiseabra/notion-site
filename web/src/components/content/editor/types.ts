@@ -33,7 +33,10 @@ export interface ContentEditor<
    * does not flush changesets, so any pending changeset actions will be overwritten.
    * Call `peek` first to trigger a flush before manipulating history.
    */
-  readonly history: ReadOnlyHistory<EditorHistoryEntry<TBlock>, TBlock[]> & {
+  readonly history: Omit<
+    ReadOnlyHistory<EditorHistoryEntry<TBlock>, TBlock[]>,
+    "action"
+  > & {
     undo(dryRun?: boolean): boolean;
     redo(dryRun?: boolean): boolean;
   };

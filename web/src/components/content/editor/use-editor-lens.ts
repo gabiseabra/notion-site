@@ -102,10 +102,6 @@ export function useEditorLens<
       revision: parent.revision,
 
       history: {
-        get action() {
-          return parent.latest && getLatest(parent.latest);
-        },
-
         get position() {
           return parent.history.position;
         },
