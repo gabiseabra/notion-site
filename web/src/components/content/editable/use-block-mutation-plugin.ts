@@ -1,10 +1,11 @@
+import { runGenerator } from "@notion-site/common/utils/generator.js";
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { AnyBlock } from "../editor/types.js";
+import { EditorActionCmd } from "../editor/editor-history";
+import { EditorTarget } from "../editor/editor-target";
+import { AnyBlock, ContentEditor, ID } from "../editor/types.js";
 import { ContentEditorPlugin } from "./types.js";
 
-export type BlockMutationPluginOptions<TBlock> = {
-  merge(left: TBlock, right: TBlock): TBlock | null;
-
+export type BlockMutationPluginOptions<TBlock extends AnyBlock> = {
   split(
     block: TBlock,
     offset: number,
@@ -14,7 +15,22 @@ export type BlockMutationPluginOptions<TBlock> = {
     right: TBlock;
   } | null;
 
-  previous?: (block: TBlock, blocks: TBlock[]) => TBlock | null;
+  merge(left: TBlock, right: TBlock): TBlock | null;
+
+  /**
+   * Yields follow-up actions that get appended to a remove or split
+   * action, letting callers keep dependent blocks in sync with the
+   * structural change.
+   */
+  cascade?: (
+    action: Extract<EditorActionCmd<TBlock>, { type: "remove" | "split" }>,
+    editor: ContentEditor<TBlock>,
+  ) => Generator<EditorActionCmd<TBlock>>;
+
+  previous?: (
+    block: TBlock,
+    editor: ContentEditor<TBlock>,
+  ) => { id: TBlock["id"]; childId?: ID } | null;
 };
 
 /**
@@ -27,12 +43,11 @@ export type BlockMutationPluginOptions<TBlock> = {
  */
 export const useBlockMutationPlugin =
   <TBlock extends AnyBlock>({
-    merge,
     split,
-    previous = (block, blocks) => {
-      const index = blocks.findIndex((b) => b.id === block.id);
-      return blocks[index - 1] ?? null;
-    },
+    merge,
+    cascade,
+    previous = (block, editor) =>
+      EditorTarget.tab({ id: block.id }, editor, -1),
   }: BlockMutationPluginOptions<TBlock>): ContentEditorPlugin<TBlock> =>
   (editor) =>
   (block) => ({
@@ -47,7 +62,9 @@ export const useBlockMutationPlugin =
           // or the block only contains nbsp (is empty)
           e.currentTarget.textContent === String.fromCharCode(160))
       ) {
-        const prevBlock = previous(block, editor.blocks);
+        const prev = previous(block, editor);
+        const prevBlock =
+          prev && editor.blocks.find((block) => block.id === prev.id);
         const prevElement = prevBlock && editor.ref(prevBlock.id).element;
         const currentBlock = editor.peek(block.id);
 
@@ -56,6 +73,7 @@ export const useBlockMutationPlugin =
         const mergedBlock = merge(prevBlock, currentBlock);
         const tragetAfter = {
           id: prevBlock.id,
+          childId: prev.childId,
           start: SelectionRange.maxOffset(prevElement),
           end: SelectionRange.maxOffset(prevElement),
         };
@@ -69,14 +87,13 @@ export const useBlockMutationPlugin =
           data,
           type: "apply",
           actions: [
-            {
-              type: "remove",
-              block: currentBlock,
-            },
-            {
-              type: "update",
-              block: mergedBlock,
-            },
+            { type: "remove", block: currentBlock },
+            { type: "update", block: mergedBlock },
+            ...(cascade
+              ? runGenerator(
+                  cascade({ type: "remove", block: currentBlock }, editor),
+                ).values
+              : []),
           ],
           targetAfter: tragetAfter,
           targetBefore: { id: block.id, ...selectionBefore },
@@ -103,8 +120,14 @@ export const useBlockMutationPlugin =
 
         editor.push({
           data,
-          type: "split",
-          ...splitBlocks,
+          type: "apply",
+          actions: [
+            { type: "split", ...splitBlocks },
+            ...(cascade
+              ? runGenerator(cascade({ type: "split", ...splitBlocks }, editor))
+                  .values
+              : []),
+          ],
           targetBefore: { id: currentBlock.id, ...selectionBefore },
           targetAfter: { id: splitBlocks.right.id, start: 0, end: 0 },
         });

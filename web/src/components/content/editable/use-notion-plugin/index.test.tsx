@@ -34,7 +34,7 @@ function TestEditor({
   return <Editor editor={editor} />;
 }
 
-describe("useNotionOrphanagePlugin", () => {
+describe("useNotionPlugin > block reparenting", () => {
   it("re-parents children of deleted block to deleted block's parent on merge", () => {
     const editorRef: RefObject<Editor | null> = { current: null };
     const { container } = render(

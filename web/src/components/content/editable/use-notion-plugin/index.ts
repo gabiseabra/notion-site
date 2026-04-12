@@ -11,7 +11,6 @@ import { createLogger, useLoggerPlugin } from "../use-logger-plugin.js";
 import { toggleAnnotations } from "./commands.js";
 import { useNotionBackspacePlugin } from "./use-notion-backspace-plugin.js";
 import { useNotionIndentPlugin } from "./use-notion-indent-plugin.js";
-import { useNotionOrphanagePlugin } from "./use-notion-orphanage-plugin.js";
 import { useNotionPrefixPlugin } from "./use-notion-prefix-plugin.js";
 
 export type NotionPluginOptions = {
@@ -45,6 +44,11 @@ export const useNotionPlugin = ({
     useNotionIndentPlugin({}),
     useBlockNavigationPlugin,
     useBlockMutationPlugin({
+      split(block, offset, deleteRange) {
+        if (inline || !Notion.Block.isRichText(block)) return null;
+
+        return Notion.Block.split(block, offset, deleteRange);
+      },
       merge(left, right) {
         if (
           inline ||
@@ -61,14 +65,39 @@ export const useNotionPlugin = ({
           ]),
         }));
       },
-      split(block, offset, deleteRange) {
-        if (inline || !Notion.Block.isRichText(block)) return null;
+      *cascade(action, editor) {
+        const deleted = action.type === "remove" ? action.block : null;
+        const original = action.type === "split" ? action.left : null;
+        const created = action.type === "split" ? action.right : null;
 
-        return Notion.Block.split(block, offset, deleteRange);
+        for (const block of editor.blocks) {
+          if (
+            deleted &&
+            block.parent.type === "block_id" &&
+            block.parent.block_id === deleted.id
+          )
+            yield {
+              type: "update",
+              block: { ...block, parent: deleted.parent },
+            };
+
+          if (
+            original &&
+            created &&
+            block.parent.type === "block_id" &&
+            block.parent.block_id === original.id
+          )
+            yield {
+              type: "update",
+              block: {
+                ...block,
+                parent: { type: "block_id", block_id: created.id },
+              },
+            };
+        }
       },
     }),
     useNotionPrefixPlugin,
-    useNotionOrphanagePlugin,
     ...Object.values(NotionHotkeys).map(useHotkeyPlugin),
   );
 
