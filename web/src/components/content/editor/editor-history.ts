@@ -1,4 +1,3 @@
-import { isNonNullable } from "@notion-site/common/utils/guards.js";
 import { History } from "@notion-site/common/utils/history.js";
 import { NonEmpty } from "@notion-site/common/utils/non-empty.js";
 import { EditorTarget } from "./editor-target";
@@ -28,28 +27,25 @@ export const EditorAction = {
   map<A extends AnyBlock, B extends AnyBlock>(
     action: EditorAction<A>,
     f: (s: A) => B,
-  ): EditorAction<B> | undefined {
+  ): EditorAction<B> {
     switch (action.type) {
       case "apply": {
-        const actions = action.actions
-          .flatMap((cmd) => {
-            const b = EditorAction.map(cmd, f);
-            return typeof b === "undefined" ? [] : EditorAction.flat([b]);
-          })
-          .filter(isNonNullable);
+        const actions = NonEmpty.merge(
+          action.actions.map((cmd) =>
+            EditorAction.flat([EditorAction.map(cmd, f)]),
+          ),
+        );
 
-        return NonEmpty.isNonEmpty(actions)
-          ? { ...action, actions }
-          : undefined;
+        return { ...action, actions };
       }
       case "split": {
         const left = f(action.left);
         const right = f(action.right);
-        return left && right ? { ...action, left, right } : undefined;
+        return { ...action, left, right };
       }
       default: {
         const block = f(action.block);
-        return block ? { ...action, block } : undefined;
+        return { ...action, block };
       }
     }
   },
@@ -59,8 +55,6 @@ export const EditorAction = {
     blocks: TBlock[],
   ): TBlock[] {
     switch (cmd.type) {
-      // case "focus":
-      //   return blocks;
       case "update":
         return blocks.map((b) => (b.id === cmd.block.id ? cmd.block : b));
       case "remove":

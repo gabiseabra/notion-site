@@ -5,8 +5,12 @@ export const NonEmpty = {
     return [t, ...ts];
   },
 
-  merge<T>([t, ...ts]: NonEmpty<T>, ...tss: T[][]): NonEmpty<T> {
-    return [t, ...ts, ...tss.flat(1)];
+  append<T>([t, ...ts]: NonEmpty<T>, ...tss: T[]): NonEmpty<T> {
+    return [t, ...ts, ...tss];
+  },
+
+  merge<T>([ts, ...tss]: NonEmpty<T>[]): NonEmpty<T> {
+    return NonEmpty.append(ts, ...tss.flatMap(NonEmpty.toArray));
   },
 
   isNonEmpty<T>(arr: T[]): arr is NonEmpty<T> {
@@ -15,5 +19,9 @@ export const NonEmpty = {
 
   extract<T>([t]: NonEmpty<T>): T {
     return t;
+  },
+
+  toArray<T>(t: NonEmpty<T>): T[] {
+    return [...t];
   },
 };
