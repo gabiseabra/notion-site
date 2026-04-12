@@ -198,13 +198,13 @@ export function useEditorLens<
           ),
           targetBefore: {
             ...(action.targetBefore ??
-              EditorTarget.end(parent, parentId, idBefore)),
+              EditorTarget.end({ id: parentId, childId: idBefore }, parent)),
             id: parentId,
             childId: idBefore,
           },
           targetAfter: {
             ...(action.targetAfter ??
-              EditorTarget.end(parent, parentId, idAfter)),
+              EditorTarget.end({ id: parentId, childId: idAfter }, parent)),
             id: parentId,
             childId: idAfter,
           },

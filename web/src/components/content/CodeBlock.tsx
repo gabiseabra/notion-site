@@ -10,7 +10,10 @@ import { Code } from "../display/Code.js";
 import { Text } from "../display/Text";
 import { LanguageDropdown } from "../inputs/LanguageDropdown";
 import { CodeEditor } from "./CodeEditor";
-import { updateCodeLanguage } from "./editable/use-notion-plugin/commands";
+import {
+  downgradeBlock,
+  updateCodeLanguage,
+} from "./editable/use-notion-plugin/commands";
 import { TextBlock } from "./editable/use-text-plugin";
 import { Editor } from "./Editor";
 import { useEditorLens } from "./editor/use-editor-lens";
@@ -74,16 +77,7 @@ function EditableCodeBlock({
         disabled={disabled}
         language={language}
         editor={codeEditor}
-        onDelete={() => {
-          editor.push({
-            type: "remove",
-            block,
-            targetBefore: { id: block.id, childId: "code", start: 0, end: 0 },
-            // todo handle selection after properly
-            targetAfter: { id: block.id, start: 0, end: 0 },
-          });
-          editor.commit();
-        }}
+        onDelete={() => editor.exec(downgradeBlock(block, "code"))}
       />
     </Code.Wrapper>
   );

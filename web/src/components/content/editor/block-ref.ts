@@ -9,8 +9,12 @@ export type BlockRef = {
 export const BlockRef = {
   all(editor: ContentEditor<AnyBlock>) {
     return editor.blocks
-      .flatMap((block) => BlockRef.entries(editor.ref(block.id)))
-      .sort(([, a], [, b]) => {
+      .flatMap((block) =>
+        BlockRef.entries(editor.ref(block.id)).map(
+          ([childId, element]) => [block.id, childId, element] as const,
+        ),
+      )
+      .sort(([, , a], [, , b]) => {
         const position = a.compareDocumentPosition(b);
         if (position & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
         if (position & Node.DOCUMENT_POSITION_PRECEDING) return 1;

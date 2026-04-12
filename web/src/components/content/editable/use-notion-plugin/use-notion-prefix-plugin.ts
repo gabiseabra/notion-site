@@ -86,5 +86,5 @@ export const useNotionPrefixPlugin = composePlugins(
       },
     })),
   ),
-  useRegExpTransformPlugin(/^```/, " ", createBlock("code")),
+  useRegExpTransformPlugin(/^```/, " ", createBlock("code"), "code"),
 );

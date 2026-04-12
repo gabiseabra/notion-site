@@ -1,6 +1,6 @@
 import { SelectionRange } from "../../../utils/selection-range.js";
 import { EditorCommand } from "../editor/editor-command.js";
-import { AnyBlock } from "../editor/types";
+import { AnyBlock, ID } from "../editor/types";
 import { ContentEditorPlugin } from "./types.js";
 
 /**
@@ -19,6 +19,7 @@ export const useRegExpTransformPlugin =
     regExp: RegExp,
     char: string,
     transform: EditorCommand<TBlock, RegExpMatchArray>,
+    childId?: ID,
   ): ContentEditorPlugin<TBlock> =>
   (editor) =>
   (block) => ({
@@ -48,7 +49,7 @@ export const useRegExpTransformPlugin =
         type: "update",
         block: newBlock,
         targetBefore: { id: block.id, ...selection },
-        targetAfter: { id: block.id, start: 0, end: 0 },
+        targetAfter: { id: newBlock.id, childId, start: 0, end: 0 },
       });
       editor.commit(data);
     },

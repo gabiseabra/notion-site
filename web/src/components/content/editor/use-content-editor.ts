@@ -152,9 +152,10 @@ export function useContentEditor<TBlock extends AnyBlock>({
           ...action,
           targetBefore:
             action.targetBefore ??
-            EditorTarget.end(editorRef.current, idBefore),
+            EditorTarget.end({ id: idBefore }, editorRef.current),
           targetAfter:
-            action.targetAfter ?? EditorTarget.end(editorRef.current, idAfter),
+            action.targetAfter ??
+            EditorTarget.end({ id: idAfter }, editorRef.current),
         });
       },
 

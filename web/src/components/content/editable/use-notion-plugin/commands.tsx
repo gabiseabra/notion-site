@@ -3,6 +3,7 @@ import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { SelectionRange } from "../../../../utils/selection-range.js";
 import { EditorCommand } from "../../editor/editor-command";
 import { EditorTarget } from "../../editor/editor-target.js";
+import { ID } from "../../editor/types";
 
 export const isAnnotated =
   (annotations: Partial<Notion.RTF.Annotations>) =>
@@ -76,7 +77,7 @@ export const setBlockType =
   };
 
 export const downgradeBlock =
-  (block: Notion.Block): EditorCommand<Notion.Block> =>
+  (block: Notion.Block, childId?: ID): EditorCommand<Notion.Block> =>
   ({ editor }) => {
     const data = "delete-block-command";
 
@@ -91,7 +92,7 @@ export const downgradeBlock =
         }),
         () => Notion.Block.extractRichText(block),
       ),
-      targetBefore: { id: block.id, start: 0, end: 0 },
+      targetBefore: { id: block.id, childId, start: 0, end: 0 },
       targetAfter: { id: block.id, start: 0, end: 0 },
     });
     editor.commit(data);
@@ -127,6 +128,26 @@ export const updateBlock =
     editor.commit(data);
   };
 
+export const deleteBlock =
+  (id: string, childId?: ID): EditorCommand<Notion.Block> =>
+  ({ editor }) => {
+    const data = "delete-block-command";
+
+    const block = editor.blocks.find((b) => b.id === id);
+    const targetAfter = EditorTarget.tab({ id, childId }, editor, -1);
+
+    if (!block || !targetAfter) return;
+
+    editor.push({
+      data,
+      type: "remove",
+      block,
+      targetBefore: { id: block.id, childId, start: 0, end: 0 },
+      targetAfter,
+    });
+    editor.commit(data);
+  };
+
 export const toggleToDo =
   (checked?: boolean): EditorCommand<Notion.Block> =>
   ({ block }) => {
@@ -136,19 +157,6 @@ export const toggleToDo =
       to_do: {
         ...block.to_do,
         checked: checked ?? !block.to_do.checked,
-      },
-    };
-  };
-
-export const updateCode =
-  (code: string): EditorCommand<Notion.Block> =>
-  ({ block }) => {
-    if (block.type !== "code") return;
-    return {
-      ...block,
-      code: {
-        ...block.code,
-        rich_text: [Notion.RTF.text(code)],
       },
     };
   };
