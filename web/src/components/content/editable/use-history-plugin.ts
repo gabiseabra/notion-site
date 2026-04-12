@@ -75,10 +75,12 @@ export const useHistoryRestorationPlugin =
     disabled?: boolean;
   }): AnyContentEditorPlugin =>
   (editor) => {
-    useEventListener(editor.bus, "postcommit", ({ editor }) => {
-      if (options?.disabled) return;
+    useEventListener(editor.bus, "ready", ({ editor }) => {
+      if (!options?.disabled) restoreSelection(editor, options);
+    });
 
-      restoreSelection(editor, options);
+    useEventListener(editor.bus, "postcommit", ({ editor }) => {
+      if (!options?.disabled) restoreSelection(editor, options);
     });
 
     return () => ({});
@@ -89,12 +91,11 @@ export function restoreSelection(
   options?: { global?: boolean },
 ) {
   const direction = editor.history.direction;
-  const cmd = editor.history.action;
 
-  if (!cmd) return;
+  if (!editor.latest) return;
 
   const { id, childId, ...selection } =
-    direction === 1 ? cmd.targetAfter : cmd.targetBefore;
+    direction === 1 ? editor.latest.targetAfter : editor.latest.targetBefore;
   const element = childId
     ? editor.ref(id).children.get(childId)
     : editor.ref(id).element;
