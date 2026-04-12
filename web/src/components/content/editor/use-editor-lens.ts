@@ -1,7 +1,7 @@
 import { autoBind } from "@notion-site/common/utils/object.js";
 import { Lens } from "@notion-site/common/utils/optics/lens.js";
 import { useEffect, useMemo, useRef } from "react";
-import { ExecCommand } from "./editor-command";
+import { execCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event";
 import { EditorAction, EditorHistoryEntry } from "./editor-history";
 import { EditorTarget } from "./editor-target";
@@ -133,7 +133,7 @@ export function useEditorLens<
           const target = EditorTarget.read(this);
           const block = id ? this.blocks.find((b) => b.id === id) : undefined;
           if (!target || (id && !block)) return;
-          return ExecCommand(this, target, block)(cmd);
+          return execCommand(this, target, block)(cmd);
         },
 
         discard(data) {

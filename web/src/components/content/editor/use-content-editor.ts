@@ -1,6 +1,6 @@
 import { autoBind } from "@notion-site/common/utils/object.js";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { ExecCommand } from "./editor-command";
+import { execCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
 import { EditorAction, EditorHistory } from "./editor-history.js";
 import { EditorRefMap } from "./editor-ref.js";
@@ -108,7 +108,7 @@ export function useContentEditor<TBlock extends AnyBlock>({
 
           if (id && !block) return;
 
-          return ExecCommand(this, target, block)(cmd);
+          return execCommand(this, target, block)(cmd);
         },
 
         /** EditorChangeset implementation */

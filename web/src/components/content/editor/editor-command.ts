@@ -2,6 +2,13 @@ import { Slot } from "../../../utils/slot";
 import { EditorTarget } from "./editor-target";
 import { AnyBlock, ContentEditor, ID } from "./types.js";
 
+/**
+ * Operation run against a target block. Either return a replacement block, in
+ * which case the runner pushes an "update" and commits, or drive editor
+ * imperatively for non-update actions and return nothing.
+ * data is a caller-supplied payload whose meaning is agreed between the command
+ * and whoever invokes it.
+ */
 export type EditorCommand<
   TBlock extends AnyBlock,
   TData = EditorTarget<TBlock> | null,
@@ -11,12 +18,24 @@ export type EditorCommand<
   editor: ContentEditor<TBlock>;
 }) => TBlock | undefined | void;
 
+/**
+ * Caller-side shape of a bound command runner, matching ContentEditor.exec.
+ * Invokes an EditorCommand against the editor's current target.
+ */
 export type ExecCommand<
   TBlock extends AnyBlock,
   TData = EditorTarget<TBlock>,
 > = (command: EditorCommand<TBlock, TData>) => void;
 
-export const ExecCommand =
+/**
+ * Builds the runner behind ContentEditor.exec.
+ * - Binds the editor and a lazy data slot (so the value, typically the DOM
+ *   selection, is not read until the command fires).
+ * - Optionally overrides the block and childId to target a specific block
+ *   instead of the one under the current selection.
+ * - Auto-commits an "update" when the command returns a replacement block.
+ */
+export const execCommand =
   <TBlock extends AnyBlock, TData>(
     editor: ContentEditor<TBlock>,
     data: Slot<TData>,
