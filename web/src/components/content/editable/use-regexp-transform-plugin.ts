@@ -19,7 +19,7 @@ export const useRegExpTransformPlugin =
     regExp: RegExp,
     char: string,
     transform: EditorCommand<TBlock, RegExpMatchArray>,
-    childId?: ID,
+    targetAfter?: { childId?: ID; start: number; end: number },
   ): ContentEditorPlugin<TBlock> =>
   (editor) =>
   (block) => ({
@@ -49,7 +49,7 @@ export const useRegExpTransformPlugin =
         type: "update",
         block: newBlock,
         targetBefore: { id: block.id, ...selection },
-        targetAfter: { id: newBlock.id, childId, start: 0, end: 0 },
+        targetAfter: { id: newBlock.id, start: 0, end: 0, ...targetAfter },
       });
       editor.commit(data);
     },
