@@ -1,9 +1,8 @@
 import { ReadOnlyHistory } from "@notion-site/common/utils/history.js";
-import { BlockRef } from "./block-ref";
 import { EditorChangeset } from "./editor-changeset";
 import { EditorCommand } from "./editor-command";
 import type { EditorEventTarget } from "./editor-event.js";
-import { EditorHistoryEntry } from "./editor-history.js";
+import { EditorRef } from "./editor-ref";
 
 export type ID = string | number | symbol;
 
@@ -33,10 +32,7 @@ export interface ContentEditor<
    * does not flush changesets, so any pending changeset actions will be overwritten.
    * Call `peek` first to trigger a flush before manipulating history.
    */
-  readonly history: Omit<
-    ReadOnlyHistory<EditorHistoryEntry<TBlock>, TBlock[]>,
-    "action"
-  > & {
+  readonly history: ReadOnlyHistory<TBlock[]> & {
     undo(dryRun?: boolean): boolean;
     redo(dryRun?: boolean): boolean;
   };
@@ -54,7 +50,7 @@ export interface ContentEditor<
   ref(
     id: TBlock["id"],
     childId?: ID,
-  ): BlockRef & {
+  ): EditorRef.MapEntry & {
     (element: HTMLElement | null): void;
   };
 

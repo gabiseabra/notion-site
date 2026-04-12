@@ -1,5 +1,5 @@
 import { SelectionRange } from "../../../utils/selection-range.js";
-import { BlockRef } from "./block-ref.js";
+import { EditorRef } from "./editor-ref.js";
 import { AnyBlock, ContentEditor, ID } from "./types.js";
 
 export type EditorTarget<TBlock extends AnyBlock> = SelectionRange & {
@@ -32,32 +32,35 @@ export const EditorTarget = {
 
     if (!range) return null;
 
-    const allElements = editor.blocks
-      .flatMap((block) =>
-        BlockRef.entries(editor.ref(block.id)).map(
-          ([childId, element]) => [block.id, childId, element] as const,
-        ),
-      )
+    const activeElement = EditorRef.read(editor, targetId)
       .filter(
-        ([id, childId]) =>
-          !(typeof targetId !== "undefined" && targetId !== id) &&
+        ({ childId }) =>
           !(typeof targetChildId !== "undefined" && targetChildId !== childId),
+      )
+      .find(
+        ({ element }) =>
+          element.contains(range.startContainer) ||
+          element.contains(document.activeElement),
       );
-
-    const activeElement = allElements.find(
-      ([, , element]) =>
-        element.contains(range.startContainer) ||
-        element.contains(document.activeElement),
-    );
 
     if (!activeElement) return null;
 
-    const [id, childId, element] = activeElement;
+    const { id, childId, element } = activeElement;
     const selection = SelectionRange.read(element);
 
     if (!selection) return null;
 
     return { ...selection, id, childId };
+  },
+
+  start<TBlock extends AnyBlock>({
+    id,
+    childId,
+  }: {
+    id: TBlock["id"];
+    childId?: ID;
+  }): EditorTarget<TBlock> {
+    return { id, childId, start: 0, end: 0 };
   },
 
   /**
@@ -84,17 +87,17 @@ export const EditorTarget = {
     editor: ContentEditor<TBlock>,
     direction: 1 | -1,
   ): EditorTarget<TBlock> | null {
-    const allElements = BlockRef.all(editor);
+    const allElements = EditorRef.read(editor);
     const ix = allElements.findIndex(
-      ([id, childId]) => id === target.id && childId === target.childId,
+      ({ id, childId }) => id === target.id && childId === target.childId,
     );
     const next = ix === -1 ? undefined : allElements[ix + direction];
 
     if (!next) return null;
 
-    const end = direction === -1 ? maxOffset(next[2]) : 0;
+    const end = direction === -1 ? maxOffset(next.element) : 0;
 
-    return { id: next[0], childId: next[1], start: end, end };
+    return { id: next.id, childId: next.childId, start: end, end };
   },
 };
 

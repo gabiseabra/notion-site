@@ -1,8 +1,8 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { BlockRef } from "./block-ref.js";
 import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
 import { EditorAction, EditorHistory } from "./editor-history.js";
+import { EditorRef } from "./editor-ref.js";
 import { EditorTarget } from "./editor-target";
 import { AnyBlock, ContentEditor, ID } from "./types.js";
 
@@ -26,7 +26,7 @@ export function useContentEditor<TBlock extends AnyBlock>({
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
   const history = useMemo(() => new EditorHistory(initialValue), []);
   const [snapshot, setSnapshot] = useState(() => history.snapshot());
-  const blocksRef = useRef<Map<TBlock["id"], BlockRef>>(new Map());
+  const blocksRef = useRef<EditorRef.Map<TBlock>>(new Map());
 
   /** Callback refs */
 
@@ -152,7 +152,8 @@ export function useContentEditor<TBlock extends AnyBlock>({
           ...action,
           targetBefore:
             action.targetBefore ??
-            EditorTarget.end({ id: idBefore }, editorRef.current),
+            history.action?.targetAfter ??
+            EditorTarget.start({ id: idBefore }),
           targetAfter:
             action.targetAfter ??
             EditorTarget.end({ id: idAfter }, editorRef.current),
