@@ -38,14 +38,14 @@ const log = (event: EditorEvent<AnyBlock>) => {
     [
       ANSI.primary(`[${event.eventType}]`),
       "on",
-      ANSI.gray(`[${event.editor.id}]`),
+      ANSI.gray(event.editor.id),
     ].join(" "),
   );
-  console.info(ANSI.secondary("[data]"), event.detail.data);
+  console.info(ANSI.secondary("data"), event.detail.data);
   if (EditorEvent.narrow(event, "commit"))
-    console.info(ANSI.secondary("[blocks]"), event.detail.blocks);
+    console.info(ANSI.secondary("blocks"), event.detail.blocks);
   if (EditorEvent.narrow(event, "push"))
-    console.info(ANSI.secondary("[action]"), event.detail.action);
-  console.info(ANSI.secondary("[editor]"), event.editor);
+    console.info(ANSI.secondary("action"), event.detail.action);
+  console.info(ANSI.secondary("editor"), event.editor);
   console.groupEnd();
 };
