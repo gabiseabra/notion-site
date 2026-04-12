@@ -1,6 +1,6 @@
 import { autoBind } from "@notion-site/common/utils/object.js";
-import { Lens } from "@notion-site/common/utils/optics/lens.js";
-import { useEffect, useMemo, useRef } from "react";
+import { Traversal } from "@notion-site/common/utils/optics/traversal.js";
+import { useEffect, useId, useMemo, useRef } from "react";
 import { execCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event";
 import { EditorAction, EditorHistoryEntry } from "./editor-history";
@@ -16,24 +16,24 @@ import { AnyBlock, ContentEditor, ID } from "./types";
  * - Scoped editors manage their own event bus, events bubble up to the parent,
  *   can be prevented.
  */
-export function useEditorLens<
+export function useEditorTraversal<
   TParent extends AnyBlock,
   TBlock extends AnyBlock,
 >({
   id: parentId,
   editor: parent,
-  lens,
+  traversal,
 }: {
   id: TParent["id"];
   editor: ContentEditor<TParent>;
-  /** Focus on child blocks */
-  lens: Lens<TParent, TBlock[]>;
+  traversal: Traversal<TParent, TBlock>;
 }) {
-  // const isReadyRef = useRef(false);
+  const id = useId();
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
   const blocks = useMemo(() => {
-    const block = parent.blocks.find((b) => b.id === parentId);
-    return block ? lens.get(block) : [];
+    return parent.blocks
+      .filter((block) => block.id === parentId)
+      .flatMap((block) => traversal.get(block));
   }, [parent]);
 
   const narrowId = ({
@@ -85,7 +85,7 @@ export function useEditorLens<
   const editor = useMemo<ContentEditor<TBlock>>(
     () =>
       autoBind({
-        id: `{${parent.id},${String(parentId)}}`,
+        id: `{${parent.id},${id}}`,
 
         bus,
 
@@ -110,10 +110,7 @@ export function useEditorLens<
           },
 
           getState() {
-            const block = parent.history
-              .getState()
-              .find((b) => b.id === parentId);
-            return block ? lens.get(block) : [];
+            return parent.history.getState().flatMap(traversal.get);
           },
 
           undo(dryRun?: boolean) {
@@ -126,7 +123,25 @@ export function useEditorLens<
         },
 
         ref(id) {
-          return parent.ref(parentId, id);
+          const parentRef = parent.ref(parentId);
+
+          return Object.assign(
+            (element: HTMLElement | null) => {
+              if (element) {
+                parentRef.children.set(id, element);
+              } else {
+                parentRef.children.delete(id);
+              }
+            },
+            {
+              get element() {
+                return parentRef.children.get(id) ?? null;
+              },
+              get children() {
+                return new Map();
+              },
+            },
+          );
         },
 
         exec(cmd, id) {
@@ -147,7 +162,7 @@ export function useEditorLens<
           );
           const block = parent.peek(parentId, flushData);
           if (!block) return null;
-          return lens.get(block).find((b) => b.id === id) ?? null;
+          return traversal.get(block).find((b) => b.id === id) ?? null;
         },
 
         push({ data, ...action }) {
@@ -169,15 +184,16 @@ export function useEditorLens<
 
           const idBefore = action.targetBefore?.id;
           const idAfter = action.targetAfter?.id;
+
           parent.push({
             data,
             type: "update",
-            block: lens.set(
+            block: traversal.modify(
               parentBlock,
-              EditorAction.applyCmd(
-                EditorAction.flat([action]),
-                lens.get(parentBlock),
-              ),
+              (block) =>
+                EditorAction.applyCmd(EditorAction.flat([action]), [
+                  block,
+                ]).find((b) => b.id === block.id) ?? block,
             ),
             targetBefore: {
               ...(action.targetBefore ??

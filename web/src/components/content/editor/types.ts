@@ -47,10 +47,7 @@ export interface ContentEditor<
    * Get the DOM element registered for a block. Returns `null` if the block
    * hasn't mounted yet or was removed.
    */
-  ref(
-    id: TBlock["id"],
-    childId?: ID,
-  ): EditorRefMapEntry & {
+  ref(id: TBlock["id"]): EditorRefMapEntry & {
     (element: HTMLElement | null): void;
   };
 

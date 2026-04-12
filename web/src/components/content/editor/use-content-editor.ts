@@ -5,7 +5,7 @@ import { EditorEvent, EditorEventTarget } from "./editor-event.js";
 import { EditorAction, EditorHistory } from "./editor-history.js";
 import { EditorRefMap } from "./editor-ref.js";
 import { EditorTarget } from "./editor-target";
-import { AnyBlock, ContentEditor, ID } from "./types.js";
+import { AnyBlock, ContentEditor } from "./types.js";
 
 /**
  * Creates shared state & controller for the editor plugins.
@@ -60,15 +60,13 @@ export function useContentEditor<TBlock extends AnyBlock>({
         history,
         bus,
 
-        ref(id, childId) {
-          const emptyMap: Map<ID, HTMLElement> = new Map();
-
+        ref(id) {
           function get() {
             let ref = blocksRef.current.get(id);
 
             if (!ref) {
               ref ??= {
-                children: emptyMap,
+                children: new Map(),
                 element: null,
               };
               blocksRef.current.set(id, ref);
@@ -77,27 +75,9 @@ export function useContentEditor<TBlock extends AnyBlock>({
             return ref;
           }
 
-          return Object.assign(
-            (element: HTMLElement | null) => {
-              if (typeof childId === "undefined") {
-                get().element = element;
-              } else if (element) {
-                get().children.set(childId, element);
-              } else {
-                get().children.delete(childId);
-              }
-            },
-            {
-              get element() {
-                if (typeof childId === "undefined") return get().element;
-                return get().children.get(childId) ?? null;
-              },
-              get children() {
-                if (typeof childId === "undefined") return get().children;
-                return emptyMap;
-              },
-            },
-          );
+          return Object.assign((element: HTMLElement | null) => {
+            get().element = element;
+          }, get());
         },
 
         exec(cmd, id) {
