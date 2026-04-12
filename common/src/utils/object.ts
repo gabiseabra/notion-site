@@ -30,8 +30,8 @@ export function omitUndefined<T>(object: Partial<T>): Partial<T> {
   return out;
 }
 
-export function keys<T extends GenericObject>(object: T): (keyof T)[] {
-  return Object.keys(object);
+export function keys<T extends object>(object: T): (keyof T)[] {
+  return Object.keys(object) as (keyof T)[];
 }
 
 export function equals<T extends GenericObject>(
@@ -42,4 +42,13 @@ export function equals<T extends GenericObject>(
   const keysA = Object.keys(a) as (keyof T)[];
   if (keysA.length !== Object.keys(b).length) return false;
   return keysA.every((key) => key in b && eq(a[key], b[key]));
+}
+
+export function autoBind<T extends object>(self: T): T {
+  return keys(self).reduce((self, key) => {
+    if (self[key] instanceof Function) {
+      return Object.assign(self, { [key]: self[key].bind(self) });
+    }
+    return self;
+  }, self);
 }

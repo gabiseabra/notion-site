@@ -1,3 +1,4 @@
+import { autoBind } from "@notion-site/common/utils/object.js";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
@@ -42,136 +43,139 @@ export function useContentEditor<TBlock extends AnyBlock>({
   /** Editor internals */
 
   const editor = useMemo<ContentEditor<TBlock>>(
-    () => ({
-      get latest() {
-        return history.action;
-      },
+    () =>
+      autoBind({
+        get latest() {
+          return history.action;
+        },
 
-      get hasUnsavedChanges() {
-        return history.position > snapshot.position;
-      },
+        get hasUnsavedChanges() {
+          return history.position > snapshot.position;
+        },
 
-      id,
+        id,
 
-      blocks: snapshot.state,
-      revision: snapshot.position,
-      history,
-      bus,
+        blocks: snapshot.state,
+        revision: snapshot.position,
+        history,
+        bus,
 
-      ref(id, childId) {
-        const emptyMap: Map<ID, HTMLElement> = new Map();
+        ref(id, childId) {
+          const emptyMap: Map<ID, HTMLElement> = new Map();
 
-        function get() {
-          let ref = blocksRef.current.get(id);
+          function get() {
+            let ref = blocksRef.current.get(id);
 
-          if (!ref) {
-            ref ??= {
-              children: emptyMap,
-              element: null,
-            };
-            blocksRef.current.set(id, ref);
+            if (!ref) {
+              ref ??= {
+                children: emptyMap,
+                element: null,
+              };
+              blocksRef.current.set(id, ref);
+            }
+
+            return ref;
           }
 
-          return ref;
-        }
-
-        return Object.assign(
-          (element: HTMLElement | null) => {
-            if (typeof childId === "undefined") {
-              get().element = element;
-            } else if (element) {
-              get().children.set(childId, element);
-            } else {
-              get().children.delete(childId);
-            }
-          },
-          {
-            get element() {
-              if (typeof childId === "undefined") return get().element;
-              return get().children.get(childId) ?? null;
+          return Object.assign(
+            (element: HTMLElement | null) => {
+              if (typeof childId === "undefined") {
+                get().element = element;
+              } else if (element) {
+                get().children.set(childId, element);
+              } else {
+                get().children.delete(childId);
+              }
             },
-            get children() {
-              if (typeof childId === "undefined") return get().children;
-              return emptyMap;
+            {
+              get element() {
+                if (typeof childId === "undefined") return get().element;
+                return get().children.get(childId) ?? null;
+              },
+              get children() {
+                if (typeof childId === "undefined") return get().children;
+                return emptyMap;
+              },
             },
-          },
-        );
-      },
+          );
+        },
 
-      exec(cmd, id) {
-        const target = EditorTarget.read(this);
-        const block = id ? snapshot.state.find((b) => b.id === id) : undefined;
+        exec(cmd, id) {
+          const target = EditorTarget.read(this);
+          const block = id
+            ? snapshot.state.find((b) => b.id === id)
+            : undefined;
 
-        if (id && !block) return;
+          if (id && !block) return;
 
-        return ExecCommand(this, target, block)(cmd);
-      },
+          return ExecCommand(this, target, block)(cmd);
+        },
 
-      /** EditorChangeset implementation */
+        /** EditorChangeset implementation */
 
-      discard(data) {
-        this.flush(data);
-        while (this.hasUnsavedChanges) history.undo();
-      },
+        discard(data) {
+          this.flush(data);
+          while (this.hasUnsavedChanges) history.undo();
+        },
 
-      flush(data?: unknown) {
-        bus.dispatchTypedEvent(
-          "flush",
-          new EditorEvent("flush", this, { data }),
-        );
-      },
+        flush(data?: unknown) {
+          bus.dispatchTypedEvent(
+            "flush",
+            new EditorEvent("flush", this, { data }),
+          );
+        },
 
-      peek(id, data) {
-        this.flush(data);
+        peek(id, data) {
+          this.flush(data);
 
-        return history.getState().find((block) => block.id === id) ?? null;
-      },
+          return history.getState().find((block) => block.id === id) ?? null;
+        },
 
-      push({ data, ...action }) {
-        this.flush(data);
+        push({ data, ...action }) {
+          this.flush(data);
 
-        const event = new EditorEvent("push", this, {
-          action,
-          data,
-        });
-        bus.dispatchTypedEvent("push", event);
+          const event = new EditorEvent("push", this, {
+            action,
+            data,
+          });
+          bus.dispatchTypedEvent("push", event);
 
-        if (event.defaultPrevented) return;
+          if (event.defaultPrevented) return;
 
-        const [cmd] = EditorAction.flat([action]);
-        const idBefore = cmd.type === "split" ? cmd.left.id : cmd.block.id;
-        const idAfter = cmd.type === "split" ? cmd.right.id : cmd.block.id;
+          const [cmd] = EditorAction.flat([action]);
+          const idBefore = cmd.type === "split" ? cmd.left.id : cmd.block.id;
+          const idAfter = cmd.type === "split" ? cmd.right.id : cmd.block.id;
 
-        history.push({
-          ...action,
-          targetBefore:
-            action.targetBefore ??
-            history.action?.targetAfter ??
-            EditorTarget.start({ id: idBefore }),
-          targetAfter:
-            action.targetAfter ?? EditorTarget.end({ id: idAfter }, this),
-        });
-      },
+          history.push({
+            ...action,
+            targetBefore:
+              action.targetBefore ??
+              history.action?.targetAfter ??
+              EditorTarget.start({ id: idBefore }),
+            targetAfter:
+              action.targetAfter ?? EditorTarget.end({ id: idAfter }, this),
+          });
+        },
 
-      commit(data) {
-        const snapshot = history.snapshot();
+        commit(data) {
+          const snapshot = history.snapshot();
 
-        const event = new EditorEvent("commit", this, {
-          blocks: snapshot.state,
-          revision: snapshot.position,
-          data: data,
-        });
-        bus.dispatchTypedEvent("commit", event);
+          const event = new EditorEvent("commit", this, {
+            blocks: snapshot.state,
+            revision: snapshot.position,
+            data: data,
+          });
+          bus.dispatchTypedEvent("commit", event);
 
-        if (event.defaultPrevented) return;
+          if (event.defaultPrevented) return;
 
-        setSnapshot({
-          state: event.detail.blocks,
-          position: event.detail.revision,
-        });
-        onCommitRef.current?.(event.detail.blocks);
-      },
-    }),
+          setSnapshot({
+            state: event.detail.blocks,
+            position: event.detail.revision,
+          });
+          onCommitRef.current?.(event.detail.blocks);
+        },
+      }),
     [bus, history, snapshot],
   );
 

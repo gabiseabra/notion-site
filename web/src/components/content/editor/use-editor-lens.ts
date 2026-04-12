@@ -1,3 +1,4 @@
+import { autoBind } from "@notion-site/common/utils/object.js";
 import { Lens } from "@notion-site/common/utils/optics/lens.js";
 import { useEffect, useMemo, useRef } from "react";
 import { ExecCommand } from "./editor-command";
@@ -30,10 +31,10 @@ export function useEditorLens<
 }) {
   // const isReadyRef = useRef(false);
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
-  const editorRef = useRef<ContentEditor<TBlock>>(null);
-
-  const lensRef = useRef(lens);
-  lensRef.current = lens;
+  const blocks = useMemo(() => {
+    const block = parent.blocks.find((b) => b.id === parentId);
+    return block ? lens.get(block) : [];
+  }, [parent]);
 
   const narrowId = ({
     id,
@@ -42,7 +43,7 @@ export function useEditorLens<
     id: TParent["id"];
     childId?: ID;
   }): { id: TBlock["id"]; childId?: ID } | null => {
-    const target = editorRef.current?.blocks.find((b) => b.id === childId);
+    const target = blocks.find((b) => b.id === childId);
 
     if (!target || id !== parentId) return null;
 
@@ -55,7 +56,7 @@ export function useEditorLens<
   const getLatest = (
     parentAction: EditorHistoryEntry<TParent>,
   ): EditorHistoryEntry<TBlock> | null => {
-    const localBlocks = editorRef.current?.blocks ?? [];
+    const localBlocks = blocks ?? [];
     const { targetBefore, targetAfter } = parentAction;
     const { id, childId } =
       parent.history.direction === 1 ? targetAfter : targetBefore;
@@ -82,153 +83,140 @@ export function useEditorLens<
   };
 
   const editor = useMemo<ContentEditor<TBlock>>(
-    () => ({
-      id: `{${parent.id},${String(parentId)}}`,
+    () =>
+      autoBind({
+        id: `{${parent.id},${String(parentId)}}`,
 
-      bus,
+        bus,
 
-      get latest() {
-        return parent.latest && getLatest(parent.latest);
-      },
-
-      get hasUnsavedChanges() {
-        return parent.hasUnsavedChanges;
-      },
-
-      blocks: (() => {
-        const block = parent.blocks.find((b) => b.id === parentId);
-        return block ? lensRef.current.get(block) : [];
-      })(),
-      revision: parent.revision,
-
-      history: {
-        get position() {
-          return parent.history.position;
+        get latest() {
+          return parent.latest && getLatest(parent.latest);
         },
 
-        get direction() {
-          return parent.history.direction;
+        get hasUnsavedChanges() {
+          return parent.hasUnsavedChanges;
         },
 
-        getState() {
-          const block = parent.history
-            .getState()
-            .find((b) => b.id === parentId);
-          return block ? lensRef.current.get(block) : [];
+        blocks,
+        revision: parent.revision,
+
+        history: {
+          get position() {
+            return parent.history.position;
+          },
+
+          get direction() {
+            return parent.history.direction;
+          },
+
+          getState() {
+            const block = parent.history
+              .getState()
+              .find((b) => b.id === parentId);
+            return block ? lens.get(block) : [];
+          },
+
+          undo(dryRun?: boolean) {
+            return parent.history.undo(dryRun);
+          },
+
+          redo(dryRun?: boolean) {
+            return parent.history.redo(dryRun);
+          },
         },
 
-        undo(dryRun?: boolean) {
-          return parent.history.undo(dryRun);
+        ref(id) {
+          return parent.ref(parentId, id);
         },
 
-        redo(dryRun?: boolean) {
-          return parent.history.redo(dryRun);
+        exec(cmd, id) {
+          const target = EditorTarget.read(this);
+          const block = id ? this.blocks.find((b) => b.id === id) : undefined;
+          if (!target || (id && !block)) return;
+          return ExecCommand(this, target, block)(cmd);
         },
-      },
 
-      ref(id) {
-        return parent.ref(parentId, id);
-      },
+        discard(data) {
+          parent.discard(data);
+        },
 
-      exec(cmd, id) {
-        if (!editorRef.current) return;
-        const target = EditorTarget.read(editorRef.current);
-        const block = id
-          ? editorRef.current.blocks.find((b) => b.id === id)
-          : undefined;
-        if (!target || (id && !block)) return;
-        return ExecCommand(editorRef.current, target, block)(cmd);
-      },
-
-      discard(data) {
-        parent.discard(data);
-      },
-
-      flush(data) {
-        if (!editorRef.current) return;
-        bus.dispatchTypedEvent(
-          "flush",
-          new EditorEvent("flush", editorRef.current, { data }),
-        );
-        parent.flush(data);
-      },
-
-      peek(id, dryRun) {
-        if (!editorRef.current) return null;
-        if (!dryRun)
+        flush(data) {
           bus.dispatchTypedEvent(
             "flush",
-            new EditorEvent("flush", editorRef.current, { data: undefined }),
+            new EditorEvent("flush", this, { data }),
           );
-        const block = parent.peek(parentId, dryRun);
-        if (!block) return null;
-        return lensRef.current.get(block).find((b) => b.id === id) ?? null;
-      },
+          parent.flush(data);
+        },
 
-      push({ data, ...action }) {
-        if (!editorRef.current) return;
+        peek(id, flushData) {
+          bus.dispatchTypedEvent(
+            "flush",
+            new EditorEvent("flush", this, { data: undefined }),
+          );
+          const block = parent.peek(parentId, flushData);
+          if (!block) return null;
+          return lens.get(block).find((b) => b.id === id) ?? null;
+        },
 
-        bus.dispatchTypedEvent(
-          "flush",
-          new EditorEvent("flush", editorRef.current, { data }),
-        );
+        push({ data, ...action }) {
+          bus.dispatchTypedEvent(
+            "flush",
+            new EditorEvent("flush", this, { data }),
+          );
 
-        const event = new EditorEvent("push", editorRef.current, {
-          action,
-          data,
-        });
-        bus.dispatchTypedEvent("push", event);
+          const event = new EditorEvent("push", this, {
+            action,
+            data,
+          });
+          bus.dispatchTypedEvent("push", event);
 
-        if (event.defaultPrevented) return;
+          if (event.defaultPrevented) return;
 
-        const parentBlock = parent.peek(parentId, true);
-        if (!parentBlock) return;
+          const parentBlock = parent.peek(parentId, true);
+          if (!parentBlock) return;
 
-        const idBefore = action.targetBefore?.id;
-        const idAfter = action.targetAfter?.id;
-        parent.push({
-          data,
-          type: "update",
-          block: lensRef.current.set(
-            parentBlock,
-            EditorAction.applyCmd(
-              EditorAction.flat([event.detail.action]),
-              lens.get(parentBlock),
+          const idBefore = action.targetBefore?.id;
+          const idAfter = action.targetAfter?.id;
+          parent.push({
+            data,
+            type: "update",
+            block: lens.set(
+              parentBlock,
+              EditorAction.applyCmd(
+                EditorAction.flat([action]),
+                lens.get(parentBlock),
+              ),
             ),
-          ),
-          targetBefore: {
-            ...(action.targetBefore ??
-              EditorTarget.end({ id: parentId, childId: idBefore }, parent)),
-            id: parentId,
-            childId: idBefore,
-          },
-          targetAfter: {
-            ...(action.targetAfter ??
-              EditorTarget.end({ id: parentId, childId: idAfter }, parent)),
-            id: parentId,
-            childId: idAfter,
-          },
-        });
-      },
+            targetBefore: {
+              ...(action.targetBefore ??
+                EditorTarget.end({ id: parentId, childId: idBefore }, parent)),
+              id: parentId,
+              childId: idBefore,
+            },
+            targetAfter: {
+              ...(action.targetAfter ??
+                EditorTarget.end({ id: parentId, childId: idAfter }, parent)),
+              id: parentId,
+              childId: idAfter,
+            },
+          });
+        },
 
-      commit(data) {
-        if (!editorRef.current) return;
+        commit(data) {
+          const event = new EditorEvent("commit", this, {
+            blocks: this.blocks,
+            revision: this.revision,
+            data,
+          });
+          bus.dispatchTypedEvent("commit", event);
 
-        const event = new EditorEvent("commit", editorRef.current, {
-          blocks: editorRef.current.blocks,
-          revision: editorRef.current.revision,
-          data,
-        });
-        bus.dispatchTypedEvent("commit", event);
+          if (event.defaultPrevented) return;
 
-        if (event.defaultPrevented) return;
-
-        parent.commit(data);
-      },
-    }),
+          parent.commit(data);
+        },
+      }),
     [parentId, parent, bus],
   );
-  editorRef.current = editor;
 
   // notify event listeners
   const isReadyRef = useRef(false);
