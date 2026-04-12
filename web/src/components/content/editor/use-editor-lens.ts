@@ -140,14 +140,6 @@ export function useEditorLens<
           parent.discard(data);
         },
 
-        flush(data) {
-          bus.dispatchTypedEvent(
-            "flush",
-            new EditorEvent("flush", this, { data }),
-          );
-          parent.flush(data);
-        },
-
         peek(id, flushData) {
           bus.dispatchTypedEvent(
             "flush",

@@ -24,7 +24,7 @@ export const useAutoCommitPlugin =
       const task = () => {
         const data = new useAutoCommitPlugin.EventData();
 
-        editor.flush(data);
+        editor.peek(EditorTarget.empty().id, data);
 
         if (!editor.hasUnsavedChanges) return;
 
