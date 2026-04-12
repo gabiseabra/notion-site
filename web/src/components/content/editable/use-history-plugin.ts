@@ -1,3 +1,4 @@
+import { ANSI } from "@notion-site/common/utils/ansi.js";
 import { KeyboardEvent } from "react";
 import { useEventListener } from "../../../hooks/use-event-listener";
 import { SelectionRange } from "../../../utils/selection-range.js";
@@ -103,8 +104,23 @@ export function restoreSelection(
 
   if (childId && !options?.global) return;
 
+  if (!element) {
+    console.warn(
+      [
+        ANSI.warning(`[history-restoration]`),
+        "Failed to restore selection:",
+        "Element ref not found",
+      ].join(" "),
+      {
+        id,
+        childId,
+        editor,
+      },
+    );
+    return;
+  }
+
   if (
-    !element ||
     !selection ||
     (element === document.activeElement &&
       selection.start === currentSelection?.start &&
