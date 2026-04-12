@@ -4,7 +4,7 @@ import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event";
 import { EditorAction, EditorHistoryEntry } from "./editor-history";
 import { EditorTarget } from "./editor-target";
-import { AnyBlock, ContentEditor } from "./types";
+import { AnyBlock, ContentEditor, ID } from "./types";
 
 /**
  * Creates a derived `ContentEditor<TBlock>` that provides a scoped view into
@@ -35,6 +35,23 @@ export function useEditorLens<
   const lensRef = useRef(lens);
   lensRef.current = lens;
 
+  const narrowId = ({
+    id,
+    childId,
+  }: {
+    id: TParent["id"];
+    childId?: ID;
+  }): { id: TBlock["id"]; childId?: ID } | null => {
+    const target = editorRef.current?.blocks.find((b) => b.id === childId);
+
+    if (!target || id !== parentId) return null;
+
+    return {
+      childId: undefined,
+      id: target.id,
+    };
+  };
+
   const getLatest = (
     parentAction: EditorHistoryEntry<TParent>,
   ): EditorHistoryEntry<TBlock> | null => {
@@ -51,7 +68,17 @@ export function useEditorLens<
       return null;
     }
 
-    return { ...action, targetBefore, targetAfter };
+    return {
+      ...action,
+      targetBefore: {
+        ...targetBefore,
+        ...narrowId(targetBefore),
+      },
+      targetAfter: {
+        ...targetAfter,
+        ...narrowId(targetAfter),
+      },
+    };
   };
 
   const liftAction = (
