@@ -62,10 +62,7 @@ export const useBlockMutationPlugin =
 
         if (!mergedBlock) return;
 
-        const data = new useBlockMutationPlugin.MergeData(
-          prevBlock,
-          currentBlock,
-        );
+        const data = new useBlockMutationPlugin.MergeData();
 
         // merge any text on the tail of this block into the previous block
         editor.push({
@@ -102,12 +99,7 @@ export const useBlockMutationPlugin =
 
         if (!splitBlocks) return null;
 
-        const data = new useBlockMutationPlugin.SplitData(
-          splitBlocks.left,
-          splitBlocks.right,
-          offset,
-          deleteRange,
-        );
+        const data = new useBlockMutationPlugin.SplitData();
 
         editor.push({
           data,
@@ -123,22 +115,6 @@ export const useBlockMutationPlugin =
     },
   });
 
-useBlockMutationPlugin.MergeData = class BlockMutationMergeData<
-  TBlock extends AnyBlock,
-> {
-  constructor(
-    public left: TBlock,
-    public right: TBlock,
-  ) {}
-};
+useBlockMutationPlugin.MergeData = class BlockMutationMergeData {};
 
-useBlockMutationPlugin.SplitData = class BlockMutationSplitData<
-  TBlock extends AnyBlock,
-> {
-  constructor(
-    public left: TBlock,
-    public right: TBlock,
-    public offset: number,
-    public deleteRange: number,
-  ) {}
-};
+useBlockMutationPlugin.SplitData = class BlockMutationSplitData {};
