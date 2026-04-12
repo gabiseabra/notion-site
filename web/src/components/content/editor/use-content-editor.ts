@@ -2,7 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { ExecCommand } from "./editor-command";
 import { EditorEvent, EditorEventTarget } from "./editor-event.js";
 import { EditorAction, EditorHistory } from "./editor-history.js";
-import { EditorRef } from "./editor-ref.js";
+import { EditorRefMap } from "./editor-ref.js";
 import { EditorTarget } from "./editor-target";
 import { AnyBlock, ContentEditor, ID } from "./types.js";
 
@@ -26,7 +26,7 @@ export function useContentEditor<TBlock extends AnyBlock>({
   const bus = useMemo(() => new EditorEventTarget<TBlock>(), []);
   const history = useMemo(() => new EditorHistory(initialValue), []);
   const [snapshot, setSnapshot] = useState(() => history.snapshot());
-  const blocksRef = useRef<EditorRef.Map<TBlock>>(new Map());
+  const blocksRef = useRef<EditorRefMap<TBlock>>(new Map());
 
   /** Callback refs */
 
@@ -41,7 +41,6 @@ export function useContentEditor<TBlock extends AnyBlock>({
 
   /** Editor internals */
 
-  const editorRef = useRef<ContentEditor<TBlock>>(null);
   const editor = useMemo<ContentEditor<TBlock>>(
     () => ({
       get latest() {
@@ -100,28 +99,25 @@ export function useContentEditor<TBlock extends AnyBlock>({
       },
 
       exec(cmd, id) {
-        if (!editorRef.current) return;
-        const target = EditorTarget.read(editorRef.current);
+        const target = EditorTarget.read(this);
         const block = id ? snapshot.state.find((b) => b.id === id) : undefined;
 
         if (id && !block) return;
 
-        return ExecCommand(editorRef.current, target, block)(cmd);
+        return ExecCommand(this, target, block)(cmd);
       },
 
       /** EditorChangeset implementation */
 
       discard(data) {
         this.flush(data);
-        while (history.position > snapshot.position) history.undo();
+        while (this.hasUnsavedChanges) history.undo();
       },
 
       flush(data?: unknown) {
-        if (!editorRef.current) return;
-
         bus.dispatchTypedEvent(
           "flush",
-          new EditorEvent("flush", editorRef.current, { data }),
+          new EditorEvent("flush", this, { data }),
         );
       },
 
@@ -132,11 +128,9 @@ export function useContentEditor<TBlock extends AnyBlock>({
       },
 
       push({ data, ...action }) {
-        if (!editorRef.current) return;
-
         this.flush(data);
 
-        const event = new EditorEvent("push", editorRef.current, {
+        const event = new EditorEvent("push", this, {
           action,
           data,
         });
@@ -155,17 +149,14 @@ export function useContentEditor<TBlock extends AnyBlock>({
             history.action?.targetAfter ??
             EditorTarget.start({ id: idBefore }),
           targetAfter:
-            action.targetAfter ??
-            EditorTarget.end({ id: idAfter }, editorRef.current),
+            action.targetAfter ?? EditorTarget.end({ id: idAfter }, this),
         });
       },
 
       commit(data) {
-        if (!editorRef.current) return;
-
         const snapshot = history.snapshot();
 
-        const event = new EditorEvent("commit", editorRef.current, {
+        const event = new EditorEvent("commit", this, {
           blocks: snapshot.state,
           revision: snapshot.position,
           data: data,
@@ -183,7 +174,6 @@ export function useContentEditor<TBlock extends AnyBlock>({
     }),
     [bus, history, snapshot],
   );
-  editorRef.current = editor;
 
   // notify event listeners
   useEffect(() => {

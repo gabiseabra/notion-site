@@ -2,7 +2,7 @@ import { ReadOnlyHistory } from "@notion-site/common/utils/history.js";
 import { EditorChangeset } from "./editor-changeset";
 import { EditorCommand } from "./editor-command";
 import type { EditorEventTarget } from "./editor-event.js";
-import { EditorRef } from "./editor-ref";
+import { EditorRefMapEntry } from "./editor-ref";
 
 export type ID = string | number | symbol;
 
@@ -50,7 +50,7 @@ export interface ContentEditor<
   ref(
     id: TBlock["id"],
     childId?: ID,
-  ): EditorRef.MapEntry & {
+  ): EditorRefMapEntry & {
     (element: HTMLElement | null): void;
   };
 

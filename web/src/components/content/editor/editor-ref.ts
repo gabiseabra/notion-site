@@ -7,18 +7,18 @@ export type EditorRef<TBlock extends AnyBlock> = {
   element: HTMLElement;
 };
 
-export namespace EditorRef {
-  export type MapEntry = {
-    element: HTMLElement | null;
-    children: globalThis.Map<ID, HTMLElement>;
-  };
+export type EditorRefMapEntry = {
+  element: HTMLElement | null;
+  children: Map<ID, HTMLElement>;
+};
 
-  export type Map<TBlock extends AnyBlock> = globalThis.Map<
-    TBlock["id"],
-    MapEntry
-  >;
+export type EditorRefMap<TBlock extends AnyBlock> = Map<
+  TBlock["id"],
+  EditorRefMapEntry
+>;
 
-  export function read<TBlock extends AnyBlock>(
+export const EditorRef = {
+  read<TBlock extends AnyBlock>(
     editor: ContentEditor<TBlock>,
     id?: TBlock["id"],
   ): EditorRef<TBlock>[] {
@@ -31,17 +31,17 @@ export namespace EditorRef {
         if (position & Node.DOCUMENT_POSITION_PRECEDING) return 1;
         return 0;
       });
-  }
+  },
+};
 
-  export function fromEntry<TBlock extends AnyBlock>(
-    ref: MapEntry,
-    id: TBlock["id"],
-  ): EditorRef<TBlock>[] {
-    return [
-      ref.element && ([undefined as ID | undefined, ref.element] as const),
-      ...Array.from(ref.children.entries()),
-    ]
-      .filter(isNonNullable)
-      .map(([childId, element]) => ({ id, childId, element }));
-  }
+function fromEntry<TBlock extends AnyBlock>(
+  ref: EditorRefMapEntry,
+  id: TBlock["id"],
+): EditorRef<TBlock>[] {
+  return [
+    ref.element && ([undefined as ID | undefined, ref.element] as const),
+    ...Array.from(ref.children.entries()),
+  ]
+    .filter(isNonNullable)
+    .map(([childId, element]) => ({ id, childId, element }));
 }
