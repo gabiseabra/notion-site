@@ -40,6 +40,18 @@ export function BlogPostFilters({
           ),
         },
         {
+          label: "Author",
+          description: "Show blog posts matching any of the authors",
+          active: !!value.authors?.length,
+          onClear: () => onChange({ ...value, authors: undefined }),
+          content: (
+            <BlogPostAuthorsFilter
+              value={value.authors ?? []}
+              onChange={(authors) => onChange({ ...value, authors })}
+            />
+          ),
+        },
+        {
           label: "Tags",
           description: "Show blog posts matching all of the tags",
           active: !!value.tags?.length,
@@ -115,6 +127,47 @@ function BlogPostTagsFilterLoader({
   return (
     <TagsFilter
       options={database.properties.Tags.multi_select.options}
+      value={value}
+      onChange={onChange}
+    />
+  );
+}
+
+function BlogPostAuthorsFilter(props: {
+  value: string[];
+  onChange: (values: string[]) => void;
+}) {
+  return (
+    <SuspenseBoundary
+      loading={
+        <p style={{ textAlign: "center" }}>
+          <Spinner size="m" />
+        </p>
+      }
+      error={(error) => (
+        <p style={{ textAlign: "center" }}>
+          <Alert type="error">{extractErrorMessage(error)}</Alert>
+        </p>
+      )}
+    >
+      <BlogPostAuthorsFilterLoader {...props} />
+    </SuspenseBoundary>
+  );
+}
+
+function BlogPostAuthorsFilterLoader({
+  value,
+  onChange,
+}: {
+  value: string[];
+  onChange: (values: string[]) => void;
+}) {
+  const orpc = useOrpc();
+  const database = suspend(() => orpc.notion.describeBlogPosts(), [orpc]);
+
+  return (
+    <TagsFilter
+      options={database.properties.Author.select.options}
       value={value}
       onChange={onChange}
     />

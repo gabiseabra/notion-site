@@ -71,6 +71,17 @@ export const BlogPostsDB = Object.assign(
                 }) as const,
             ),
           },
+
+          // authors
+          {
+            or: (input.authors ?? []).map(
+              (author) =>
+                ({
+                  property: "Author",
+                  select: { equals: author },
+                }) as const,
+            ),
+          },
         ].filter(isTruthy),
       },
     }),

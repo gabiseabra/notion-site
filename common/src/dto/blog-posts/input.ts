@@ -7,6 +7,7 @@ export const BlogPostsInput = z.object({
   after: z.string().optional(),
   tags: z.string().array().optional(),
   statuses: BlogPostStatus.array().optional(),
+  authors: z.string().array().optional(),
 });
 
 export type BlogPostsInput = z.infer<typeof BlogPostsInput>;
