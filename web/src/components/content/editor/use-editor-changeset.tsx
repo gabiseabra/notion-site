@@ -50,7 +50,7 @@ export function useEditorChangeset<TBlock extends AnyBlock>(
         changesetRef.current.batchId = Math.random();
       },
 
-      push({ targetAfter, targetBefore, data, ...action }) {
+      push({ targetAfter, targetBefore, ...action }) {
         if (
           targetBefore &&
           EditorTarget.isEmpty(changesetRef.current.targetBefore)
