@@ -1,5 +1,4 @@
 import { isTruthy } from "@notion-site/common/utils/guards.js";
-import { isElementType } from "@testing-library/user-event/dist/cjs/utils/index.js";
 import {
   CSSProperties,
   HTMLInputTypeAttribute,
@@ -93,7 +92,7 @@ export function Input({
           onChange={(e) => {
             const element = e.currentTarget;
             onChange?.(
-              (isElementType(element, "div")
+              (element instanceof HTMLDivElement
                 ? element.textContent
                 : element.value) ?? "",
             );
