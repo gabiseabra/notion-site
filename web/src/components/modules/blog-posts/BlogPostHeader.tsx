@@ -1,5 +1,6 @@
 import { BlogPost } from "@notion-site/common/dto/blog-posts/index.js";
 import { BlogPostStatus } from "@notion-site/common/dto/blog-posts/status.js";
+import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { Link } from "react-router";
 import * as env from "../../../env.js";
 import { Badge } from "../../display/Badge.js";
@@ -29,13 +30,22 @@ export function BlogPostHeader({
       resource={blogPost}
       hiddenTitle={hiddenProperties?.includes("Title")}
       after={
-        <Row wrap>
+        <Row wrap alignY="center">
           {!hiddenProperties?.includes("Publish Date") &&
             blogPost.properties["Publish Date"].date && (
               <PublishedDate
                 date={blogPost.properties["Publish Date"].date.start}
               />
             )}
+
+          {!hiddenProperties.includes("Author") &&
+            blogPost.properties["Author"].select && (
+              <Author {...blogPost.properties["Author"].select} />
+            )}
+
+          <Span bold color="muted">
+            •
+          </Span>
 
           {!hiddenProperties?.includes("Status") &&
             blogPost.properties["Status"].status && (
@@ -80,5 +90,22 @@ function PublishedDate({ date }: { date: Date }) {
         {date.toLocaleDateString()}
       </Span>
     </span>
+  );
+}
+
+function Author({
+  color,
+  name,
+}: NonNullable<zNotion.properties.select<string>["select"]>) {
+  return (
+    <>
+      <Span bold size="caption" color="muted">
+        by
+      </Span>
+
+      <Badge size="s" color={color}>
+        {name}
+      </Badge>
+    </>
   );
 }

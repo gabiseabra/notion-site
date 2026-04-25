@@ -8,6 +8,7 @@ export const BlogPost = NotionResource({
   "Publish Date": zNotion.primitives.date,
   Tags: zNotion.properties.multi_select(z.string()),
   Status: zNotion.properties.status(BlogPostStatus),
+  Author: zNotion.properties.select(z.string()),
 });
 
 export type BlogPost = z.infer<typeof BlogPost>;
