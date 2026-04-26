@@ -50,10 +50,6 @@ pre[class*="language-"] {
 
   /* more heading options */
 
-  /** max heading font-size */
-  --size-h1: 2.25em;
-  /** min heading font-size */
-  --size-h4: 1.25em;
   /** h4 font-weight */
   --weight-h4: 700;
   /** h1 font-weight */
@@ -133,14 +129,14 @@ a {
 }
 
 h1 {
-  @include text.heading-size(1);
+  font-size: text.heading-size(1);
   font-family: var(--font-h1, var(--font-heading));
   font-weight: var(--weight-h1, var(--weight-heading));
   line-height: 1em;
 }
 
 h2 {
-  @include text.heading-size(2);
+  font-size: text.heading-size(2);
   font-family: var(--font-h2, var(--font-heading));
   font-weight: var(--weight-h2, var(--weight-heading));
   color: var(--color-heading);
@@ -148,7 +144,7 @@ h2 {
 }
 
 h3 {
-  @include text.heading-size(3);
+  font-size: text.heading-size(3);
   font-family: var(--font-h3, var(--font-heading));
   font-weight: var(--weight-h3, var(--weight-heading));
   color: var(--color-heading);
@@ -156,7 +152,7 @@ h3 {
 }
 
 h4 {
-  @include text.heading-size(4);
+  font-size: text.heading-size(4);
   font-family: var(--font-h4, var(--font-heading));
   font-weight: var(--weight-h4, var(--weight-heading));
   color: var(--color-heading);

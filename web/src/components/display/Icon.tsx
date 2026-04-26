@@ -10,15 +10,17 @@ import styles from "./Icon.module.scss";
 type IconProps = {
   size: IconControlProps["size"];
   icon: zNotion.media.icon;
+  className?: string;
+  style?: CSSProperties;
 };
 
 /**
  * Renders a Notion icon.
  * @direction inline
  */
-export function Icon({ icon, size }: IconProps) {
+export function Icon({ icon, size, ...props }: IconProps) {
   return (
-    <IconControl as="span" color="currentColor" size={size}>
+    <IconControl as="span" color="currentColor" size={size} {...props}>
       {match(icon)
         .with({ type: "emoji" }, (icon) => icon.emoji)
         .with({ type: "custom_emoji" }, (icon) => (
@@ -38,7 +40,7 @@ export function Icon({ icon, size }: IconProps) {
 export type IconControlProps = {
   as: "div" | "span" | "a" | "button";
 
-  size: "xs" | "s" | "m" | "l" | "xl";
+  size: "xs" | "s" | "m" | "l" | "xl" | "auto";
   color: zNotion.primitives.color | "primary" | "secondary" | "currentColor";
 
   badge?: string;
@@ -77,6 +79,7 @@ export function IconControl({
     m: 24,
     l: 32,
     xl: 64,
+    auto: undefined,
   }[size];
 
   return (

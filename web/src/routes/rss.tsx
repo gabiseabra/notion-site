@@ -18,6 +18,7 @@ export const children = [
             head={() => null}
             header={(blogPost) => (
               <BlogPostHeader
+                hiddenCover
                 as="header"
                 size="l"
                 blogPost={blogPost}

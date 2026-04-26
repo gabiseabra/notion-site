@@ -17,6 +17,7 @@ export function BlogPostList({ items }: { items: BlogPost[] }) {
       render={(blogPost) => (
         <Col p={2}>
           <BlogPostHeader
+            hiddenCover
             key={blogPost.id}
             as="section"
             size="s"

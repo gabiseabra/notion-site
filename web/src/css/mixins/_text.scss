@@ -9,15 +9,19 @@
   );
 }
 
-@mixin heading-size(
-  $level,
-  $min: var(--size-h4),
-  $max: var(--size-h1),
-  $levels: 4
-) {
-  font-size: calc(
-    #{$max} - ((#{$level} - 1) / (#{$levels} - 1)) * (#{$max} - #{$min})
-  );
+@function heading-size($level) {
+  @if ($level == 1) {
+    @return 2.25em;
+  }
+  @if ($level == 2) {
+    @return 2em;
+  }
+  @if ($level == 3) {
+    @return 1.65em;
+  }
+  @if ($level == 4) {
+    @return 1.25em;
+  }
 }
 
 @mixin indent($indent: 0) {

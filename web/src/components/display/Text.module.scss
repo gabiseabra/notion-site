@@ -90,7 +90,7 @@
 
 @for $level from 1 through 4 {
   .#{"size-h" + $level} {
-    @include text.heading-size($level);
+    font-size: text.heading-size($level);
   }
 }
 

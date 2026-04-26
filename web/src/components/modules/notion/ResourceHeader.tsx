@@ -3,14 +3,16 @@ import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { ReactNode } from "react";
 import { Link } from "react-router";
 import { RichText } from "../../content/RichText.js";
+import { Cover } from "../../display/Cover";
 import { Icon } from "../../display/Icon.js";
 import { Text } from "../../display/Text.js";
-import { Col, ColProps } from "../../layout/FlexBox.js";
+import { ColProps } from "../../layout/FlexBox.js";
 
 export function ResourceHeader<DB extends NotionResource>({
   as: Component,
   size,
   resource,
+  hiddenCover,
   hiddenTitle,
   before,
   after,
@@ -18,6 +20,7 @@ export function ResourceHeader<DB extends NotionResource>({
   as: ColProps["as"];
   size: "s" | "m" | "l";
   resource: DB;
+  hiddenCover?: boolean;
   hiddenTitle?: boolean;
   before?: ReactNode;
   after?: ReactNode;
@@ -28,20 +31,33 @@ export function ResourceHeader<DB extends NotionResource>({
   const mt = ({ s: 0, m: 1, l: 4 } as const)[size];
   const mb = ({ s: 0, m: 3, l: 6 } as const)[size];
 
+  const hasCover = !hiddenCover && !!resource.cover;
+
   const title = Object.values(resource.properties).find(
     hasPropertyValue("type", "title"),
   );
 
   return (
-    <Col as={Component} gap={gap} mt={mt} mb={mb}>
+    <Cover
+      as={Component}
+      gap={gap}
+      mt={mt}
+      mb={mb}
+      cover={(hasCover && resource.cover) || undefined}
+    >
       {before}
 
       {!hiddenTitle && (
-        <Link to={resource.url}>
+        <Link
+          to={resource.url}
+          style={{
+            fontSize: hasCover ? "1.5em" : undefined,
+          }}
+        >
           <Text as={TextElement} size={textSize} m={0}>
             {resource.icon && (
               <>
-                <Icon icon={resource.icon} size={size} />
+                <Icon icon={resource.icon} size={hasCover ? "auto" : size} />
                 &nbsp;
               </>
             )}
@@ -52,6 +68,6 @@ export function ResourceHeader<DB extends NotionResource>({
       )}
 
       {after}
-    </Col>
+    </Cover>
   );
 }

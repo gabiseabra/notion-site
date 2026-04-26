@@ -1,0 +1,26 @@
+@use "../../css/mixins/text" as text;
+
+.cover {
+  position: relative;
+  z-index: 0;
+}
+
+.has-image {
+  padding-top: calc(var(--space) * 14);
+  padding-bottom: calc(var(--space) * 10);
+  text-shadow:
+    text.shadow-outline(var(--color-shadow), 0.25px),
+    text.shadow-outline(var(--color-shadow), 0.25px),
+    0 5px 8px var(--color-shadow),
+    0 5px 5px var(--color-shadow);
+}
+
+.cover-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  background-position: center 33.333%;
+  background-size: cover;
+}
