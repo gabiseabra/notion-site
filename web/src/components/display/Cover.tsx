@@ -42,7 +42,7 @@ export function Cover({ cover, children, className, ...props }: CoverProps) {
         />
       )}
 
-      {children}
+      <div className={styles.content}>{children}</div>
     </Col>
   );
 }

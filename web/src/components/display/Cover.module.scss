@@ -1,8 +1,7 @@
 @use "../../css/mixins/text" as text;
 
-.cover {
-  position: relative;
-  z-index: 0;
+.content {
+  z-index: 1;
 }
 
 .has-image {
@@ -16,11 +15,10 @@
 }
 
 .cover-image {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  z-index: -1;
   background-position: center 33.333%;
   background-size: cover;
 }
