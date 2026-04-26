@@ -22,7 +22,7 @@ export const children = [
                 as="header"
                 size="l"
                 blogPost={blogPost}
-                hiddenProperties={["Publish Date", "Status", "Tags"]}
+                hiddenProperties={["Publish Date", "Status", "Tags", "Author"]}
               />
             )}
           />

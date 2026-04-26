@@ -44,9 +44,12 @@ export function BlogPostHeader({
               <Author {...blogPost.properties["Author"].select} />
             )}
 
-          <Span bold color="muted">
-            •
-          </Span>
+          {!hiddenProperties.includes("Publish Date") &&
+            !hiddenProperties.includes("Author") && (
+              <Span bold color="muted">
+                •
+              </Span>
+            )}
 
           {!hiddenProperties?.includes("Status") &&
             blogPost.properties["Status"].status && (

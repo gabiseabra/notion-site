@@ -89,7 +89,14 @@ export const BlogPostsDB = Object.assign(
       ...BlogPostsDB.inputOptions(input),
       cache: true,
       feedItem: (post: BlogPost): Partial<Item> => ({
-        published: post.properties["Publish Date"]?.date?.start ?? undefined,
+        published: post.properties["Publish Date"].date?.start ?? undefined,
+        author: post.properties["Author"].select
+          ? [
+              {
+                name: post.properties["Author"].select.name,
+              },
+            ]
+          : undefined,
       }),
     }),
   },
