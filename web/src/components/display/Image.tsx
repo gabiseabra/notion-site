@@ -39,6 +39,8 @@ export function Image({
         <img
           style={{
             maxWidth: "100%",
+            maxHeight: "inherit",
+            width: "auto",
             height: "auto",
             ...style,
           }}

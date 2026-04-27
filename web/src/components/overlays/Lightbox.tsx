@@ -32,7 +32,7 @@ export function Lightbox({ open, onClose, children, footer }: LightboxProps) {
           as="button"
           color="default"
           size="l"
-          p={2}
+          m={2}
           title="Close"
           onClick={onClose}
         >
