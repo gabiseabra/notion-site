@@ -19,6 +19,7 @@ export const children = [
             header={(blogPost) => (
               <BlogPostHeader
                 hiddenCover
+                hiddenEditButton
                 as="header"
                 size="l"
                 blogPost={blogPost}

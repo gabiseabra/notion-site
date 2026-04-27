@@ -17,6 +17,7 @@ export function BlogPostHeader({
   size: "s" | "m" | "l";
   blogPost: BlogPost;
   hiddenCover?: boolean;
+  hiddenEditButton?: boolean;
   hiddenProperties?: (keyof BlogPost["properties"])[];
 }) {
   // Hide published status badge in production since only published posts are listed anyways

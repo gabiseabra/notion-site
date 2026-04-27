@@ -18,6 +18,7 @@ export function BlogPostList({ items }: { items: BlogPost[] }) {
         <Col p={2}>
           <BlogPostHeader
             hiddenCover
+            hiddenEditButton
             key={blogPost.id}
             as="section"
             size="s"

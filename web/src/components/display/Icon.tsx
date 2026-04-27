@@ -97,7 +97,6 @@ export function IconControl({
       style={{
         display: "inline-block",
         width: pxSize,
-        height: pxSize,
         ...style,
         ...css.getPaddingStyles(props),
         ...css.getMarginStyles(props),

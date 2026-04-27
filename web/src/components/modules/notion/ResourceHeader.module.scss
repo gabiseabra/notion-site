@@ -1,0 +1,15 @@
+.title {
+  display: inline-flex;
+  align-items: center;
+}
+
+.edit-button {
+  position: absolute;
+  text-decoration: none;
+  opacity: 0;
+  transition: 0.1s linear;
+}
+
+.title:hover .edit-button {
+  opacity: 1;
+}

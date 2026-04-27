@@ -2,11 +2,13 @@ import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
 import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
 import { ReactNode } from "react";
 import { Link } from "react-router";
+import * as env from "../../../env.js";
 import { RichText } from "../../content/RichText.js";
 import { Cover } from "../../display/Cover";
 import { Icon } from "../../display/Icon.js";
 import { Text } from "../../display/Text.js";
 import { ColProps } from "../../layout/FlexBox.js";
+import styles from "./ResourceHeader.module.scss";
 
 export function ResourceHeader<DB extends NotionResource>({
   as: Component,
@@ -14,6 +16,7 @@ export function ResourceHeader<DB extends NotionResource>({
   resource,
   hiddenCover,
   hiddenTitle,
+  hiddenEditButton = !env.DEV,
   before,
   after,
 }: {
@@ -22,6 +25,7 @@ export function ResourceHeader<DB extends NotionResource>({
   resource: DB;
   hiddenCover?: boolean;
   hiddenTitle?: boolean;
+  hiddenEditButton?: boolean;
   before?: ReactNode;
   after?: ReactNode;
 }) {
@@ -50,6 +54,7 @@ export function ResourceHeader<DB extends NotionResource>({
       {!hiddenTitle && (
         <Link
           to={resource.url}
+          className={styles["title"]}
           style={{
             fontSize: hasCover ? "1.5em" : undefined,
           }}
@@ -63,6 +68,20 @@ export function ResourceHeader<DB extends NotionResource>({
             )}
 
             {title && <RichText value={title.title} />}
+
+            {!hiddenEditButton && (
+              <span
+                className={styles["edit-button"]}
+                onClick={(e) => {
+                  window.open(`https://notion.so/${resource.id}`, "_blank");
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+              >
+                &nbsp;
+                <Icon icon={{ type: "emoji", emoji: "✏️" }} size="s" />
+              </span>
+            )}
           </Text>
         </Link>
       )}

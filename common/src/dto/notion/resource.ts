@@ -7,7 +7,7 @@ import { zNotion } from "./schema/index.js";
 export const _NotionResource = z.object({
   object: z.literal("page"),
 
-  id: z.string(),
+  id: z.string().transform((id) => id.replace(/-/g, "")),
   url: z.string().transform((url) => URL.parse(url)?.pathname ?? url),
   parent: z.union([
     zNotion.references.database_id,
