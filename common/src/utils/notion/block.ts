@@ -259,3 +259,28 @@ export function parentEquals(a: Block["parent"], b: Block["parent"]) {
       a.block_id === b.block_id)
   );
 }
+
+export function mapMediaURL(
+  block: Block,
+  f: (url: { url: string }) => { url: string },
+): Block {
+  if (block.type === "image" && block.image.type === "external") {
+    return {
+      ...block,
+      image: {
+        ...block.image,
+        external: f(block.image.external),
+      },
+    };
+  }
+  if (block.type === "image" && block.image.type === "file") {
+    return {
+      ...block,
+      image: {
+        ...block.image,
+        file: f(block.image.file),
+      },
+    };
+  }
+  return block;
+}
