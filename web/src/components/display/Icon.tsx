@@ -1,6 +1,6 @@
 import { type zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { isTruthy } from "@notion-site/common/utils/guards.js";
-import { omit } from "@notion-site/common/utils/object.js";
+import { omit, omitUndefined } from "@notion-site/common/utils/object.js";
 import { CSSProperties, ReactNode } from "react";
 import { match } from "ts-pattern";
 import * as css from "../../css/index.js";
@@ -18,9 +18,18 @@ type IconProps = {
  * Renders a Notion icon.
  * @direction inline
  */
-export function Icon({ icon, size, ...props }: IconProps) {
+export function Icon({ icon, size, style, ...props }: IconProps) {
   return (
-    <IconControl as="span" color="currentColor" size={size} {...props}>
+    <IconControl
+      as="span"
+      color="currentColor"
+      size={size}
+      style={omitUndefined({
+        height: icon.type === "emoji" ? 0 : undefined,
+        ...style,
+      })}
+      {...props}
+    >
       {match(icon)
         .with({ type: "emoji" }, (icon) => icon.emoji)
         .with({ type: "custom_emoji" }, (icon) => (
@@ -97,6 +106,7 @@ export function IconControl({
       style={{
         display: "inline-block",
         width: pxSize,
+        height: pxSize,
         ...style,
         ...css.getPaddingStyles(props),
         ...css.getMarginStyles(props),
