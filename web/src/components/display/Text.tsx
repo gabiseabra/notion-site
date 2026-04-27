@@ -17,7 +17,7 @@ export type TextProps = {
   css.PaddingProps &
   HTMLAttributes<HTMLElement>;
 
-type TextTag = "div" | "p" | "blockquote" | "h1" | "h2" | "h3" | "h4";
+type TextTag = "div" | "p" | "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5";
 
 type TextColor =
   | zNotion.primitives.api_color
@@ -27,7 +27,7 @@ type TextColor =
   | "muted"
   | "link";
 
-type TextSize = "caption" | "body" | "h1" | "h2" | "h3" | "h4";
+type TextSize = "caption" | "body" | "h1" | "h2" | "h3" | "h4" | "h5";
 
 /**
  * A block element meant for wrapping around text.

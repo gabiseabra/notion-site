@@ -163,6 +163,19 @@ export function Block({
             </IndentationLevel.Provider>
           </>
         ))
+        .with({ type: "heading_4" }, (block) => (
+          <>
+            <Text
+              as="h5"
+              color={block.heading_4.color}
+              {...contentProps(block.heading_4.rich_text)}
+            />
+
+            <IndentationLevel.Provider value={indent + 1}>
+              {children}
+            </IndentationLevel.Provider>
+          </>
+        ))
         .with({ type: "quote" }, (block) => (
           <>
             <Text

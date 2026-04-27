@@ -72,6 +72,7 @@ export const useNotionPrefixPlugin = composePlugins(
   useRegExpTransformPlugin(/^#/, " ", createBlock("heading_1")),
   useRegExpTransformPlugin(/^##/, " ", createBlock("heading_2")),
   useRegExpTransformPlugin(/^###/, " ", createBlock("heading_3")),
+  useRegExpTransformPlugin(/^####/, " ", createBlock("heading_4")),
   useRegExpTransformPlugin(/^-/, " ", createBlock("bulleted_list_item")),
   useRegExpTransformPlugin(/^(\d+)\./, " ", createNumberedList),
   useRegExpTransformPlugin(/^\[ \]/, " ", createBlock("to_do")),

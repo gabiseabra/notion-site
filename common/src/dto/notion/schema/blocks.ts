@@ -43,6 +43,16 @@ export const heading_3 = z.object({
 });
 export type heading_3 = z.infer<typeof heading_3>;
 
+export const heading_4 = z.object({
+  type: z.literal("heading_4"),
+  heading_4: z.object({
+    rich_text: rich_text_item,
+    color: api_color,
+    // is_toggleable: z.boolean(),
+  }),
+});
+export type heading_4 = z.infer<typeof heading_4>;
+
 export const bulleted_list_item = z.object({
   type: z.literal("bulleted_list_item"),
   bulleted_list_item: z.object({
@@ -256,6 +266,7 @@ export const block = z.discriminatedUnion("type", [
   heading_1.extend(base_block_shape),
   heading_2.extend(base_block_shape),
   heading_3.extend(base_block_shape),
+  heading_4.extend(base_block_shape),
   bulleted_list_item.extend(base_block_shape),
   numbered_list_item.extend(base_block_shape),
   to_do.extend(base_block_shape),
@@ -283,6 +294,7 @@ export const rich_text_type = z.enum([
   "heading_1",
   "heading_2",
   "heading_3",
+  "heading_4",
   "quote",
   "bulleted_list_item",
   "numbered_list_item",

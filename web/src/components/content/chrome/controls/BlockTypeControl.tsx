@@ -28,11 +28,16 @@ const options = [
   {
     id: "heading_2",
     title: "Heading 2",
-    icon: <FaHeading style={{ transform: "scale(0.85)" }} />,
+    icon: <FaHeading style={{ transform: "scale(0.9)" }} />,
   },
   {
     id: "heading_3",
     title: "Heading 3",
+    icon: <FaHeading style={{ transform: "scale(0.8)" }} />,
+  },
+  {
+    id: "heading_4",
+    title: "Heading 4",
     icon: <FaHeading style={{ transform: "scale(0.75)" }} />,
   },
   {

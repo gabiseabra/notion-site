@@ -22,6 +22,9 @@
   @if ($level == 4) {
     @return 1.25em;
   }
+  @if ($level == 5) {
+    @return 1em;
+  }
 }
 
 @mixin indent($indent: 0) {

@@ -34,7 +34,7 @@
 
   & > .body {
     border-radius: var(--radius);
-    overflow: hidden;
+    overflow-y: auto;
   }
 
   & > footer {

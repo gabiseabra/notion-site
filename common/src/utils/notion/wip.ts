@@ -28,6 +28,7 @@ export function create(_base: WithRequired<Partial<Block>, "type">): Block {
     .with({ type: "heading_1" }, (base) => ({ ...heading_1, ...base }))
     .with({ type: "heading_2" }, (base) => ({ ...heading_2, ...base }))
     .with({ type: "heading_3" }, (base) => ({ ...heading_3, ...base }))
+    .with({ type: "heading_4" }, (base) => ({ ...heading_4, ...base }))
     .with({ type: "divider" }, (base) => ({ ...divider, ...base }))
     .with({ type: "quote" }, (base) => ({ ...quote, ...base }))
     .with({ type: "bulleted_list_item" }, (base) => ({
@@ -155,6 +156,10 @@ const heading_2 = {
 
 const heading_3 = {
   heading_3: empty_content,
+} as const;
+
+const heading_4 = {
+  heading_4: empty_content,
 } as const;
 
 const divider = {

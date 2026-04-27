@@ -11,6 +11,7 @@ export const RichTextType = [
   "heading_1",
   "heading_2",
   "heading_3",
+  "heading_4",
   "quote",
   "bulleted_list_item",
   "numbered_list_item",
@@ -62,6 +63,8 @@ export function extract(block: Block): Node {
       return block.heading_2;
     case "heading_3":
       return block.heading_3;
+    case "heading_4":
+      return block.heading_4;
     case "bulleted_list_item":
       return block.bulleted_list_item;
     case "numbered_list_item":
@@ -109,6 +112,8 @@ export function map<T extends BlockType>(
       return { ...block, heading_2: f(extract(block)) };
     case "heading_3":
       return { ...block, heading_3: f(extract(block)) };
+    case "heading_4":
+      return { ...block, heading_4: f(extract(block)) };
     case "quote":
       return { ...block, quote: f(extract(block)) };
     case "divider":
