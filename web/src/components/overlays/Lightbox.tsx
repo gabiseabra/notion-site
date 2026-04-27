@@ -1,6 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { IoIosClose } from "react-icons/io";
+import { useWindowEventListener } from "../../hooks/use-window-event-listener";
 import { IconControl } from "../display/Icon.js";
 import styles from "./Lightbox.module.scss";
 
@@ -17,6 +18,12 @@ export function Lightbox({ open, onClose, children, footer }: LightboxProps) {
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "unset";
   }, [open]);
+
+  useWindowEventListener("keydown", (event) => {
+    if (event.key === "Escape" && open) {
+      onClose();
+    }
+  });
 
   if (!open) return null;
 
