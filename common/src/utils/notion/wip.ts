@@ -45,6 +45,8 @@ export function create(_base: WithRequired<Partial<Block>, "type">): Block {
     .with({ type: "code" }, (base) => ({ ...code, ...base }))
     .with({ type: "callout" }, (base) => ({ ...callout, ...base }))
     .with({ type: "toggle" }, (base) => ({ ...toggle, ...base }))
+    .with({ type: "column_list" }, (base) => ({ ...column_list, ...base }))
+    .with({ type: "column" }, (base) => ({ ...column, ...base }))
     .exhaustive();
 }
 
@@ -222,4 +224,12 @@ const toggle = {
     rich_text: [],
     color: "default" as const,
   },
+};
+
+const column_list = {
+  column_list: {},
+};
+
+const column = {
+  column: { width_ratio: 1 },
 };

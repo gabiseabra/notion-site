@@ -10,6 +10,7 @@ import { Callout } from "../display/Callout.js";
 import { Image } from "../display/Image.js";
 import { Span, Text } from "../display/Text.js";
 import { Checkbox } from "../inputs/Checkbox.js";
+import { Col, Row } from "../layout/FlexBox";
 import { LinkToPage } from "../navigation/LinkToPage.js";
 import { CodeBlock } from "./CodeBlock.js";
 import { ContentEditableProps } from "./editable/types.js";
@@ -263,6 +264,10 @@ export function Block({
           >
             {children}
           </Accordion>
+        ))
+        .with({ type: "column_list" }, () => <Row>{children}</Row>)
+        .with({ type: "column" }, (block) => (
+          <Col flex={block.column.width_ratio}>{children}</Col>
         ))
         .exhaustive()}
     </>

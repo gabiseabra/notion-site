@@ -84,6 +84,10 @@ export function extract(block: Block): Node {
       return block.callout;
     case "toggle":
       return block.toggle;
+    case "column_list":
+      return block.column_list;
+    case "column":
+      return block.column;
   }
 }
 
@@ -127,6 +131,10 @@ export function map<T extends BlockType>(
       return { ...block, callout: f(extract(block)) };
     case "toggle":
       return { ...block, toggle: f(extract(block)) };
+    case "column_list":
+      return { ...block, column_list: f(extract(block)) };
+    case "column":
+      return { ...block, column: f(extract(block)) };
   }
 }
 

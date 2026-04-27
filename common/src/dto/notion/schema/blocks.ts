@@ -230,6 +230,20 @@ export const toggle = z.object({
 });
 export type toggle = z.infer<typeof toggle>;
 
+export const column_list = z.object({
+  type: z.literal("column_list"),
+  column_list: z.object({}),
+});
+export type column_list = z.infer<typeof column_list>;
+
+export const column = z.object({
+  type: z.literal("column"),
+  column: z.object({
+    width_ratio: z.number(),
+  }),
+});
+export type column = z.infer<typeof column>;
+
 export const base_block_shape = {
   id: z.string(),
   parent: z.union([page_id, block_id]),
@@ -253,6 +267,8 @@ export const block = z.discriminatedUnion("type", [
   code.extend(base_block_shape),
   callout.extend(base_block_shape),
   toggle.extend(base_block_shape),
+  column_list.extend(base_block_shape),
+  column.extend(base_block_shape),
 ]);
 export type block = z.infer<typeof block>;
 
