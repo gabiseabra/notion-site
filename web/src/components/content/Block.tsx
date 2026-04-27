@@ -265,7 +265,7 @@ export function Block({
             {children}
           </Accordion>
         ))
-        .with({ type: "column_list" }, () => <Row>{children}</Row>)
+        .with({ type: "column_list" }, () => <Row gap={2}>{children}</Row>)
         .with({ type: "column" }, (block) => (
           <Col flex={block.column.width_ratio}>{children}</Col>
         ))
