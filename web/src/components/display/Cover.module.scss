@@ -7,13 +7,15 @@
 .has-image {
   padding-top: calc(var(--space) * 14);
   padding-bottom: calc(var(--space) * 10);
-  text-shadow:
-    text.shadow-outline(var(--color-shadow), 0.25px),
-    text.shadow-outline(var(--color-shadow), 0.25px),
-    0 5px 10px var(--color-shadow),
-    0 5px 10px var(--color-shadow),
-    0 5px 8px var(--color-shadow),
-    0 5px 5px var(--color-shadow);
+  h1 {
+    text-shadow:
+      text.shadow-outline(var(--color-shadow), 0.25px),
+      text.shadow-outline(var(--color-shadow), 0.25px),
+      0 5px 10px var(--color-shadow),
+      0 5px 10px var(--color-shadow),
+      0 5px 8px var(--color-shadow),
+      0 5px 5px var(--color-shadow);
+  }
 }
 
 .cover-image {
