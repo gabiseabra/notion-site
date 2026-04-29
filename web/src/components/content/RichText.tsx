@@ -10,6 +10,7 @@ import { ContentEditableProps } from "./editable/types.js";
 export type RichTextProps = {
   value: Notion.RichText;
   size?: TextProps["size"];
+  color?: TextProps["color"];
 } & ContentEditableProps;
 
 /**
