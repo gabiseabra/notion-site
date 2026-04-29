@@ -67,7 +67,7 @@ export function getRouteByResource({ id, url, parent }: NotionResource) {
       .map((route) => ({
         ...route,
         id,
-        path: route.path.replace("*", url.replace(/^\//, "")),
+        path: route.path.replace("*", url.replace(/^\/(?:p\/)?/, "")),
       }))
       .pop() ??
     getFallbackRoute(url)
