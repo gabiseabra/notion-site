@@ -18,18 +18,20 @@ export function Image({
 
   return (
     <Col style={{ marginLeft: css.indent(indent) }}>
-      <img
-        style={{
-          maxWidth: "100%",
-          height: "auto",
-          cursor: "pointer",
-          ...style,
-        }}
-        onClick={() => setIsOpen(true)}
-        {...props}
-      />
+      <div style={{ width: "fit-content", margin: "auto" }}>
+        <img
+          style={{
+            maxWidth: "100%",
+            height: "auto",
+            cursor: "pointer",
+            ...style,
+          }}
+          onClick={() => setIsOpen(true)}
+          {...props}
+        />
 
-      {caption && <div>{caption}</div>}
+        {caption && <div>{caption}</div>}
+      </div>
 
       <Lightbox
         open={isOpen}
