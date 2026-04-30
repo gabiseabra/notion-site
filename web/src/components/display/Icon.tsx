@@ -112,6 +112,7 @@ export function IconControl({
         ...css.getMarginStyles(props),
       }}
       onClick={disabled || readOnly ? undefined : () => onClick?.()}
+      disabled={disabled}
       {...omit(props, [...css.paddingProps, ...css.marginProps])}
     >
       {children}

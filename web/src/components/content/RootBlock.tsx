@@ -8,6 +8,7 @@ import { isNonNullable } from "@notion-site/common/utils/guards.js";
 import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { Fragment, ReactNode } from "react";
 import { match } from "ts-pattern";
+import { GalleryProvider } from "../display/Gallery";
 import { Block } from "./Block.js";
 
 type RootBlockProps = {
@@ -28,27 +29,31 @@ export function RootBlock({
   value,
   render = (children, block) => <Block value={block}>{children}</Block>,
 }: RootBlockProps) {
-  return Notion.BlockTree.map<ReactNode>(
-    Notion.BlockTree.create(value),
-    (children, block, path) => (
-      <Fragment key={block.id}>{render(children, block, path)}</Fragment>
-    ),
-    (children, branch) =>
-      match(branch)
-        .with({ type: "block" }, () => children)
-        .with({ type: "bulleted_list" }, ({ id }) => (
-          <ul key={id}>{children}</ul>
-        ))
-        .with({ type: "numbered_list" }, ({ id, children: items }) => (
-          <ol
-            key={id}
-            start={items
-              .map((item) => item.numbered_list_item.list_start_index)
-              .find(isNonNullable)}
-          >
-            {children}
-          </ol>
-        ))
-        .exhaustive(),
+  return (
+    <GalleryProvider>
+      {Notion.BlockTree.map<ReactNode>(
+        Notion.BlockTree.create(value),
+        (children, block, path) => (
+          <Fragment key={block.id}>{render(children, block, path)}</Fragment>
+        ),
+        (children, branch) =>
+          match(branch)
+            .with({ type: "block" }, () => children)
+            .with({ type: "bulleted_list" }, ({ id }) => (
+              <ul key={id}>{children}</ul>
+            ))
+            .with({ type: "numbered_list" }, ({ id, children: items }) => (
+              <ol
+                key={id}
+                start={items
+                  .map((item) => item.numbered_list_item.list_start_index)
+                  .find(isNonNullable)}
+              >
+                {children}
+              </ol>
+            ))
+            .exhaustive(),
+      )}
+    </GalleryProvider>
   );
 }
