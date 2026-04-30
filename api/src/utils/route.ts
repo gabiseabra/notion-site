@@ -1,6 +1,10 @@
 import { NotionResource } from "@notion-site/common/dto/notion/resource.js";
+import { zNotion } from "@notion-site/common/dto/notion/schema/index.js";
 import { Route } from "@notion-site/common/dto/route.js";
+import { hasPropertyValue } from "@notion-site/common/utils/guards.js";
+import { Notion } from "@notion-site/common/utils/notion/index.js";
 import { isUuid, uuidEquals } from "@notion-site/common/utils/uuid.js";
+import slug from "limax";
 import * as env from "../env.js";
 
 function getRouteById(pageId: string): Route | undefined {
@@ -31,12 +35,12 @@ function getRouteByPath(path: string): Route | undefined {
     return {
       ...route,
       id: uuid,
-      path: route.path.replace("*", wildcardPart),
+      path: route.path.replace("*", slugify({ id: uuid })),
     };
   }
 }
 
-function getFallbackRoute(id: string) {
+function getFallbackRoute(id: string, resource?: NotionResource) {
   const uuid = extractUuid(id);
   const fallbackRoute = env.routes.find((r) => r.id === "*" && !r.parent);
 
@@ -44,12 +48,14 @@ function getFallbackRoute(id: string) {
     return {
       ...fallbackRoute,
       id: uuid,
-      path: fallbackRoute.path.replace("*", id.replace(/^\\/, "")),
+      path: fallbackRoute.path.replace("*", slugify(resource ?? { id: uuid })),
     };
   }
 }
 
-export function getRouteByResource({ id, url, parent }: NotionResource) {
+export function getRouteByResource(resource: NotionResource) {
+  const { id, url, parent } = resource;
+
   return (
     getRouteById(url) ??
     env.routes
@@ -67,10 +73,10 @@ export function getRouteByResource({ id, url, parent }: NotionResource) {
       .map((route) => ({
         ...route,
         id,
-        path: route.path.replace("*", url.replace(/^\/(?:p\/)?/, "")),
+        path: route.path.replace("*", slugify(resource)),
       }))
       .pop() ??
-    getFallbackRoute(url)
+    getFallbackRoute(url, resource)
   );
 }
 
@@ -84,8 +90,25 @@ export function matchRoute(pathOrId: string): Route | undefined {
 
 export function extractUuid(id: string) {
   if (isUuid(id)) return id;
-  if (id.startsWith("/")) return;
   const uuidPart = id.split("-").pop();
   if (!uuidPart || !isUuid(uuidPart)) return;
   return uuidPart;
+}
+
+function slugify({
+  id,
+  properties,
+}: {
+  id: string;
+  properties?: zNotion.properties.Properties;
+}) {
+  const title =
+    properties &&
+    Object.values(properties).find(hasPropertyValue("type", "title"));
+  const titleSlug =
+    title && slug(Notion.titleToString(title) ?? "", { tone: false });
+
+  if (!titleSlug) return id;
+
+  return `${titleSlug}-${id}`;
 }
