@@ -223,8 +223,8 @@ export const getNotionPage = memoize(_getNotionPage, {
  * Recursively fetches all blocks for a page (depth-first) and parses them.
  */
 async function _getNotionBlocks(id: string) {
-  const blocks: zNotion.blocks.block[] = [];
-  const errors: { id: string; error: Error }[] = [];
+  const blocks: zNotion.blocks.block[][] = [];
+  const errors: { id: string; error: Error }[][] = [];
 
   let cursor = undefined;
 
@@ -242,42 +242,46 @@ async function _getNotionBlocks(id: string) {
 
     if (!response) return null;
 
-    for (const block of response.results) {
-      if (!isFullBlock(block)) {
-        errors.push({
-          id: block.id,
-          error: new Error("Expected a full block response."),
-        });
+    await Promise.all(
+      response.results.map(async (block, index) => {
+        if (!isFullBlock(block)) {
+          errors[index] = [
+            {
+              id: block.id,
+              error: new Error("Expected a full block response."),
+            },
+          ];
 
-        continue;
-      }
-
-      const parseResult = zNotion.blocks.block.safeParse(block);
-
-      if (!parseResult.success) {
-        errors.push({ id: block.id, error: parseResult.error });
-        console.warn(`Failed to parse block`, block);
-      } else {
-        const block = parseResult.data;
-
-        blocks.push(block);
-
-        if (block.has_children && block.type !== "child_page") {
-          const children = (await getNotionBlocks(block.id)) ?? {
-            blocks: [],
-            errors: [],
-          };
-
-          blocks.push(...children.blocks);
-          errors.push(...children.errors);
+          return;
         }
-      }
-    }
+
+        const parseResult = zNotion.blocks.block.safeParse(block);
+
+        if (!parseResult.success) {
+          errors[index] = [{ id: block.id, error: parseResult.error }];
+          console.warn(`Failed to parse block`, block);
+        } else {
+          const block = parseResult.data;
+
+          blocks[index] = [block];
+
+          if (block.has_children && block.type !== "child_page") {
+            const children = (await getNotionBlocks(block.id)) ?? {
+              blocks: [],
+              errors: [],
+            };
+
+            blocks[index].push(...children.blocks);
+            errors[index] = children.errors;
+          }
+        }
+      }),
+    );
 
     cursor = response.has_more ? response.next_cursor : undefined;
   } while (cursor);
 
-  return { blocks, errors };
+  return { blocks: blocks.flat(), errors: errors.flat() };
 }
 
 export const getNotionBlocks = memoize(_getNotionBlocks, {
