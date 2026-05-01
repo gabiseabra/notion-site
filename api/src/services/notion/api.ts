@@ -265,6 +265,8 @@ async function _getNotionBlocks(id: string) {
 
           blocks[index] = [block];
 
+          if (block.type === "image") getNotionMediaBlock.set(block, block.id);
+
           if (block.has_children && block.type !== "child_page") {
             const children = (await getNotionBlocks(block.id)) ?? {
               blocks: [],
@@ -286,5 +288,38 @@ async function _getNotionBlocks(id: string) {
 
 export const getNotionBlocks = memoize(_getNotionBlocks, {
   cache: new MemoryCache({ ttl: 60_000 }),
+  hash: (id) => id,
+});
+
+/**
+ * Get a single notion block by id.
+ */
+async function _getNotionMediaBlock(id: string) {
+  const response = await notion.blocks.retrieve({
+    block_id: id,
+  });
+
+  if (!response) return null;
+
+  const parseResult = zNotion.blocks.block.safeParse(response);
+
+  if (!parseResult.success)
+    throw new Error(
+      `Failed to parse block ${id}: ${showError({
+        error: parseResult.error,
+        response,
+      })}`,
+    );
+
+  if (parseResult.data.type !== "image")
+    throw new Error(
+      `Invalid block type ${id}: expected "image", got "${parseResult.data.type}"`,
+    );
+
+  return parseResult.data;
+}
+
+export const getNotionMediaBlock = memoize(_getNotionMediaBlock, {
+  cache: new MemoryCache({ ttl: 15 * 60_000 }),
   hash: (id) => id,
 });

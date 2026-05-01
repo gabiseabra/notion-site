@@ -255,7 +255,7 @@ export const column = z.object({
 export type column = z.infer<typeof column>;
 
 export const base_block_shape = {
-  id: z.string(),
+  id: z.string().transform((id) => id.replace(/-/g, "")),
   parent: z.union([page_id, block_id]),
   has_children: z.boolean(),
 };

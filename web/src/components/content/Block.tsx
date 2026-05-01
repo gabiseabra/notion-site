@@ -5,6 +5,7 @@ import { createContext, ReactNode, Ref, useContext } from "react";
 import { pipe } from "ts-functional-pipe";
 import { match } from "ts-pattern";
 import * as css from "../../css/index.js";
+import * as env from "../../env";
 import { Accordion } from "../display/Accordion.js";
 import { Callout } from "../display/Callout.js";
 import { Image } from "../display/Image.js";
@@ -232,10 +233,7 @@ export function Block({
                   />
                 )
               }
-              src={match(data.image)
-                .with({ type: "external" }, ({ external }) => external.url)
-                .with({ type: "file" }, ({ file }) => file.url)
-                .exhaustive()}
+              src={`${env.API_URL}/media/${data.id}`}
             />
 
             <IndentationLevel.Provider value={indent + 1}>

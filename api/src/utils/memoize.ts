@@ -32,7 +32,10 @@ export type MemoizeOptions<Args extends unknown[], Value> = {
 export function memoize<F extends (...args: any[]) => Promise<any>>(
   fn: F,
   options: MemoizeOptions<Parameters<F>, Awaited<ReturnType<F>>>,
-): F;
+): F & {
+  set(value: Awaited<ReturnType<F>>, ...args: Parameters<F>): void;
+  clear(): void;
+};
 export function memoize<Args extends unknown[], Value>(
   fn: (...args: Args) => Promise<Value>,
   { cache, hash, skip }: MemoizeOptions<Args, Value>,
@@ -40,30 +43,41 @@ export function memoize<Args extends unknown[], Value>(
   const store = cache ?? new MemoryCache<Value>({});
   const inflight = new Map<string, Promise<Value>>();
 
-  return async (...args: Args) => {
-    if (skip?.(...args)) {
-      return await fn(...args);
-    }
+  return Object.assign(
+    async (...args: Args) => {
+      if (skip?.(...args)) {
+        return await fn(...args);
+      }
 
-    const key = hash(...args);
-    const cached = await store.get(key);
-    if (cached !== undefined) {
-      return cached;
-    }
+      const key = hash(...args);
+      const cached = await store.get(key);
+      if (cached !== undefined) {
+        return cached;
+      }
 
-    const existing = inflight.get(key);
-    if (existing) return existing;
+      const existing = inflight.get(key);
+      if (existing) return existing;
 
-    const run = Promise.resolve(fn(...args))
-      .then(async (value) => {
-        await store.set(key, value);
-        return value;
-      })
-      .finally(() => {
-        inflight.delete(key);
-      });
+      const run = Promise.resolve(fn(...args))
+        .then(async (value) => {
+          await store.set(key, value);
+          return value;
+        })
+        .finally(() => {
+          inflight.delete(key);
+        });
 
-    inflight.set(key, run);
-    return run;
-  };
+      inflight.set(key, run);
+      return run;
+    },
+    {
+      set(value: Value, ...args: Args) {
+        const key = hash(...args);
+        store.set(key, value);
+      },
+      clear() {
+        store.clear();
+      },
+    },
+  );
 }

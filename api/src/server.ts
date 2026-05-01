@@ -7,6 +7,7 @@ import { httpErrorMiddleware } from "./services/express/http-error-middleware.js
 import { streamMiddleware } from "./services/express/stream-middleware.js";
 import { BlogPostsDB } from "./services/notion/database/blog-posts.js";
 import { createNotionDatabaseFeed } from "./services/notion/feed.js";
+import { notionMediaMiddleware } from "./services/notion/media-middleware.js";
 import { nodeRPCHandler } from "./services/orpc/handler.js";
 import { orpcMiddleware } from "./services/orpc/middleware.js";
 import { ViteServer } from "./services/vite/server.js";
@@ -33,6 +34,8 @@ async function createServer() {
           ),
     ),
   );
+
+  app.get("/api/media/:id", notionMediaMiddleware);
 
   app.use(orpcMiddleware("/api", nodeRPCHandler));
 

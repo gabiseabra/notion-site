@@ -8,13 +8,13 @@ export type database_id = z.infer<typeof database_id>;
 
 export const page_id = z.object({
   type: z.literal("page_id"),
-  page_id: z.string(),
+  page_id: z.string().transform((id) => id.replace(/-/g, "")),
 });
 export type page_id = z.infer<typeof page_id>;
 
 export const block_id = z.object({
   type: z.literal("block_id"),
-  block_id: z.string(),
+  block_id: z.string().transform((id) => id.replace(/-/g, "")),
 });
 export type block_id = z.infer<typeof block_id>;
 
