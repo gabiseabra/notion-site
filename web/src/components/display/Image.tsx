@@ -58,7 +58,9 @@ export function Image({
           {...props}
         />
 
-        {caption && <div>{caption}</div>}
+        {caption && (
+          <div style={{ color: "var(--color-muted)" }}>{caption}</div>
+        )}
       </div>
 
       <Lightbox
@@ -71,7 +73,7 @@ export function Image({
                 <IconControl
                   as="button"
                   size="m"
-                  color="currentColor"
+                  color="default"
                   title="Previous image"
                   disabled={!gallery.next(id, "left")}
                   onClick={() => gallery.move("left")}
@@ -86,7 +88,7 @@ export function Image({
                 <IconControl
                   as="button"
                   size="m"
-                  color="currentColor"
+                  color="default"
                   title="Next image"
                   disabled={!gallery.next(id, "right")}
                   onClick={() => gallery.move("right")}

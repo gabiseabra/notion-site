@@ -28,12 +28,12 @@
   margin: var(--gutter-content);
   max-height: min(100%, calc(100vh - var(--gutter-content) * 2));
   border-radius: var(--radius);
+  overflow: clip;
 
   background: var(--bg-from);
   @include shadow.shadow(10, 2);
 
   & > .body {
-    border-radius: var(--radius);
     overflow-y: auto;
     display: flex;
     max-height: calc(100vh - var(--gutter-content) * 2);
@@ -47,6 +47,13 @@
     position: absolute;
     top: 0;
     right: 0;
+
+    > svg {
+      stroke-width: 20px;
+      stroke: #ffffff90;
+      stroke-linecap: round;
+      paint-order: stroke;
+    }
   }
 }
 

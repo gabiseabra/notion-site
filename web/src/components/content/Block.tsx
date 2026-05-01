@@ -226,11 +226,7 @@ export function Block({
               indent={indent}
               caption={
                 data.image.caption.length > 0 && (
-                  <RichText
-                    size="caption"
-                    color="muted"
-                    value={data.image.caption}
-                  />
+                  <RichText size="caption" value={data.image.caption} />
                 )
               }
               src={`${env.API_URL}/media/${data.id}`}
