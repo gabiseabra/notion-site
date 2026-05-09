@@ -18,15 +18,16 @@ export function Layout({ children }: { children: ReactNode }) {
       <main>{children}</main>
 
       <footer>
-        <p>
+        <div>
           <a href="https://gabiseabra.dev">gabiseabra.dev</a> &copy; 2025
-        </p>
+          <nav className={styles["footer-nav"]}>
+            <Link to="/blog">Blog</Link>
+            <a href="https://rss.gabiseabra.dev/feed">RSS</a>
+            <a href="mailto:hey@gabiseabra.dev">Email</a>
+          </nav>
+        </div>
 
-        <nav>
-          <Link to="/blog">Blog</Link>
-          <a href="https://rss.gabiseabra.dev/feed">RSS</a>
-          <a href="mailto:hey@gabiseabra.dev">Email</a>
-        </nav>
+        <div>Feito com amor 🫀 sem robô</div>
       </footer>
     </div>
   );
