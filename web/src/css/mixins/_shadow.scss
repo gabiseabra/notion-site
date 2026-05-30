@@ -17,6 +17,6 @@
   box-shadow: $shadows;
 }
 
-@mixin border {
-  border: 1px solid color-mix(in oklch, var(--color-shadow), white 45%);
+@mixin border($width: 1px) {
+  border: $width solid color-mix(in oklch, var(--color-shadow), white 45%);
 }

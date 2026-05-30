@@ -22,7 +22,7 @@
   background: var(--bg-from);
   border-radius: var(--radius);
 
-  @include shadow.border;
+  @include shadow.border(0.5px);
 
   > input {
     flex: 1;
